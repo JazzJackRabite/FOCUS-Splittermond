@@ -107,6 +107,16 @@ Repository `JazzJackRabite/FOKUS-1.0-claudeedition` (Branch `main`; entstanden a
 - Bücher kommen nur noch über Einstellungen → Regelpakete. Alte Einträge der früheren Modul- und Beschreibungsverwaltung im
   Browserspeicher werden nicht mehr gelesen (nicht gelöscht).
 
+## Stand 9 (05.11.2026): Bedingte Wirkungen beim Würfeln
+
+- Probe, Angriff und Zauber zeigen einen Abschnitt „Stärken & Meisterschaften“ mit den bedingten Wirkungen, die zu diesem Wurf passen
+  können (`situativeBoni()` in `regelwerk/wirkungen.ts`, Anzeige in `components/play/SituativeBoni.tsx`). Der Spieler klickt an,
+  was in der Lage zutrifft; der Bonus fließt in den Wurf und steht im Würfelprotokoll.
+- Zugeordnet: Boni auf die gewürfelte Fertigkeit (auch Waffen- und Magieschulfertigkeit), auf „Proben“ allgemein, auf Angriffe
+  (Nahkampfangriffe nicht bei Schuss-/Wurfwaffen) und auf Zauber. Zusatzschaden, SR ignorieren und Schadensboni erscheinen beim
+  Angriff nur als Hinweis; Manöver-Wirkungen stecken weiter in der Manöverauswahl.
+- Ohne Regelpakete oder ohne passende Wirkung erscheint der Abschnitt nicht.
+
 ## Nächste Schritte
 
 Die geplanten Schritte sind erledigt. Offen bleiben Ideen wie Spielhilfen für bedingte Wirkungen (z. B. Bonus gegen Typus per Klick

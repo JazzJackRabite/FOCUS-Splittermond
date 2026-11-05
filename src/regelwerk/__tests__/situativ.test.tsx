@@ -1,0 +1,59 @@
+/**
+ * Bedingte Wirkungen beim Würfeln: passende Boni je Wurf, anklickbar im Probendialog.
+ */
+import React from 'react';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { Katalog } from '../katalog';
+import { basisAusDateien } from './hilfen';
+import { setzeAktivenKatalog } from '../bruecke';
+import { situativeBoni, wirkungenDesCharakters } from '../wirkungen';
+import { CharacterContext } from '../../context/CharacterContext';
+import { RollModal } from '../../components/play/RollModal';
+import { DEFAULT_STATE } from '../../hooks/useCharacterState';
+
+const b = basisAusDateien();
+const K = new Katalog(b.manifest, [b.basis]);
+const IDS = ['grw:staerke:feine-nase', 'grw:staerke:orientierungssinn', 'grw:meisterschaft:arkane-kunde:jaeger-des-uebernatuerlichen',
+  'grw:meisterschaft:heimlichkeit:ueberraschungsangriff-i', 'grw:meisterschaft:beherrschungsmagie:einfuehlsamkeit'];
+const liste = wirkungenDesCharakters(K, IDS);
+const namen = (l: ReturnType<typeof situativeBoni>) => l.map(x => `${x.quelle}:${x.wert}`);
+
+describe('Situative Boni je Wurf', () => {
+  it('Probe: Fertigkeitsbonus nur für die passende Fertigkeit, allgemeine Probenboni immer', () => {
+    expect(namen(situativeBoni(K, liste, 'probe', 'Wahrnehmung'))).toEqual(['Feine Nase:2', 'Orientierungssinn:3']);
+    expect(namen(situativeBoni(K, liste, 'probe', 'Athletik'))).toEqual(['Orientierungssinn:3']);
+  });
+  it('Angriff: Angriffsbonus verrechenbar, Zusatzschaden nur als Hinweis', () => {
+    expect(namen(situativeBoni(K, liste, 'angriff', 'Klingenwaffen'))).toEqual(['Orientierungssinn:3', 'Jäger des Übernatürlichen:3', 'Überraschungsangriff I:null']);
+  });
+  it('Zauber: keine Angriffsboni; dauerhafte Wirkungen erscheinen nie', () => {
+    const z = namen(situativeBoni(K, liste, 'zauber', 'Beherrschungsmagie'));
+    expect(z).toEqual(['Orientierungssinn:3']);
+  });
+});
+
+describe('Probendialog', () => {
+  beforeAll(() => setzeAktivenKatalog(K, false));
+  afterAll(() => setzeAktivenKatalog(null, false));
+
+  it('Bonus anklicken erhöht den Gesamt-Modifikator', () => {
+    const calc = { wirkungen: { liste, fertigkeitsBoni: {} } } as never;
+    render(
+      <CharacterContext.Provider value={{ state: DEFAULT_STATE, dispatch: () => {}, calc }}>
+        <RollModal skillName="Wahrnehmung" baseValue={10} onClose={() => {}} />
+      </CharacterContext.Provider>,
+    );
+    expect(screen.getByTestId('situative-boni')).toBeTruthy();
+    expect(screen.queryByText('Gesamt-Modifikator:')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: /Feine Nase/ }));
+    expect(screen.getByText('Gesamt-Modifikator:').nextSibling?.textContent).toBe('+2');
+    fireEvent.click(screen.getByRole('button', { name: /Orientierungssinn/ }));
+    expect(screen.getByText('Gesamt-Modifikator:').nextSibling?.textContent).toBe('+5');
+  });
+
+  it('ohne Charakterkontext kein Abschnitt', () => {
+    render(<RollModal skillName="Wahrnehmung" baseValue={10} onClose={() => {}} />);
+    expect(screen.queryByTestId('situative-boni')).toBeNull();
+  });
+});

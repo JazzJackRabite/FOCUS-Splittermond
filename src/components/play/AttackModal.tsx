@@ -94,6 +94,7 @@ export interface AttackModalProps {
 
 type RollType = 'standard' | 'safe' | 'risk';
 import { wuerfeln } from '../../utils/wuerfeln';
+import { SituativeBoni, useSituativeBoni } from './SituativeBoni';
 
 export const AttackModal: React.FC<AttackModalProps> = ({
   target,
@@ -109,6 +110,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
 }) => {
   const modalHeadingId = useId();
   const { weapon, skillName, skillTotal } = target;
+  const situativ = useSituativeBoni('angriff', skillName);
 
   // Available Maneuvers (Free + Masteries) filtered strictly by weapon category & skill
   const availableManeuvers = useMemo(() => {
@@ -179,6 +181,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
     totalConditionPenalty +
     situationalMod +
     situationPresetBonus +
+    situativ.summe +
     (target.customBonus ?? 0);
 
   // Step 2: Roll Execution & State
@@ -325,7 +328,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
           id: `atk_${Date.now()}`,
           type: 'roll',
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          label: `Angriff mit ${weapon.name} (${selectedManeuver.name})`,
+          label: `Angriff mit ${weapon.name} (${selectedManeuver.name})${situativ.labels.length ? ` [${situativ.labels.join(', ')}]` : ''}`,
           d10s: rollDice,
           baseVal: totalAttackModifier,
           modifier: extraSPBonus,
@@ -362,7 +365,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
           id: `atk_miss_${Date.now()}`,
           type: 'roll',
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          label: `Angriff mit ${weapon.name} (${selectedManeuver.name})`,
+          label: `Angriff mit ${weapon.name} (${selectedManeuver.name})${situativ.labels.length ? ` [${situativ.labels.join(', ')}]` : ''}`,
           d10s: rollDice,
           baseVal: totalAttackModifier,
           modifier: extraSPBonus,
@@ -571,6 +574,8 @@ export const AttackModal: React.FC<AttackModalProps> = ({
               </div>
             </div>
 
+            <SituativeBoni boni={situativ.boni} gewaehlt={situativ.gewaehlt} onToggle={situativ.umschalten} dunkel />
+
             {/* Situational Toggles */}
             <div className="flex flex-wrap gap-2 pt-2 border-t border-[#2a3c54]/60 text-xs">
               <button
@@ -768,6 +773,9 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                 )}
                 {totalConditionPenalty !== 0 && (
                   <span className="text-red-400">({totalConditionPenalty} Zustand)</span>
+                )}
+                {situativ.summe !== 0 && (
+                  <span className="text-emerald-400">({situativ.summe > 0 ? '+' : ''}{situativ.summe} Stärken/Meisterschaften)</span>
                 )}
                 {situationalMod + situationPresetBonus !== 0 && (
                   <span className="text-emerald-400">

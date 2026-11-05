@@ -99,3 +99,51 @@ export function wirkungKurz(w: Wirkung): string {
     default: return w.beleg;
   }
 }
+
+// ---------------------------------------------------------------- Situative Boni beim Würfeln
+export type WurfArtKontext = 'probe' | 'angriff' | 'zauber';
+
+export interface SituativerBonus {
+  /** eindeutig je Wirkung des Charakters */
+  id: string;
+  quelle: string;
+  /** Bonus (positiv) oder Malus (negativ); null = nur Hinweis, nicht verrechenbar (z. B. Zusatzschaden) */
+  wert: number | null;
+  text: string;
+  bedingung?: string | null;
+  beleg: string;
+}
+
+const FERNKAMPF = new Set(['Schusswaffen', 'Wurfwaffen']);
+
+/**
+ * Bedingte Wirkungen, die zu diesem Wurf passen könnten: Der Spieler entscheidet, ob die Lage zutrifft.
+ * - Fertigkeitsboni der gewürfelten Fertigkeit (auch Waffen- und Magieschulfertigkeit), Boni auf „Proben“ allgemein
+ * - Angriff: Boni auf Angriffe (Nahkampfangriffe nur im Nahkampf); Zusatzschaden, SR ignorieren und Schadensboni als Hinweis
+ *   (Wirkungen „beim Manöver“ stecken in der Manöverauswahl und erscheinen hier nicht)
+ * - Zauber: Boni auf Zauber; Schadensboni als Hinweis
+ */
+export function situativeBoni(k: Katalog, liste: CharakterWirkung[], art: WurfArtKontext, fertigkeit: string): SituativerBonus[] {
+  const out: SituativerBonus[] = [];
+  const nahkampf = !FERNKAMPF.has(fertigkeit);
+  liste.forEach((cw, i) => {
+    // Manöver-Wirkungen stecken in der Manöverauswahl des Angriffs; hier nur bedingte Wirkungen
+    if (cw.status !== 'bedingt') return;
+    const w = cw.wirkung;
+    const zahl = typeof w.wert === 'number' ? (w.art === 'malus' ? -w.wert : w.wert) : null;
+    let passt = false; let nurHinweis = false;
+    if ((w.art === 'bonus' || w.art === 'malus') && cw.status === 'bedingt') {
+      if (w.bezug === 'fertigkeit') passt = (w.fertigkeit_refs ?? []).some(r => (k.get(r.id)?.name ?? r.text) === fertigkeit);
+      else if (w.bezug === 'proben') passt = true;
+      else if (w.bezug === 'angriff') passt = art === 'angriff';
+      else if (w.bezug === 'nahkampfangriff') passt = art === 'angriff' && nahkampf;
+      else if (w.bezug === 'zauber') passt = art === 'zauber';
+      else if (w.bezug === 'schaden') { passt = art === 'angriff' || art === 'zauber'; nurHinweis = true; }
+    } else if (art === 'angriff' && cw.status === 'bedingt' && (w.art === 'zusatzschaden' || w.art === 'sr_ignorieren')) {
+      passt = true; nurHinweis = true;
+    }
+    if (!passt) return;
+    out.push({ id: `${cw.quelle}#${i}`, quelle: cw.quelleName, wert: nurHinweis ? null : zahl, text: wirkungKurz(w), bedingung: w.bedingung, beleg: w.beleg });
+  });
+  return out;
+}

@@ -41,6 +41,7 @@ import { generateId } from '../../utils/id';
 import type { RollEntry } from './DiceLog';
 import { getActiveRollModifiers } from '../../utils/conditionModifiers';
 import { wuerfeln } from '../../utils/wuerfeln';
+import { SituativeBoni, useSituativeBoni } from './SituativeBoni';
 
 export interface CastSpellSuccessResult {
   spell: Spell;
@@ -139,7 +140,8 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
   }, [conditionMods]);
 
   // Total skill modifier
-  const totalRollModifier = schoolSkillTotal + woundPenalty + totalConditionPenalty + situationalMod;
+  const situativ = useSituativeBoni('zauber', schoolSkillName);
+  const totalRollModifier = schoolSkillTotal + woundPenalty + totalConditionPenalty + situationalMod + situativ.summe;
 
   // Step 2: Roll execution & state
   const [hasRolled, setHasRolled] = useState<boolean>(false);
@@ -308,7 +310,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
           id: generateId(),
           type: 'roll',
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-          label: `Zauberprobe: ${spell.name} (${schoolSkillName}) [${type === 'standard' ? 'Standard' : type === 'safe' ? 'Sicherheit' : 'Risiko'}]`,
+          label: `Zauberprobe: ${spell.name} (${schoolSkillName}) [${type === 'standard' ? 'Standard' : type === 'safe' ? 'Sicherheit' : 'Risiko'}]${situativ.labels.length ? ` [${situativ.labels.join(', ')}]` : ''}`,
           d10s,
           baseVal: schoolSkillTotal,
           modifier: totalRollModifier - schoolSkillTotal,
@@ -663,6 +665,11 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                     Zustände {totalConditionPenalty}
                   </span>
                 )}
+                {situativ.summe !== 0 && (
+                  <span className="bg-[#2F5D3A] text-white border border-[#244a2e] px-2 py-0.5 rounded font-mono">
+                    Stärken/MS {situativ.summe > 0 ? '+' : ''}{situativ.summe}
+                  </span>
+                )}
                 <div className="flex items-center gap-1 bg-white border border-[#d1c4b0] px-1.5 py-0.5 rounded text-xs">
                   <span className="text-stone-500">Sit.:</span>
                   <button
@@ -686,6 +693,8 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                 </span>
               </div>
             </div>
+
+            <SituativeBoni boni={situativ.boni} gewaehlt={situativ.gewaehlt} onToggle={situativ.umschalten} />
 
             {/* Roll Buttons or Roll Result */}
             {!hasRolled ? (

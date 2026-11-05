@@ -9,6 +9,7 @@ import {
   isSkillAffectedByBehinderung,
   type ActiveRollModifier,
 } from '../../utils/conditionModifiers';
+import { SituativeBoni, useSituativeBoni } from './SituativeBoni';
 
 // ---------------------------------------------------------------
 // Dice roll logic (RAW)
@@ -169,6 +170,7 @@ export const RollModal: React.FC<RollModalProps> = ({
   }, [activeModifiers, conditions, woundPenalty, healthLevelName, behinderung, skillName]);
 
   const [modifiersList, setModifiersList] = useState<ActiveRollModifier[]>(initialModifiers);
+  const situativ = useSituativeBoni('probe', skillName);
   const [extraModifier, setExtraModifier] = useState(0);
   const [extraModifierStr, setExtraModifierStr] = useState('0');
   const [schwierigkeit, setSchwierigkeit] = useState<number | null>(initialSchwierigkeit ?? null);
@@ -193,7 +195,7 @@ export const RollModal: React.FC<RollModalProps> = ({
     .reduce((sum, m) => sum + m.malus, 0);
 
   const splinterModifier = splinterBonusSpent ? 3 : 0;
-  const effectiveModifier = conditionMalusTotal + extraModifier + splinterModifier;
+  const effectiveModifier = conditionMalusTotal + situativ.summe + extraModifier + splinterModifier;
   const diceCount = (rollType === 'risk' ? 4 : 2) + (grossmeister ? 1 : 0);
 
   const toggleModifier = (id: string) => {
@@ -217,7 +219,7 @@ export const RollModal: React.FC<RollModalProps> = ({
       setIsRolling(false);
       setResult(r);
 
-      const currentEffMod = conditionMalusTotal + extraModifier + (bonusApplied ? 3 : 0);
+      const currentEffMod = conditionMalusTotal + situativ.summe + extraModifier + (bonusApplied ? 3 : 0);
       const computedTotal = baseValue + r.result + currentEffMod;
       const computedEg =
         schwierigkeit !== null
@@ -227,6 +229,7 @@ export const RollModal: React.FC<RollModalProps> = ({
       const activeConditionLabels = modifiersList
         .filter((m) => m.active)
         .map((m) => `${m.label} (${m.malus >= 0 ? `+${m.malus}` : m.malus})`);
+      activeConditionLabels.push(...situativ.labels);
 
       if (bonusApplied) {
         activeConditionLabels.push('Splitterpunkt +3');
@@ -271,7 +274,7 @@ export const RollModal: React.FC<RollModalProps> = ({
     setSplinterBonusSpent(true);
 
     if (result && onRecordRoll) {
-      const newEffMod = conditionMalusTotal + extraModifier + 3;
+      const newEffMod = conditionMalusTotal + situativ.summe + extraModifier + 3;
       const newComputedTotal = baseValue + result.result + newEffMod;
       const newComputedEg =
         schwierigkeit !== null
@@ -281,6 +284,7 @@ export const RollModal: React.FC<RollModalProps> = ({
       const activeConditionLabels = modifiersList
         .filter((m) => m.active)
         .map((m) => `${m.label} (${m.malus >= 0 ? `+${m.malus}` : m.malus})`);
+      activeConditionLabels.push(...situativ.labels);
       activeConditionLabels.push('Splitterpunkt +3');
 
       onRecordRoll({
@@ -352,6 +356,8 @@ export const RollModal: React.FC<RollModalProps> = ({
         </div>
 
         {/* Zustands- & Wundabzüge (D&D Beyond Style: automatisch eingerechnet und einzeln abwählbar) */}
+        <SituativeBoni boni={situativ.boni} gewaehlt={situativ.gewaehlt} onToggle={situativ.umschalten} />
+
         {modifiersList.length > 0 && (
           <div className="bg-[#e3d4b9] rounded-xl p-3 mb-3 border border-[#d1c4b0]">
             <div className="flex justify-between items-center mb-1.5">
