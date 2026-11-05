@@ -1,0 +1,81 @@
+/// <reference types="vite/client" />
+/**
+ * Laden der Regelpakete im Browser.
+ * - Basis (Grundregelwerk) liegt im Editor: public/regelpakete/manifest.json und grw.srp.json.
+ * - Weitere Bücher lädt die Nutzerin oder der Nutzer als Datei hoch (Regelpakete/editor/buecher/<id>.srp.json);
+ *   sie bleiben im Browser (siehe paketSpeicher.ts) und werden nie an einen Server geschickt.
+ */
+import { Katalog } from './katalog';
+import type { LadePaket, Manifest, PaketInfo, RegelPaket } from './typen';
+
+export const BASIS_ORDNER = 'regelpakete/';
+
+async function sha256Hex(daten: ArrayBuffer): Promise<string | null> {
+  try {
+    if (!globalThis.crypto?.subtle) return null;
+    const h = await globalThis.crypto.subtle.digest('SHA-256', daten);
+    return [...new Uint8Array(h)].map(b => b.toString(16).padStart(2, '0')).join('');
+  } catch {
+    return null;
+  }
+}
+
+export interface Basis { manifest: Manifest; basis: LadePaket; warnungen: string[] }
+
+/** Lädt Manifest und Grundregelwerk aus dem public-Ordner des Editors. */
+export async function ladeBasis(basisUrl: string = (import.meta.env?.BASE_URL ?? '/') + BASIS_ORDNER, abruf: typeof fetch = fetch): Promise<Basis> {
+  const warnungen: string[] = [];
+  const mRes = await abruf(basisUrl + 'manifest.json');
+  if (!mRes.ok) throw new Error(`Regelpakete: manifest.json nicht ladbar (${mRes.status})`);
+  const manifest = (await mRes.json()) as Manifest;
+  const info = manifest.pakete.find(p => p.id === manifest.basis_paket);
+  if (!info?.datei) throw new Error('Regelpakete: Basispaket fehlt im Manifest');
+  const pRes = await abruf(basisUrl + info.datei);
+  if (!pRes.ok) throw new Error(`Regelpakete: ${info.datei} nicht ladbar (${pRes.status})`);
+  const roh = await pRes.arrayBuffer();
+  const sha = await sha256Hex(roh);
+  if (sha && info.sha256 && sha !== info.sha256) warnungen.push(`${info.datei}: Prüfsumme stimmt nicht mit dem Manifest überein`);
+  const paket = JSON.parse(new TextDecoder('utf-8').decode(roh)) as RegelPaket;
+  return { manifest, basis: { info, paket, erwarteteEintraege: info.eintraege }, warnungen };
+}
+
+/** Liest ein hochgeladenes Buchpaket und prüft, ob es zum Editor passt. Wirft einen Fehler mit verständlicher Meldung. */
+export function buchpaketLesen(text: string, manifest: Manifest): LadePaket {
+  let paket: RegelPaket;
+  try {
+    paket = JSON.parse(text);
+  } catch {
+    throw new Error('Die Datei ist kein gültiges JSON.');
+  }
+  if (paket?.format !== 'splittermond-regelpaket' || !Array.isArray(paket.eintraege) || !paket.paket?.id) {
+    throw new Error('Die Datei ist kein Splittermond-Regelpaket (Format „splittermond-regelpaket“).');
+  }
+  const id = paket.paket.id;
+  if (id === manifest.basis_paket) throw new Error('Das Grundregelwerk ist bereits im Editor enthalten.');
+  const bekannt = manifest.bekannte_pakete?.find(p => p.id === id);
+  const li = paket.ladeinfo;
+  if (!li && !bekannt) throw new Error(`Unbekanntes Buch „${id}“ ohne Ladeangaben. Bitte die Datei aus Regelpakete/editor/buecher verwenden.`);
+  const info: PaketInfo = {
+    id,
+    titel: paket.paket.titel,
+    kuerzel: paket.paket.kuerzel,
+    erscheinungsjahr: paket.paket.erscheinungsjahr,
+    ladereihenfolge: li?.ladereihenfolge ?? bekannt!.ladereihenfolge,
+    abhaengigkeiten: li?.abhaengigkeiten ?? bekannt!.abhaengigkeiten,
+    optionale_pakete: li?.optionale_pakete ?? bekannt?.optionale_pakete ?? [],
+    eintraege: paket.eintraege.length,
+  };
+  return { info, paket, regelgruppen: li?.regelgruppen ?? {}, umbenannt: li?.umbenannt ?? {}, erwarteteEintraege: li?.original.eintraege ?? paket.statistik?.eintraege };
+}
+
+/** Baut den Katalog aus Basis und hochgeladenen Büchern. Bücher mit fehlenden Pflicht-Abhängigkeiten werden ausgelassen. */
+export function erstelleKatalog(basis: Basis, buecher: LadePaket[]): { katalog: Katalog; ausgelassen: { id: string; grund: string }[] } {
+  const da = new Set([basis.basis.info.id, ...buecher.map(b => b.info.id)]);
+  const ausgelassen: { id: string; grund: string }[] = [];
+  const nutzbar = buecher.filter(b => {
+    const fehlt = b.info.abhaengigkeiten.filter(a => !da.has(a));
+    if (fehlt.length) ausgelassen.push({ id: b.info.id, grund: `benötigt ${fehlt.join(', ')}` });
+    return !fehlt.length;
+  });
+  return { katalog: new Katalog(basis.manifest, [basis.basis, ...nutzbar]), ausgelassen };
+}

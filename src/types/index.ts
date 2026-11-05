@@ -1,0 +1,360 @@
+import type { RegelIds } from '../regelwerk/ids';
+// ============================================================
+// Race trait types
+// ============================================================
+
+export interface RaceTrait {
+  id: string;
+  label: string;
+  modifiers: Partial<Record<'strengthPoints' | 'resourcePoints' | 'splinterPoints', number>>;
+}
+
+export interface RaceData {
+  gk: number;
+  mods: Partial<Record<string, number>>;
+  freeMods: number;
+  strengths: string[];
+  traits: RaceTrait[];
+}
+
+// ============================================================
+// Character entity types
+// ============================================================
+
+export interface Mastery {
+  id: string;
+  name: string;
+  tier: number;
+  cost: number;
+  isFree: boolean;
+  isCreationBonus: boolean;
+  source: string;
+  page?: number;
+  desc?: string;
+  skill?: string;
+  userNote?: string; // Freitext-Notiz des Benutzers
+}
+
+export interface Spell {
+  name: string;
+  school: string;
+  grade: number;
+  /** Focus cost string from DB (e.g. "1", "K1", "4V1", "5V2") or number for backwards-compatibility */
+  cost: string | number;
+  /** EP cost when learned in XP mode */
+  xpCost?: number;
+  castTime?: string;
+  range?: string;
+  duration?: string;
+  target?: string;
+  description?: string;
+  page?: number;
+  isFree?: boolean;
+  source?: string;
+  sourceMode?: AppMode;
+}
+
+export interface ItemEntry {
+  name: string;
+  level: number;
+  source: string;
+  desc?: string;
+  pointCost?: number;
+  isFree?: boolean;
+  sourceRef?: string;
+  page?: number;
+  isRacial?: boolean;
+  onlyCreation?: boolean;
+}
+
+// ============================================================
+// Play Mode types
+// ============================================================
+
+export interface HealthSlot {
+  type: 'empty' | 'exhausted' | 'consumed' | 'channeled';
+}
+
+export interface FocusState {
+  exhausted: number;
+  channeled: number;
+  consumed: number;
+}
+
+export interface ChanneledSpell {
+  id: string;
+  name: string;
+  channeledFocus: number;
+  school?: string;
+  grade?: number;
+  castTime?: string;
+  duration?: string;
+  range?: string;
+  target?: string;
+  enhancements?: string[];
+  notes?: string;
+  activeRounds?: number;
+  activeTicks?: number;
+  startedAt?: string;
+}
+
+export interface StatusCondition {
+  id: string;
+  key: string;
+  level?: number;
+  note?: string;
+}
+
+export interface PlayState {
+  healthSlots: HealthSlot[];
+  focus: FocusState;
+  splitterPoints: number;
+  channeledSpells: ChanneledSpell[];
+  dyingLevel: 0 | 2 | 3 | 4; // 0 = kein Sterbend, 2 = Sterbend 2 (Wunden), 3 = Sterbend 3 (Wunden), 4 = Tod
+  conditions: StatusCondition[];
+  tempHP: number;      // Total temporary HP granted
+  tempHPUsed: number;  // How many temp HP have been consumed by damage
+  lpModifier: number;  // Manual LP modifier (added to maxLP alongside Robust bonus)
+}
+
+// ============================================================
+// Character state (full)
+// ============================================================
+
+export type AppMode = 'creation' | 'xp' | 'play' | 'combat' | 'inventory';
+
+export interface InventoryItem {
+  id: string;
+  name: string;
+  type: 'weapon' | 'armor' | 'shield' | 'gear' | 'alchemika' | 'other';
+  category?: string;
+  quantity: number;
+  weight?: number; // Last (Weight)
+  price?: string;
+  desc?: string;
+  equipped?: boolean;
+  source?: string;      // e.g. "GRW", "Mondstahlklingen", "Eigen"
+  page?: number;        // e.g. 183
+  // Weapon-specific properties
+  weaponSkill?: string; // e.g. "Klingenwaffen"
+  damage?: string;      // e.g. "1W6+4"
+  wgs?: number | string;// e.g. 8
+  range?: string;       // e.g. "20m"
+  attributes?: string;  // e.g. "Scharf 2, Wuchtig"
+  // Armor / Shield-specific properties
+  vtdBonus?: number;    // e.g. +2
+  sr?: number;          // e.g. 2
+  handicap?: number;    // Behinderung, e.g. 1
+  tickModifier?: number;// e.g. 1
+  minStrength?: number; // e.g. 3
+}
+
+export interface Money {
+  solare: number;  // S (Gold, 1 S = 100 L)
+  lunare: number;  // L (Silber, 1 L = 100 T)
+  telare: number;  // T (Kupfer, 1 T)
+}
+
+export interface AttrMap {
+  AUS: number;
+  BEW: number;
+  INT: number;
+  KON: number;
+  MYS: number;
+  STA: number;
+  VER: number;
+  WIL: number;
+}
+
+export interface AdvancementLogEntry {
+  id: string;
+  timestamp: string;
+  category: 'xp' | 'attr' | 'skill' | 'mastery' | 'spell' | 'strength' | 'resource' | 'language' | 'weakness' | 'note';
+  title: string;
+  detail?: string;
+  xpDelta?: number; // e.g. +15 for XP added, -7 for skill increased, etc.
+}
+
+export interface CharacterState {
+  mode: AppMode;
+  xpTotal: number;
+  name: string;
+  race: string;
+  moonSign: string;
+  homeRegion: string;
+  attrBase: AttrMap;
+  raceBonusAttrs: string[];
+  attrIncrements: AttrMap;
+  skillsBase: Record<string, number>;
+  skillsXp: Record<string, number>;
+  masteries: Record<string, Mastery[]>;
+  strengthsList: ItemEntry[];
+  resourcesList: ItemEntry[];
+  weaknessesList: ItemEntry[];
+  languagesList: ItemEntry[];
+  spellsList: Spell[];
+  playState: PlayState;
+  inventory?: InventoryItem[];
+  money?: Money;
+  advancementLog?: AdvancementLogEntry[];
+  advancementHistory?: CharacterState[];
+  creationFinalized?: boolean;
+  ignoreEncumbrance?: boolean;
+  /** Erschaffung nach Regelwerk: gewählte Kultur- und Abstammungsmodule (Katalog-IDs) und was davon eingetragen wurde */
+  erschaffung?: ErschaffungsWahl;
+  /** Begleiter mit Katalog-ID (Tiergefährte über die Ressource Kreatur, beschworenes Wesen) */
+  begleiter?: Begleiter[];
+  /** Claude-Edition: Regel-IDs zu den gespeicherten Namen (siehe src/regelwerk/ids.ts) */
+  regelIds?: RegelIds;
+}
+
+export interface Begleiter { id: string; art: 'tier' | 'wesen'; name: string; notiz?: string }
+
+export interface ErschaffungsModulWahl {
+  fertigkeiten?: Record<string, string>;
+  ressourcen?: Record<string, string>;
+  staerke?: string;
+  meisterschaft?: number;
+}
+export interface ErschaffungsModulAngewendet {
+  fertigkeiten: Record<string, number>;
+  ressourcen: Record<string, number>;
+  staerke?: { name: string; stufe: number };
+  meisterschaft?: { skill: string; name: string };
+}
+export interface ErschaffungsModulZustand { modul: string; wahl?: ErschaffungsModulWahl; angewendet?: ErschaffungsModulAngewendet }
+export interface ErschaffungsWahl { kultur?: ErschaffungsModulZustand | null; abstammung?: ErschaffungsModulZustand | null }
+
+// ============================================================
+// Reducer actions
+// ============================================================
+
+export type CharacterAction =
+  | { type: 'SET_MODE'; payload: AppMode }
+  | { type: 'UNDO_LAST_ADVANCEMENT' }
+  | { type: 'SET_IGNORE_ENCUMBRANCE'; payload: boolean }
+  | { type: 'PLAY_SET_STATE'; payload: PlayState }
+  | { type: 'SET_CREATION_FINALIZED'; payload: boolean }
+  | { type: 'SET_XP_TOTAL'; payload: number }
+  | { type: 'ADD_XP_WITH_NOTE'; payload: { amount: number; note?: string } }
+  | { type: 'EDIT_XP_TOTAL_WITH_NOTE'; payload: { newTotal: number; note?: string } }
+  | { type: 'ADD_ADVANCEMENT_LOG'; payload: AdvancementLogEntry }
+  | { type: 'REMOVE_ADVANCEMENT_LOG_ENTRY'; payload: string }
+  | { type: 'CLEAR_ADVANCEMENT_LOG' }
+  | { type: 'SET_NAME'; payload: string }
+  | { type: 'SET_RACE'; payload: { race: string; racialStrengths: ItemEntry[]; keptStrengths: ItemEntry[] } }
+  | { type: 'SET_MOON_SIGN'; payload: string }
+  | { type: 'SET_HOME_REGION'; payload: string }
+  | { type: 'MOD_ATTR_BASE'; payload: { key: keyof AttrMap; delta: number } }
+  | { type: 'TOGGLE_RACE_BONUS'; payload: string }
+  | { type: 'MOD_ATTR_XP'; payload: { key: keyof AttrMap; delta: number } }
+  | { type: 'MOD_SKILL'; payload: { key: string; delta: number } }
+  | { type: 'SET_SKILLS_BASE'; payload: Record<string, number> }
+  | { type: 'SET_SKILLS_XP'; payload: Record<string, number> }
+  | { type: 'ADD_MASTERY'; payload: { skill: string; mastery: Mastery } }
+  | { type: 'REMOVE_MASTERY_BY_ID'; payload: { skill: string; id: string } }
+  | { type: 'REMOVE_MASTERY_BY_IDX'; payload: { skill: string; idx: number } }
+  | { type: 'ADD_SPELL'; payload: Spell }
+  | { type: 'REMOVE_SPELL_BY_IDX'; payload: number }
+  | { type: 'ADD_STRENGTH'; payload: ItemEntry }
+  | { type: 'REMOVE_STRENGTH'; payload: number }
+  | { type: 'ADD_RESOURCE'; payload: ItemEntry }
+  | { type: 'REMOVE_RESOURCE'; payload: number }
+  | { type: 'ADD_WEAKNESS'; payload: ItemEntry }
+  | { type: 'REMOVE_WEAKNESS'; payload: number }
+  | { type: 'ADD_LANGUAGE'; payload: ItemEntry }
+  | { type: 'REMOVE_LANGUAGE'; payload: number }
+  | { type: 'SET_LANGUAGES_LIST'; payload: ItemEntry[] }
+  | { type: 'SET_STRENGTHS_LIST'; payload: ItemEntry[] }
+  | { type: 'LOAD_STATE'; payload: Partial<CharacterState> }
+  | { type: 'PLAY_TAKE_DAMAGE'; payload: { kind: 'exhausted' | 'consumed' | 'channeled'; maxLP?: number; amount?: number } }
+  | { type: 'PLAY_SET_DYING_LEVEL'; payload: 0 | 2 | 3 | 4 }
+  | { type: 'PLAY_UNDO_DAMAGE'; payload: { kind: 'exhausted' | 'consumed' | 'channeled'; amount?: number; maxLP?: number } }
+  | {
+      type: 'PLAY_HEAL_EXHAUSTED';
+      payload?: {
+        healAllStun?: boolean;
+        stunAmount?: number;
+        healAllExhaustedFocus?: boolean;
+        exhaustedFocusAmount?: number;
+        exhaustReduction?: number;
+        removeConditions?: boolean;
+      };
+    }
+  | { type: 'PLAY_REST_HEAL'; payload: { konAmount: number; wilAmount: number; lpHealAmount?: number; foHealAmount?: number } }
+  | { type: 'PLAY_SPEND_FOCUS'; payload: { kind: 'exhausted' | 'channeled' | 'consumed'; amount: number } }
+  | { type: 'PLAY_CANCEL_CHANNELED_SPELL'; payload: { id: string } }
+  | { type: 'PLAY_ADD_CHANNELED_SPELL'; payload: ChanneledSpell }
+  | { type: 'PLAY_UPDATE_CHANNELED_SPELL'; payload: { id: string; update: Partial<ChanneledSpell> } }
+  | {
+      type: 'PLAY_CAST_SPELL';
+      payload: {
+        exhaustedFocus?: number;
+        channeledFocus?: number;
+        consumedFocus?: number;
+        channeledSpell?: ChanneledSpell;
+      };
+    }
+  | { type: 'PLAY_SET_SPLITTER'; payload: number }
+  | { type: 'PLAY_ADD_CONDITION'; payload: StatusCondition }
+  | { type: 'PLAY_REMOVE_CONDITION'; payload: { id: string } }
+  | { type: 'PLAY_DIVINE_MERCY'; payload: { maxLP: number } }
+  | { type: 'PLAY_ADD_TEMP_HP'; payload: { amount: number } }
+  | { type: 'PLAY_REMOVE_TEMP_HP'; payload: { amount: number } }
+  | { type: 'PLAY_SET_LP_MODIFIER'; payload: { modifier: number; newMaxLP: number } }
+  | { type: 'PLAY_RESET'; payload: { maxLP: number; maxFocus: number; maxSplitter: number } }
+  | { type: 'ADD_INVENTORY_ITEM'; payload: InventoryItem }
+  | { type: 'REMOVE_INVENTORY_ITEM'; payload: { id: string } }
+  | { type: 'UPDATE_INVENTORY_ITEM'; payload: { id: string; updates: Partial<InventoryItem> } }
+  | { type: 'TOGGLE_EQUIP_ITEM'; payload: { id: string } }
+  | { type: 'SET_MONEY'; payload: Partial<Money> }
+  | { type: 'ERSCHAFFUNG_MODUL_SETZEN'; payload: { art: 'kultur' | 'abstammung'; modul: ErschaffungsModulZustand | null } }
+  | { type: 'ERSCHAFFUNG_MODUL_EINTRAGEN'; payload: { art: 'kultur' | 'abstammung'; werte: ErschaffungsModulAngewendet; beschreibungen?: Record<string, string> } }
+  | { type: 'ERSCHAFFUNG_MODUL_AUSTRAGEN'; payload: { art: 'kultur' | 'abstammung' } }
+  | { type: 'BEGLEITER_HINZU'; payload: Begleiter }
+  | { type: 'BEGLEITER_ENTFERNEN'; payload: { index: number } }
+  | { type: 'REGEL_NAMEN_ABGLEICHEN'; payload: Partial<Pick<CharacterState, 'strengthsList' | 'weaknessesList' | 'resourcesList' | 'masteries' | 'spellsList'>> };
+
+// ============================================================
+// Derived / calculated values
+// ============================================================
+
+export interface DerivedStats {
+  GSW: number;
+  INI: number;
+  LP: number;
+  FO: number;
+  VTD: number;
+  SR: number;
+  GW: number;
+  KW: number;
+}
+
+export interface CreationUsage {
+  attr: number;
+  skill: number;
+  strength: number;
+  resource: number;
+  language: number;
+  languages: number;
+  nonMagicPoints: number;
+  creationMasteries: number;
+  strengthLimit: number;
+  resourceLimit: number;
+}
+
+// ============================================================
+// Component prop types
+// ============================================================
+
+export interface AttributeRowProps {
+  attrKey: string;
+  total: number;
+  startValue: number;
+  onIncrease: () => void;
+  onDecrease: () => void;
+  canIncrease: boolean;
+  canDecrease: boolean;
+  cost: number;
+  mode: AppMode;
+}

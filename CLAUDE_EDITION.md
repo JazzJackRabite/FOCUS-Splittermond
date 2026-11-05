@@ -1,0 +1,108 @@
+# FOKUS 1.0 – Claude-Edition
+
+Repository `JazzJackRabite/FOKUS-1.0-claudeedition` (Branch `main`; entstanden als Branch `FOKUS-1.0-claudeedition` von FOKUS-1.0). Ziel: Der Editor arbeitet mit den Splittermond-Regelpaketen aus dem Ordner `SCR4P3/Regelpakete`
+(feste IDs statt Namen, Regeln aus den Daten statt fest im Code).
+
+## Stand 1 (05.11.2026): Regelpakete und Lader
+
+- **Eingebaut ist nur das Grundregelwerk:** `public/regelpakete/manifest.json` und `grw.srp.json`
+  (erzeugt mit `Werkzeuge/regelpakete/editor_export.py`, Ordner `Regelpakete/editor/basis`). Andere Bücher liegen nicht im Repo.
+- **Weitere Bücher lädt man selbst:** Einstellungen → Regelpakete → „Buchpakete auswählen“, Dateien aus
+  `Regelpakete/editor/buecher` (z. B. `magie.srp.json`). Sie bleiben im Browser (IndexedDB), werden beim nächsten Start wieder
+  geladen und nie an einen Server geschickt. Jedes Buchpaket bringt seine Ladeangaben mit (`ladeinfo`: Ladereihenfolge,
+  Abhängigkeiten, Regelgruppen, Umbenennungen).
+- **Lader in TypeScript** (`src/regelwerk/`): Portierung von `Pruefsuite/lader.py`
+  - `Katalog` – Lade-Algorithmus, Ergänzungen/Ersetzungen, Regelgruppen (geltende Fassung), Referenzprüfung
+  - `erfuellt` – alle Bedingungsarten der Voraussetzungen
+  - `abgeleiteteWerte` – Formeln, Heldengrad, Stärken, Ausrüstung, Höchstbonus, Wunden (GRW S. 13–15)
+  - `pruefeErschaffung` – alle Schritte und Budgets der Erschaffung (GRW S. 22–30)
+  - `verfuegbareDienste` – Dienste beschworener Wesen (nur mit Buchpaket „Die Magie“)
+  - `RegelwerkProvider` / `useRegelwerk()` – Katalog für die ganze App
+- **Abgleich mit der Python-Referenz:** `src/regelwerk/__tests__/regelwerk.test.ts` vergleicht 161 Voraussetzungen ×
+  13 Charaktere, 120 Berechnungen abgeleiteter Werte und 150 Erschaffungen mit den Ergebnissen des Python-Laders.
+  Mit allen Büchern lokal: `FOKUS_BUECHER=<Regelpakete/editor/buecher> FOKUS_REFERENZ_VOLL=<referenz_voll.json> npx vitest run src/regelwerk`.
+
+
+## Stand 2 (05.11.2026): Regeln aus den Daten, Bücher im Editor
+
+- **Abgeleitete Werte nach den Regeldaten** (`regelwerk/bruecke.ts` → `abgeleiteteFuerCharakter`, eingebunden in
+  `utils/characterCalculations.ts`). Damit sind vier Abweichungen vom Buch behoben:
+  1. Heldengrad-Bonus +2 auch auf die Verteidigung, nicht nur auf GW und KW (GRW S. 89)
+  2. +1 Splitterpunkt je Heldengrad (S. 88)
+  3. Stärken wirken auf abgeleitete Werte: Flink, Hoher Geistiger/Körperlicher Widerstand, Verbesserte Initiative, Einen Schritt voraus,
+     Robust, Erhöhter Fokuspool, Zusätzliche Splitterpunkte
+  4. Halbe Behinderung auf GSW kaufmännisch gerundet (S. 11); VTD-Bonus der Ausrüstung bis zum Höchstbonus (S. 18)
+  Ohne geladene Regelpakete (z. B. in alten Tests) rechnet der Editor wie bisher.
+- **Voraussetzungen über den Katalog** (`utils/prerequisiteValidator.ts` → `voraussetzungAusKatalog`): Jede Meisterschaft, die im Katalog
+  steht (GRW und hochgeladene Bücher), wird formal geprüft; „Entscheidung der Spielleitung“ wird als Hinweis angezeigt.
+- **Hochgeladene Bücher im Editor:** Zauber, Meisterschaften (mit Schwelle, Manöver-Kennzeichen, Voraussetzung), Stärken, Schwächen und
+  Ressourcen erscheinen in allen Auswahllisten (über `getActivePackages` im `gameResourceManager`). Allgemeine Kampf- und
+  Magiemeisterschaften der Bücher stehen bei den passenden Fertigkeiten.
+- **Zuordnung Editor-Namen → IDs** geprüft: alle Rassen, Fertigkeiten, Stärken, Ressourcen und Meisterschaften des Editors haben eine ID.
+
+## Stand 3 (05.11.2026): Erschaffung nach Regelwerk
+
+- **Kultur & Abstammung** (neue Karte in der Erschaffung, `components/creation/ErschaffungRegelwerk.tsx`): Modul wählen
+  (12 Kulturen und 17 Abstammungen des GRW, dazu Kulturen hochgeladener Bücher) oder frei verteilen. Wahlmöglichkeiten des Moduls
+  (z. B. „Redegewandtheit oder eine Magieschule“, Ressourcen, Stärke, Meisterschaft) per Auswahlliste; „Modulwerte eintragen“
+  schreibt Fertigkeitspunkte, Ressourcen, Stärke und Meisterschaft in den Charakter, „Werte wieder austragen“ nimmt sie zurück.
+  Die Wahl wird mit dem Charakter gespeichert (`erschaffung`, auch im JSON-Export/Import).
+- **Regelprüfung der Erschaffung (GRW S. 22–30)** mit `pruefeErschaffung()`: Attribute, freie Rassenmodifikatoren, Kultur, Abstammung,
+  Ausbildung, Schritt 7, Start-Erfahrung und Feinschliff. Weil der Editor nur Summen speichert, ordnet `regelwerk/erschaffungEditor.ts`
+  die Punkte außerhalb der Module den Schritten zu (maximaler Fluss über die Grenzen je Schritt): Gibt es eine regelgerechte Verteilung,
+  wird sie gefunden; sonst meldet die Prüfung den überzogenen Schritt.
+- FO in der Erschaffung zeigt jetzt den Gesamtwert mit Stärken (z. B. Erhöhter Fokuspool).
+- Damit ist die letzte der sechs bekannten Abweichungen vom Buch behoben.
+
+## Stand 4 (05.11.2026): Würfel, Großmeister, freie Meisterschaften
+
+- **Gemeinsame Würfellogik** (`utils/wuerfeln.ts`) für Probe, Angriff und Zauber nach GRW S. 16–19. Der Angriffsdialog wich vorher
+  vom Buch ab (Sicherheitswurf addierte beide Würfel, Patzer nur bei Doppel-1, Triumph nur bei Doppel-10); jetzt einheitlich:
+  Patzer bei Augensumme ≤ 3, Triumph ab 19, Sicherheitswurf wertet nur den höheren Würfel.
+- **Großmeister** ab 15 Fertigkeitspunkten (Schwelle aus den Regeldaten): automatisch ein zusätzlicher W10 bei Probe, Angriff und Zauber,
+  zählt nicht für den Patzer; Hinweis in der Fertigkeitszeile.
+- **Freie Meisterschaft trotz unerfüllter Voraussetzung** (GRW S. 92): Sind auf einer Schwelle nur solche Meisterschaften übrig, ist
+  eine davon als Gratis-Meisterschaft wählbar (mit Hinweis, dass sie erst mit erfüllter Voraussetzung nutzbar ist).
+- Geprüft: Die GRW-Texte der eingebauten Daten stimmen mit den Regelpaketen überein (419 Zauber, 437 Meisterschaften, 43 Stärken,
+  20 Schwächen identisch; Ressourcen nur mit eingebetteter Stufentabelle) – kein Austausch nötig.
+
+## Stand 5 (05.11.2026): Begleiter
+
+- **Karte „Begleiter“ im Inventar** (`components/begleiter/BegleiterKarte.tsx`, Logik in `regelwerk/begleiter.ts`), nur mit Regelpaketen.
+- **Tiergefährten** über die Ressource Kreatur (GRW S. 78): Auswahl aus allen Kreaturen/Tieren mit Merkmal „Kreatur N“; Tiere über der
+  höchsten Ressourcenstufe sind gesperrt, Hinweise bei zu vielen Tieren oder zu niedriger Stufe. Mit dem GRW allein: 11 Tiere
+  (Taube bis Riesenschlange, S. 284–287); weitere kommen mit Büchern wie dem Bestienmeister. Wertekasten aufklappbar; bei
+  „Werte wie … mit folgenden Änderungen“ die berechneten Werte.
+- **Beschworene Wesen** (nur mit „Die Magie“, 65 Wesen): Auswahl, Werte und verfügbare Dienste je nach den Meisterschaften des Charakters.
+- Gespeichert im Charakter als `begleiter: [{ id, art, name }]` (Import geprüft); Aktionen `BEGLEITER_HINZU` / `BEGLEITER_ENTFERNEN`.
+
+## Stand 6 (05.11.2026): Wirkungen
+
+- `regelwerk/wirkungen.ts` liest `wirkungen_strukturiert` der Stärken und Meisterschaften des Charakters (nur Wirkungen auf ihn selbst).
+- **Eingerechnet:** dauerhafte Boni auf benannte Fertigkeiten (z. B. Einfühlsamkeit: Empathie +2) im Fertigkeitswert (`getSkillTotal`,
+  also auch bei Proben); Meisterschaftseffekte sind kumulativ (GRW S. 92). Stärken wie Hoher Geistiger Widerstand wirken wie bisher über
+  die abgeleiteten Werte und werden nicht doppelt gezählt. Die Fertigkeitspunkte (`getSkillValue`, z. B. für Großmeister) bleiben unberührt.
+- **Angezeigt:** Karte „Wirkungen“ unter „Spielen“ mit Eingerechnet / Dauerhaft (Resistenzen, Immunitäten) / In bestimmten Lagen /
+  Bei Manövern; grünes Kästchen am Fertigkeitswert zeigt den Bonus und seine Quellen.
+- Datenkorrektur dabei: Wirkungen der Beschwörer-Meisterschaften aus „Die Magie“ betreffen das Wesen, nicht den Zauberer
+  (neues Buchpaket `magie.srp.json` nötig).
+
+## Stand 7 (05.11.2026): Charaktere mit Regel-IDs
+
+- Beim Speichern (Browserspeicher) und beim Export steht unter `regelIds` zu jedem Namen die ID aus den Regelpaketen: Rasse,
+  Stärken, Schwächen, Ressourcen, Meisterschaften („Fertigkeit|Name“), Zauber („Schule|Name“) und die geladenen Pakete (Prüfsumme).
+  Die Namen bleiben das führende Format; alte Charaktere ohne IDs laden wie bisher und erhalten die IDs beim nächsten Speichern.
+- Beim Laden mit Regelpaketen (`regelwerk/useNamensAbgleich.ts`, Logik in `regelwerk/ids.ts`): Passt ein Name nicht mehr, die
+  gespeicherte ID aber schon (auch über Umbenennungen und Regelgruppen), wird der Name aktualisiert; ein Hinweis nennt die Änderungen.
+  Einträge aus nicht geladenen Büchern bleiben unverändert und behalten ihre ID.
+- Behoben: Erschaffung nach Regelwerk (Stand 3) und Begleiter (Stand 5) gingen beim Neuladen der Seite verloren (`hydrateState`).
+
+## Nächste Schritte
+
+Die geplanten Schritte sind erledigt. Offen bleiben Ideen wie Spielhilfen für bedingte Wirkungen (z. B. Bonus gegen Typus per Klick
+anwenden) oder Werte der Begleiter im Kampf.
+
+## Google AI Studio
+
+Unverändert eine Vite-/React-App mit `metadata.json` im Wurzelordner; Import über „Import from GitHub“, Hosting über Cloud Run.
+Neue Abhängigkeiten gibt es nicht. Die Regelpakete liegen in `public/` und werden zur Laufzeit geladen.

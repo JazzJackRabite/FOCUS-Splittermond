@@ -1,0 +1,8 @@
+{
+  "description": "FOCUS Splittermond Charaktereditor und Spiel-Assistent mit nativer SQLite-Grundregelwerk-Datenbank, Würfelprotokoll und Steigerungssystem.",
+  "requestFramePermissions": [],
+  "name": "FOCUS_1.0",
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

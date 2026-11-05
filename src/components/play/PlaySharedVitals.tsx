@@ -1,0 +1,1482 @@
+import React, { useState } from 'react';
+import {
+  AlertTriangle,
+  Check,
+  Sparkles,
+  Shield,
+} from 'lucide-react';
+import { useCharacter } from '../../context/CharacterContext';
+import { usePlaySession } from '../../context/PlaySessionContext';
+import {
+  CONDITIONS_WITH_LEVELS,
+  ALL_CONDITIONS,
+  HEALTH_LEVEL_LABELS,
+  WOUND_PENALTIES,
+} from '../../data/rules';
+import { getConditionDescription } from '../../utils/conditionModifiers';
+import { toast } from 'react-hot-toast';
+import { generateId } from '../../utils/id';
+import type { StatusCondition, HealthSlot, ChanneledSpell } from '../../types';
+
+// ============================================================================
+// Compound Stepper Button Component (matches user's screenshot)
+// [  −        Label / Symbol        1   +  ]
+// ============================================================================
+
+interface CompoundStepperProps {
+  label: string;
+  symbol?: string;
+  variant: 'amber' | 'red' | 'blue' | 'teal';
+  amount: number;
+  onAmountChange: (val: number) => void;
+  onMinus: () => void;
+  onPlus: () => void;
+  onLabelClick?: () => void;
+  minusTitle?: string;
+  plusTitle?: string;
+}
+
+const CompoundStepper: React.FC<CompoundStepperProps> = ({
+  label,
+  symbol,
+  variant,
+  amount,
+  onAmountChange,
+  onMinus,
+  onPlus,
+  onLabelClick,
+  minusTitle = 'Verringern / Heilen',
+  plusTitle = 'Hinzufügen / Ausgeben',
+}) => {
+  const styles = {
+    amber: {
+      border: 'border-[#966b2d]/70 hover:border-[#c99a4e]',
+      bg: 'bg-[#261c11]',
+      accent: 'text-[#e0a84d]',
+      text: 'text-[#FBEFCE]',
+      hoverBtn: 'hover:bg-[#c99a4e]/20',
+    },
+    red: {
+      border: 'border-[#8c3d35]/70 hover:border-[#b06258]',
+      bg: 'bg-[#291715]',
+      accent: 'text-[#cc6b60]',
+      text: 'text-[#F9DEDC]',
+      hoverBtn: 'hover:bg-[#b06258]/20',
+    },
+    blue: {
+      border: 'border-[#3d5675]/70 hover:border-[#5c7189]',
+      bg: 'bg-[#14202e]',
+      accent: 'text-[#7a9bbd]',
+      text: 'text-[#DCE8F4]',
+      hoverBtn: 'hover:bg-[#5c7189]/20',
+    },
+    teal: {
+      border: 'border-[#35665d]/70 hover:border-[#5f9a8d]',
+      bg: 'bg-[#122320]',
+      accent: 'text-[#69ad9f]',
+      text: 'text-[#D9EFEA]',
+      hoverBtn: 'hover:bg-[#5f9a8d]/20',
+    },
+  }[variant];
+
+  return (
+    <div
+      className={`flex items-center justify-between rounded-lg border ${styles.border} ${styles.bg} px-1.5 sm:px-2 py-1 min-h-[36px] shadow-xs select-none transition-all`}
+    >
+      {/* Minus Button */}
+      <button
+        type="button"
+        onClick={onMinus}
+        title={minusTitle}
+        className={`text-base font-bold ${styles.accent} ${styles.hoverBtn} w-6 h-6 flex items-center justify-center rounded cursor-pointer transition-colors active:scale-90`}
+      >
+        −
+      </button>
+
+      {/* Center Label (Clickable) */}
+      <button
+        type="button"
+        onClick={onLabelClick || onPlus}
+        className={`flex-1 text-center font-bold text-xs tracking-wide ${styles.text} hover:opacity-90 active:scale-98 transition-all px-1 truncate flex items-center justify-center gap-1 cursor-pointer`}
+      >
+        <span className="truncate">{label}</span>
+        {symbol && <span className="font-mono text-[11px] opacity-90 shrink-0">{symbol}</span>}
+      </button>
+
+      {/* Right Stepper: Value + Plus */}
+      <div className="flex items-center gap-0.5 shrink-0">
+        <input
+          type="number"
+          min={1}
+          max={20}
+          value={amount}
+          onFocus={(e) => e.target.select()}
+          onChange={(e) => onAmountChange(Math.max(1, Math.min(20, parseInt(e.target.value, 10) || 1)))}
+          className={`w-6 sm:w-7 text-center bg-transparent border-0 font-mono font-bold text-xs ${styles.text} focus:outline-none p-0`}
+        />
+        <button
+          type="button"
+          onClick={onPlus}
+          title={plusTitle}
+          className={`text-base font-bold ${styles.accent} ${styles.hoverBtn} w-6 h-6 flex items-center justify-center rounded cursor-pointer transition-colors active:scale-90`}
+        >
+          +
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// ============================================================================
+// PlaySharedVitals Main Component
+// ============================================================================
+
+export interface PlaySharedVitalsProps {
+  isMinimal?: boolean;
+}
+
+export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = false }) => {
+  const { state, dispatch, calc } = useCharacter();
+  const session = usePlaySession();
+
+  const { playState, name, race, moonSign } = state;
+  const {
+    maxLP,
+    maxFO,
+    currentWoundPenalty,
+    currentHealthLevelName,
+    derived,
+    robustBonus,
+    armorSR,
+    gearVtdBonus,
+    splinterPoints: maxSplitter,
+    heldengrad,
+    totalHandicap = 0,
+  } = calc;
+
+  const { healthSlots, focus, splitterPoints, channeledSpells, dyingLevel } = playState;
+  const conditions = playState.conditions ?? [];
+  const tempHP = playState.tempHP ?? 0;
+  const tempHPUsed = playState.tempHPUsed ?? 0;
+  const activeTempHP = Math.max(0, tempHP - tempHPUsed);
+  const lpModifier = playState.lpModifier ?? 0;
+
+  // Stepper amounts state
+  const [stunDamageAmount, setStunDamageAmount] = useState<number>(1);
+  const [consumedDamageAmount, setConsumedDamageAmount] = useState<number>(1);
+  const [channeledDamageAmount, setChanneledDamageAmount] = useState<number>(1);
+  const [tempHPAmount, setTempHPAmount] = useState<number>(1);
+
+  const [exhaustedFocusAmount, setExhaustedFocusAmount] = useState<number>(1);
+  const [channeledFocusAmount, setChanneledFocusAmount] = useState<number>(1);
+  const [consumedFocusAmount, setConsumedFocusAmount] = useState<number>(1);
+
+  // Condition dropdown state
+  const [selectedCondition, setSelectedCondition] = useState<string>('Benommen');
+  const [conditionLevel, setConditionLevel] = useState<number>(1);
+
+  // Minimal condition quick-picker state (Tab Spielen)
+  const [showMinimalConditionPicker, setShowMinimalConditionPicker] = useState<boolean>(false);
+  const [selectedMinimalCondition, setSelectedMinimalCondition] = useState<string>('Liegend');
+  const [minimalConditionLevel, setMinimalConditionLevel] = useState<number>(1);
+
+  const totalChanneledFO = (channeledSpells ?? []).reduce((sum, s) => sum + (s.channeledFocus || 0), 0);
+  const consumedLP = healthSlots.filter((s) => s.type === 'consumed').length;
+  const exhaustedLP = healthSlots.filter((s) => s.type === 'exhausted').length;
+  const channeledLP = healthSlots.filter((s) => s.type === 'channeled').length;
+  const freeLP = healthSlots.filter((s) => s.type === 'empty').length;
+  const totalLP = healthSlots.length || maxLP * 5;
+  const totalDamage = consumedLP + exhaustedLP + channeledLP;
+
+  const focusAvailable = maxFO - focus.exhausted - focus.channeled - focus.consumed;
+  const woundPenaltyDisplay = currentWoundPenalty;
+
+  const isLahm = conditions.some((c) => c.key === 'Lahm');
+  const isRingend = conditions.some((c) => c.key === 'Ringend');
+  const isBewusstlos = conditions.some((c) => c.key === 'Bewusstlos');
+  const isLiegend = conditions.some((c) => c.key === 'Liegend');
+
+  const effectiveGSW = isRingend ? 0 : isLahm ? Math.floor(derived.GSW / 2) : derived.GSW;
+  const effectiveVTD = isBewusstlos ? 0 : isRingend ? Math.max(0, derived.VTD - 3) : isLiegend ? Math.max(0, derived.VTD - 2) : derived.VTD;
+
+  const formatConditionLabel = (c: StatusCondition) => {
+    let lbl = c.key;
+    if (c.level && c.level > 1) lbl += ` ${c.level}`;
+    if (c.note) lbl += ` (${c.note})`;
+    return lbl;
+  };
+
+  const handleAddQuickCondition = (conditionKey: string, customLevel?: number) => {
+    const hasLevels = CONDITIONS_WITH_LEVELS.includes(conditionKey as any);
+    const existing = conditions.find((c) => c.key === conditionKey);
+    const levelToSet = hasLevels ? (existing ? (existing.level ?? 1) + 1 : (customLevel ?? 1)) : undefined;
+
+    const newCondition: StatusCondition = {
+      id: generateId(),
+      key: conditionKey,
+      level: levelToSet,
+    };
+
+    session.logAndDispatch(
+      { type: 'PLAY_ADD_CONDITION', payload: newCondition },
+      {
+        category: 'condition',
+        title: `Zustand erhalten: ${conditionKey}`,
+        description: formatConditionLabel(newCondition),
+        badge: { text: conditionKey, variant: 'warning' },
+      }
+    );
+
+    toast.success(
+      existing && hasLevels
+        ? `Zustand ${conditionKey} auf Stufe ${levelToSet} erhöht`
+        : `Zustand ${conditionKey}${levelToSet && levelToSet > 1 ? ` ${levelToSet}` : ''} hinzugefügt`
+    );
+  };
+
+  // Slot click removal
+  const handleRemoveSlotDamage = (slot: HealthSlot, index: number) => {
+    session.logAndDispatch(
+      { type: 'PLAY_UNDO_DAMAGE', payload: { kind: slot.type as 'exhausted' | 'consumed' | 'channeled', amount: 1, maxLP } },
+      {
+        category: 'heal',
+        title: '1 Schadenspunkt entfernt',
+        description: `Schaden (${slot.type}) per Klick auf Kästchen #${index + 1} entfernt`,
+        badge: { text: '-1 Schaden', variant: 'success' },
+      }
+    );
+    toast.success('1 Schadenspunkt entfernt.');
+  };
+
+  const handleRemoveFocusSlot = (slotType: 'consumed' | 'channeled' | 'exhausted') => {
+    if (slotType === 'consumed') {
+      session.logAndDispatch(
+        { type: 'PLAY_SPEND_FOCUS', payload: { kind: 'consumed', amount: -1 } },
+        {
+          category: 'focus',
+          title: 'Verzehrter Fokus regeneriert',
+          description: '1 verzehrter Fokus per Klick auf Kästchen regeneriert',
+          badge: { text: '-1 Verzehrt', variant: 'success' },
+        }
+      );
+      toast.success('1 verzehrter Fokus regeneriert.');
+    } else if (slotType === 'channeled') {
+      session.logAndDispatch(
+        { type: 'PLAY_SPEND_FOCUS', payload: { kind: 'channeled', amount: -1 } },
+        {
+          category: 'focus',
+          title: 'Kanalisierter Fokus verringert',
+          description: '1 kanalisierter Fokus per Klick auf Kästchen freigegeben',
+          badge: { text: '-1 Kanalisiert', variant: 'info' },
+        }
+      );
+      toast.success('1 kanalisierter Fokus freigegeben.');
+    } else if (slotType === 'exhausted') {
+      session.logAndDispatch(
+        { type: 'PLAY_SPEND_FOCUS', payload: { kind: 'exhausted', amount: -1 } },
+        {
+          category: 'focus',
+          title: 'Erschöpfter Fokus regeneriert',
+          description: '1 erschöpfter Fokus per Klick auf Kästchen regeneriert',
+          badge: { text: '-1 Erschöpft', variant: 'success' },
+        }
+      );
+      toast.success('1 erschöpfter Fokus regeneriert.');
+    }
+  };
+
+  // Render health slot box (sleek solid minimal tiles from screenshot)
+  const renderHealthSlot = (slot: HealthSlot, index: number) => {
+    let styleClass = 'bg-[#171E2D] border border-[#2D374D]';
+    let title = 'Frei';
+
+    if (slot.type === 'consumed') {
+      styleClass = 'bg-[#B06258] border border-[#C57468]';
+      title = isMinimal ? 'Echter Schaden' : 'Echter Schaden (■) – Klick zum Entfernen';
+    } else if (slot.type === 'exhausted') {
+      styleClass = 'bg-[#C99A4E] border border-[#DEB062]';
+      title = isMinimal ? 'Betäubungsschaden' : 'Betäubungsschaden (✕) – Klick zum Entfernen';
+    } else if (slot.type === 'channeled') {
+      styleClass = 'bg-[#5C7189] border border-[#748BA6]';
+      title = isMinimal ? 'Kanalisierter Schaden' : 'Kanalisierter Schaden (/) – Klick zum Entfernen';
+    }
+
+    if (isMinimal) {
+      return (
+        <div
+          key={index}
+          title={title}
+          className={`w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-[3px] select-none ${styleClass}`}
+        />
+      );
+    }
+
+    const isClickable = slot.type !== 'empty';
+
+    return (
+      <button
+        key={index}
+        type="button"
+        disabled={!isClickable}
+        onClick={isClickable ? () => handleRemoveSlotDamage(slot, index) : undefined}
+        title={title}
+        className={`w-5.5 h-5.5 sm:w-6 sm:h-6 rounded-md transition-all select-none ${styleClass} ${
+          isClickable
+            ? 'cursor-pointer hover:scale-105 active:scale-95 hover:shadow-md'
+            : 'cursor-default'
+        }`}
+      />
+    );
+  };
+
+  // Render focus slot box (sleek solid tiles from screenshot)
+  const renderFocusSlot = (type: 'consumed' | 'channeled' | 'exhausted' | 'empty', index: number) => {
+    let styleClass = 'bg-[#182030] border border-[#2B354A]';
+    let title = 'Frei';
+
+    if (type === 'consumed') {
+      styleClass = 'bg-[#B06258] border border-[#C57468]';
+      title = isMinimal ? 'Verzehrter Fokus' : 'Verzehrter Fokus – Klick zum Regenerieren';
+    } else if (type === 'channeled') {
+      styleClass = 'bg-[#5C7189] border border-[#748BA6]';
+      title = isMinimal ? 'Kanalisierter Fokus' : 'Kanalisierter Fokus – Klick zum Freigeben';
+    } else if (type === 'exhausted') {
+      styleClass = 'bg-[#C99A4E] border border-[#DEB062]';
+      title = isMinimal ? 'Erschöpfter Fokus' : 'Erschöpfter Fokus – Klick zum Regenerieren';
+    }
+
+    if (isMinimal) {
+      return (
+        <div
+          key={index}
+          title={title}
+          className={`w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-[3px] select-none ${styleClass}`}
+        />
+      );
+    }
+
+    const isClickable = type !== 'empty';
+
+    return (
+      <button
+        key={index}
+        type="button"
+        disabled={!isClickable}
+        onClick={isClickable ? () => handleRemoveFocusSlot(type) : undefined}
+        title={title}
+        className={`w-5.5 h-5.5 sm:w-6 sm:h-6 rounded-md transition-all select-none ${styleClass} ${
+          isClickable
+            ? 'cursor-pointer hover:scale-105 active:scale-95 hover:shadow-md'
+            : 'cursor-default'
+        }`}
+      />
+    );
+  };
+
+  // Fokus spend handler
+  const handleSpendFocus = (kind: 'exhausted' | 'channeled' | 'consumed', amount: number) => {
+    const isAdding = amount > 0;
+    const abs = Math.abs(amount);
+    const titles = {
+      exhausted: isAdding ? `${abs} Fokus erschöpft` : `${abs} erschöpfter Fokus regeneriert`,
+      channeled: isAdding ? `${abs} Fokus kanalisiert` : `${abs} kanalisierter Fokus freigegeben`,
+      consumed: isAdding ? `${abs} Fokus verzehrt` : `${abs} verzehrter Fokus regeneriert`,
+    };
+
+    session.logAndDispatch(
+      { type: 'PLAY_SPEND_FOCUS', payload: { kind, amount } },
+      {
+        category: 'focus',
+        title: titles[kind],
+        badge: {
+          text: `${isAdding ? '-' : '+'}${abs} FO`,
+          variant: isAdding ? (kind === 'consumed' ? 'danger' : 'warning') : 'success',
+        },
+      }
+    );
+    toast.success(titles[kind]);
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* ── 2-Column Grid: LEBENSPUNKTE (Links) & FOKUS (Rechts) nebeneinander ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start w-full">
+        {/* ── WINDOW 1: LEBENSPUNKTE ── */}
+        <div className={`bg-[#171F2E] border border-[#2B374D] rounded-xl shadow-lg ${isMinimal ? 'p-3 space-y-2' : 'p-3.5 sm:p-4 space-y-3'}`}>
+          {/* Header: LEBENSPUNKTE on left, Unverletzt / Wundstufe pill on right */}
+          <div className="flex justify-between items-center pb-1.5 border-b border-[#2B374D]/60 gap-2">
+            <h3 className={`${isMinimal ? 'text-base font-bold' : 'text-lg font-bold'} fantasy-font tracking-wide text-[#F2EFE6]`}>
+              LEBENSPUNKTE
+            </h3>
+
+            <div>
+              {woundPenaltyDisplay !== 0 ? (
+                <span className="border border-[#8C443C] bg-[#2d1c1a] text-[#F9DEDC] text-xs font-semibold px-2 py-0.5 rounded-md flex items-center gap-1.5 shadow-xs">
+                  <AlertTriangle size={12} className="text-[#F9DEDC] shrink-0" />
+                  <span>{currentHealthLevelName || 'Verletzt'}</span>
+                  <span className="font-mono font-black">{woundPenaltyDisplay}</span>
+                </span>
+              ) : dyingLevel > 0 ? (
+                <span className="border border-red-700 bg-red-950 text-red-200 text-xs font-semibold px-2 py-0.5 rounded-md flex items-center gap-1 shadow-xs animate-pulse">
+                  <span>💀 Sterbend {dyingLevel}</span>
+                </span>
+              ) : (
+                <span className="border border-[#4e825a] bg-[#16291e] text-[#a1d9b0] text-xs font-semibold px-2 py-0.5 rounded-md flex items-center gap-1 shadow-xs">
+                  <Check size={12} className="text-[#a1d9b0] shrink-0" />
+                  <span>{currentHealthLevelName || 'Unverletzt'}</span>
+                </span>
+              )}
+            </div>
+          </div>
+
+          {isMinimal ? (
+            /* ── Minimalist view: Nur Lebenspunkte, Zustände (KEINE Kästchen, KEINE redundante Wundstufe) ── */
+            <div className="space-y-2">
+              {/* 1. Lebenspunkte */}
+              <div className="space-y-1">
+                <div className="flex justify-between items-baseline">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-xl sm:text-2xl font-bold font-mono text-[#F2EFE6] tracking-tight">
+                      {freeLP}
+                    </span>
+                    <span className="text-stone-400 text-xs sm:text-sm font-medium">
+                      / {totalLP} LP
+                    </span>
+                    {activeTempHP > 0 && (
+                      <span className="text-[10px] font-semibold font-mono text-[#86D4C4] bg-[#122320] border border-[#35665D] px-1.5 py-0.2 rounded">
+                        +{activeTempHP} Temp
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-[11px] sm:text-xs text-stone-300">
+                    {totalDamage > 0 ? (
+                      <span>Schaden: <strong className="font-mono text-[#DE8A80]">{totalDamage}</strong></span>
+                    ) : (
+                      <span className="text-emerald-400 font-medium">Vollständig gesund</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Sleek continuous health bar (smooth meter, NO individual Kästchen) */}
+                <div className="h-2 w-full bg-[#101622] rounded-full overflow-hidden flex border border-[#2B374D]/60 shadow-inner">
+                  <div
+                    style={{ width: `${(freeLP / Math.max(1, totalLP)) * 100}%` }}
+                    className="bg-gradient-to-r from-emerald-600 to-emerald-500 h-full transition-all duration-300"
+                    title={`Freie LP: ${freeLP}`}
+                  />
+                  {exhaustedLP > 0 && (
+                    <div
+                      style={{ width: `${(exhaustedLP / Math.max(1, totalLP)) * 100}%` }}
+                      className="bg-[#C99A4E] h-full transition-all duration-300"
+                      title={`Betäubungsschaden: ${exhaustedLP}`}
+                    />
+                  )}
+                  {channeledLP > 0 && (
+                    <div
+                      style={{ width: `${(channeledLP / Math.max(1, totalLP)) * 100}%` }}
+                      className="bg-[#5C7189] h-full transition-all duration-300"
+                      title={`Kanalisierter Schaden: ${channeledLP}`}
+                    />
+                  )}
+                  {consumedLP > 0 && (
+                    <div
+                      style={{ width: `${(consumedLP / Math.max(1, totalLP)) * 100}%` }}
+                      className="bg-[#B06258] h-full transition-all duration-300"
+                      title={`Echter Schaden: ${consumedLP}`}
+                    />
+                  )}
+                </div>
+
+                {/* Damage breakdown text */}
+                <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[10px] sm:text-[11px] text-stone-400 pt-0.5">
+                  <span className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-[#B06258] inline-block" />
+                    Echt: <strong className="font-mono text-[#F2EFE6]">{consumedLP}</strong>
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-[#C99A4E] inline-block" />
+                    Betäubung: <strong className="font-mono text-[#F2EFE6]">{exhaustedLP}</strong>
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-[#5C7189] inline-block" />
+                    Kanalisiert: <strong className="font-mono text-[#F2EFE6]">{channeledLP}</strong>
+                  </span>
+                  {activeTempHP > 0 && (
+                    <span className="flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-[#5F9A8D] inline-block" />
+                      Temp: <strong className="font-mono text-[#86D4C4]">+{activeTempHP}</strong>
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* 2. Zustände mit dezenter Schnellauswahl */}
+              <div className="pt-1.5 border-t border-[#2B374D]/60 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setShowMinimalConditionPicker((prev) => !prev)}
+                      className="text-xs uppercase font-bold tracking-wider text-stone-400 hover:text-[#C5A059] fantasy-font flex items-center gap-1.5 cursor-pointer transition-colors"
+                      title="Zustand-Schnellauswahl öffnen/schließen"
+                    >
+                      <span>Zustände</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowMinimalConditionPicker((prev) => !prev)}
+                      className={`w-4.5 h-4.5 rounded text-[11px] font-bold flex items-center justify-center transition-all cursor-pointer border ${
+                        showMinimalConditionPicker
+                          ? 'border-[#C5A059] bg-[#C5A059] text-[#1B365D] shadow-xs'
+                          : 'border-[#3A4A62] bg-[#141b27] hover:border-[#C5A059] text-stone-300 hover:text-[#C5A059]'
+                      }`}
+                      title={showMinimalConditionPicker ? 'Schnellmenü schließen' : 'Zustand schnell hinzufügen'}
+                      aria-label="Zustand hinzufügen"
+                    >
+                      {showMinimalConditionPicker ? '✕' : '+'}
+                    </button>
+                  </div>
+                  <span className="text-[10px] text-stone-500 font-semibold">
+                    {conditions.length} aktiv
+                  </span>
+                </div>
+
+                {/* Dezente Schnellauswahl */}
+                {showMinimalConditionPicker && (
+                  <div className="bg-[#121926] border border-[#2B3B52] rounded-lg p-2 sm:p-2.5 space-y-2 shadow-lg text-xs">
+                    <div className="flex items-center justify-between text-[11px] text-stone-400">
+                      <span className="font-semibold text-stone-300">Schnellauswahl (1 Klick):</span>
+                      <button
+                        type="button"
+                        onClick={() => setShowMinimalConditionPicker(false)}
+                        className="text-stone-400 hover:text-stone-200 text-xs px-1 cursor-pointer font-bold"
+                        title="Schließen"
+                      >
+                        ✕
+                      </button>
+                    </div>
+
+                    {/* Häufigste Zustände als Schnell-Chips */}
+                    <div className="flex flex-wrap gap-1">
+                      {['Liegend', 'Benommen', 'Verwirrt', 'Erschöpft', 'Blutend', 'Brennend', 'Geblendet', 'Bewusstlos'].map((key) => {
+                        const existing = conditions.find((c) => c.key === key);
+                        return (
+                          <button
+                            key={key}
+                            type="button"
+                            onClick={() => handleAddQuickCondition(key)}
+                            className={`px-2 py-0.5 rounded-full text-[11px] font-medium border transition-all cursor-pointer flex items-center gap-1 ${
+                              existing
+                                ? 'bg-[#2A2315] border-[#C5A059] text-[#F3E5CF] hover:bg-[#3D301C]'
+                                : 'bg-[#182233] border-[#2E3E55] text-stone-300 hover:border-[#C5A059]/70 hover:text-white'
+                            }`}
+                            title={existing ? `${key} aktiv (Klick erhöht Stufe)` : `${key} hinzufügen`}
+                          >
+                            <span>{key}</span>
+                            {existing && existing.level && (
+                              <span className="text-[#C5A059] font-mono font-bold text-[10px]">
+                                {existing.level}
+                              </span>
+                            )}
+                            <span className="text-[#C5A059] text-[10px] font-bold">+</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Auswahlliste für alle Splittermond-Zustände */}
+                    <div className="flex items-center gap-1.5 pt-1.5 border-t border-[#232F42]">
+                      <select
+                        value={selectedMinimalCondition}
+                        onChange={(e) => setSelectedMinimalCondition(e.target.value)}
+                        className="bg-[#182233] border border-[#2E3E55] rounded px-2 py-1 text-xs text-[#F2EFE6] font-medium focus:outline-none focus:border-[#C5A059] cursor-pointer flex-1 min-w-[110px]"
+                      >
+                        {ALL_CONDITIONS.map((cond: string) => (
+                          <option key={cond} value={cond} className="bg-[#141b27] text-white">
+                            {cond}
+                          </option>
+                        ))}
+                      </select>
+
+                      {CONDITIONS_WITH_LEVELS.includes(selectedMinimalCondition as any) && (
+                        <div className="flex items-center gap-1">
+                          <span className="text-[10px] text-stone-400">Stufe:</span>
+                          <input
+                            type="number"
+                            min={1}
+                            max={6}
+                            value={minimalConditionLevel}
+                            onFocus={(e) => e.target.select()}
+                            onChange={(e) => setMinimalConditionLevel(parseInt(e.target.value, 10) || 1)}
+                            className="w-10 bg-[#182233] border border-[#2E3E55] rounded px-1 py-1 text-center text-xs font-mono font-bold text-[#F2EFE6] focus:outline-none focus:border-[#C5A059]"
+                          />
+                        </div>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={() => handleAddQuickCondition(selectedMinimalCondition, minimalConditionLevel)}
+                        className="bg-[#C5A059] hover:bg-[#d4b06a] text-[#1B365D] font-bold px-2 py-1 rounded text-xs transition-colors cursor-pointer shrink-0"
+                        title="Ausgewählten Zustand hinzufügen"
+                      >
+                        + Hinzufügen
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Aktive Zustände Badges */}
+                {conditions.length > 0 ? (
+                  <div className="flex flex-wrap gap-1.5">
+                    {conditions.map((c) => (
+                      <span
+                        key={c.id}
+                        title={getConditionDescription(c)}
+                        className="inline-flex items-center gap-1.5 bg-[#141c28] hover:bg-[#192433] text-[#F2EFE6] border border-[#C5A059]/40 hover:border-[#C5A059]/80 rounded-full px-2 py-0.5 text-xs font-medium shadow-2xs transition-colors"
+                      >
+                        <span>{c.key}</span>
+                        {c.level && c.level > 1 && (
+                          <span className="text-[#C5A059] font-mono font-bold text-[11px]">
+                            {c.level}
+                          </span>
+                        )}
+                        {c.note && (
+                          <span className="text-stone-400 text-[10px] font-normal">
+                            ({c.note})
+                          </span>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            session.logAndDispatch(
+                              { type: 'PLAY_REMOVE_CONDITION', payload: { id: c.id } },
+                              {
+                                category: 'condition',
+                                title: 'Zustand entfernt',
+                                description: `${formatConditionLabel(c)} aufgehoben`,
+                                badge: { text: `${c.key} weg`, variant: 'success' },
+                              }
+                            );
+                          }}
+                          className="ml-0.5 text-stone-400 hover:text-[#ff8ba7] transition-colors cursor-pointer text-xs leading-none font-bold"
+                          title="Zustand entfernen"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <div
+                    onClick={() => setShowMinimalConditionPicker((prev) => !prev)}
+                    className="text-[11px] text-stone-500 hover:text-stone-400 italic cursor-pointer transition-colors"
+                    title="Klicken, um Zustand-Schnellauswahl zu öffnen"
+                  >
+                    Keine aktiven Zustände
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            /* ── Volle Ansicht für Tab Kampf & Magie ── */
+            <>
+              {/* ── Temporär row (wird nur angezeigt, wenn aktive temporäre LP vorhanden sind) ── */}
+              {activeTempHP > 0 && (
+                <div className="flex items-center gap-2 sm:gap-3 py-1 px-1.5 bg-[#121924]/60 rounded-lg border border-[#243044]">
+                  <div className="w-32 sm:w-36 text-xs font-semibold text-stone-300 flex items-center gap-1 shrink-0">
+                    <span>Temporär:</span>
+                    <span className="font-mono text-xs font-bold px-1.5 py-0.2 rounded border text-[#86D4C4] bg-[#122320] border-[#35665D]">
+                      {activeTempHP}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center flex-wrap gap-1">
+                    {Array.from({ length: activeTempHP }).map((_, i) => (
+                      <button
+                        key={`temp-active-${i}`}
+                        type="button"
+                        onClick={() => {
+                          dispatch({ type: 'PLAY_REMOVE_TEMP_HP', payload: { amount: 1 } });
+                          toast.success('1 temporären LP entfernt');
+                        }}
+                        title={`Temporärer LP #${i + 1} (Aktiv) – Klick zum Entfernen`}
+                        className="w-5.5 h-5.5 sm:w-6 sm:h-6 rounded-md bg-[#5F9A8D] border border-[#86D4C4] shadow-xs hover:scale-105 active:scale-95 transition-all cursor-pointer select-none"
+                      />
+                    ))}
+                    {tempHPUsed > 0 &&
+                      Array.from({ length: tempHPUsed }).map((_, i) => (
+                        <div
+                          key={`temp-used-${i}`}
+                          title={`Temporärer LP #${i + 1} (Verbraucht)`}
+                          className="w-5.5 h-5.5 sm:w-6 sm:h-6 rounded-md bg-[#162925] border border-[#2d4d45] flex items-center justify-center text-[10px] font-bold text-[#5F9A8D] select-none"
+                        >
+                          ✕
+                        </div>
+                      ))}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        dispatch({ type: 'PLAY_ADD_TEMP_HP', payload: { amount: 1 } });
+                        toast.success('+1 temporärer LP');
+                      }}
+                      title="+1 temporären LP hinzufügen"
+                      className="w-5.5 h-5.5 sm:w-6 sm:h-6 rounded-md border border-dashed border-[#5F9A8D]/70 hover:border-[#86D4C4] text-[#86D4C4] flex items-center justify-center text-xs font-bold hover:bg-[#5F9A8D]/20 transition-all cursor-pointer"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* ── Health level rows (5 standard Splittermond levels) ── */}
+              <div className="space-y-1.5">
+                {HEALTH_LEVEL_LABELS.slice(0, 5).map((label: string, level: number) => {
+                  const start = level * maxLP;
+                  const levelSlots = healthSlots.slice(start, start + maxLP);
+                  const penalty = WOUND_PENALTIES[level];
+                  return (
+                    <div key={level} className="flex items-center gap-2 sm:gap-3">
+                      <div className="w-32 sm:w-36 text-xs font-semibold text-stone-300 shrink-0 leading-tight flex items-center justify-between">
+                        <span className="whitespace-nowrap">{label}</span>
+                        {penalty !== 0 ? (
+                          <span className="text-[#cc6b60] font-bold ml-1 font-mono shrink-0">({penalty})</span>
+                        ) : (
+                          <span className="text-stone-500 font-mono text-[10px] ml-1 shrink-0">±0</span>
+                        )}
+                      </div>
+                      <div className="flex flex-wrap gap-1 sm:gap-1.5">
+                        {levelSlots.map((slot, idx) => {
+                          const absoluteIdx = start + idx;
+                          return renderHealthSlot(slot, absoluteIdx);
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* ── Action Stepper Buttons Row 1: Betäubung, Echter Schaden, Kanalisiert ── */}
+              <div className="grid grid-cols-3 gap-1.5 sm:gap-2 pt-1 border-t border-[#2B374D]/60">
+                <CompoundStepper
+                  label="Betäubung"
+                  variant="amber"
+                  amount={stunDamageAmount}
+                  onAmountChange={setStunDamageAmount}
+                  onPlus={() => {
+                    session.logAndDispatch(
+                      { type: 'PLAY_TAKE_DAMAGE', payload: { kind: 'exhausted', amount: stunDamageAmount, maxLP } },
+                      {
+                        category: 'damage',
+                        title: `${stunDamageAmount} Betäubungsschaden`,
+                        description: `${stunDamageAmount} Betäubung erlitten`,
+                        badge: { text: `-${stunDamageAmount} LP (Bet.)`, variant: 'warning' },
+                      }
+                    );
+                    toast.success(`${stunDamageAmount} Betäubungsschaden erlitten`);
+                  }}
+                  onMinus={() => {
+                    session.logAndDispatch(
+                      { type: 'PLAY_UNDO_DAMAGE', payload: { kind: 'exhausted', amount: stunDamageAmount, maxLP } },
+                      {
+                        category: 'heal',
+                        title: `${stunDamageAmount} Betäubung geheilt`,
+                        badge: { text: `+${stunDamageAmount} LP (Bet.)`, variant: 'success' },
+                      }
+                    );
+                    toast.success(`${stunDamageAmount} Betäubung geheilt`);
+                  }}
+                  minusTitle="Betäubungsschaden heilen"
+                  plusTitle="Betäubungsschaden nehmen"
+                />
+
+                <CompoundStepper
+                  label="Echter Schaden"
+                  variant="red"
+                  amount={consumedDamageAmount}
+                  onAmountChange={setConsumedDamageAmount}
+                  onPlus={() => {
+                    session.logAndDispatch(
+                      { type: 'PLAY_TAKE_DAMAGE', payload: { kind: 'consumed', amount: consumedDamageAmount, maxLP } },
+                      {
+                        category: 'damage',
+                        title: `${consumedDamageAmount} echter Schaden`,
+                        description: `${consumedDamageAmount} echte LP als Schaden erlitten`,
+                        badge: { text: `-${consumedDamageAmount} LP`, variant: 'danger' },
+                      }
+                    );
+                    toast.success(`${consumedDamageAmount} echter Schaden erlitten`);
+                  }}
+                  onMinus={() => {
+                    session.logAndDispatch(
+                      { type: 'PLAY_REST_HEAL', payload: { konAmount: consumedDamageAmount, wilAmount: 0 } },
+                      {
+                        category: 'heal',
+                        title: `${consumedDamageAmount} Wunde(n) geheilt`,
+                        badge: { text: `+${consumedDamageAmount} LP`, variant: 'success' },
+                      }
+                    );
+                    toast.success(`${consumedDamageAmount} Wunde(n) geheilt`);
+                  }}
+                  minusTitle="Echten Schaden heilen"
+                  plusTitle="Echten Schaden nehmen"
+                />
+
+                <CompoundStepper
+                  label="Kanalisiert"
+                  variant="blue"
+                  amount={channeledDamageAmount}
+                  onAmountChange={setChanneledDamageAmount}
+                  onPlus={() => {
+                    session.logAndDispatch(
+                      { type: 'PLAY_TAKE_DAMAGE', payload: { kind: 'channeled', amount: channeledDamageAmount, maxLP } },
+                      {
+                        category: 'damage',
+                        title: `${channeledDamageAmount} Schaden kanalisiert`,
+                        badge: { text: `-${channeledDamageAmount} LP (Kan.)`, variant: 'info' },
+                      }
+                    );
+                    toast.success(`${channeledDamageAmount} Schaden kanalisiert`);
+                  }}
+                  onMinus={() => {
+                    session.logAndDispatch(
+                      { type: 'PLAY_UNDO_DAMAGE', payload: { kind: 'channeled', amount: channeledDamageAmount, maxLP } },
+                      {
+                        category: 'heal',
+                        title: `${channeledDamageAmount} kanalisierter Schaden entfernt`,
+                        badge: { text: `+${channeledDamageAmount} LP`, variant: 'info' },
+                      }
+                    );
+                    toast.success(`${channeledDamageAmount} kanalisierter Schaden entfernt`);
+                  }}
+                  minusTitle="Kanalisierten Schaden entfernen"
+                  plusTitle="Schaden kanalisieren"
+                />
+              </div>
+
+              {/* ── Action Stepper Row 2: Temp LP & LP-Modifikator ── */}
+              <div className="grid grid-cols-2 gap-1.5 sm:gap-2 pt-1">
+                <CompoundStepper
+                  label={`Temp LP (${activeTempHP})`}
+                  variant="teal"
+                  amount={tempHPAmount}
+                  onAmountChange={setTempHPAmount}
+                  onPlus={() => {
+                    dispatch({ type: 'PLAY_ADD_TEMP_HP', payload: { amount: tempHPAmount } });
+                    toast.success(`+${tempHPAmount} temporäre LP`);
+                  }}
+                  onMinus={() => {
+                    dispatch({ type: 'PLAY_REMOVE_TEMP_HP', payload: { amount: tempHPAmount } });
+                    toast.success(`-${tempHPAmount} temporäre LP`);
+                  }}
+                  minusTitle="Temporäre LP verringern"
+                  plusTitle="Temporäre LP hinzufügen"
+                />
+
+                <div className="flex items-center justify-between bg-[#141b27] border border-[#2e3b52] rounded-lg px-2.5 py-1 min-h-[36px]">
+                  <span className="text-stone-300 text-xs font-semibold truncate">
+                    LP-Mod:
+                  </span>
+                  <input
+                    type="number"
+                    value={lpModifier}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value, 10) || 0;
+                      dispatch({
+                        type: 'PLAY_SET_LP_MODIFIER',
+                        payload: {
+                          modifier: val,
+                          newMaxLP: Math.max(1, (derived.LP || 8) + robustBonus + val),
+                        },
+                      });
+                    }}
+                    className="w-12 bg-transparent border-0 font-mono font-bold text-xs text-[#F2EFE6] text-right focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* ── ZUSTÄNDE (Inside LP window, compact full interactive) ── */}
+              <div className="border border-[#2a364c] bg-[#141c29]/90 rounded-lg p-2.5 space-y-2 mt-2">
+                <div className="flex justify-between items-center">
+                  <h4 className="font-bold text-xs uppercase tracking-wider text-[#F2EFE6] fantasy-font">
+                    ZUSTÄNDE
+                  </h4>
+                  {conditions.length > 0 ? (
+                    <span className="text-[10px] text-amber-400 font-semibold">
+                      {conditions.length} aktiv
+                    </span>
+                  ) : (
+                    <span className="text-[10px] text-stone-500 font-medium">0 aktiv</span>
+                  )}
+                </div>
+
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <select
+                    value={selectedCondition}
+                    onChange={(e) => setSelectedCondition(e.target.value)}
+                    className="bg-[#141b27] border border-[#2e3b52] rounded-md px-2 py-1 text-xs text-[#F2EFE6] font-medium focus:outline-none focus:border-[#C5A059] cursor-pointer flex-1 min-w-[120px]"
+                  >
+                    {ALL_CONDITIONS.map((cond: string) => (
+                      <option key={cond} value={cond} className="bg-[#141b27] text-white">
+                        {cond}
+                      </option>
+                    ))}
+                  </select>
+                  {CONDITIONS_WITH_LEVELS.includes(selectedCondition as any) && (
+                    <input
+                      type="number"
+                      min={1}
+                      max={6}
+                      value={conditionLevel}
+                      onFocus={(e) => e.target.select()}
+                      onChange={(e) => setConditionLevel(parseInt(e.target.value, 10) || 1)}
+                      className="w-10 bg-[#141b27] border border-[#2e3b52] rounded-md px-1.5 py-1 text-center text-xs font-mono font-bold text-[#F2EFE6] focus:outline-none focus:border-[#C5A059]"
+                    />
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newCondition: StatusCondition = {
+                        id: generateId(),
+                        key: selectedCondition,
+                        level: CONDITIONS_WITH_LEVELS.includes(selectedCondition as any) ? conditionLevel : undefined,
+                      };
+                      session.logAndDispatch(
+                        { type: 'PLAY_ADD_CONDITION', payload: newCondition },
+                        {
+                          category: 'condition',
+                          title: `Zustand erhalten: ${selectedCondition}`,
+                          description: formatConditionLabel(newCondition),
+                          badge: { text: selectedCondition, variant: 'warning' },
+                        }
+                      );
+                      toast.success(`Zustand ${selectedCondition} hinzugefügt`);
+                    }}
+                    className="bg-[#1c2738] hover:bg-[#25354d] text-[#8fa7c7] hover:text-[#d6e3f5] border border-[#31435f] px-2.5 py-1 rounded-md text-xs font-bold transition-all shadow-xs cursor-pointer shrink-0"
+                    title="Zustand hinzufügen"
+                  >
+                    +
+                  </button>
+                </div>
+
+                {/* Active conditions chips if any */}
+                {conditions.length > 0 ? (
+                  <div className="flex flex-wrap gap-1.5 pt-1.5 border-t border-[#2a364c]/40">
+                    {conditions.map((c) => (
+                      <span
+                        key={c.id}
+                        title={getConditionDescription(c)}
+                        className="inline-flex items-center gap-1.5 bg-[#141c28] hover:bg-[#192433] text-[#F2EFE6] border border-[#C5A059]/40 hover:border-[#C5A059]/80 rounded-full px-2.5 py-0.5 text-xs font-medium shadow-2xs transition-colors"
+                      >
+                        <span>{c.key}</span>
+                        {c.level && c.level > 1 && (
+                          <span className="text-[#C5A059] font-mono font-bold text-[11px]">
+                            {c.level}
+                          </span>
+                        )}
+                        {c.note && (
+                          <span className="text-stone-400 text-[10px] font-normal">
+                            ({c.note})
+                          </span>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            session.logAndDispatch(
+                              { type: 'PLAY_REMOVE_CONDITION', payload: { id: c.id } },
+                              {
+                                category: 'condition',
+                                title: 'Zustand entfernt',
+                                description: `${formatConditionLabel(c)} aufgehoben`,
+                                badge: { text: `${c.key} weg`, variant: 'success' },
+                              }
+                            );
+                          }}
+                          className="ml-0.5 text-stone-400 hover:text-[#8B263E] transition-colors cursor-pointer text-sm leading-none font-bold"
+                          title="Zustand entfernen"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-[11px] text-stone-500 italic py-0.5 border-t border-[#2a364c]/30">
+                    Keine aktiven Zustände
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* ── WINDOW 2: FOKUS ── */}
+        <div className={`bg-[#171F2E] border border-[#2B374D] rounded-xl shadow-lg ${isMinimal ? 'p-3 space-y-2' : 'p-3.5 sm:p-4 space-y-3'}`}>
+          {/* Header: FOKUS on left, Verfügbar on right */}
+          <div className="flex justify-between items-center pb-1.5 border-b border-[#2B374D]/60 gap-2">
+            <h3 className={`${isMinimal ? 'text-base font-bold' : 'text-lg font-bold'} fantasy-font tracking-wide text-[#F2EFE6]`}>
+              FOKUS
+            </h3>
+            <span className="text-xs sm:text-sm font-bold text-[#F2EFE6]">
+              Verfügbar:{' '}
+              <span className={focusAvailable < 0 ? 'text-[#B06258] font-mono font-bold' : 'text-emerald-400 font-mono font-bold'}>
+                {focusAvailable}
+              </span>{' '}
+              / <span className="font-mono">{maxFO}</span>
+            </span>
+          </div>
+
+          {isMinimal ? (
+            /* ── Minimalist view: Nur Fokus, Kanalisierte Zauber (KEINE Kästchen) ── */
+            <div className="space-y-2">
+              {/* 1. Fokus */}
+              <div className="space-y-1">
+                <div className="flex justify-between items-baseline">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-xl sm:text-2xl font-bold font-mono text-[#F2EFE6] tracking-tight">
+                      {focusAvailable}
+                    </span>
+                    <span className="text-stone-400 text-xs sm:text-sm font-medium">
+                      / {maxFO} FO
+                    </span>
+                  </div>
+                  <div className="text-[11px] sm:text-xs text-stone-300">
+                    {focusAvailable === maxFO ? (
+                      <span className="text-emerald-400 font-medium">Voll verfügbar</span>
+                    ) : (
+                      <span>Gebunden / Verbraucht: <strong className="font-mono text-[#DE8A80]">{maxFO - focusAvailable}</strong></span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Sleek continuous focus bar (smooth meter, NO individual Kästchen) */}
+                <div className="h-2 w-full bg-[#101622] rounded-full overflow-hidden flex border border-[#2B374D]/60 shadow-inner">
+                  <div
+                    style={{ width: `${(Math.max(0, focusAvailable) / Math.max(1, maxFO)) * 100}%` }}
+                    className="bg-gradient-to-r from-cyan-600 to-cyan-500 h-full transition-all duration-300"
+                    title={`Freier Fokus: ${focusAvailable}`}
+                  />
+                  {focus.exhausted > 0 && (
+                    <div
+                      style={{ width: `${(focus.exhausted / Math.max(1, maxFO)) * 100}%` }}
+                      className="bg-[#C99A4E] h-full transition-all duration-300"
+                      title={`Erschöpfter Fokus: ${focus.exhausted}`}
+                    />
+                  )}
+                  {focus.channeled > 0 && (
+                    <div
+                      style={{ width: `${(focus.channeled / Math.max(1, maxFO)) * 100}%` }}
+                      className="bg-[#5C7189] h-full transition-all duration-300"
+                      title={`Kanalisierter Fokus: ${focus.channeled}`}
+                    />
+                  )}
+                  {focus.consumed > 0 && (
+                    <div
+                      style={{ width: `${(focus.consumed / Math.max(1, maxFO)) * 100}%` }}
+                      className="bg-[#B06258] h-full transition-all duration-300"
+                      title={`Verzehrter Fokus: ${focus.consumed}`}
+                    />
+                  )}
+                </div>
+
+                {/* Focus breakdown details */}
+                <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[10px] sm:text-[11px] text-stone-400 pt-0.5">
+                  <span className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full border border-[#4A5470] bg-[#182030] inline-block" />
+                    Frei: <strong className="font-mono text-emerald-400">{focusAvailable}</strong>
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-[#C99A4E] inline-block" />
+                    Erschöpft: <strong className="font-mono text-[#F2EFE6]">{focus.exhausted}</strong>
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-[#5C7189] inline-block" />
+                    Kanalisiert: <strong className="font-mono text-[#F2EFE6]">{focus.channeled}</strong>
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-[#B06258] inline-block" />
+                    Verzehrt: <strong className="font-mono text-[#F2EFE6]">{focus.consumed}</strong>
+                  </span>
+                </div>
+              </div>
+
+              {/* 2. Kanalisierte Zauber */}
+              <div className="pt-1.5 border-t border-[#2B374D]/60 space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs uppercase font-bold tracking-wider text-stone-400 fantasy-font">
+                    Kanalisierte Zauber
+                  </span>
+                  <span className="text-[10px] text-stone-500 font-semibold">
+                    {channeledSpells.length} aktiv ({totalChanneledFO} K-Fokus)
+                  </span>
+                </div>
+                {channeledSpells.length > 0 ? (
+                  <div className="flex flex-wrap gap-1.5">
+                    {channeledSpells.map((s) => (
+                      <span
+                        key={s.id}
+                        title={`${s.name}: Bindet ${s.channeledFocus} kanalisierten Fokus. Klick auf '×' hebt Zauber auf.`}
+                        className="inline-flex items-center gap-1.5 bg-[#141c28] hover:bg-[#192433] text-[#F2EFE6] border border-[#5C7189]/50 hover:border-[#748BA6] rounded-full px-2 py-0.5 text-xs font-medium shadow-2xs transition-colors"
+                      >
+                        <span className="font-semibold text-[#F2EFE6]">{s.name}</span>
+                        <span
+                          className="text-[#86D4C4] font-mono font-bold text-[11px] bg-[#122320] px-1.5 py-0.2 rounded border border-[#35665D]"
+                          title={`Bindet ${s.channeledFocus} K-Fokus`}
+                        >
+                          K{s.channeledFocus}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => session.handleCancelChanneledSpell(s)}
+                          className="ml-0.5 text-stone-400 hover:text-[#ff8ba7] transition-colors cursor-pointer text-xs leading-none font-bold"
+                          title={`'${s.name}' aufheben (${s.channeledFocus} K-Fokus wird zu erschöpftem Fokus)`}
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-[11px] text-stone-500 italic">Keine kanalisierten Zauber aktiv</div>
+                )}
+              </div>
+            </div>
+          ) : (
+            /* ── Volle Ansicht für Tab Kampf & Magie ── */
+            <>
+              {/* Focus slot visualization */}
+              {maxFO > 0 && (
+                <div className="space-y-2">
+                  <div className="flex flex-wrap gap-1 sm:gap-1.5">
+                    {Array.from({ length: maxFO }, (_, i) => {
+                      let slotType: 'consumed' | 'channeled' | 'exhausted' | 'empty' = 'empty';
+                      if (i < focus.consumed) slotType = 'consumed';
+                      else if (i < focus.consumed + focus.channeled) slotType = 'channeled';
+                      else if (i < focus.consumed + focus.channeled + focus.exhausted) slotType = 'exhausted';
+                      return renderFocusSlot(slotType, i);
+                    })}
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-3 text-[11px] text-stone-300 pt-0.5">
+                    <span className="flex items-center gap-1">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#B06258] inline-block" />
+                      Verzehrt
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#5C7189] inline-block" />
+                      Kanalisiert
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#C99A4E] inline-block" />
+                      Erschöpft
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <span className="w-2.5 h-2.5 rounded-full border border-[#4A5470] bg-[#182030] inline-block" />
+                      Frei
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* 3 compound steppers */}
+              <div className="grid grid-cols-3 gap-1.5 sm:gap-2 pt-1 border-t border-[#2B374D]/60">
+                <CompoundStepper
+                  label="Erschöpft"
+                  variant="amber"
+                  amount={exhaustedFocusAmount}
+                  onAmountChange={setExhaustedFocusAmount}
+                  onMinus={() => handleSpendFocus('exhausted', -exhaustedFocusAmount)}
+                  onPlus={() => handleSpendFocus('exhausted', exhaustedFocusAmount)}
+                  minusTitle="Erschöpften Fokus regenerieren"
+                  plusTitle="Erschöpften Fokus ausgeben"
+                />
+                <CompoundStepper
+                  label="Kanalisiert"
+                  variant="blue"
+                  amount={channeledFocusAmount}
+                  onAmountChange={setChanneledFocusAmount}
+                  onMinus={() => handleSpendFocus('channeled', -channeledFocusAmount)}
+                  onPlus={() => handleSpendFocus('channeled', channeledFocusAmount)}
+                  minusTitle="Kanalisierten Fokus freigeben"
+                  plusTitle="Fokus kanalisieren"
+                />
+                <CompoundStepper
+                  label="Verzehrt"
+                  variant="red"
+                  amount={consumedFocusAmount}
+                  onAmountChange={setConsumedFocusAmount}
+                  onMinus={() => handleSpendFocus('consumed', -consumedFocusAmount)}
+                  onPlus={() => handleSpendFocus('consumed', consumedFocusAmount)}
+                  minusTitle="Verzehrten Fokus regenerieren"
+                  plusTitle="Verzehrten Fokus ausgeben"
+                />
+              </div>
+
+              {/* Quick Focus Actions */}
+              {focus.exhausted > 0 && (
+                <div className="pt-2 border-t border-[#2B374D]/60 flex items-center">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      session.logAndDispatch(
+                        { type: 'PLAY_SPEND_FOCUS', payload: { kind: 'exhausted', amount: -focus.exhausted } },
+                        {
+                          category: 'focus',
+                          title: 'Alles Erschöpfte erholt',
+                          badge: { text: `+${focus.exhausted} FO`, variant: 'success' },
+                        }
+                      );
+                      toast.success('Alles Erschöpfte erholt');
+                    }}
+                    className="w-full bg-[#241c12] hover:bg-[#382b1b] text-[#e0a84d] border border-[#966b2d]/70 rounded-lg py-1 px-2 text-xs font-semibold transition-all shadow-xs cursor-pointer text-center"
+                  >
+                    Alles Erschöpfte erholen ({focus.exhausted})
+                  </button>
+                </div>
+              )}
+
+              {/* ── KANALISIERTE ZAUBER (Inside Focus window: displays active spells with release action) ── */}
+              <div className="border border-[#2a364c] bg-[#141c29]/90 rounded-lg p-2.5 space-y-2 mt-2">
+                <div className="flex justify-between items-center">
+                  <h4 className="font-bold text-xs uppercase tracking-wider text-[#F2EFE6] fantasy-font">
+                    KANALISIERTE ZAUBER
+                  </h4>
+                  {channeledSpells.length > 0 ? (
+                    <span className="text-[10px] text-[#748BA6] font-semibold">
+                      {channeledSpells.length} aktiv ({totalChanneledFO} K-Fokus)
+                    </span>
+                  ) : (
+                    <span className="text-[10px] text-stone-500 font-medium">0 aktiv</span>
+                  )}
+                </div>
+
+                {/* Active channeled spells chips if any */}
+                {channeledSpells.length > 0 ? (
+                  <div className="flex flex-wrap gap-1.5 pt-0.5">
+                    {channeledSpells.map((s) => (
+                      <span
+                        key={s.id}
+                        title={`${s.name}: Bindet ${s.channeledFocus} kanalisierten Fokus. Klick auf 'Aufheben' wandelt diesen Fokus in erschöpften Fokus um.`}
+                        className="inline-flex items-center gap-1.5 bg-[#141c28] hover:bg-[#192433] text-[#F2EFE6] border border-[#5C7189]/50 hover:border-[#748BA6] rounded-full px-2.5 py-0.5 text-xs font-medium shadow-2xs transition-colors"
+                      >
+                        <span className="font-semibold text-[#F2EFE6]">{s.name}</span>
+                        <span
+                          className="text-[#86D4C4] font-mono font-bold text-[11px] bg-[#122320] px-1.5 py-0.2 rounded border border-[#35665D]"
+                          title={`Bindet ${s.channeledFocus} kanalisierte(n) Fokuspunkt(e)`}
+                        >
+                          K{s.channeledFocus}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => session.handleCancelChanneledSpell(s)}
+                          className="ml-1 text-[11px] font-bold text-[#8fa7c7] hover:text-[#ff8ba7] bg-[#1c2738] hover:bg-[#2b1f26] px-1.5 py-0.5 rounded transition-all cursor-pointer flex items-center gap-0.5"
+                          title={`'${s.name}' aufheben (${s.channeledFocus} K-Fokus wird zu erschöpftem Fokus)`}
+                        >
+                          <span>×</span>
+                          <span>Aufheben</span>
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-[11px] text-stone-500 italic py-0.5">
+                    Keine kanalisierten Zauber aktiv
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* ── 4. Abgeleitete Werte & Splitterpunkte Row ── */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+        {/* Abgeleitete Werte */}
+        <div className="derived-stats-card @container bg-[#171F2E] rounded-xl border border-[#2B374D] shadow-lg p-4 sm:p-5 flex flex-col justify-between">
+          <div>
+            <div className="flex justify-between items-center border-b border-[#C5A059]/40 pb-2 mb-3 gap-2">
+              <h3 className="font-bold text-lg sm:text-xl fantasy-font text-[#F2EFE6] flex items-center gap-2 shrink-0">
+                <Shield size={18} className="text-[#C5A059] shrink-0" />
+                <span>Abgeleitete Werte</span>
+              </h3>
+              <span className="text-xs text-stone-400 font-medium whitespace-nowrap truncate text-right">Splittermond Kampfwirkung</span>
+            </div>
+
+            <div className="grid grid-cols-3 @[480px]:grid-cols-6 gap-2 text-center derived-stats-grid">
+              <div
+                className="bg-[#141b27] rounded-lg p-2 border border-[#2B374D] shadow-2xs"
+                title={
+                  isRingend
+                    ? 'Geschwindigkeit: 0 (Zustand: Ringend)'
+                    : isLahm
+                      ? `Geschwindigkeit: ${effectiveGSW} (halbiert durch Zustand Lahm)`
+                      : totalHandicap > 0
+                        ? `Geschwindigkeit: ${derived.GSW} (reduziert um ${Math.floor(totalHandicap / 2)} durch halbe Behinderung von ${totalHandicap})`
+                        : 'Geschwindigkeit (GSW)'
+                }
+              >
+                <span className="text-[10px] uppercase font-bold text-stone-400 block">GSW</span>
+                <span className="text-xl font-bold text-[#F2EFE6] font-mono">
+                  {effectiveGSW}
+                  {isRingend ? (
+                    <span className="text-[10px] text-[#ff8ba7] font-bold ml-1 font-mono">(0)</span>
+                  ) : isLahm ? (
+                    <span className="text-[10px] text-[#ff8ba7] font-bold ml-1 font-mono">(½)</span>
+                  ) : totalHandicap > 0 && Math.floor(totalHandicap / 2) > 0 ? (
+                    <span className="text-[11px] text-[#ff8ba7] font-bold ml-1 font-mono">
+                      (-{Math.floor(totalHandicap / 2)})
+                    </span>
+                  ) : null}
+                </span>
+              </div>
+              <div className="bg-[#141b27] rounded-lg p-2 border border-[#2B374D] shadow-2xs">
+                <span className="text-[10px] uppercase font-bold text-stone-400 block">INI</span>
+                <span className="text-xl font-bold text-[#F2EFE6] font-mono">{derived.INI}</span>
+              </div>
+              <div
+                className="bg-[#141b27] rounded-lg p-2 border border-[#2B374D] shadow-2xs"
+                title={
+                  isBewusstlos
+                    ? 'Verteidigung: 0 (Zustand: Bewusstlos/Wehrlos)'
+                    : isRingend
+                      ? `Verteidigung: ${effectiveVTD} (−3 durch Zustand Ringend)`
+                      : isLiegend
+                        ? `Verteidigung: ${effectiveVTD} (−2 Nahkampf-VTD durch Zustand Liegend)`
+                        : gearVtdBonus > 0
+                          ? `VTD: Basis ${derived.VTD - gearVtdBonus} + Ausrüstung +${gearVtdBonus}`
+                          : 'Verteidigung'
+                }
+              >
+                <span className="text-[10px] uppercase font-bold text-stone-400 block">VTD</span>
+                <span className="text-xl font-bold text-[#F2EFE6] font-mono">
+                  {effectiveVTD}
+                  {isBewusstlos ? (
+                    <span className="text-[10px] text-[#ff8ba7] font-bold ml-1">(=0)</span>
+                  ) : isRingend ? (
+                    <span className="text-[10px] text-[#ff8ba7] font-bold ml-1">(-3)</span>
+                  ) : isLiegend ? (
+                    <span className="text-[10px] text-[#ff8ba7] font-bold ml-1">(-2)</span>
+                  ) : gearVtdBonus > 0 ? (
+                    <span className="text-[10px] text-emerald-400 font-bold ml-0.5">+{gearVtdBonus}</span>
+                  ) : null}
+                </span>
+              </div>
+              <div
+                className="bg-[#141b27] rounded-lg p-2 border border-[#2B374D] shadow-2xs"
+                title={`Schadensreduktion: ${armorSR} Rüstung + ${derived.SR - armorSR} natürlich`}
+              >
+                <span className="text-[10px] uppercase font-bold text-stone-400 block">SR</span>
+                <span className="text-xl font-bold text-[#F2EFE6] font-mono">
+                  {derived.SR}
+                  {armorSR > 0 && <span className="text-[10px] text-amber-400 font-bold ml-0.5">({armorSR})</span>}
+                </span>
+              </div>
+              <div className="bg-[#141b27] rounded-lg p-2 border border-[#2B374D] shadow-2xs">
+                <span className="text-[10px] uppercase font-bold text-stone-400 block">GW</span>
+                <span className="text-xl font-bold text-[#F2EFE6] font-mono">{derived.GW}</span>
+              </div>
+              <div className="bg-[#141b27] rounded-lg p-2 border border-[#2B374D] shadow-2xs">
+                <span className="text-[10px] uppercase font-bold text-stone-400 block">KW</span>
+                <span className="text-xl font-bold text-[#F2EFE6] font-mono">{derived.KW}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Splitterpunkte */}
+        <div className="bg-[#171F2E] rounded-xl border border-[#2B374D] shadow-lg p-4 sm:p-5 flex flex-col justify-between">
+          <div>
+            <div className="flex justify-between items-center border-b border-[#C5A059]/40 pb-2 mb-3 gap-2">
+              <h3 className="font-bold text-lg sm:text-xl fantasy-font text-[#F2EFE6] flex items-center gap-1.5 shrink-0">
+                <Sparkles size={18} className="text-[#C5A059] shrink-0" />
+                <span>Splitterpunkte</span>
+              </h3>
+              <span className="text-sm font-bold text-[#C5A059] font-mono whitespace-nowrap shrink-0">
+                {splitterPoints} / {maxSplitter} SP
+              </span>
+            </div>
+
+            {/* Visual tokens */}
+            <div className="flex flex-wrap gap-1.5 my-2">
+              {Array.from({ length: Math.max(maxSplitter, splitterPoints) }).map((_, idx) => {
+                const isAvailable = idx < splitterPoints;
+                return (
+                  <span
+                    key={idx}
+                    className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs transition-all ${
+                      isAvailable
+                        ? 'bg-[#C5A059] text-[#1B365D] shadow-sm border border-[#9b7b3b]'
+                        : 'bg-[#182030] text-stone-500 border border-[#2B354A]'
+                    }`}
+                  >
+                    ★
+                  </span>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* SP controls */}
+          <div className="flex items-center gap-2 pt-2 border-t border-[#2B374D]/60 mt-3">
+            <button
+              type="button"
+              disabled={splitterPoints <= 0}
+              onClick={() => {
+                const newSP = Math.max(0, splitterPoints - 1);
+                session.logAndDispatch(
+                  { type: 'PLAY_SET_SPLITTER', payload: newSP },
+                  {
+                    category: 'splitter',
+                    title: '1 Splitterpunkt ausgegeben',
+                    description: `Splitterpunkte auf ${newSP} SP gesetzt`,
+                    badge: { text: '-1 SP', variant: 'gold' },
+                  }
+                );
+                toast.success('1 Splitterpunkt eingesetzt');
+              }}
+              className="flex-1 bg-[#C5A059] hover:bg-[#d6b16a] disabled:opacity-40 text-[#1B365D] font-bold py-1.5 px-2 rounded-lg text-xs transition-all shadow-xs cursor-pointer whitespace-nowrap text-center"
+            >
+              1 SP einsetzen
+            </button>
+            <div className="flex items-center gap-1 shrink-0">
+              <button
+                type="button"
+                disabled={splitterPoints <= 0}
+                onClick={() => {
+                  const newSP = Math.max(0, splitterPoints - 1);
+                  session.logAndDispatch(
+                    { type: 'PLAY_SET_SPLITTER', payload: newSP },
+                    {
+                      category: 'splitter',
+                      title: 'Splitterpunkt -1',
+                      badge: { text: '-1 SP', variant: 'gold' },
+                    }
+                  );
+                }}
+                className="w-7 h-7 bg-[#141b27] hover:bg-[#1f2b3e] border border-[#2B374D] rounded-lg flex items-center justify-center font-bold text-stone-300 disabled:opacity-40 text-xs cursor-pointer"
+              >
+                -
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const newSP = splitterPoints + 1;
+                  session.logAndDispatch(
+                    { type: 'PLAY_SET_SPLITTER', payload: newSP },
+                    {
+                      category: 'splitter',
+                      title: 'Splitterpunkt +1',
+                      badge: { text: '+1 SP', variant: 'gold' },
+                    }
+                  );
+                }}
+                className="w-7 h-7 bg-[#141b27] hover:bg-[#1f2b3e] border border-[#2B374D] rounded-lg flex items-center justify-center font-bold text-stone-300 text-xs cursor-pointer"
+              >
+                +
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
