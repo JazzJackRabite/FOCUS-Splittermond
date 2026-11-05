@@ -219,7 +219,7 @@ const App: React.FC = () => {
                 </h1>
                 <p className="text-[11px] sm:text-xs text-[#C5A059] italic tracking-wide leading-tight mt-1">
                   Freier Online Charaktereditor:<br />
-                  Universum Splittermond v0.9
+                  Universum Splittermond v.1.2
                 </p>
               </div>
 
