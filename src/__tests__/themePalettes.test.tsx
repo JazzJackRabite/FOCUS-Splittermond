@@ -49,7 +49,8 @@ describe('Theme Palettes & SettingsModal', () => {
     // Modal title & tabs
     expect(screen.getByText('Einstellungen')).toBeDefined();
     expect(screen.getByRole('button', { name: /Allgemein & Farbschema/i })).toBeDefined();
-    expect(screen.getByRole('button', { name: /Admin & Ressourcen/i })).toBeDefined();
+    expect(screen.getByRole('button', { name: /Regelpakete/i })).toBeDefined();
+    expect(screen.queryByRole('button', { name: /Admin & Ressourcen/i })).toBeNull();
     expect(screen.getByRole('button', { name: /Info/i })).toBeDefined();
 
     // Mode toggle button in header (no text, aria-label to toggle)
@@ -88,9 +89,6 @@ describe('Theme Palettes & SettingsModal', () => {
     // Initial tab is Allgemein & Farbschema
     expect(screen.getByText('Erscheinungsbild')).toBeDefined();
 
-    // Click Admin & Ressourcen
-    fireEvent.click(screen.getByRole('button', { name: /Admin & Ressourcen/i }));
-    expect(screen.getAllByText(/Admin-Konsole öffnen/i).length).toBeGreaterThan(0);
 
     // Click Info
     fireEvent.click(screen.getByRole('button', { name: /Info/i }));

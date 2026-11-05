@@ -97,6 +97,16 @@ Repository `JazzJackRabite/FOKUS-1.0-claudeedition` (Branch `main`; entstanden a
   Einträge aus nicht geladenen Büchern bleiben unverändert und behalten ihre ID.
 - Behoben: Erschaffung nach Regelwerk (Stand 3) und Begleiter (Stand 5) gingen beim Neuladen der Seite verloren (`hydrateState`).
 
+## Stand 8 (05.11.2026): „Admin & Ressourcen“ entfernt (Repository FOKUS-1.2)
+
+- Arbeitsstand liegt jetzt in `JazzJackRabite/FOKUS-1.2` (aus Google AI Studio: npm statt Bun, Entwicklungsserver auf Port 3000,
+  `.env.example`). Die Versionsgeschichte der Stände 1–7 liegt in `JazzJackRabite/FOKUS-1.0-claudeedition`.
+- Entfernt: Reiter „Admin & Ressourcen“ in den Einstellungen, Admin-Konsole (Module, Beschreibungen ändern, Datenmodell,
+  SQLite-Explorer), PIN-Schutz, Ressourcen-Backup, die Demo-Module „Mondstahlklingen“/„Götter & Dämonen“, der JSON-Modulimport,
+  `sqliteService` und die Abhängigkeit `sql.js`.
+- Bücher kommen nur noch über Einstellungen → Regelpakete. Alte Einträge der früheren Modul- und Beschreibungsverwaltung im
+  Browserspeicher werden nicht mehr gelesen (nicht gelöscht).
+
 ## Nächste Schritte
 
 Die geplanten Schritte sind erledigt. Offen bleiben Ideen wie Spielhilfen für bedingte Wirkungen (z. B. Bonus gegen Typus per Klick

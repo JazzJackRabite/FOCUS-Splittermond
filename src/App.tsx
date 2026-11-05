@@ -9,7 +9,6 @@ import { CharacterContext, useCharacter } from './context/CharacterContext';
 import { XpAddModal } from './components/modals/XpAddModal';
 import { ProfileModal } from './components/modals/ProfileModal';
 import { SettingsModal } from './components/common/SettingsModal';
-import { AdminModal } from './components/admin/AdminModal';
 import { useTheme } from './hooks/useTheme';
 import { loadFromLocalStorage } from './hooks/useLocalStorage';
 import { ConfirmDialog } from './components/ui/ConfirmDialog';
@@ -86,7 +85,6 @@ const App: React.FC = () => {
   const [showXpModal, setShowXpModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showThemeModal, setShowThemeModal] = useState(false);
-  const [showAdminModal, setShowAdminModal] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogState | null>(null);
 
   useEffect(() => {
@@ -324,16 +322,7 @@ const App: React.FC = () => {
               currentThemeId={currentThemeId}
               onSelectTheme={(themeId) => setTheme(themeId)}
               onClose={() => setShowThemeModal(false)}
-              onOpenAdmin={() => {
-                setShowThemeModal(false);
-                setShowAdminModal(true);
-              }}
             />
-          )}
-
-          {/* Admin Modal */}
-          {showAdminModal && (
-            <AdminModal onClose={() => setShowAdminModal(false)} />
           )}
 
           {/* TABS */}

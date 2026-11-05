@@ -16,8 +16,7 @@
     "lucide-react": "^0.408.0",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
-    "react-hot-toast": "2.4.1",
-    "sql.js": "^1.14.2"
+    "react-hot-toast": "2.4.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.2.2",
@@ -25,7 +24,6 @@
     "@types/node": "^22.14.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "@types/sql.js": "^1.4.11",
     "@vitejs/plugin-react": "^5.0.0",
     "autoprefixer": "^10.4.27",
     "jsdom": "^30.0.1",
