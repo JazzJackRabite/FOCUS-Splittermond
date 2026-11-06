@@ -3,8 +3,10 @@ import { useRegelwerk } from '../../regelwerk/RegelwerkContext';
 import { TierAbschnitt } from '../../components/begleiter/TierAbschnitt';
 import { WesenAbschnitt } from '../../components/begleiter/WesenAbschnitt';
 import { GefolgeAbschnitt } from '../../components/begleiter/GefolgeAbschnitt';
+import { UntotAbschnitt } from '../../components/begleiter/UntotAbschnitt';
+import { GolemAbschnitt } from '../../components/begleiter/GolemAbschnitt';
 
-/** Tab „Begleiter“: Tiere (Tiergefährten, Reittiere, Vertraute), Gefolge und beschworene Wesen. Braucht die Regelpakete. */
+/** Tab „Begleiter“: Tiere (Tiergefährten, Reittiere, Vertraute), Gefolge, beschworene Wesen, erhobene Untote und Golems. Braucht die Regelpakete. */
 export const BegleiterView: React.FC = () => {
   const { katalog: k } = useRegelwerk();
   return (
@@ -16,6 +18,8 @@ export const BegleiterView: React.FC = () => {
           <TierAbschnitt k={k} />
           <GefolgeAbschnitt k={k} />
           <WesenAbschnitt k={k} />
+          <UntotAbschnitt k={k} />
+          <GolemAbschnitt k={k} />
         </>
       )}
     </div>

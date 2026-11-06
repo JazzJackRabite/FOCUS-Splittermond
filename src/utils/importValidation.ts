@@ -519,9 +519,15 @@ export function validateCharacterImport(data: unknown): Partial<CharacterState> 
     ...(typeof w.staerke === 'string' ? { staerke: w.staerke } : {}),
     ...(typeof w.meisterschaft === 'number' ? { meisterschaft: w.meisterschaft } : {}),
   });
+  const zahlen = (o: unknown) => (o && typeof o === 'object' && !Array.isArray(o)
+    ? Object.fromEntries(Object.entries(o as Record<string, unknown>).filter(([, v]) => typeof v === 'number' && v > 0)) as Record<string, number> : undefined);
+  const steigerung = (w: Record<string, unknown>): NonNullable<Begleiter['steigerung']> => ({
+    ...(zahlen(w.attribute) ? { attribute: zahlen(w.attribute) } : {}),
+    ...(zahlen(w.fertigkeiten) ? { fertigkeiten: zahlen(w.fertigkeiten) } : {}),
+  });
   if (Array.isArray(data.begleiter)) {
     const b = (data.begleiter as unknown[]).filter((x): x is Record<string, unknown> => !!x && typeof x === 'object' && typeof (x as Record<string, unknown>).id === 'string'
-      && ['tier', 'wesen', 'gefolge'].includes(String((x as Record<string, unknown>).art)))
+      && ['tier', 'wesen', 'gefolge', 'golem', 'untoter'].includes(String((x as Record<string, unknown>).art)))
       .map((x) => ({
         id: String(x.id), art: x.art as Begleiter['art'], name: String(x.name ?? x.id),
         ...(typeof x.notiz === 'string' ? { notiz: x.notiz } : {}),
@@ -536,6 +542,14 @@ export function validateCharacterImport(data: unknown): Partial<CharacterState> 
         ...(Array.isArray(x.schwellen) ? { schwellen: texte(x.schwellen) } : {}),
         ...(Array.isArray(x.meisterschaften) ? { meisterschaften: texte(x.meisterschaften) } : {}),
         ...(Array.isArray(x.zauber) ? { zauber: texte(x.zauber) } : {}),
+        ...(typeof x.material === 'string' ? { material: x.material } : {}),
+        ...(Array.isArray(x.bausteine) ? { bausteine: texte(x.bausteine) } : {}),
+        ...(Array.isArray(x.sonderausstattung) ? { sonderausstattung: texte(x.sonderausstattung) } : {}),
+        ...(x.golemRessource === true ? { golemRessource: true } : {}),
+        ...(typeof x.erhebung === 'string' ? { erhebung: x.erhebung } : {}),
+        ...(typeof x.verstaerkungen === 'number' && x.verstaerkungen >= 0 ? { verstaerkungen: Math.floor(x.verstaerkungen) } : {}),
+        ...(typeof x.abnormitaet === 'string' ? { abnormitaet: x.abnormitaet } : {}),
+        ...(x.steigerung && typeof x.steigerung === 'object' && !Array.isArray(x.steigerung) ? { steigerung: steigerung(x.steigerung as Record<string, unknown>) } : {}),
         ...(x.kulturWahl && typeof x.kulturWahl === 'object' && !Array.isArray(x.kulturWahl) ? { kulturWahl: kulturWahl(x.kulturWahl as Record<string, unknown>) } : {}),
       }));
     if (b.length) result.begleiter = b;

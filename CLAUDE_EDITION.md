@@ -208,8 +208,33 @@ anwenden) oder Werte der Begleiter im Kampf.
 - Code: `regelwerk/gefolge.ts` (gefolgeWerte, kulturWerte, gruppenOptionen, meisterschaftsAngebot, zauberAngebot),
   `components/begleiter/GefolgeAbschnitt.tsx`, Typ `Begleiter` um `art: 'gefolge'` und die Gefolge-Felder erweitert, Import.
   Tests: `gefolge.test.tsx`.
-- Offen (nächste Teile): Vertraute aus „Die Magie“, erhobene Untote (Abnormitäten), Golems (Golem-Bausteine), Baukasten für
-  Wesen; Begleiter im Kampf-Tab; Boni aus Abrichtungen im Wertekasten.
+
+## Tab „Begleiter“, Teil 3: Erhobene Untote und Golems (Branch `begleiter-teil2`)
+
+- **Modifikationen-Texte** (`regelwerk/modifikationen.ts`): „KON +1, STÄ +1; LP +1, VTD +2; Angriff +1, INI −1; Athletik +2;
+  zusätzliches Merkmal: …; Merkmal Pazifist entfällt; GK +1 (maximal 7); Waffenmerkmal …“ werden ausgelesen und auf den
+  Wertekasten angewendet (Attribute, abgeleitete Werte, Waffen mit Wert/Schaden/WGS/INI, Fertigkeiten, Merkmale, „Zerbrechlich wird
+  zu Schwächlich …“ samt LP +1 nach S. 207). Wahlen und Freitexte („ein beliebiges Attribut +1“, freie Punkte/Meisterschaften)
+  bleiben als Hinweis für den Feinschliff bzw. die Spielleitung.
+- **Erhobene Untote** (Die Magie S. 182–184, nur mit Erhebungszauber im Katalog): Zauber → Wertesatz (Untote erheben:
+  Wandelnder Leichnam/Skelett, Totentier: Gruftkatze/Wimmelnder Schrecken, Grabesbestie: Ghul/Seuchenbringer, Der letzte Ruf:
+  Knochenschänder/Mumie). Verstand 0. EP aus der Verstärkung (10/15/25/35), mehrfach nur mit Nekromant. Steigerung „von 0 an“
+  (Fertigkeitspunkte 3/5/7/9 EP, Attribute 10/15/20 …), Attribute wirken auf abgeleitete Werte (Formeln des GRW), Fertigkeiten
+  und Angriff (BEW + STÄ); Pseudo-Fertigkeit „Angriff (Waffen)“. Grenze der neuen Punkte nach Zaubergrad (1–2 → HG 1 …),
+  freie Meisterschaft ab 6/9/12/15 Punkten, keine Magieschulen, kein Arkane Kunde/Geschichte und Mythen. Abnormität (5 EP,
+  Meister der Abnormitäten) mit ihren Modifikationen.
+- **Golems** (Die Magie S. 197–207, nur mit Buchpaket): Korpus (Klein/Mittel/Groß), Material (Schritt 2, mit Schwachpunkt),
+  Zusätzliche Fähigkeiten, Rollen (Kämpfer braucht Aggressiv), Applikationen (zwei frei bzw. eine je Stufe über die Ressource
+  Golem; jede weitere +1 Schwierigkeit, +3 Fortschrittspunkte und ein Schwachpunkt), Schwachpunkte (Anfällig, Feingliedrig,
+  Langsam auch in Zahlen), Instruktionen (Folge/Warte immer, eine weitere + „Zusätzliche Instruktion“), Verfügungen,
+  Sonderausstattung (eine je zwei Stufen). Ausgabe: Stufe des Merkmals Golem mit Aufschlüsselung, Werte, passender
+  Animierungszauber, Konstruktionsprobe, Kaufpreis, Meisterschaftsschwelle für den Feinschliff, Ressource Golem.
+- Datenlücke: Skelett, Wandelnder Leichnam, Ghul (GRW-Bestiarium) sowie Mumie und Seuchenbringer (Bestien & Ungeheuer) haben
+  keine Werte in den Paketen; diese Untoten lassen sich anlegen und steigern, der Editor verweist auf die Buchseite.
+- Code: `regelwerk/{modifikationen,untote,golem}.ts`, `components/begleiter/{UntotAbschnitt,GolemAbschnitt}.tsx`, Typ `Begleiter`
+  (`art: 'golem' | 'untoter'`, Felder für Bausteine und Steigerung), Import. Tests: `untoteGolems.test.tsx`. 269 Tests grün.
+- Offen: Vertraute aus „Die Magie“, Baukasten für beschwörbare Wesen (Magie S. 193–196) und für Bestien (Bestienmeister),
+  Begleiter im Kampf-Tab, Boni aus Abrichtungen im Wertekasten, fehlende Bestiarium-Werte auf der Datenseite.
 
 ## Google AI Studio
 

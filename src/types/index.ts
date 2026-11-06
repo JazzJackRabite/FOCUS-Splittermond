@@ -210,7 +210,7 @@ export interface CharacterState {
 
 export interface Begleiter {
   /** Tier/Wesen: Katalog-ID des Wertekastens; Gefolge: Katalog-ID der Kultur */
-  id: string; art: 'tier' | 'wesen' | 'gefolge'; name: string; notiz?: string;
+  id: string; art: 'tier' | 'wesen' | 'gefolge' | 'golem' | 'untoter'; name: string; notiz?: string;
   /** eigener Name des Tieres bzw. Wesens */
   rufname?: string;
   /** Punkte der Ressource Kreatur für dieses Tier (0/fehlt = ohne Ressource, z. B. gekauft) */
@@ -236,6 +236,24 @@ export interface Begleiter {
   meisterschaften?: string[];
   /** Zauber (IDs) */
   zauber?: string[];
+  // ---- Golem (Die Magie S. 197–207); id = Korpus
+  /** Golemmaterial (Katalog-ID) */
+  material?: string;
+  /** Golem-Bausteine (IDs, Wiederholung = mehrfach gewählt) */
+  bausteine?: string[];
+  /** gewählte Sonderausstattung je Platz (Text der Möglichkeit, z. B. „SR +2“) */
+  sonderausstattung?: string[];
+  /** über die Ressource Golem dauerhaft animiert (Großer Ritus) */
+  golemRessource?: boolean;
+  // ---- Erhobener Untoter (Die Magie S. 182–184); id = Wertesatz (Kreatur) oder „untoter:<Name>“
+  /** Zauber, mit dem der Untote erhoben wurde */
+  erhebung?: string;
+  /** wie oft die Verstärkung „Erfahrungspunkte“ gewählt wurde */
+  verstaerkungen?: number;
+  /** Abnormität (ID) */
+  abnormitaet?: string;
+  /** mit Erfahrungspunkten gesteigert: Attribute (Kürzel) und Fertigkeiten (IDs), jeweils Anzahl der Punkte */
+  steigerung?: { attribute?: Record<string, number>; fertigkeiten?: Record<string, number> };
 }
 
 export interface ErschaffungsModulWahl {
