@@ -10,6 +10,7 @@ import type {
   InventoryItem,
   Money,
   ChanneledSpell,
+  Begleiter,
 } from '../types';
 import { generateId } from './id';
 
@@ -511,17 +512,31 @@ export function validateCharacterImport(data: unknown): Partial<CharacterState> 
     }
     if (Object.keys(e).length) result.erschaffung = e as CharacterState['erschaffung'];
   }
+  const texte = (l: unknown) => (l as unknown[]).filter((a): a is string => typeof a === 'string');
+  const kulturWahl = (w: Record<string, unknown>): NonNullable<Begleiter['kulturWahl']> => ({
+    ...(w.fertigkeiten && typeof w.fertigkeiten === 'object' && !Array.isArray(w.fertigkeiten)
+      ? { fertigkeiten: Object.fromEntries(Object.entries(w.fertigkeiten as Record<string, unknown>).filter(([, v]) => typeof v === 'string')) as Record<string, string> } : {}),
+    ...(typeof w.staerke === 'string' ? { staerke: w.staerke } : {}),
+    ...(typeof w.meisterschaft === 'number' ? { meisterschaft: w.meisterschaft } : {}),
+  });
   if (Array.isArray(data.begleiter)) {
     const b = (data.begleiter as unknown[]).filter((x): x is Record<string, unknown> => !!x && typeof x === 'object' && typeof (x as Record<string, unknown>).id === 'string'
-      && ((x as Record<string, unknown>).art === 'tier' || (x as Record<string, unknown>).art === 'wesen'))
+      && ['tier', 'wesen', 'gefolge'].includes(String((x as Record<string, unknown>).art)))
       .map((x) => ({
-        id: String(x.id), art: x.art as 'tier' | 'wesen', name: String(x.name ?? x.id),
+        id: String(x.id), art: x.art as Begleiter['art'], name: String(x.name ?? x.id),
         ...(typeof x.notiz === 'string' ? { notiz: x.notiz } : {}),
         ...(typeof x.rufname === 'string' ? { rufname: x.rufname } : {}),
         ...(typeof x.kreatur === 'number' && x.kreatur >= 0 ? { kreatur: x.kreatur } : {}),
         ...(typeof x.qualitaet === 'number' && x.qualitaet >= 1 ? { qualitaet: x.qualitaet } : {}),
         ...(x.vertrauter === true ? { vertrauter: true } : {}),
-        ...(Array.isArray(x.abrichtungen) ? { abrichtungen: (x.abrichtungen as unknown[]).filter((a): a is string => typeof a === 'string') } : {}),
+        ...(Array.isArray(x.abrichtungen) ? { abrichtungen: texte(x.abrichtungen) } : {}),
+        ...(typeof x.aufgabe === 'string' ? { aufgabe: x.aufgabe } : {}),
+        ...(typeof x.rasse === 'string' ? { rasse: x.rasse } : {}),
+        ...(Array.isArray(x.attributFrei) ? { attributFrei: texte(x.attributFrei) } : {}),
+        ...(Array.isArray(x.schwellen) ? { schwellen: texte(x.schwellen) } : {}),
+        ...(Array.isArray(x.meisterschaften) ? { meisterschaften: texte(x.meisterschaften) } : {}),
+        ...(Array.isArray(x.zauber) ? { zauber: texte(x.zauber) } : {}),
+        ...(x.kulturWahl && typeof x.kulturWahl === 'object' && !Array.isArray(x.kulturWahl) ? { kulturWahl: kulturWahl(x.kulturWahl as Record<string, unknown>) } : {}),
       }));
     if (b.length) result.begleiter = b;
   }

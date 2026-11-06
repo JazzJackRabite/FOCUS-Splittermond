@@ -209,7 +209,8 @@ export interface CharacterState {
 }
 
 export interface Begleiter {
-  id: string; art: 'tier' | 'wesen'; name: string; notiz?: string;
+  /** Tier/Wesen: Katalog-ID des Wertekastens; Gefolge: Katalog-ID der Kultur */
+  id: string; art: 'tier' | 'wesen' | 'gefolge'; name: string; notiz?: string;
   /** eigener Name des Tieres bzw. Wesens */
   rufname?: string;
   /** Punkte der Ressource Kreatur für dieses Tier (0/fehlt = ohne Ressource, z. B. gekauft) */
@@ -220,6 +221,21 @@ export interface Begleiter {
   vertrauter?: boolean;
   /** Abrichtungen (Katalog-IDs, in Reihenfolge; Wiederholung = mehrfach gewählt) */
   abrichtungen?: string[];
+  // ---- Gefolge (Ressource Gefolge, GRW S. 77–78)
+  /** Aufgabe, z. B. Leibdiener, Knappe, Leibwächter */
+  aufgabe?: string;
+  /** Katalog-ID der Rasse */
+  rasse?: string;
+  /** freie Attributboni der Rasse (volle Attributnamen, je Platz) */
+  attributFrei?: string[];
+  /** Wahl im Kulturmodul (wie bei der Erschaffung) */
+  kulturWahl?: { fertigkeiten?: Record<string, string>; staerke?: string; meisterschaft?: number };
+  /** Fertigkeiten (IDs), die auf die erste Meisterschaftsschwelle angehoben sind (je 1 Punkt) */
+  schwellen?: string[];
+  /** zusätzliche Meisterschaften (IDs) */
+  meisterschaften?: string[];
+  /** Zauber (IDs) */
+  zauber?: string[];
 }
 
 export interface ErschaffungsModulWahl {

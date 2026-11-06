@@ -2,8 +2,9 @@ import React from 'react';
 import { useRegelwerk } from '../../regelwerk/RegelwerkContext';
 import { TierAbschnitt } from '../../components/begleiter/TierAbschnitt';
 import { WesenAbschnitt } from '../../components/begleiter/WesenAbschnitt';
+import { GefolgeAbschnitt } from '../../components/begleiter/GefolgeAbschnitt';
 
-/** Tab „Begleiter“: Tiere (Tiergefährten, Reittiere, Vertraute) und beschworene Wesen. Braucht die Regelpakete. */
+/** Tab „Begleiter“: Tiere (Tiergefährten, Reittiere, Vertraute), Gefolge und beschworene Wesen. Braucht die Regelpakete. */
 export const BegleiterView: React.FC = () => {
   const { katalog: k } = useRegelwerk();
   return (
@@ -13,6 +14,7 @@ export const BegleiterView: React.FC = () => {
       ) : (
         <>
           <TierAbschnitt k={k} />
+          <GefolgeAbschnitt k={k} />
           <WesenAbschnitt k={k} />
         </>
       )}
