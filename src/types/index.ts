@@ -204,11 +204,25 @@ export interface CharacterState {
   erschaffung?: ErschaffungsWahl;
   /** Begleiter mit Katalog-ID (Tiergefährte über die Ressource Kreatur, beschworenes Wesen) */
   begleiter?: Begleiter[];
+  /** Relikte (Ressource Relikt): Baukasten aus den Regelpaketen, je Relikt ein Inventareintrag */
+  relikte?: Relikt[];
   /** Claude-Edition: Regel-IDs zu den gespeicherten Namen (siehe src/regelwerk/ids.ts) */
   regelIds?: RegelIds;
 }
 
 export interface Begleiter { id: string; art: 'tier' | 'wesen'; name: string; notiz?: string }
+
+/** Gewählter Baustein eines Relikts (Regel-ID aus den Paketen) */
+export interface ReliktBaustein { id: string; name?: string; anzahl: number; grad?: number; stufe?: number; auswahl?: string }
+/** Relikt: Punkte der Ressource Relikt, Gegenstandsart, Grundgegenstand (Ausrüstungs-ID) und Bausteine */
+export interface Relikt {
+  id: string; name: string; punkte: number; art: string;
+  basisId?: string; basisName?: string;
+  bausteine: ReliktBaustein[];
+  notiz?: string;
+  /** ID des zugehörigen Inventareintrags */
+  inventarId: string;
+}
 
 export interface ErschaffungsModulWahl {
   fertigkeiten?: Record<string, string>;
@@ -313,6 +327,8 @@ export type CharacterAction =
   | { type: 'ERSCHAFFUNG_MODUL_AUSTRAGEN'; payload: { art: 'kultur' | 'abstammung' } }
   | { type: 'BEGLEITER_HINZU'; payload: Begleiter }
   | { type: 'BEGLEITER_ENTFERNEN'; payload: { index: number } }
+  | { type: 'RELIKT_SPEICHERN'; payload: { relikt: Relikt; inventar: InventoryItem } }
+  | { type: 'RELIKT_LOESCHEN'; payload: { id: string } }
   | { type: 'REGEL_NAMEN_ABGLEICHEN'; payload: Partial<Pick<CharacterState, 'strengthsList' | 'weaknessesList' | 'resourcesList' | 'masteries' | 'spellsList'>> };
 
 // ============================================================

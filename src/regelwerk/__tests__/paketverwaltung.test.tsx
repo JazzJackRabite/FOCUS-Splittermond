@@ -34,14 +34,14 @@ describe('Paketverwaltung', () => {
     render(<RegelwerkProvider basisUrl="/regelpakete/"><RegelpaketeTab /><Zaehler /></RegelwerkProvider>);
     await waitFor(() => expect(screen.getByText('Splittermond: Die Regeln (3. erratierte Neuauflage)')).toBeTruthy());
     const vorher = Number(screen.getByTestId('anzahl').textContent);
-    expect(vorher).toBe(1520);
+    expect(vorher).toBe(1539);
     const datei = new File([JSON.stringify(TESTBUCH)], 'testbuch.srp.json', { type: 'application/json' });
     await act(async () => { fireEvent.change(screen.getByTestId('regelpakete-upload'), { target: { files: [datei] } }); });
     await waitFor(() => expect(screen.getByText('Testbuch der Prüfung')).toBeTruthy());
-    expect(Number(screen.getByTestId('anzahl').textContent)).toBe(1521);
+    expect(Number(screen.getByTestId('anzahl').textContent)).toBe(vorher + 1);
     await act(async () => { fireEvent.click(screen.getByLabelText('Testbuch der Prüfung entfernen')); });
     await waitFor(() => expect(screen.queryByText('Testbuch der Prüfung')).toBeNull());
-    expect(Number(screen.getByTestId('anzahl').textContent)).toBe(1520);
+    expect(Number(screen.getByTestId('anzahl').textContent)).toBe(vorher);
     vi.unstubAllGlobals();
   });
 });

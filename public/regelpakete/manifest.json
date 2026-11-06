@@ -279,6 +279,10 @@
    "bezeichnung": "Feenwelten",
    "charakterbau_auswahl": false
   },
+  "artefaktwirkung": {
+   "bezeichnung": "Wirkungen von Strukturgebern (Artefaktqualität)",
+   "charakterbau_auswahl": true
+  },
   "abrichtung": {
    "bezeichnung": "Abrichtungen für Tiergefährten",
    "charakterbau_auswahl": true
@@ -332,18 +336,19 @@
    "erscheinungsjahr": 2017,
    "regionalband": false,
    "datei": "grw.srp.json",
-   "sha256": "43082226ea7f0a95806be986d29924259d27d3b819b900e865d51c8fbe6790ee",
-   "bytes": 2682332,
+   "sha256": "613ef3699e4b1f6d5aa40557dc046ce72c5b4115ec68222f25d8623d4b4b0ad3",
+   "bytes": 2723574,
    "basis": true,
    "pflicht": true,
    "abhaengigkeiten": [],
    "optionale_pakete": [],
    "referenziert_pakete": [],
    "ladereihenfolge": 0,
-   "eintraege": 1520,
+   "eintraege": 1539,
    "nach_typ": {
     "abstammung": 17,
     "alchemikum": 14,
+    "artefaktwirkung": 3,
     "dienstleistung": 19,
     "fertigkeit": 53,
     "gegenstand": 46,
@@ -362,7 +367,7 @@
     "objektzustand": 3,
     "qualitaetspreis": 9,
     "rasse": 5,
-    "regel": 232,
+    "regel": 239,
     "ressource": 10,
     "ruestung": 10,
     "schild": 5,
@@ -371,12 +376,13 @@
     "sprache": 36,
     "staerke": 43,
     "tier": 3,
+    "verbesserung": 9,
     "waffe": 69,
     "zauber": 278,
     "zustand": 17
    },
    "nach_aktion": {
-    "neu": 1520
+    "neu": 1539
    }
   }
  ],

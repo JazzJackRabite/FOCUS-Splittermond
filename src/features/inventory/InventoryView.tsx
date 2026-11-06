@@ -26,6 +26,7 @@ import { generateId } from '../../utils/id';
 import type { InventoryItem } from '../../types';
 import { toast } from 'react-hot-toast';
 import { BegleiterKarte } from '../../components/begleiter/BegleiterKarte';
+import { ReliktKarte } from '../../components/relikte/ReliktKarte';
 
 export const InventoryView: React.FC = () => {
   const { state, dispatch, calc } = useCharacter();
@@ -702,6 +703,9 @@ export const InventoryView: React.FC = () => {
           })
         )}
       </div>
+
+      {/* ── RELIKTE (Ressource Relikt; Baukasten aus den Regelpaketen) ── */}
+      <ReliktKarte />
 
       {/* ── BEGLEITER (Tiergefährten, beschworene Wesen; nur mit Regelpaketen) ── */}
       <BegleiterKarte />

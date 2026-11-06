@@ -143,7 +143,7 @@ export function baseCharacterReducer(
         'skillsBase', 'skillsXp', 'masteries',
         'strengthsList', 'resourcesList', 'weaknessesList', 'languagesList',
         'spellsList', 'playState', 'inventory', 'money', 'advancementLog', 'creationFinalized',
-        'ignoreEncumbrance', 'erschaffung', 'begleiter', 'regelIds',
+        'ignoreEncumbrance', 'erschaffung', 'begleiter', 'relikte', 'regelIds',
       ];
       const safePayload: Partial<CharacterState> = {};
       for (const key of KNOWN_KEYS) {
@@ -1233,6 +1233,24 @@ export function baseCharacterReducer(
     case 'BEGLEITER_ENTFERNEN':
       return { ...state, begleiter: (state.begleiter ?? []).filter((_, i) => i !== action.payload.index) };
 
+    // ---- Relikte: Relikt speichern und Inventareintrag anlegen bzw. aktualisieren ----
+    case 'RELIKT_SPEICHERN': {
+      const { relikt, inventar } = action.payload;
+      const liste = state.relikte ?? [];
+      const relikte = liste.some(r => r.id === relikt.id) ? liste.map(r => (r.id === relikt.id ? relikt : r)) : [...liste, relikt];
+      const inv = state.inventory ?? [];
+      const inventory = inv.some(it => it.id === inventar.id) ? inv.map(it => (it.id === inventar.id ? { ...it, ...inventar } : it)) : [...inv, inventar];
+      return { ...state, relikte, inventory };
+    }
+    case 'RELIKT_LOESCHEN': {
+      const r = (state.relikte ?? []).find(x => x.id === action.payload.id);
+      return {
+        ...state,
+        relikte: (state.relikte ?? []).filter(x => x.id !== action.payload.id),
+        inventory: r ? (state.inventory ?? []).filter(it => it.id !== r.inventarId) : state.inventory,
+      };
+    }
+
     // ---- Erschaffung nach Regelwerk: Kultur- und Abstammungsmodule (GRW S. 23–24) ----
     case 'ERSCHAFFUNG_MODUL_SETZEN': {
       const alt = state.erschaffung?.[action.payload.art];
@@ -1368,6 +1386,7 @@ function hydrateState(): CharacterState {
     // Claude-Edition: Erschaffung nach Regelwerk, Begleiter und Regel-IDs gingen beim Neuladen verloren
     ...(saved.erschaffung ? { erschaffung: saved.erschaffung as CharacterState['erschaffung'] } : {}),
     ...(Array.isArray(saved.begleiter) ? { begleiter: saved.begleiter as CharacterState['begleiter'] } : {}),
+    ...(Array.isArray(saved.relikte) ? { relikte: saved.relikte as CharacterState['relikte'] } : {}),
     ...(saved.regelIds && typeof saved.regelIds === 'object' ? { regelIds: saved.regelIds as CharacterState['regelIds'] } : {}),
   };
   return referenceCharacterResources(raw);

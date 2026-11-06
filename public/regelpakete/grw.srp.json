@@ -13,16 +13,17 @@
    "pdf_datei": "Splittermond_GRW_dritte-erratierte-Neuauflage-1.pdf",
    "pdf_sha256": "f824ffc4850360d07e1633bdc27cc922dd2ae498320187e7e9e3def3a5dd6cc3",
    "datenbank_datei": "GRW_2026-10-27_mit-Fertigkeiten-und-Mondzeichen.sqlite",
-   "datenbank_sha256": "02bd20e42973b4020841cce251ad72e5a5974fdae79016281e8e3d956ceaf0a2"
+   "datenbank_sha256": "d533986cd493844e34f0c58eebc92e5c2d1c35b3034856cbd8e1952a2b6a7fee"
   },
   "seitenangaben": "buch_seiten = gedruckte Seitenzahl im Buch; pdf_seiten = Seite in der PDF-Datei"
  },
  "abhaengigkeiten": [],
  "statistik": {
-  "eintraege": 1520,
+  "eintraege": 1539,
   "nach_typ": {
    "abstammung": 17,
    "alchemikum": 14,
+   "artefaktwirkung": 3,
    "dienstleistung": 19,
    "fertigkeit": 53,
    "gegenstand": 46,
@@ -41,7 +42,7 @@
    "objektzustand": 3,
    "qualitaetspreis": 9,
    "rasse": 5,
-   "regel": 232,
+   "regel": 239,
    "ressource": 10,
    "ruestung": 10,
    "schild": 5,
@@ -50,12 +51,13 @@
    "sprache": 36,
    "staerke": 43,
    "tier": 3,
+   "verbesserung": 9,
    "waffe": 69,
    "zauber": 278,
    "zustand": 17
   },
   "nach_aktion": {
-   "neu": 1520
+   "neu": 1539
   }
  },
  "eintraege": [
@@ -7884,6 +7886,14 @@
      ],
      "pdf_seite": 80,
      "buch_seite": 79
+    },
+    "relikt_baukasten": {
+     "budget": "ressourcenpunkte",
+     "max_punkte": 6,
+     "bausteintypen": [
+      "verbesserung",
+      "artefaktwirkung"
+     ]
     },
     "regelgruppe": "grw:ressource:relikt"
    }
@@ -62661,6 +62671,393 @@
    ]
   },
   {
+   "id": "grw:verbesserung:behinderung-1",
+   "typ": "verbesserung",
+   "aktion": "neu",
+   "name": "Behinderung -1",
+   "quelle": {
+    "paket": "grw",
+    "buch_seiten": [
+     142
+    ],
+    "pdf_seiten": [
+     143
+    ],
+    "alt_id": "sm:58418741-8efc-537a-8df7-2ff69bd32601",
+    "kategorie_in_datenbank": "verbesserungen"
+   },
+   "daten": {
+    "beschreibung": "Behinderung -1 (maximal -1)",
+    "kosten_text": "2",
+    "kosten_qualitaet": 2,
+    "maximal_text": "maximal -1",
+    "hinweise": [
+     "Ergänzt am 06.11.2026 (Herstellung, Gegenstandsqualität und Verbesserungen; Wirkungen von Strukturgebern; Anlass: Relikte im Editor)."
+    ],
+    "baustein": {
+     "kosten": 2,
+     "max_anzahl": 1,
+     "gilt_fuer": [
+      "ruestung",
+      "schild"
+     ],
+     "aenderungen": [
+      {
+       "feld": "behinderung",
+       "wert": -1
+      }
+     ]
+    },
+    "regelgruppe": "grw:verbesserung:behinderung-1"
+   },
+   "hinweise": [
+    "Ergänzt am 06.11.2026 (Herstellung, Gegenstandsqualität und Verbesserungen; Wirkungen von Strukturgebern; Anlass: Relikte im Editor)."
+   ]
+  },
+  {
+   "id": "grw:verbesserung:fertigkeitsbonus-auf-einen-schwerpunkt",
+   "typ": "verbesserung",
+   "aktion": "neu",
+   "name": "Fertigkeitsbonus auf einen Schwerpunkt",
+   "quelle": {
+    "paket": "grw",
+    "buch_seiten": [
+     142
+    ],
+    "pdf_seiten": [
+     143
+    ],
+    "alt_id": "sm:2da29de7-5b71-5f6a-b0c5-f04058a44d0c",
+    "kategorie_in_datenbank": "verbesserungen"
+   },
+   "daten": {
+    "beschreibung": "Bonus von 1 auf einen Schwerpunkt einer passenden Fertigkeit*, maximal +3",
+    "kosten_text": "2",
+    "kosten_qualitaet": 2,
+    "maximal_text": "maximal +3",
+    "hinweise": [
+     "Ergänzt am 06.11.2026 (Herstellung, Gegenstandsqualität und Verbesserungen; Wirkungen von Strukturgebern; Anlass: Relikte im Editor)."
+    ],
+    "fussnote": "*z.B. Kampffertigkeit bei Waffen, Darbietung bei einem Tanzkleid, siehe auch Kasten oben.",
+    "baustein": {
+     "kosten": 2,
+     "max_anzahl": 3,
+     "gilt_fuer": [
+      "alle"
+     ],
+     "aenderungen": [
+      {
+       "feld": "schwerpunkt",
+       "wert": 1
+      }
+     ],
+     "auswahl": "schwerpunkt"
+    },
+    "regelgruppe": "grw:verbesserung:fertigkeitsbonus-auf-einen-schwerpunkt"
+   },
+   "hinweise": [
+    "Ergänzt am 06.11.2026 (Herstellung, Gegenstandsqualität und Verbesserungen; Wirkungen von Strukturgebern; Anlass: Relikte im Editor)."
+   ]
+  },
+  {
+   "id": "grw:verbesserung:haerte-1",
+   "typ": "verbesserung",
+   "aktion": "neu",
+   "name": "Härte +1",
+   "quelle": {
+    "paket": "grw",
+    "buch_seiten": [
+     142
+    ],
+    "pdf_seiten": [
+     143
+    ],
+    "alt_id": "sm:85465fdd-02e1-5e14-90ec-106180a1045f",
+    "kategorie_in_datenbank": "verbesserungen"
+   },
+   "daten": {
+    "beschreibung": "Härte +1, maximal +2",
+    "kosten_text": "1",
+    "kosten_qualitaet": 1,
+    "maximal_text": "maximal +2",
+    "hinweise": [
+     "Ergänzt am 06.11.2026 (Herstellung, Gegenstandsqualität und Verbesserungen; Wirkungen von Strukturgebern; Anlass: Relikte im Editor)."
+    ],
+    "baustein": {
+     "kosten": 1,
+     "max_anzahl": 2,
+     "gilt_fuer": [
+      "alle"
+     ],
+     "aenderungen": [
+      {
+       "feld": "haerte",
+       "wert": 1
+      }
+     ]
+    },
+    "regelgruppe": "grw:verbesserung:haerte-1"
+   },
+   "hinweise": [
+    "Ergänzt am 06.11.2026 (Herstellung, Gegenstandsqualität und Verbesserungen; Wirkungen von Strukturgebern; Anlass: Relikte im Editor)."
+   ]
+  },
+  {
+   "id": "grw:verbesserung:last-1",
+   "typ": "verbesserung",
+   "aktion": "neu",
+   "name": "Last -1",
+   "quelle": {
+    "paket": "grw",
+    "buch_seiten": [
+     142
+    ],
+    "pdf_seiten": [
+     143
+    ],
+    "alt_id": "sm:3ecdb932-4005-5454-bfe6-bf06f6841d15",
+    "kategorie_in_datenbank": "verbesserungen"
+   },
+   "daten": {
+    "beschreibung": "Last -1, maximal auf die Hälfte, ohne Verlust an Haltbarkeit",
+    "kosten_text": "1",
+    "kosten_qualitaet": 1,
+    "maximal_text": "maximal auf die Hälfte",
+    "hinweise": [
+     "Ergänzt am 06.11.2026 (Herstellung, Gegenstandsqualität und Verbesserungen; Wirkungen von Strukturgebern; Anlass: Relikte im Editor)."
+    ],
+    "baustein": {
+     "kosten": 1,
+     "max_anzahl": null,
+     "gilt_fuer": [
+      "alle"
+     ],
+     "aenderungen": [
+      {
+       "feld": "last",
+       "wert": -1
+      }
+     ],
+     "grenze": "last_haelfte"
+    },
+    "regelgruppe": "grw:verbesserung:last-1"
+   },
+   "hinweise": [
+    "Ergänzt am 06.11.2026 (Herstellung, Gegenstandsqualität und Verbesserungen; Wirkungen von Strukturgebern; Anlass: Relikte im Editor)."
+   ]
+  },
+  {
+   "id": "grw:verbesserung:schadensreduktion-1",
+   "typ": "verbesserung",
+   "aktion": "neu",
+   "name": "Schadensreduktion +1",
+   "quelle": {
+    "paket": "grw",
+    "buch_seiten": [
+     142
+    ],
+    "pdf_seiten": [
+     143
+    ],
+    "alt_id": "sm:5189340d-1809-50c9-913c-a559760f31ed",
+    "kategorie_in_datenbank": "verbesserungen"
+   },
+   "daten": {
+    "beschreibung": "Schadensreduktion +1 (maximal +1)",
+    "kosten_text": "2",
+    "kosten_qualitaet": 2,
+    "maximal_text": "maximal +1",
+    "hinweise": [
+     "Ergänzt am 06.11.2026 (Herstellung, Gegenstandsqualität und Verbesserungen; Wirkungen von Strukturgebern; Anlass: Relikte im Editor)."
+    ],
+    "baustein": {
+     "kosten": 2,
+     "max_anzahl": 1,
+     "gilt_fuer": [
+      "ruestung"
+     ],
+     "aenderungen": [
+      {
+       "feld": "sr",
+       "wert": 1
+      }
+     ]
+    },
+    "regelgruppe": "grw:verbesserung:schadensreduktion-1"
+   },
+   "hinweise": [
+    "Ergänzt am 06.11.2026 (Herstellung, Gegenstandsqualität und Verbesserungen; Wirkungen von Strukturgebern; Anlass: Relikte im Editor)."
+   ]
+  },
+  {
+   "id": "grw:verbesserung:tick-zuschlag-1",
+   "typ": "verbesserung",
+   "aktion": "neu",
+   "name": "Tick-Zuschlag -1",
+   "quelle": {
+    "paket": "grw",
+    "buch_seiten": [
+     142
+    ],
+    "pdf_seiten": [
+     143
+    ],
+    "alt_id": "sm:a051c591-0308-539d-9524-eb928b325989",
+    "kategorie_in_datenbank": "verbesserungen"
+   },
+   "daten": {
+    "beschreibung": "Tick-Zuschlag -1 (maximal -1)",
+    "kosten_text": "2",
+    "kosten_qualitaet": 2,
+    "maximal_text": "maximal -1",
+    "hinweise": [
+     "Ergänzt am 06.11.2026 (Herstellung, Gegenstandsqualität und Verbesserungen; Wirkungen von Strukturgebern; Anlass: Relikte im Editor)."
+    ],
+    "baustein": {
+     "kosten": 2,
+     "max_anzahl": 1,
+     "gilt_fuer": [
+      "ruestung",
+      "schild"
+     ],
+     "aenderungen": [
+      {
+       "feld": "tick_zuschlag",
+       "wert": -1
+      }
+     ]
+    },
+    "regelgruppe": "grw:verbesserung:tick-zuschlag-1"
+   },
+   "hinweise": [
+    "Ergänzt am 06.11.2026 (Herstellung, Gegenstandsqualität und Verbesserungen; Wirkungen von Strukturgebern; Anlass: Relikte im Editor)."
+   ]
+  },
+  {
+   "id": "grw:verbesserung:waffengeschwindigkeit-1",
+   "typ": "verbesserung",
+   "aktion": "neu",
+   "name": "Waffengeschwindigkeit -1",
+   "quelle": {
+    "paket": "grw",
+    "buch_seiten": [
+     142
+    ],
+    "pdf_seiten": [
+     143
+    ],
+    "alt_id": "sm:0906918b-555c-56fb-8a90-db3545b587fb",
+    "kategorie_in_datenbank": "verbesserungen"
+   },
+   "daten": {
+    "beschreibung": "Waffengeschwindigkeit -1, maximal -1",
+    "kosten_text": "2",
+    "kosten_qualitaet": 2,
+    "maximal_text": "maximal -1",
+    "hinweise": [
+     "Ergänzt am 06.11.2026 (Herstellung, Gegenstandsqualität und Verbesserungen; Wirkungen von Strukturgebern; Anlass: Relikte im Editor)."
+    ],
+    "baustein": {
+     "kosten": 2,
+     "max_anzahl": 1,
+     "gilt_fuer": [
+      "waffe"
+     ],
+     "aenderungen": [
+      {
+       "feld": "wgs",
+       "wert": -1
+      }
+     ]
+    },
+    "regelgruppe": "grw:verbesserung:waffengeschwindigkeit-1"
+   },
+   "hinweise": [
+    "Ergänzt am 06.11.2026 (Herstellung, Gegenstandsqualität und Verbesserungen; Wirkungen von Strukturgebern; Anlass: Relikte im Editor)."
+   ]
+  },
+  {
+   "id": "grw:verbesserung:waffenschaden-1",
+   "typ": "verbesserung",
+   "aktion": "neu",
+   "name": "Waffenschaden +1",
+   "quelle": {
+    "paket": "grw",
+    "buch_seiten": [
+     142
+    ],
+    "pdf_seiten": [
+     143
+    ],
+    "alt_id": "sm:62200a5f-d931-515c-b700-66510fe66f01",
+    "kategorie_in_datenbank": "verbesserungen"
+   },
+   "daten": {
+    "beschreibung": "Waffenschaden +1, maximal +2",
+    "kosten_text": "1",
+    "kosten_qualitaet": 1,
+    "maximal_text": "maximal +2",
+    "hinweise": [
+     "Ergänzt am 06.11.2026 (Herstellung, Gegenstandsqualität und Verbesserungen; Wirkungen von Strukturgebern; Anlass: Relikte im Editor)."
+    ],
+    "baustein": {
+     "kosten": 1,
+     "max_anzahl": 2,
+     "gilt_fuer": [
+      "waffe"
+     ],
+     "aenderungen": [
+      {
+       "feld": "schaden",
+       "wert": 1
+      }
+     ]
+    },
+    "regelgruppe": "grw:verbesserung:waffenschaden-1"
+   },
+   "hinweise": [
+    "Ergänzt am 06.11.2026 (Herstellung, Gegenstandsqualität und Verbesserungen; Wirkungen von Strukturgebern; Anlass: Relikte im Editor)."
+   ]
+  },
+  {
+   "id": "grw:verbesserung:wirkung-eines-alchemistischen-produkts",
+   "typ": "verbesserung",
+   "aktion": "neu",
+   "name": "Wirkung eines alchemistischen Produkts",
+   "quelle": {
+    "paket": "grw",
+    "buch_seiten": [
+     142
+    ],
+    "pdf_seiten": [
+     143
+    ],
+    "alt_id": "sm:71429271-9efc-521e-a3a2-e58c8d19f191",
+    "kategorie_in_datenbank": "verbesserungen"
+   },
+   "daten": {
+    "beschreibung": "einzelne Wirkung eines alchemistischen Produkts",
+    "kosten_text": "siehe S. 144",
+    "kosten_qualitaet": null,
+    "maximal_text": null,
+    "hinweise": [
+     "Ergänzt am 06.11.2026 (Herstellung, Gegenstandsqualität und Verbesserungen; Wirkungen von Strukturgebern; Anlass: Relikte im Editor)."
+    ],
+    "verweis": "siehe S. 144",
+    "baustein": {
+     "kosten": null,
+     "max_anzahl": null,
+     "gilt_fuer": [
+      "alchemikum"
+     ],
+     "aenderungen": []
+    }
+   },
+   "hinweise": [
+    "Ergänzt am 06.11.2026 (Herstellung, Gegenstandsqualität und Verbesserungen; Wirkungen von Strukturgebern; Anlass: Relikte im Editor)."
+   ]
+  },
+  {
    "id": "grw:objekt:aussenportal",
    "typ": "objekt",
    "aktion": "neu",
@@ -64367,6 +64764,189 @@
    },
    "hinweise": [
     "Ergänzt am 02.11.2026 (Sprachen als Verweisziel; Fließtext „Sprachen von Lorakis“)."
+   ]
+  },
+  {
+   "id": "grw:artefaktwirkung:verbesserter-widerstand-geistig",
+   "typ": "artefaktwirkung",
+   "aktion": "neu",
+   "name": "Verbesserter Widerstand (geistig)",
+   "quelle": {
+    "paket": "grw",
+    "buch_seiten": [
+     254
+    ],
+    "pdf_seiten": [
+     255
+    ],
+    "alt_id": "sm:3522bf6a-d0bc-5d73-bef7-f499a4ea4040",
+    "kategorie_in_datenbank": "artefaktwirkungen"
+   },
+   "daten": {
+    "beschreibung": "+1 auf geistigen Widerstand, maximal +3",
+    "kosten_text": "2",
+    "kosten_artefaktqualitaet": 2,
+    "maximal_text": "maximal +3",
+    "voraussetzung_herstellung": "Meisterschaft Zauberfinger in Bann- oder Schutzmagie",
+    "nur_strukturgeber": true,
+    "hinweise": [
+     "Ergänzt am 06.11.2026 (Herstellung, Gegenstandsqualität und Verbesserungen; Wirkungen von Strukturgebern; Anlass: Relikte im Editor)."
+    ],
+    "baustein": {
+     "kosten": 2,
+     "max_anzahl": 3,
+     "gilt_fuer": [
+      "alle"
+     ],
+     "aenderungen": [
+      {
+       "feld": "gw",
+       "wert": 1
+      }
+     ],
+     "nur_hoechster": "gw"
+    }
+   },
+   "hinweise": [
+    "Ergänzt am 06.11.2026 (Herstellung, Gegenstandsqualität und Verbesserungen; Wirkungen von Strukturgebern; Anlass: Relikte im Editor)."
+   ]
+  },
+  {
+   "id": "grw:artefaktwirkung:verbesserter-widerstand-koerperlich",
+   "typ": "artefaktwirkung",
+   "aktion": "neu",
+   "name": "Verbesserter Widerstand (körperlich)",
+   "quelle": {
+    "paket": "grw",
+    "buch_seiten": [
+     254
+    ],
+    "pdf_seiten": [
+     255
+    ],
+    "alt_id": "sm:78cc5bdc-d2c1-514e-8d01-15830e904d15",
+    "kategorie_in_datenbank": "artefaktwirkungen"
+   },
+   "daten": {
+    "beschreibung": "+1 auf körperlichen Widerstand, maximal +3",
+    "kosten_text": "2",
+    "kosten_artefaktqualitaet": 2,
+    "maximal_text": "maximal +3",
+    "voraussetzung_herstellung": "Meisterschaft Zauberfinger in Bann- oder Schutzmagie",
+    "nur_strukturgeber": true,
+    "hinweise": [
+     "Ergänzt am 06.11.2026 (Herstellung, Gegenstandsqualität und Verbesserungen; Wirkungen von Strukturgebern; Anlass: Relikte im Editor)."
+    ],
+    "baustein": {
+     "kosten": 2,
+     "max_anzahl": 3,
+     "gilt_fuer": [
+      "alle"
+     ],
+     "aenderungen": [
+      {
+       "feld": "kw",
+       "wert": 1
+      }
+     ],
+     "nur_hoechster": "kw"
+    }
+   },
+   "hinweise": [
+    "Ergänzt am 06.11.2026 (Herstellung, Gegenstandsqualität und Verbesserungen; Wirkungen von Strukturgebern; Anlass: Relikte im Editor)."
+   ]
+  },
+  {
+   "id": "grw:artefaktwirkung:zauberverankerung",
+   "typ": "artefaktwirkung",
+   "aktion": "neu",
+   "name": "Zauberverankerung",
+   "quelle": {
+    "paket": "grw",
+    "buch_seiten": [
+     254
+    ],
+    "pdf_seiten": [
+     255
+    ],
+    "alt_id": "sm:7e1fa0a6-1311-5e2d-8885-ff44c81285d1",
+    "kategorie_in_datenbank": "artefaktwirkungen"
+   },
+   "daten": {
+    "beschreibung": "Das Artefakt schafft eine Zauberwirkung, die einem konkreten Zauber des angegebenen Grades entspricht.",
+    "kosten_nach_grad": [
+     {
+      "grad": 0,
+      "kosten_artefaktqualitaet": 1,
+      "voraussetzung_herstellung": "Kenntnis des Zaubers, Meisterschaft Zauberfinger oder Schriftrollen erstellen I"
+     },
+     {
+      "grad": 1,
+      "kosten_artefaktqualitaet": 2,
+      "voraussetzung_herstellung": "Kenntnis des Zaubers, Meisterschaft Zauberfinger oder Schriftrollen erstellen I"
+     },
+     {
+      "grad": 2,
+      "kosten_artefaktqualitaet": 3,
+      "voraussetzung_herstellung": "Kenntnis des Zaubers, Meisterschaft Wunderwirker oder Schriftrollen erstellen II"
+     },
+     {
+      "grad": 3,
+      "kosten_artefaktqualitaet": 4,
+      "voraussetzung_herstellung": "Kenntnis des Zaubers, Meisterschaft Wunderwirker oder Schriftrollen erstellen II"
+     },
+     {
+      "grad": 4,
+      "kosten_artefaktqualitaet": 5,
+      "voraussetzung_herstellung": "Kenntnis des Zaubers, Meisterschaft Artefaktmeister oder Schriftrollen erstellen III"
+     },
+     {
+      "grad": 5,
+      "kosten_artefaktqualitaet": 6,
+      "voraussetzung_herstellung": "Kenntnis des Zaubers, Meisterschaft Artefaktmeister oder Schriftrollen erstellen III"
+     }
+    ],
+    "hinweise": [
+     "Ergänzt am 06.11.2026 (Herstellung, Gegenstandsqualität und Verbesserungen; Wirkungen von Strukturgebern; Anlass: Relikte im Editor)."
+    ],
+    "baustein": {
+     "kosten": null,
+     "max_anzahl": null,
+     "gilt_fuer": [
+      "alle"
+     ],
+     "aenderungen": [],
+     "kosten_nach_grad": [
+      {
+       "grad": 0,
+       "kosten": 1
+      },
+      {
+       "grad": 1,
+       "kosten": 2
+      },
+      {
+       "grad": 2,
+       "kosten": 3
+      },
+      {
+       "grad": 3,
+       "kosten": 4
+      },
+      {
+       "grad": 4,
+       "kosten": 5
+      },
+      {
+       "grad": 5,
+       "kosten": 6
+      }
+     ],
+     "auswahl": "zauber"
+    }
+   },
+   "hinweise": [
+    "Ergänzt am 06.11.2026 (Herstellung, Gegenstandsqualität und Verbesserungen; Wirkungen von Strukturgebern; Anlass: Relikte im Editor)."
    ]
   },
   {
@@ -72490,6 +73070,480 @@
     "regeltext": "Die Rassen Auf Lorakis gibt es verschiedene zivilisierte Rassen, von denen fünf über den ganzen Kontinent verbreitet sind und den Großteil der Bewohner aller Reiche stellen: die ehrgeizigen Menschen, die die zahlreichste Rasse sind und die sich durch Vielseitigkeit auszeichnen die feinsinnigen Alben, die für Schönheit und Grazie bekannt sind die zähen Zwerge, die trotz ihres kleinen Wuchses ungemein stark und ausdauernd sind die kleinen Gnome, die ursprünglich aus den Feenwelten stammen und ein starkes magisches Gespür besitzen die wolfartigen Varge, deren Stärke unter den Rassen von Lorakis ihresgleichen sucht Diese Rassen prägen das Bild vieler Tavernen und Basare zwischen Westergrom und Takasadu, und man kann sie in praktisch allen Häfen und auf allen Landstraßen antreffen. Dabei leben die Rassen meist nicht voneinander getrennt, sondern haben auch gemeinsame Kulturen gegründet, in denen sie einträchtig Seite an Seite leben. Die fünf Rassen werden auf den folgenden Seiten ausführlicher vorgestellt und bilden die für einen Abenteurer wählbaren Rassen. Jede Rasse hat dabei eigene Vor- und Nachteile, die ihre unterschiedlichen Fähigkeiten innerhalb der Spielwelt abbilden. Alle Rassen werden nach einem einheitlichen Muster beschrieben: Nach einem kurzen Überblick folgen die Beschreibung der körperlichen Grundlagen und anschließend Angaben zur Verbreitung auf Lorakis. Dabei ist zu beachten, dass in den meisten Reichen der bekannten Welt die einzelnen Rassen einträchtig beisammen leben – die Wahl einer Rasse bestimmt also nicht automatisch auch die Lebensweise des Abenteurers. Diese wird erst durch die Punktverteilung im Rahmen der freien Charaktererschaffung oder durch die Wahl einer Kultur (siehe S. 38) in der Modul-Erschaffung bestimmt – was jeweils im nächsten Schritt der Generierung (siehe S. 23) geschieht. Erläuterung der Werteangaben Die Beschreibung jeder Rasse wird von einem Wertekasten komplettiert, in dem Sie die spielrelevanten Eigenschaften aufgelistet finden. Die einzelnen Punkte werden hier kurz näher erläutert. Attributsmodifikator: Jeder Abenteurer erhält einen Bonus auf die prägenden Attribute (siehe Seite 11) seiner Rasse. Durch diese dürfen auch die in Schritt 6 der Generierung genannten Höchst- und Mindestwerte über- oder unterschritten werden. Anmerkung: Zu beachten ist, dass bei der Steigerung eines beliebigen Attributs auch bereits fest durch die Rasse modifizierte Attribute gewählt werden können. Bei den Vargen ist nach ihrem Stärkebonus von einem beliebigen anderen Attribut die Rede – hier darf entsprechend die Stärke nicht weiter modifiziert werden, wohl aber alle anderen Attribute. Größenklasse: Dieser abstrakte Zahlenwert setzt die Größe der Völker von Lorakis ins Verhältnis zueinander und hat beispielsweise Einfluss darauf, wie viel man einstecken kann und wie leicht man getroffen wird (siehe S. 13). Stärken: Alle hier genannten Stärken (siehe S. 72) erhält ein Angehöriger der jeweiligen Rasse automatisch, es fallen hierfür keine Kosten an. Haarfarbe & Augenfarbe: Dies ist keine regeltechnische Angabe, sondern dient der weiteren Ausgestaltung Ihres Abenteurers. Wenn Sie diesen Punkt auswürfeln wollen, finden Sie hierfür alle Angaben. Aber natürlich können Sie die Haar- und Augenfarbe Ihres Abenteurers auch völlig frei bestimmen. Generell ist hierbei natürlich zu beachten, dass aufgrund der großen Varianz zwischen den Völkern von Lorakis die hier gemachten Angaben keine Aussagen über die prozentuale Verteilung der Haarfarben innerhalb der einzelnen Rassen treffen – es dient lediglich einer einfachen und schnellen Auswahl, falls Sie hier auf ein Zufallselement Wert legen. Körpergröße: Hier finden Sie Würfelangaben für die Körpergröße Ihres Helden, können anhand der vorhandenen Spanne diese aber auch frei festlegen. Die Körpergröße ist nicht mit der regeltechnischen Größenklasse zu verwechseln und dient der zusätzlichen Ausgestaltung Ihres Abenteurers. Gewicht: Das Gewicht Ihres Abenteurers hat ebenfalls keine regeltechnischen Auswirkungen. Sie können es mit Blick auf die Körpergröße und die Attribute frei festlegen. Zur Orientierung wird bei jeder Rasse eine grobe Spanne angegeben.",
     "regelbereich": "herkunft_regeln"
    }
+  },
+  {
+   "id": "grw:regel:herstellung-regeln:alchemika-herstellen",
+   "typ": "regel",
+   "aktion": "neu",
+   "name": "Alchemika herstellen",
+   "quelle": {
+    "paket": "grw",
+    "buch_seiten": [
+     144
+    ],
+    "pdf_seiten": [
+     145
+    ],
+    "alt_id": "sm:b5e3fd42-3151-5d91-a822-fe0e00767bf7",
+    "kategorie_in_datenbank": "herstellung_regeln"
+   },
+   "daten": {
+    "text": "Alchemisten kennen viele Methoden, um bestimmte häufige Wirkungen hervorzurufen. Um eine Wirkung zu erzeugen, muss ein Alchemist ein Produkt mit einer bestimmten Gegenstandsqualität herstellen. Ein Alchemikum mit Qualität 0 erhält 1 Wirkung in Höhe von 1 Stufe automatisch, jede weitere Wirkung kostet Qualitätsstufen wie unten angegeben. Ein Heiltrank der Gegenstandsqualität 1 heilt also 8 Punkte Schaden sofort (4 aus der Grundwirkung von Qualität 0, 4 weitere aus der gesteigerten Qualität). Ansonsten folgt die Herstellung von Alchemika den gleichen Regeln wie die Herstellung anderer Gegenstände. Maximal können zwei unterschiedliche Wirkungen miteinander kombiniert werden. Bei der Herstellung kann der Alchemist festlegen, auf welche Art das Produkt wirken soll (Einnahme, Blut, Kontakt). Jede zusätzliche Wirkungsart erhöht die Qualität um 1. Beispiel: Eshi will ein Krafttonikum herstellen, das zwei Stufen des Zustands Erschöpft aufhebt (2 Qualitätsstufen) und außerdem einen Bonus in Höhe von 1 Punkt auf alle Proben mit Konstitution für 1 Stunde gibt (1 Qualitätsstufe). Das Tonikum soll sowohl geschluckt (Einnahme) als auch in die Haut massiert werden können (Kontakt, 1 Qualitätsstufe für insgesamt 2 Anwendungsarten). Insgesamt benötigt er also 4 Qualitätsstufen. 1 Qualitätsstufe erhält ein Alchemikum der Qualität 0 automatisch, also muss er einen Trank der Gegenstandsqualität 3 herstellen. Nach den Regeln auf S. 19 benötigt er daher 6 Fortschrittspunkte bei erweiterten Alchemie-Proben gegen 26.",
+    "tabellen": [
+     {
+      "kopf": [
+       "Wirkung",
+       "Kosten (Qualität)"
+      ],
+      "zeilen": [
+       [
+        "sofortige Heilung von 4 Punkten Schaden, maximal 12 Punkte",
+        "1"
+       ],
+       [
+        "Heilung eines Giftes, pro Giftgrad",
+        "1"
+       ],
+       [
+        "Schwierigkeit der Behandlung einer Krankheit sinkt um 10, pro Krankheitsgrad",
+        "1"
+       ],
+       [
+        "Attributsbonus (+1 auf alle Proben mit dem Attribut, 1 Stunde, maximal 2 Punkte)",
+        "1"
+       ],
+       [
+        "Heilung des Zustandes Bewusstlos",
+        "2"
+       ],
+       [
+        "Heilung einer Stufe des Zustandes Erschöpft",
+        "1"
+       ],
+       [
+        "Heilung von Siechtum 1",
+        "2"
+       ],
+       [
+        "Heilung von Siechtum 2 (nur gegen eine einzelne konkrete Ursache)",
+        "4"
+       ],
+       [
+        "Gift (Klingenfett: Blut 1/ Blutend (Gift)/60 Ticks)",
+        "1"
+       ],
+       [
+        "Gift (Echsentarr: Blut 2/ Benommen (Gift)/5 Minuten)",
+        "2"
+       ]
+      ],
+      "pdf_seite": 145,
+      "buch_seite": 144
+     }
+    ],
+    "kaesten": [
+     {
+      "titel": null,
+      "text": "Begrenzung der Alchemika Der Abenteurer kann ohne Erholung nur Nutznießer von Konstitution +2 hilfreichen Alchemika werden, die Anwendung weiterer hilfreicher Alchemika bleibt wirkungslos. Der Körper kann nicht mehr hilfreiche alchemistische Stoffe aufnehmen. Erst nach einer Ruhephase wird die Begrenzung wieder zurückgesetzt und der Abenteurer kann erneut von hilfreichen Alchemika profitieren. Dies gilt nur für Alchemika, die den Abenteurer selbst betreffen und ihn stärken, wie Heiltränke oder Stärkungselixiere. Andere Alchemika, die nicht auf ihn wirken (z.B. Waffengift) kann er weiterhin gegen Gegner einsetzen, ebenso, wie er weiterhin zum Opfer von Schwächungstränken oder Giften werden kann.",
+      "pdf_seite": 145,
+      "buch_seite": 144
+     }
+    ],
+    "hinweise": [
+     "Ergänzt am 06.11.2026 (Herstellung, Gegenstandsqualität und Verbesserungen; Wirkungen von Strukturgebern; Anlass: Relikte im Editor)."
+    ],
+    "regelbereich": "herstellung_regeln"
+   },
+   "hinweise": [
+    "Ergänzt am 06.11.2026 (Herstellung, Gegenstandsqualität und Verbesserungen; Wirkungen von Strukturgebern; Anlass: Relikte im Editor)."
+   ]
+  },
+  {
+   "id": "grw:regel:herstellung-regeln:gegenstaende-einschaetzen",
+   "typ": "regel",
+   "aktion": "neu",
+   "name": "Gegenstände einschätzen",
+   "quelle": {
+    "paket": "grw",
+    "buch_seiten": [
+     145
+    ],
+    "pdf_seiten": [
+     146
+    ],
+    "alt_id": "sm:0a09b90e-fbaa-5d3a-b5b3-116e8d1a84d3",
+    "kategorie_in_datenbank": "herstellung_regeln"
+   },
+   "daten": {
+    "text": "Um die Qualität von Gegenständen einzuschätzen, ist eine profunde Kenntnis des Handwerks ebenfalls nützlich. Versierte Händler können dies tun, ohne selbst Handwerker zu sein. Probe: Einfache Probe, wahlweise auf Straßenkunde oder auf Verstand + Intuition + Handwerksfertigkeit. Die Schwierigkeit beträgt 20, bei Fälschungen 20 zuzüglich der doppelten (vorgetäuschten) Gegenstandsqualität. Verheerend: Der Abenteurer schätzt den Gegenstand vollkommen falsch ein und schätzt seine Qualität genau als Gegenteil ein. Misslungen: Der Abenteurer hat keine Ahnung, was es mit dem Gegenstand auf sich hat. Gelungen: Der Abenteurer erkennt die Gegenstandsqualität und erhält eine grobe Ahnung der Auswirkungen („Ein besonders scharfes Schwert“, „Ein Heiltrank“). Herausragend: Der Abenteurer erkennt nicht nur die Gegenstandsqualität, sondern kann auch sämtliche Auswirkungen präzise einschätzen.",
+    "tabellen": [],
+    "kaesten": [
+     {
+      "titel": null,
+      "text": "Zerschlissene Schuhe, trübe Juwelen Universell einsetzbare Handwerksregeln laden natürlich dazu ein, sie möglichst effektiv zu nutzen, indem beispielsweise ein Schneider als Ausgangsgegenstand einfache Stoffschuhe nimmt und daraus die Wundersamen Stoffschuhe des Schleichens +3 fertigt, die (aufgrund der niedrigen Grundkosten) ausgesprochen günstig zu erwerben und anzufertigen sind. Außerdem würde er möglicherweise zusätzlich die Wundersamen Wollsocken des Schleichens und die Wundersame Leinenhose des Schleichens anfertigen. Um das zu verhindern, gelten folgende Faustregeln: Der Bonus, den ein Gegenstand erhält, gilt üblicherweise nicht für den einzelnen Gegenstand, sondern für einen ganzen Satz notwendiger Gegenstände. Im Beispiel oben also müsste der Schneider einen ganzen Satz Kleidung anfertigen, um den Heimlichkeit-Bonus zu erhalten. Auch eine einzelne Zange oder ein Hammer, ein einzelner Armreif oder ein Ohrring geben keinen Bonus, ein ganzer Satz Schmiedewerkzeuge oder ein Satz kostbarer Juwelen hingegen sehr wohl. Nur, wenn kein weiterer Gegenstand zum Einsatz notwendig ist (z.B. bei Waffen), verleihen einzelne Objekte den Bonus. Das letzte Wort bei der Entscheidung, ob eine Gegenstandsverbesserung möglich ist, hat immer der Spielleiter.",
+      "pdf_seite": 146,
+      "buch_seite": 145
+     }
+    ],
+    "hinweise": [
+     "Ergänzt am 06.11.2026 (Herstellung, Gegenstandsqualität und Verbesserungen; Wirkungen von Strukturgebern; Anlass: Relikte im Editor)."
+    ],
+    "regelbereich": "herstellung_regeln"
+   },
+   "hinweise": [
+    "Ergänzt am 06.11.2026 (Herstellung, Gegenstandsqualität und Verbesserungen; Wirkungen von Strukturgebern; Anlass: Relikte im Editor)."
+   ]
+  },
+  {
+   "id": "grw:regel:herstellung-regeln:gegenstaende-herstellen",
+   "typ": "regel",
+   "aktion": "neu",
+   "name": "Gegenstände herstellen",
+   "quelle": {
+    "paket": "grw",
+    "buch_seiten": [
+     143,
+     144
+    ],
+    "pdf_seiten": [
+     144,
+     145
+    ],
+    "alt_id": "sm:b9fccd08-b255-5472-8e3e-40bb95786c33",
+    "kategorie_in_datenbank": "herstellung_regeln"
+   },
+   "daten": {
+    "text": "Das Herstellen von Gegenständen ist die grundlegendste handwerkliche Arbeit. Voraussetzungen sind die entsprechenden Werkzeuge (eine Schmiede, ein alchemistisches Labor oder Nadel und Faden) und je nach Gegenstand die entsprechenden Meisterschaften (Geselle, Fachmann, Meister) in den zugehörigen Fertigkeiten und Schwerpunkten. Materialkosten: Hohe Qualität benötigt gutes Material, weshalb die Materialkosten vom fertigen Gegenstand abhängig sind. Sie betragen ein Drittel des Preises des fertigen Produktes. Ist der Handwerker bereits im Besitz des Materials, reduzieren sich die Kosten auf ein Zehntel (Verbrauchsmaterial). Probe: Erweiterte Probe (Handwerksfertigkeit). Die Schwierigkeit beträgt 20 zuzüglich der doppelten Gegenstandsqualität. Insgesamt müssen Fortschrittspunkte in Höhe der doppelten Gegenstandsqualität angesammelt werden (mindestens 1). Eine einzelne Probe benötigt üblicherweise einen halben Tag, kann (je nach Spielleiterentscheidung) bei besonders komplexen oder besonders einfachen Projekten aber auch deutlich davon abweichen. Verheerend: Etwas geht fürchterlich schief. Der Handwerker verliert nicht nur jeglichen Fortschritt, sondern auch das Rohmaterial. Misslungen: Der Handwerker verliert 1 angesammelten Fortschrittspunkt. Knapp misslungen: Ein Fehler im Material, der aber ausgeglichen werden kann: Wenn der Handwerker zusätzliches Material im Wert von (Gegenstandsqualität) Lunaren aufwendet (mindestens 1), kann er doch noch 1 Fortschrittspunkt ansammeln. Gelungen: Der Handwerker erhält 1 Fortschrittspunkt +1 pro Erfolgsgrad, die er zu seinen bereits angesammelten addieren kann. Herausragend: Die Probe gelingt zusätzlich in der halben Zeit. Ausrüstung und Umstände Improvisiertes Werkzeug (leicht negativ), zusätzliche Aufzeichnungen (Schnittmuster, Anleitungen etc., leicht positiv), Ressource Mentor (vermittelte Geheimtechniken, leicht bis stark positiv) Gegenstandsqualität fälschen Perfide Betrüger können auf die Idee kommen, eine geschickte Handwerksarbeit nur vorzutäuschen. Eine gute Fälschung ist weniger aufwändig herzustellen als ein entsprechender Gegenstand – und deutlich billiger. Um einen Gegenstand zu fälschen, muss der Handwerker ihn herstellen wie oben beschrieben. Die Schwierigkeit beträgt aber nur 20 zuzüglich der einfachen (vorgetäuschten) Gegenstandsqualität, und es müssen auch nur Fortschrittspunkte in Höhe der einfachen (vorgetäuschten) Gegenstandsqualität angesammelt werden. Die Materialkosten entsprechen einem Drittel der Kosten eines Gegenstandes mit Qualität 0.",
+    "tabellen": [],
+    "kaesten": [
+     {
+      "titel": null,
+      "text": "Unterschiedliche Werkstoffe Viele Gegenstände bestehen aus mehreren Werkstoffen. Ein Rucksack mag aus Leder sein, wird aber mit Metallschnallen verschlossen, eine Axt hat einen Griff aus Holz. Der Einfachheit halber wird bei Herstellung und Reparatur von Gegenständen nur die Fertigkeit/Meisterschaft des hauptsächlichen Werkstoffes benötigt. Wer eine Axt herstellen will, muss also nicht Metallbearbeitung (für das Axtblatt), Holzbearbeitung (für den Schaft) und Leder- und Stoffbearbeitung (für die Griffumwicklung) beherrschen. Es reicht, wenn er schmieden kann. Alle Proben werden auf diese Fertigkeit abgelegt, auch wenn sie andere Werkstoffe betreffen mögen. Es wird davon ausgegangen, dass der Hersteller die notwendigen Handwerksgriffe beherrscht oder entsprechende Einzelteile von anderen Handwerkern erhält (was durch die Materialkosten abgedeckt ist). Im Zweifel entscheidet der Spielleiter, welcher Werkanteil der wichtigere ist. Er ist am anderen Ufer! Schnell, baut ein Floß! Manchmal kommt es nicht darauf an, ein möglichst perfektes Werkstück zu schaffen, manchmal muss es einfach nur schnell gehen. Eine Leiter muss gebaut werden, um eine Mauer zu überwinden, ein Floß, um auf die andere Seite des Flusses zu gelangen, oder die Tür muss notdürftig vernagelt werden, bevor die Orks ins Haus stürmen. Vielleicht sind nicht die geeigneten Mittel zur Hand, um ein belastbares Werk zu schaffen. In einem solchen Fall kann ein Handwerker improvisieren und das Beste aus seiner Situation machen. Für improvisierte Gegenstände gelten folgende Richtlinien: Die Probe, um einen improvisierten Gegenstand herzustellen, hat immer eine Schwierigkeit von 20. Sie dauert zwischen 15 Minuten (kleine, einfache Gegenstände, etwa ein Knüppel), 30 Minuten (mittlere Gegenstände, etwa eine Leiter) und 1 Stunde (ein Floß, eine größere Tür). Improvisierte Gegenstände haben die Werte ihrer normalen Gegenstücke, aber immer eine Gegenstandsqualität von -2. Ihr Einsatz erhält daher üblicherweise einen Malus in Höhe von 1 Punkt auf die jeweilige Probe. Die Haltbarkeit (siehe S. 179) improvisierter Gegenstände gegen bewusste Zerstörung ist halbiert. Vor allem aber halten improvisierte Gegenstände auch unter guten Bedingungen nicht lange: Nach ihrem Einsatzzweck sind sie nicht mehr verwendbar. Ein improvisiertes Floß hilft also bei der Flussüberquerung, fällt danach aber auseinander, ein Knüppel ist nach einem Kampf so beschädigt, dass man ihn wegwerfen muss. Überschüssige Erfolgsgrade bei der Herstellungsprobe ermöglichen pro Erfolgsgrad einen weiteren Einsatz.",
+      "pdf_seite": 144,
+      "buch_seite": 143
+     }
+    ],
+    "hinweise": [
+     "Ergänzt am 06.11.2026 (Herstellung, Gegenstandsqualität und Verbesserungen; Wirkungen von Strukturgebern; Anlass: Relikte im Editor)."
+    ],
+    "regelbereich": "herstellung_regeln"
+   },
+   "hinweise": [
+    "Ergänzt am 06.11.2026 (Herstellung, Gegenstandsqualität und Verbesserungen; Wirkungen von Strukturgebern; Anlass: Relikte im Editor)."
+   ]
+  },
+  {
+   "id": "grw:regel:herstellung-regeln:gegenstaende-reparieren",
+   "typ": "regel",
+   "aktion": "neu",
+   "name": "Gegenstände reparieren",
+   "quelle": {
+    "paket": "grw",
+    "buch_seiten": [
+     144
+    ],
+    "pdf_seiten": [
+     145
+    ],
+    "alt_id": "sm:4b1a7ce3-3af1-5ed4-9d3c-0aeca05442c7",
+    "kategorie_in_datenbank": "herstellung_regeln"
+   },
+   "daten": {
+    "text": "Beschädigte Gegenstände können repariert werden. Hierfür braucht der fähige Handwerker die entsprechende Meisterschaft und zumindest improvisiertes Werkzeug. Probe: Einfache Probe (Handwerksfertigkeit). Die Schwierigkeit beträgt 20 zuzüglich der Gegenstandsqualität und nimmt 2 Stunden in Anspruch. Verheerend: Das war’s! Anstatt den Gegenstand zu reparieren, wird er irreparabel beschädigt. Misslungen: Der Handwerker schafft es nicht, den Gegenstand zu reparieren. Knapp misslungen: Fast hätte es geklappt. Wenn der Handwerker 2 zusätzliche Stunden aufwendet, gelingt die Reparatur. Gelungen: Der Gegenstand wird repariert. Herausragend: Die Probe gelingt in der halben Zeit. Ausrüstung und Umstände Handwerker ist der ursprüngliche Hersteller (leicht positiv)",
+    "tabellen": [],
+    "kaesten": [],
+    "hinweise": [
+     "Ergänzt am 06.11.2026 (Herstellung, Gegenstandsqualität und Verbesserungen; Wirkungen von Strukturgebern; Anlass: Relikte im Editor)."
+    ],
+    "regelbereich": "herstellung_regeln"
+   },
+   "hinweise": [
+    "Ergänzt am 06.11.2026 (Herstellung, Gegenstandsqualität und Verbesserungen; Wirkungen von Strukturgebern; Anlass: Relikte im Editor)."
+   ]
+  },
+  {
+   "id": "grw:regel:herstellung-regeln:gegenstandsqualitaet",
+   "typ": "regel",
+   "aktion": "neu",
+   "name": "Gegenstandsqualität",
+   "quelle": {
+    "paket": "grw",
+    "buch_seiten": [
+     142,
+     143
+    ],
+    "pdf_seiten": [
+     143,
+     144
+    ],
+    "alt_id": "sm:6d10a8d0-6cb5-5450-aa5b-c73482f07ea5",
+    "kategorie_in_datenbank": "herstellung_regeln"
+   },
+   "daten": {
+    "text": "Alle Gegenstände verfügen über eine Gegenstandsqualität: ein abstraktes Maß für die Güte und Verarbeitung dieses Gegenstandes. Die übliche Qualität beträgt 0. Dies ist Ware von der Stange, wie sie in Ausrüstungslisten steht: Solide handwerkliche Arbeit ohne Besonderheit. Geschickte Handwerker können auch Gegenstände von höherer Qualität herstellen. Hierfür benötigen sie nicht nur wertvollere Materialien und mehr Zeit, sondern vor allem auch die entsprechenden Meisterschaften. Die maximal erreichbare Qualität ist 6 (mit der Meisterschaft Meisterwerk 7). Verbesserungen Gegenstände höherer Qualität besitzen ein oder mehrere Verbesserungen. Jede Verbesserung kostet eine bestimmte Anzahl Qualitätsstufen. Beispiel: Ein Schwert, das einen um 1 Punkt erhöhten Schaden verursachen (1 Stufe), einen Bonus in Höhe von 1 Punkt auf die Fertigkeitsprobe geben (2 Stufen) und 1 Tick schneller sein soll (2 Stufen), benötigt 5 Qualitätsstufen. Der Handwerker muss also ein Schwert der Gegenstandsqualität 5 herstellen. Negative Qualität Minderwertige Gegenstände sind einfacher, billiger und schneller herzustellen, so dass es manchmal von Vorteil sein kann, sich auf eine negative Qualität zu verlassen. Eine negative Qualitätsstufe bewirkt das Gegenteil der aufgeführten Auswirkungen: Ein Malus auf die Fertigkeit, erhöhtes Gewicht, reduzierter Schaden und so weiter. Dafür erleichtert sie die Herstellung entsprechend. Es ist nicht möglich, negative und positive Qualität zu kombinieren, also beispielsweise eine Waffe zu schmieden, die schwerer ist (negative Qualität), aber dennoch einen Bonus gibt (positive Qualität): Gegenstände sind entweder gut oder schlecht. *z.B. Kampffertigkeit bei Waffen, Darbietung bei einem Tanzkleid, siehe auch Kasten oben. Kosten Die Preise in der Liste (siehe S. 183) gelten für Gegenstände der normalen Qualität 0. Gegenstände mit höherer oder niedrigerer Qualität weichen in den Preisen ab.",
+    "tabellen": [
+     {
+      "kopf": [
+       "Verbesserung",
+       "Kosten (Qualität)"
+      ],
+      "zeilen": [
+       [
+        "Bonus von 1 auf einen Schwerpunkt einer passenden Fertigkeit*, maximal +3",
+        "2"
+       ],
+       [
+        "Last -1, maximal auf die Hälfte, ohne Verlust an Haltbarkeit",
+        "1"
+       ],
+       [
+        "Waffenschaden +1, maximal +2",
+        "1"
+       ],
+       [
+        "Waffengeschwindigkeit -1, maximal -1",
+        "2"
+       ],
+       [
+        "Schadensreduktion +1 (maximal +1)",
+        "2"
+       ],
+       [
+        "Behinderung -1 (maximal -1)",
+        "2"
+       ],
+       [
+        "Tick-Zuschlag -1 (maximal -1)",
+        "2"
+       ],
+       [
+        "Härte +1, maximal +2",
+        "1"
+       ],
+       [
+        "einzelne Wirkung eines alchemistischen Produkts",
+        "siehe S. 144"
+       ]
+      ],
+      "pdf_seite": 143,
+      "buch_seite": 142
+     },
+     {
+      "kopf": [
+       "Qualität",
+       "Gegenstände",
+       "Alchemika"
+      ],
+      "zeilen": [
+       [
+        "Negative Qualität",
+        "−10 % pro Stufe",
+        "–"
+       ],
+       [
+        "0",
+        "+/−0",
+        "5 L"
+       ],
+       [
+        "1",
+        "+15 L",
+        "10 L"
+       ],
+       [
+        "2",
+        "+30 L",
+        "15 L"
+       ],
+       [
+        "3",
+        "+60 L",
+        "25 L"
+       ],
+       [
+        "4",
+        "+90 L",
+        "35 L"
+       ],
+       [
+        "5",
+        "+150 L",
+        "55 L"
+       ],
+       [
+        "6",
+        "+210 L",
+        "75 L"
+       ],
+       [
+        "je Stufe über 6",
+        "+75 L",
+        "+25 L"
+       ]
+      ],
+      "pdf_seite": 144,
+      "buch_seite": 143
+     }
+    ],
+    "kaesten": [
+     {
+      "titel": null,
+      "text": "Tanzschuhe und Kronjuwelen Um festzulegen, welche Gegenstände einen Bonus auf welche Fertigkeit geben, orientieren Sie sich am Einsatzgebiet: Ein gut gearbeiteter Satz Kletterwerkzeuge mag einen Bonus bei Athletik-Proben zum Erklimmen einer Mauer geben, nicht aber bei der hektischen Flucht vor den Wachen hinter jener Mauer. Ein aufwändiges Tanzgewand verbessert die Darbietung bei einem Vortanzen, edler Schmuck mag bei einem Hofball die Diplomatie (Minnekunst) erleichtern, ein teurer Sattel und gutes Zaumzeug zum Reiten sind bei der Tierführung nützlich. Es gilt, dass ein Gegenstand immer nur einen Bonus auf einen bestimmten Schwerpunkt einer Fertigkeit gibt, nicht auf die gesamte Fertigkeit: Kletterwerkzeuge helfen dabei, eine Mauer zu überwinden, aber nicht dabei, vor Verfolgern zu flüchten. Das letzte Wort, was genau möglich ist, hat hier immer der Spielleiter.",
+      "pdf_seite": 143,
+      "buch_seite": 142
+     }
+    ],
+    "hinweise": [
+     "Ergänzt am 06.11.2026 (Herstellung, Gegenstandsqualität und Verbesserungen; Wirkungen von Strukturgebern; Anlass: Relikte im Editor)."
+    ],
+    "regelbereich": "herstellung_regeln"
+   },
+   "hinweise": [
+    "Ergänzt am 06.11.2026 (Herstellung, Gegenstandsqualität und Verbesserungen; Wirkungen von Strukturgebern; Anlass: Relikte im Editor)."
+   ]
+  },
+  {
+   "id": "grw:regel:herstellung-regeln:herstellung-und-reparatur",
+   "typ": "regel",
+   "aktion": "neu",
+   "name": "Herstellung und Reparatur",
+   "quelle": {
+    "paket": "grw",
+    "buch_seiten": [
+     141
+    ],
+    "pdf_seiten": [
+     142
+    ],
+    "alt_id": "sm:d5775db4-c688-517c-acfc-966551c6b9a8",
+    "kategorie_in_datenbank": "herstellung_regeln"
+   },
+   "daten": {
+    "text": "In Splittermond gibt es drei Fertigkeiten, die verwendet werden können, um Gegenstände herzustellen und zu reparieren: Alchemie, Edelhandwerk und Handwerk. Alle diese Fertigkeiten haben eines gemeinsam: Sie ermöglichen es einer geübten Person, aus Rohmaterialien Gegenstände herzustellen oder beschädigte Gegenstände zu reparieren, vorausgesetzt, sie besitzt Werkzeug und ausreichend Zeit. Die folgenden Regeln gelten (sinngemäß) für alle drei Fertigkeiten. Welche Fertigkeit benutzt wird, um ein bestimmtes Produkt herzustellen, und welche Schwerpunkte hierfür nötig sind, entnehmen sie der folgenden Tabelle. Die Tabelle ist nicht erschöpfend, sondern soll vor allem als Orientierung dienen.",
+    "tabellen": [
+     {
+      "kopf": [
+       "Fertigkeit",
+       "Schwerpunkt",
+       "Produkt"
+      ],
+      "zeilen": [
+       [
+        "Alchemie",
+        "alle",
+        "Zaubertränke, Heilmittel, Gifte, Tinkturen"
+       ],
+       [
+        "Edelhandwerk",
+        "Architektur",
+        "Baupläne, Grundrisse"
+       ],
+       [
+        "",
+        "Juwelier",
+        "Juwelen, Schmuck, Ziergegenstände"
+       ],
+       [
+        "",
+        "Malerei",
+        "Bilder, Zeichnungen"
+       ],
+       [
+        "Handwerk",
+        "Holzbearbeitung",
+        "hölzerne Waffen, Möbel, Zimmermannsarbeiten"
+       ],
+       [
+        "",
+        "Schneiderei/ Lederverarbeitung",
+        "Kleider, Rüstungen, Gegenstände aus Tuch und Leder"
+       ],
+       [
+        "",
+        "Schmiedekunst",
+        "metallene Waffen, Rüstungen und Gebrauchsgegenstände"
+       ],
+       [
+        "",
+        "Steinbearbeitung",
+        "steinerne Waffen, Statuetten, Skulpturen"
+       ]
+      ],
+      "pdf_seite": 142,
+      "buch_seite": 141
+     }
+    ],
+    "kaesten": [],
+    "hinweise": [
+     "Ergänzt am 06.11.2026 (Herstellung, Gegenstandsqualität und Verbesserungen; Wirkungen von Strukturgebern; Anlass: Relikte im Editor)."
+    ],
+    "regelbereich": "herstellung_regeln"
+   },
+   "hinweise": [
+    "Ergänzt am 06.11.2026 (Herstellung, Gegenstandsqualität und Verbesserungen; Wirkungen von Strukturgebern; Anlass: Relikte im Editor)."
+   ]
+  },
+  {
+   "id": "grw:regel:herstellung-regeln:komplexe-gegenstaende-anleitungen-und-rezepturen",
+   "typ": "regel",
+   "aktion": "neu",
+   "name": "Komplexe Gegenstände, Anleitungen und Rezepturen",
+   "quelle": {
+    "paket": "grw",
+    "buch_seiten": [
+     141,
+     142
+    ],
+    "pdf_seiten": [
+     142,
+     143
+    ],
+    "alt_id": "sm:978d2710-ab2a-502c-933d-63b5824b1cb7",
+    "kategorie_in_datenbank": "herstellung_regeln"
+   },
+   "daten": {
+    "text": "Nicht alle Gegenstände können von jedem Handwerker hergestellt werden. Ein ashurmazaanischer Dorfschmied weiß vermutlich ebenso wenig über die Herstellung eines fulnischen Doppelschwertes wie ein Amulettbauer der Durghach über die Geheimnisse eines Kompasses. Die Komplexität eines Gegenstandes ist in der Ausrüstungsliste mit einem Buchstaben gekennzeichnet, der beschreibt, welche Voraussetzung ein Handwerker erfüllen muss, wenn er den Gegenstand herstellen will. Anleitungen und Rezepturen Bestimmte Gegenstände erfordern eine Anleitung, sprich: Ein Handwerker erlangt das Wissen für die Herstellung nicht automatisch mit Erwerb einer Meisterschaft, sondern muss es von einem anderen Handwerker erlernen oder aus einer anderen Quelle erfahren. Dies betrifft besonders die Alchemie: Alchemie beschränkt sich natürlich nicht auf einfache Heiltränke oder Gifte, wie sie hier vorgestellt werden. Es gibt Tränke, die den Anwender in ein Tier verwandeln oder Salben, die ihn unsichtbar machen können. Derartige Alchemika sind aber nicht einfach aus dem Handgelenk herzustellen. Hier benötigt ein Alchemist konkrete Rezepte und spezielle Zutaten.",
+    "tabellen": [
+     {
+      "kopf": [
+       "Komplexität",
+       "Voraussetzung"
+      ],
+      "zeilen": [
+       [
+        "U (ungeübt)",
+        "keine"
+       ],
+       [
+        "G (Geselle)",
+        "Meisterschaft Geselle im passenden Schwerpunkt"
+       ],
+       [
+        "F (Fachmann)",
+        "Meisterschaft Fachmann im passenden Schwerpunkt"
+       ],
+       [
+        "M (Meister)",
+        "Meisterschaft Meister im passenden Schwerpunkt"
+       ],
+       [
+        "A (Anleitung)",
+        "Anleitung vorhanden"
+       ]
+      ],
+      "pdf_seite": 143,
+      "buch_seite": 142
+     }
+    ],
+    "kaesten": [],
+    "hinweise": [
+     "Ergänzt am 06.11.2026 (Herstellung, Gegenstandsqualität und Verbesserungen; Wirkungen von Strukturgebern; Anlass: Relikte im Editor)."
+    ],
+    "regelbereich": "herstellung_regeln"
+   },
+   "hinweise": [
+    "Ergänzt am 06.11.2026 (Herstellung, Gegenstandsqualität und Verbesserungen; Wirkungen von Strukturgebern; Anlass: Relikte im Editor)."
+   ]
   },
   {
    "id": "grw:regel:kampf-regeln:abwarten",
