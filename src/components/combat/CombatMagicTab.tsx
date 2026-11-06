@@ -17,15 +17,9 @@ import { usePlaySession } from '../../context/PlaySessionContext';
 import { PlaySharedVitals } from '../play/PlaySharedVitals';
 import { SourceBadge } from '../ui/SourceBadge';
 import { SKILL_CATEGORIES, SKILL_DATA } from '../../data/rules';
-import {
-  WEAPONS_DATA,
-  ARMORS_DATA,
-  SHIELDS_DATA,
-  ALL_EQUIPMENT,
-  type WeaponItem,
-  type ArmorItem,
-  type ShieldItem,
-} from '../../data/equipment';
+import { type WeaponItem, type ArmorItem, type ShieldItem } from '../../data/equipment';
+import { alleAusruestung } from '../../regelwerk/ausruestung';
+import { useRegelwerk } from '../../regelwerk/RegelwerkContext';
 import { getMasteryDetails } from '../../utils/gameResourceManager';
 import {
   getFullSpellInfo,
@@ -43,7 +37,7 @@ const getItemSource = (item: { name: string; source?: string; page?: number | st
       page: typeof item.page === 'number' ? item.page : item.page ? parseInt(String(item.page), 10) : undefined,
     };
   }
-  const match = ALL_EQUIPMENT.find((e) => e.name.toLowerCase() === item.name.toLowerCase());
+  const match = alleAusruestung().find((e) => e.name.toLowerCase() === item.name.toLowerCase());
   return {
     source: match?.source || 'GRW',
     page: match?.page,
@@ -182,6 +176,12 @@ const QuickSpellCard: React.FC<QuickSpellCardProps> = ({ spell, session }) => {
 
 export const CombatMagicTab: React.FC = () => {
   const { state, dispatch, calc } = useCharacter();
+  const { katalog } = useRegelwerk();
+  // Waffen, Rüstungen und Schilde aus GRW und hochgeladenen Regelpaketen
+  const ausruestung = useMemo(() => alleAusruestung(katalog), [katalog]);
+  const WEAPONS_DATA = useMemo(() => ausruestung.filter((i): i is WeaponItem => i.type === 'weapon'), [ausruestung]);
+  const ARMORS_DATA = useMemo(() => ausruestung.filter((i): i is ArmorItem => i.type === 'armor'), [ausruestung]);
+  const SHIELDS_DATA = useMemo(() => ausruestung.filter((i): i is ShieldItem => i.type === 'shield'), [ausruestung]);
   const session = usePlaySession();
 
   const { spellsList, masteries, inventory = [] } = state;
@@ -253,7 +253,7 @@ export const CombatMagicTab: React.FC = () => {
         w.skill === weaponCategoryFilter;
       return matchesSearch && matchesCat;
     });
-  }, [weaponSearch, weaponCategoryFilter]);
+  }, [WEAPONS_DATA, weaponSearch, weaponCategoryFilter]);
 
   const filteredCatalogArmors = useMemo(() => {
     const list: Array<ArmorItem | ShieldItem> = [
@@ -266,7 +266,7 @@ export const CombatMagicTab: React.FC = () => {
         a.attributes.toLowerCase().includes(armorSearch.toLowerCase())
       );
     });
-  }, [armorSearch, armorTypeFilter]);
+  }, [ARMORS_DATA, SHIELDS_DATA, armorSearch, armorTypeFilter]);
 
   // Handle adding catalog weapon
   const handleAddCatalogWeapon = (w: WeaponItem, equipImmediately = true) => {

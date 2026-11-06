@@ -19,7 +19,8 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import { useCharacter } from '../../context/CharacterContext';
-import { ALL_EQUIPMENT } from '../../data/equipment';
+import { alleAusruestung } from '../../regelwerk/ausruestung';
+import { useRegelwerk } from '../../regelwerk/RegelwerkContext';
 import { SourceBadge } from '../../components/ui/SourceBadge';
 import { generateId } from '../../utils/id';
 import type { InventoryItem } from '../../types';
@@ -30,6 +31,9 @@ export const InventoryView: React.FC = () => {
   const { state, dispatch, calc } = useCharacter();
   const { inventory = [], money = { solare: 0, lunare: 5, telare: 0 } } = state;
   const { loadCapacity, totalLoad } = calc;
+  const { katalog } = useRegelwerk();
+  // GRW-Liste plus Ausrüstung der hochgeladenen Regelpakete
+  const ALL_EQUIPMENT = useMemo(() => alleAusruestung(katalog), [katalog]);
 
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -46,7 +50,7 @@ export const InventoryView: React.FC = () => {
     });
     if (set.size === 0) set.add('GRW');
     return Array.from(set);
-  }, []);
+  }, [ALL_EQUIPMENT]);
 
   // Helper to resolve source & page for any item
   const getItemSource = (item: { name: string; source?: string; page?: number | string }) => {
@@ -122,7 +126,7 @@ export const InventoryView: React.FC = () => {
 
       return true;
     });
-  }, [catalogSearch, catalogCategoryFilter, catalogSourceFilter]);
+  }, [ALL_EQUIPMENT, catalogSearch, catalogCategoryFilter, catalogSourceFilter]);
 
   // Handle Money change
   const handleModifyMoney = (field: 'solare' | 'lunare' | 'telare', delta: number) => {
@@ -731,7 +735,7 @@ export const InventoryView: React.FC = () => {
                     : 'bg-[#faf4e6] text-[#1B365D] border border-[#d1c4b0] hover:bg-[#ebdcc4]'
                 }`}
               >
-                Splittermond Katalog (400+ Gegenstände)
+                Splittermond Katalog ({ALL_EQUIPMENT.length} Gegenstände)
               </button>
               <button
                 type="button"
@@ -848,6 +852,11 @@ export const InventoryView: React.FC = () => {
                       </button>
                     </div>
                   ))}
+                  {filteredCatalog.length > 50 && (
+                    <p className="text-[11px] text-stone-500 italic text-center py-1">
+                      {filteredCatalog.length - 50} weitere Treffer – Suche oder Filter verfeinern.
+                    </p>
+                  )}
                 </div>
               </div>
             )}

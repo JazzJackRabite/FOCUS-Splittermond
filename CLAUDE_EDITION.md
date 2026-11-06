@@ -117,6 +117,21 @@ Repository `JazzJackRabite/FOKUS-1.0-claudeedition` (Branch `main`; entstanden a
   Angriff nur als Hinweis; Manöver-Wirkungen stecken weiter in der Manöverauswahl.
 - Ohne Regelpakete oder ohne passende Wirkung erscheint der Abschnitt nicht.
 
+## Stand 10 (06.11.2026): Ausrüstung aus den Buchpaketen
+
+- Vorher kam die Ausrüstung nur aus der eingebauten GRW-Liste (`data/equipment.ts`); Gegenstände, Waffen, Rüstungen usw. der
+  hochgeladenen Bücher fehlten. Jetzt liefert `regelwerk/ausruestung.ts` → `alleAusruestung()` die GRW-Liste plus alle
+  Ausrüstungs-Einträge der Bücher (mit allen Büchern rund 820): Waffen, Rüstungen, Schilde, Gegenstände, Kleidung, Projektile,
+  Ausrüstungssätze, Alchemika, Kräuter, Gifte, Material, Verbesserungen und magische Gegenstände – mit Werten, Quelle und Seite.
+- Inventar („Gegenstand hinzufügen“, Filter nach Quelle) und Kampf-Tab (Waffe bzw. Rüstung/Schild auswählen) nutzen diese Liste.
+  Bei mehr als 50 Treffern weist das Inventar darauf hin, die Suche zu verfeinern.
+- Änderungen der Bücher an GRW-Ausrüstung: „ersetzt“ übernimmt die neuen Werte (z. B. Waffenlos mit Freihändig, Mondstahlklingen
+  S. 111) und nennt die Änderung in der Beschreibung; Beschreibungen aus „ergaenzt“ (vor allem Mondstahlklingen) werden angehängt.
+- Doppelte Einträge mehrerer Bücher fasst der Lader über die Regelgruppen zusammen; sie erscheinen einmal.
+- Tests: `regelwerk/__tests__/ausruestung.test.ts` (Testbuch; mit `FOKUS_BUECHER` zusätzlich: jeder Ausrüstungs-Eintrag aller
+  Bücher genau einmal in der Liste).
+- Noch nicht im Editor: Nachschlage-Inhalte wie Gottheiten, Reliktkräfte, Abrichtungen, Golembausteine, Feenwelten.
+
 ## Nächste Schritte
 
 Die geplanten Schritte sind erledigt. Offen bleiben Ideen wie Spielhilfen für bedingte Wirkungen (z. B. Bonus gegen Typus per Klick
