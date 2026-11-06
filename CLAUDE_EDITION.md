@@ -162,6 +162,16 @@ anwenden) oder Werte der Begleiter im Kampf.
 - Code: `zauberAnpassungen`, `kostenDelta`, `kostenAnwenden`, `zauberdauerAnpassen`, `giltFuerSchule` in `regelwerk/wirkungen.ts`;
   `useZauberAnpassungen`/`ZauberAnpassungen` in `components/play/SituativeBoni.tsx`. Tests: `zauberWirkungen.test.tsx`. 246 Tests grün.
 
+## Stand 13 (06.11.2026): Probenboni nur bei passenden Fertigkeiten
+
+- Fehler: Wirkungen auf „Proben“ ohne benannte Fertigkeit (z. B. Orientierungssinn „Proben zur Orientierung“, Geländekunde)
+  erschienen bei jeder Fertigkeitsprobe, auch bei Alchemie.
+- Regelpakete: solche Wirkungen tragen jetzt `fertigkeit_refs` (für welche Fertigkeiten sie gelten) oder `alle_proben: true`
+  (z. B. Kühler Kopf). Zuordnung auf der Datenseite in `wirkungen_probenbezug.json` (nur IDs); Meisterschaften ohne Eintrag
+  gelten für ihre eigene Fertigkeit. Neues GRW-Paket in `public/regelpakete`.
+- Editor: Boni auf „Proben“ nur bei den zugeordneten Fertigkeiten bzw. bei „alle Proben“; ohne Zuordnung nicht im Würfeldialog
+  (weiter in der Karte „Wirkungen“). Tests angepasst. 246 Tests grün.
+
 ## Google AI Studio
 
 Unverändert eine Vite-/React-App mit `metadata.json` im Wurzelordner; Import über „Import from GitHub“, Hosting über Cloud Run.
