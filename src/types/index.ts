@@ -121,7 +121,7 @@ export interface PlayState {
 // Character state (full)
 // ============================================================
 
-export type AppMode = 'creation' | 'xp' | 'play' | 'combat' | 'inventory';
+export type AppMode = 'creation' | 'xp' | 'play' | 'combat' | 'inventory' | 'begleiter';
 
 export interface InventoryItem {
   id: string;
@@ -208,7 +208,19 @@ export interface CharacterState {
   regelIds?: RegelIds;
 }
 
-export interface Begleiter { id: string; art: 'tier' | 'wesen'; name: string; notiz?: string }
+export interface Begleiter {
+  id: string; art: 'tier' | 'wesen'; name: string; notiz?: string;
+  /** eigener Name des Tieres bzw. Wesens */
+  rufname?: string;
+  /** Punkte der Ressource Kreatur für dieses Tier (0/fehlt = ohne Ressource, z. B. gekauft) */
+  kreatur?: number;
+  /** Grundpotenzial nach Qualität (gekaufte Tiere, Bestienmeister S. 15); fehlt = 1 */
+  qualitaet?: number;
+  /** Stärke Tiervertrauter auf dieses Tier */
+  vertrauter?: boolean;
+  /** Abrichtungen (Katalog-IDs, in Reihenfolge; Wiederholung = mehrfach gewählt) */
+  abrichtungen?: string[];
+}
 
 export interface ErschaffungsModulWahl {
   fertigkeiten?: Record<string, string>;
@@ -313,6 +325,7 @@ export type CharacterAction =
   | { type: 'ERSCHAFFUNG_MODUL_AUSTRAGEN'; payload: { art: 'kultur' | 'abstammung' } }
   | { type: 'BEGLEITER_HINZU'; payload: Begleiter }
   | { type: 'BEGLEITER_ENTFERNEN'; payload: { index: number } }
+  | { type: 'BEGLEITER_AENDERN'; payload: { index: number; aenderung: Partial<Omit<Begleiter, 'id' | 'art'>> } }
   | { type: 'REGEL_NAMEN_ABGLEICHEN'; payload: Partial<Pick<CharacterState, 'strengthsList' | 'weaknessesList' | 'resourcesList' | 'masteries' | 'spellsList'>> };
 
 // ============================================================

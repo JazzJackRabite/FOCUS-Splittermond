@@ -1232,6 +1232,8 @@ export function baseCharacterReducer(
       return { ...state, ...action.payload };
     case 'BEGLEITER_ENTFERNEN':
       return { ...state, begleiter: (state.begleiter ?? []).filter((_, i) => i !== action.payload.index) };
+    case 'BEGLEITER_AENDERN':
+      return { ...state, begleiter: (state.begleiter ?? []).map((b, i) => (i === action.payload.index ? { ...b, ...action.payload.aenderung } : b)) };
 
     // ---- Erschaffung nach Regelwerk: Kultur- und Abstammungsmodule (GRW S. 23–24) ----
     case 'ERSCHAFFUNG_MODUL_SETZEN': {

@@ -13,7 +13,7 @@ import type {
 } from '../types';
 import { generateId } from './id';
 
-const VALID_MODES: AppMode[] = ['creation', 'xp', 'play', 'combat', 'inventory'];
+const VALID_MODES: AppMode[] = ['creation', 'xp', 'play', 'combat', 'inventory', 'begleiter'];
 
 function isString(v: unknown): v is string {
   return typeof v === 'string';
@@ -514,7 +514,15 @@ export function validateCharacterImport(data: unknown): Partial<CharacterState> 
   if (Array.isArray(data.begleiter)) {
     const b = (data.begleiter as unknown[]).filter((x): x is Record<string, unknown> => !!x && typeof x === 'object' && typeof (x as Record<string, unknown>).id === 'string'
       && ((x as Record<string, unknown>).art === 'tier' || (x as Record<string, unknown>).art === 'wesen'))
-      .map((x) => ({ id: String(x.id), art: x.art as 'tier' | 'wesen', name: String(x.name ?? x.id), ...(typeof x.notiz === 'string' ? { notiz: x.notiz } : {}) }));
+      .map((x) => ({
+        id: String(x.id), art: x.art as 'tier' | 'wesen', name: String(x.name ?? x.id),
+        ...(typeof x.notiz === 'string' ? { notiz: x.notiz } : {}),
+        ...(typeof x.rufname === 'string' ? { rufname: x.rufname } : {}),
+        ...(typeof x.kreatur === 'number' && x.kreatur >= 0 ? { kreatur: x.kreatur } : {}),
+        ...(typeof x.qualitaet === 'number' && x.qualitaet >= 1 ? { qualitaet: x.qualitaet } : {}),
+        ...(x.vertrauter === true ? { vertrauter: true } : {}),
+        ...(Array.isArray(x.abrichtungen) ? { abrichtungen: (x.abrichtungen as unknown[]).filter((a): a is string => typeof a === 'string') } : {}),
+      }));
     if (b.length) result.begleiter = b;
   }
 
@@ -534,6 +542,7 @@ export function validateCharacterImport(data: unknown): Partial<CharacterState> 
     result.mode === 'play' ||
     result.mode === 'combat' ||
     result.mode === 'inventory' ||
+    result.mode === 'begleiter' ||
     (typeof data.xpTotal === 'number' && data.xpTotal > 15)
   ) {
     // If the imported character has items, play mode, or spent XP, ensure creation is finalized

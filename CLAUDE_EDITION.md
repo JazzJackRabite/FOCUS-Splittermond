@@ -162,6 +162,26 @@ anwenden) oder Werte der Begleiter im Kampf.
 - Code: `zauberAnpassungen`, `kostenDelta`, `kostenAnwenden`, `zauberdauerAnpassen`, `giltFuerSchule` in `regelwerk/wirkungen.ts`;
   `useZauberAnpassungen`/`ZauberAnpassungen` in `components/play/SituativeBoni.tsx`. Tests: `zauberWirkungen.test.tsx`. 246 Tests grün.
 
+## Tab „Begleiter“, Teil 1: Tiere (Branch `begleiter-tab`)
+
+- Neuer Tab **Begleiter** (nach Inventar, freigeschaltet wie die anderen Spiel-Tabs). Die Karte „Begleiter“ ist aus dem Inventar
+  hierher umgezogen und aufgeteilt in **Tiere** und **Beschworene Wesen** (Dienste wie bisher).
+- **Tiere:** alle Tiere mit Wertekasten (Merkmal Kreatur N oder Typus Tier), auch ohne Ressource (gekauft, gezähmt). Je Tier:
+  Rufname, zugeordnete Ressource Kreatur (beim Hinzufügen die kleinste freie, die reicht), Qualität, Vertrauter (Stärke
+  Tiervertrauter), Notiz. Warnungen: mehr/höhere Kreatur-Zuordnungen als Ressourcen, mehrere Vertraute, Vertrauter ohne Stärke.
+  Reittiere werden erkannt (Typus Reittier oder Grundausbildung Reittier I).
+- **Abrichtungen und Potenzial (Bestienmeister S. 15–23, nur mit Buchpaket):** Potenzial = Grundwert/Qualität + 2 je Kreatur +
+  3 Tiervertrauter + Tierspezialist (je 1) + Meister der Bestien (2) + Meisterbändiger (1, nur Kreatur), mit Aufschlüsselung.
+  Abrichtungen nach Gruppen wählbar, Kosten in Potenzialpunkten, Mehrfachwahl („maximal viermal“, „einmal pro HG“ …).
+  Grundausbildungen (Reittier I, Kampfgefährte …) kosten 1 und brauchen zusätzlich die Voraussetzung der Abrichtung
+  „Grundausbildung“ (Dompteur). Voraussetzungen werden geprüft – auch die des Tieres (`traeger: "tier"`: Typus, Größenklasse,
+  frühere Abrichtungen) und gestaffelte je Wahl (Kämpfer). Nicht erfüllte Voraussetzungen sind markiert, blockieren aber nicht.
+- Grenzen: Boni aus Abrichtungen sind im Wertekasten noch nicht eingerechnet (die Daten haben dafür keine strukturierten Wirkungen).
+  Datenfehler: „Kleiner Trick“ verlangt Dompteur vom Tier statt vom Tierführer (`traeger: "tier"` zu viel).
+- Code: `regelwerk/begleiter.ts` (alleTiere, abrichtungen, mehrfachGrenze, tierTraeger, pruefeAbrichtung, potenzial),
+  `components/begleiter/{TierAbschnitt,WesenAbschnitt,Wertekasten}.tsx`, `features/begleiter/BegleiterView.tsx`,
+  Aktion `BEGLEITER_AENDERN`, Import der neuen Felder. Tests: `begleiter.test.tsx` (mit Bestienmeister lokal).
+
 ## Google AI Studio
 
 Unverändert eine Vite-/React-App mit `metadata.json` im Wurzelordner; Import über „Import from GitHub“, Hosting über Cloud Run.

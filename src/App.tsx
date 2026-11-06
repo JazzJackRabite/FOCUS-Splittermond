@@ -17,6 +17,7 @@ import { AdvancementView } from './features/advancement/AdvancementView';
 import { PlayView } from './features/play/PlayView';
 import { CombatMagicTab } from './components/combat/CombatMagicTab';
 import { InventoryView } from './features/inventory/InventoryView';
+import { BegleiterView } from './features/begleiter/BegleiterView';
 import { PlaySessionProvider, usePlaySession } from './context/PlaySessionContext';
 import type { ConfirmDialogState } from './hooks/useModals';
 import type { AppMode } from './types';
@@ -89,7 +90,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     if (
-      (mode === 'xp' || mode === 'play' || mode === 'combat' || mode === 'inventory') &&
+      (mode === 'xp' || mode === 'play' || mode === 'combat' || mode === 'inventory' || mode === 'begleiter') &&
       !isCreationComplete &&
       !state.creationFinalized
     ) {
@@ -131,7 +132,7 @@ const App: React.FC = () => {
       return;
     }
 
-    // targetMode is 'xp', 'play', 'combat', or 'inventory'
+    // targetMode is 'xp', 'play', 'combat', 'inventory' or 'begleiter'
     if (!state.creationFinalized) {
       if (!isCreationComplete) {
         toast.error('Die Charaktererschaffung ist noch nicht vollständig!');
@@ -389,6 +390,19 @@ const App: React.FC = () => {
             >
               <span>Inventar</span>
             </button>
+
+            <button
+              onClick={() => handleTabClick('begleiter')}
+              disabled={!isAdvancementUnlocked}
+              className={`flex-1 min-w-[85px] min-h-[40px] py-2 sm:py-2.5 md:py-3 px-1.5 sm:px-3 text-center font-bold uppercase tracking-normal sm:tracking-wider md:tracking-widest text-[11px] sm:text-xs md:text-sm transition-all flex items-center justify-center select-none ${
+                mode === 'begleiter'
+                  ? 'bg-[#faf4e6] text-[#1B365D] border-b-2 sm:border-b-0 sm:border-t-4 border-[#1B365D] shadow-xs'
+                  : 'text-gray-700 hover:bg-[#ebdcc3]'
+              } ${!isAdvancementUnlocked ? 'opacity-50 cursor-not-allowed' : ''}`}
+              title={!isAdvancementUnlocked ? 'Erst verfügbar wenn Erschaffung abgeschlossen' : ''}
+            >
+              <span>Begleiter</span>
+            </button>
           </div>
 
           {/* MAIN CONTENT */}
@@ -397,6 +411,7 @@ const App: React.FC = () => {
           {mode === 'play' && <PlayView />}
           {mode === 'combat' && <CombatMagicTab />}
           {mode === 'inventory' && <InventoryView />}
+          {mode === 'begleiter' && <BegleiterView />}
         </div>
       </PlaySessionProvider>
     </CharacterContext.Provider>

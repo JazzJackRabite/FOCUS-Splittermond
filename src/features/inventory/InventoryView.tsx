@@ -25,7 +25,6 @@ import { SourceBadge } from '../../components/ui/SourceBadge';
 import { generateId } from '../../utils/id';
 import type { InventoryItem } from '../../types';
 import { toast } from 'react-hot-toast';
-import { BegleiterKarte } from '../../components/begleiter/BegleiterKarte';
 
 export const InventoryView: React.FC = () => {
   const { state, dispatch, calc } = useCharacter();
@@ -702,9 +701,6 @@ export const InventoryView: React.FC = () => {
           })
         )}
       </div>
-
-      {/* ── BEGLEITER (Tiergefährten, beschworene Wesen; nur mit Regelpaketen) ── */}
-      <BegleiterKarte />
 
       {/* ── MODAL: GEGENSTAND HINZUFÜGEN ── */}
       {showAddModal && (
