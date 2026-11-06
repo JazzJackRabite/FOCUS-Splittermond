@@ -40,6 +40,8 @@ export interface CharakterWirkung {
   quelleTyp: string;
   wirkung: Wirkung;
   status: WirkungsStatus;
+  /** Meisterschaften: Fertigkeiten (Editor-Namen), unter denen der Charakter sie führt – bei allgemeinen Magiemeisterschaften die Magieschulen */
+  schulen?: string[];
 }
 
 const FUER_CHARAKTER = new Set(['selbst', 'selbst_und_verbuendete']);
@@ -58,8 +60,11 @@ function status(k: Katalog, quelle: string, w: Wirkung): WirkungsStatus {
   return 'dauerhaft';
 }
 
-/** Alle Wirkungen der gegebenen Einträge (Stärken mehrfach möglich: je Stufe einmal), die den Charakter selbst betreffen */
-export function wirkungenDesCharakters(k: Katalog, ids: string[]): CharakterWirkung[] {
+/**
+ * Alle Wirkungen der gegebenen Einträge (Stärken mehrfach möglich: je Stufe einmal), die den Charakter selbst betreffen.
+ * `fertigkeitJeId`: zu Meisterschafts-IDs die Fertigkeiten, unter denen der Charakter sie führt (für Magieschulen).
+ */
+export function wirkungenDesCharakters(k: Katalog, ids: string[], fertigkeitJeId?: Record<string, string[]>): CharakterWirkung[] {
   const out: CharakterWirkung[] = [];
   const gesehen = new Set<string>();
   for (const id of ids) {
@@ -70,7 +75,9 @@ export function wirkungenDesCharakters(k: Katalog, ids: string[]): CharakterWirk
     gesehen.add(e.id);
     for (const w of (e.daten.wirkungen_strukturiert ?? []) as Wirkung[]) {
       if (!FUER_CHARAKTER.has(w.traeger)) continue;
-      out.push({ quelle: e.id, quelleName: e.name, quelleTyp: e.typ, wirkung: w, status: status(k, e.id, w) });
+      const cw: CharakterWirkung = { quelle: e.id, quelleName: e.name, quelleTyp: e.typ, wirkung: w, status: status(k, e.id, w) };
+      if (fertigkeitJeId?.[e.id]?.length) cw.schulen = fertigkeitJeId[e.id];
+      out.push(cw);
     }
   }
   return out;
@@ -192,7 +199,7 @@ export function situativeBoni(k: Katalog, liste: CharakterWirkung[], art: WurfAr
       else if (w.bezug === 'proben') passt = true;
       else if (w.bezug === 'angriff') passt = art === 'angriff';
       else if (w.bezug === 'nahkampfangriff') passt = art === 'angriff' && nahkampf;
-      else if (w.bezug === 'zauber') passt = art === 'zauber';
+      else if (w.bezug === 'zauber') passt = art === 'zauber' && giltFuerSchule(k, cw, fertigkeit);
       else if (w.bezug === 'schaden') { passt = art === 'angriff' || art === 'zauber'; nurHinweis = true; }
     } else if (art === 'angriff' && cw.status === 'bedingt' && (w.art === 'zusatzschaden' || w.art === 'sr_ignorieren')) {
       passt = true; nurHinweis = true;
@@ -202,4 +209,127 @@ export function situativeBoni(k: Katalog, liste: CharakterWirkung[], art: WurfAr
     out.push({ id: `${cw.quelle}#${i}`, quelle: cw.quelleName, wert: nurHinweis ? null : zahl, text, bedingung: w.bedingung, beleg: w.beleg });
   });
   return out;
+}
+
+// ---------------------------------------------------------------- Zaubermechanik (Gruppe B) im Zauber-Dialog
+const ALLGEMEINE_MAGIE = 'grw:meisterschaftsgruppe:allgemeine-magiemeisterschaften';
+
+/**
+ * Gilt die Wirkung für einen Zauber dieser Magieschule (Editor-Name, z. B. „Feuermagie“)?
+ * - Meisterschaft einer Magieschule: nur für Zauber dieser Schule
+ * - allgemeine Magiemeisterschaft: für die Schulen, unter denen der Charakter sie führt (unbekannt → alle)
+ * - Meisterschaften anderer Fertigkeiten (z. B. Arkane Kunde, Empathie) und Stärken: für alle Zauber, die Lage entscheidet der Spieler
+ */
+export function giltFuerSchule(k: Katalog, cw: CharakterWirkung, schule: string): boolean {
+  if (cw.quelleTyp !== 'meisterschaft') return true;
+  const f = k.get(cw.quelle)?.daten.fertigkeit as string | undefined;
+  if (f === ALLGEMEINE_MAGIE) return !cw.schulen?.length || cw.schulen.includes(schule);
+  const fe = f ? k.get(f) : undefined;
+  if (fe?.typ === 'fertigkeit' && fe.daten.kategorie === 'Magieschule') return fe.name === schule;
+  return true;
+}
+
+/** Änderung der Fokuskosten: nicht verzehrter Anteil (erschöpft bzw. kanalisiert) und verzehrter Anteil, mit Vorzeichen */
+export interface KostenDelta { erschoepft: number; kanalisiert: number; verzehrt: number }
+
+/**
+ * Kostenangabe einer Wirkung → Änderung für einen Zauber. „(K)“ heißt: kanalisiert, wenn der Zauber kanalisiert ist.
+ * „4V1 oder K3V1“ → die Variante, die zum Zauber passt. Zahl allein → Punkte im nicht verzehrten Anteil.
+ * Nicht berechenbar (z. B. „halbe Kosten“, „2 je GK über 6“) → null.
+ */
+export function kostenDelta(art: string, wert: unknown, zauberKanalisiert: boolean): KostenDelta | null {
+  const vz = art === 'kosten_gesenkt' ? -1 : art === 'kosten_erhoeht' ? 1 : 0;
+  if (!vz) return null;
+  let gesamt: number; let verzehrt = 0; let kanal = zauberKanalisiert;
+  if (typeof wert === 'number') gesamt = wert;
+  else {
+    const varianten = String(wert ?? '').split(/\s+oder\s+/).map(v => v.trim());
+    const v = varianten.find(x => /^K/.test(x) === zauberKanalisiert) ?? varianten[0];
+    const m = v.match(/^(\(K\)|K)?(\d+)(?:V(\d+))?$/);
+    if (!m) return null;
+    if (m[1] === 'K') kanal = true;
+    gesamt = Number(m[2]); verzehrt = m[3] ? Number(m[3]) : 0;
+    if (verzehrt > gesamt) return null;
+  }
+  const rest = gesamt - verzehrt;
+  const n = (x: number) => (x === 0 ? 0 : x);
+  return { erschoepft: n(kanal ? 0 : vz * rest), kanalisiert: n(kanal ? vz * rest : 0), verzehrt: n(vz * verzehrt) };
+}
+
+export interface FokusKosten { isChanneled: boolean; exhausted: number; channeled: number; consumed: number; total: number; raw: string }
+
+/**
+ * Kostenänderungen auf die Grundkosten anwenden. Kein Anteil fällt unter 0; eine Senkung des verzehrten Anteils, die der Zauber
+ * nicht hat, geht auf den übrigen Anteil. Gesamtkosten mindestens 1, wenn der Zauber etwas kostet (Mindestkosten).
+ */
+export function kostenAnwenden<T extends FokusKosten>(basis: T, deltas: KostenDelta[]): T {
+  if (!deltas.length) return basis;
+  let e = basis.exhausted; let c = basis.channeled; let v = basis.consumed;
+  for (const d of deltas) {
+    v += d.verzehrt;
+    let uebrig = d.erschoepft + d.kanalisiert;
+    if (v < 0) { uebrig += v; v = 0; }
+    if (basis.isChanneled || d.kanalisiert) c += uebrig; else e += uebrig;
+    if (e < 0) { c += e; e = 0; }
+    if (c < 0) { e += c; c = 0; if (e < 0) e = 0; }
+  }
+  if (basis.total > 0 && e + c + v < 1) { if (basis.isChanneled) c = 1; else e = 1; }
+  return { ...basis, exhausted: e, channeled: c, consumed: v, total: e + c + v, isChanneled: basis.isChanneled || c > 0 };
+}
+
+export interface ZauberAnpassung {
+  /** Eintrags-ID der Quelle: alle Anpassungen einer Meisterschaft werden gemeinsam gewählt */
+  id: string;
+  quelle: string;
+  /** kosten/dauer: anklickbar und verrechnet; hinweis: nur anzeigen */
+  art: 'kosten' | 'dauer' | 'hinweis';
+  text: string;
+  bedingung?: string | null;
+  beleg: string;
+  kosten?: KostenDelta;
+  /** Änderung der Zauberdauer */
+  dauer?: { wert: number; einheit: 'ticks' | 'minuten' };
+}
+
+const B_HINWEIS = new Set(['schwierigkeit', 'wirkungsdauer', 'reichweite', 'erfolgsgrade', 'zauberschaden', 'zauberkosten', 'zauberdauer']);
+
+/**
+ * Wirkungen auf Zaubermechanik (Kosten, Zauberdauer, Schwierigkeit, Reichweite …) für einen Zauber dieser Schule.
+ * Alle hängen von einer Lage oder einer Wahl des Spielers ab (z. B. „für Bannzauber des Typus Konter“, Auge des Zauberers):
+ * Kosten und Zauberdauer sind deshalb anklickbar, der Rest wird als Hinweis gezeigt. Würfelboni stehen bei situativeBoni().
+ */
+export function zauberAnpassungen(k: Katalog, liste: CharakterWirkung[], schule: string, zauberKanalisiert: boolean): ZauberAnpassung[] {
+  const out: ZauberAnpassung[] = [];
+  liste.forEach(cw => {
+    const w = cw.wirkung;
+    if (!B_HINWEIS.has(String(w.bezug)) || w.art === 'schaden') return;
+    if (!giltFuerSchule(k, cw, schule)) return;
+    // Kosten und Zauberdauer derselben Meisterschaft gehören zusammen (z. B. Auge des Zauberers: +5 Ticks und (K)4V2) → gleiche id
+    const basis = { id: cw.quelle, quelle: cw.quelleName, bedingung: w.bedingung, beleg: w.beleg };
+    if (w.bezug === 'zauberkosten') {
+      const d = kostenDelta(w.art, w.wert, zauberKanalisiert);
+      const text = `Kosten ${w.art === 'kosten_gesenkt' ? '−' : '+'}${w.wert}`;
+      out.push(d ? { ...basis, art: 'kosten', text, kosten: d } : { ...basis, art: 'hinweis', text });
+      return;
+    }
+    if (w.bezug === 'zauberdauer' && typeof w.wert === 'number' && (w.einheit === 'ticks' || w.einheit === 'minuten')
+      && (w.art === 'wert_erhoeht' || w.art === 'wert_gesenkt')) {
+      const wert = w.art === 'wert_gesenkt' ? -w.wert : w.wert;
+      out.push({ ...basis, art: 'dauer', text: `Zauberdauer ${wert > 0 ? '+' : '−'}${Math.abs(wert)} ${w.einheit === 'ticks' ? 'Ticks' : 'Minuten'}`, dauer: { wert, einheit: w.einheit } });
+      return;
+    }
+    out.push({ ...basis, art: 'hinweis', text: wirkungKurz(w) });
+  });
+  return out;
+}
+
+/** Zauberdauer („9 Ticks“, „5 Minuten“) um gewählte Änderungen gleicher Einheit anpassen (mindestens 1); andere Angaben bleiben */
+export function zauberdauerAnpassen(zauberdauer: string | undefined, aenderungen: { wert: number; einheit: 'ticks' | 'minuten' }[]): string | undefined {
+  const m = (zauberdauer ?? '').match(/^(\d+)\s*(Ticks?|Minuten?)\b/i);
+  if (!m || !aenderungen.length) return zauberdauer;
+  const einheit = /^tick/i.test(m[2]) ? 'ticks' : 'minuten';
+  const summe = aenderungen.filter(a => a.einheit === einheit).reduce((s, a) => s + a.wert, 0);
+  if (!summe) return zauberdauer;
+  const n = Math.max(1, Number(m[1]) + summe);
+  return `${n} ${einheit === 'ticks' ? (n === 1 ? 'Tick' : 'Ticks') : (n === 1 ? 'Minute' : 'Minuten')}`;
 }

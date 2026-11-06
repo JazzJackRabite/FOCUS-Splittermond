@@ -148,6 +148,20 @@ Repository `JazzJackRabite/FOKUS-1.0-claudeedition` (Branch `main`; entstanden a
 Die geplanten Schritte sind erledigt. Offen bleiben Ideen wie Spielhilfen für bedingte Wirkungen (z. B. Bonus gegen Typus per Klick
 anwenden) oder Werte der Begleiter im Kampf.
 
+## Stand 12 (06.11.2026): Zaubermechanik aus Meisterschaften im Zauber-Dialog
+
+- Neuer Abschnitt „Kosten & Zauberdauer aus Meisterschaften“ im Zauber-Dialog: je Meisterschaft ein Knopf zum Anklicken
+  (z. B. Sparsamer Zauberer, Eiliger Schutz, Auge des Zauberers mit Zauberdauer und Kosten gemeinsam). Gewählte Änderungen
+  fließen in Grundkosten, Fokusabzug, Zauberdauer und die Zusammenfassung ein; Schwierigkeit, Wirkungsdauer, Zusatzschaden u. Ä.
+  erscheinen als Hinweis. „(K)2V1“ richtet sich nach dem Zauber, „4V1 oder K3V1“ wählt die passende Variante, Mindestkosten 1.
+- Magieschule beachtet: Meisterschaften einer Schule gelten nur für deren Zauber, allgemeine Magiemeisterschaften nur für die
+  Schulen, unter denen der Charakter sie führt. Das gilt jetzt auch für die anklickbaren Würfelboni auf Zauber.
+- Regelfehler behoben (Ausgangsstand): Fokuskosten mit V wurden doppelt gezählt („5V2“ = 7 Fokus). Nach GRW (Kanalisierte
+  Zauber: „K6V2 sind 6 kanalisierte Punkte Fokus insgesamt, davon werden 2 sofort verzehrt“) kostet 5V2 insgesamt 5 Fokus:
+  3 erschöpft, 2 verzehrt. Alte Tests auf die Buchregel umgestellt.
+- Code: `zauberAnpassungen`, `kostenDelta`, `kostenAnwenden`, `zauberdauerAnpassen`, `giltFuerSchule` in `regelwerk/wirkungen.ts`;
+  `useZauberAnpassungen`/`ZauberAnpassungen` in `components/play/SituativeBoni.tsx`. Tests: `zauberWirkungen.test.tsx`. 246 Tests grün.
+
 ## Google AI Studio
 
 Unverändert eine Vite-/React-App mit `metadata.json` im Wurzelordner; Import über „Import from GitHub“, Hosting über Cloud Run.

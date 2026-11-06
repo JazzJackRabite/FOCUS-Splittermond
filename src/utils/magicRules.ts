@@ -14,13 +14,15 @@ export interface ParsedFocusCost {
 /**
  * Parses Splittermond focus cost strings like "4", "K1", "4V1", "12V3", "K4V1", "K8V2", "K16V4", "20V5"
  *
- * Rules:
+ * Regel (GRW, Kanalisierte Zauber): Die Zahl hinter V ist ein Teil der Gesamtkosten, nicht zusätzlich.
+ * „K6V2 sind 6 kanalisierte Punkte Fokus insgesamt, davon werden 2 sofort verzehrt.“
  * - "4": 4 exhausted focus
  * - "K1": 1 channeled focus
- * - "4V1": Total 4 focus (3 exhausted, 1 consumed)
- * - "K4V1": 4 channeled focus + 1 consumed focus (total 5 focus)
- * - "12V3": Total 12 focus (9 exhausted, 3 consumed)
- * - "K8V2": 8 channeled focus + 2 consumed focus (total 10 focus)
+ * - "4V1": total 4 focus (3 exhausted, 1 consumed)
+ * - "K4V1": total 4 focus (3 channeled, 1 consumed)
+ * - "12V3": total 12 focus (9 exhausted, 3 consumed)
+ * - "K8V2": total 8 focus (6 channeled, 2 consumed)
+ * `exhausted`/`channeled` sind jeweils nur der nicht verzehrte Anteil.
  */
 export function parseFocusCost(costInput?: string | number | null): ParsedFocusCost {
   const raw = String(costInput ?? '0').trim();
@@ -48,13 +50,16 @@ export function parseFocusCost(costInput?: string | number | null): ParsedFocusC
       channeled = 1;
     }
   } else {
-    // Non-channeled: e.g. "4", "5V2" (5 exhausted, 2 consumed)
+    // Non-channeled: e.g. "4", "5V2" (insgesamt 5, davon 2 verzehrt)
     const numMatch = raw.match(/^(\d+)/);
     if (numMatch) {
       exhausted = parseInt(numMatch[1], 10) || 0;
     }
   }
 
+  // V ist Teil der genannten Gesamtkosten
+  consumed = Math.min(consumed, isChanneled ? channeled : exhausted);
+  if (isChanneled) channeled -= consumed; else exhausted -= consumed;
   const total = exhausted + channeled + consumed;
   return {
     isChanneled,

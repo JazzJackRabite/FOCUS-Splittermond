@@ -301,10 +301,10 @@ describe('Splittermond GRW – Umfassende Regelprüfung, 5 Testcharaktere & Kamp
       // Telkin wirkt 'Felsgeschoss' (Grad 1, Kosten 3V1)
       const costStr = '3V1';
       const parsedCost = parseFocusCost(costStr);
-      // In Splittermond "3V1": 3 erschöpft, 1 verzehrt = 4 total
-      expect(parsedCost.exhausted).toBe(3);
+      // GRW: "3V1" kostet insgesamt 3 Fokus, davon 1 verzehrt → 2 erschöpft + 1 verzehrt
+      expect(parsedCost.exhausted).toBe(2);
       expect(parsedCost.consumed).toBe(1);
-      expect(parsedCost.total).toBe(4);
+      expect(parsedCost.total).toBe(3);
 
       // Zauberprobe: 2W10 + Fertigkeit Felsmagie + MYS + KON vs Schwierigkeit 15
       // Wurf 18 vs 15 -> Diff 3 -> 1 EG
@@ -331,10 +331,10 @@ describe('Splittermond GRW – Umfassende Regelprüfung, 5 Testcharaktere & Kamp
       });
 
       expect(result.current.state.playState.focus.consumed).toBe(1);
-      expect(result.current.state.playState.focus.exhausted).toBe(3);
+      expect(result.current.state.playState.focus.exhausted).toBe(2);
       // Freier Fokus = maxFokus - (consumed + exhausted + channeled)
       const freeFocus = maxFokus - (result.current.state.playState.focus.consumed + result.current.state.playState.focus.exhausted);
-      expect(freeFocus).toBe(16); // 20 - 4 = 16 freier Fokus
+      expect(freeFocus).toBe(17); // 20 - 3 = 17 freier Fokus
     });
 
     it('Schritt 6: Splitterpunkt-Einsatz im Kampf (GRW S. 200)', () => {

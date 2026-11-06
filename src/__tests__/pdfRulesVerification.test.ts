@@ -468,15 +468,16 @@ describe('Splittermond GRW (2. erratierte Neuauflage) - Regelverifikation anhand
     it('parst Fokuskosten wie K4V1, 5V2, K8V2, K1 korrekt (PDF S. 195-196)', () => {
       const c1 = parseFocusCost('K4V1');
       expect(c1.isChanneled).toBe(true);
-      expect(c1.channeled).toBe(4);
+      // GRW: „K6V2 sind 6 kanalisierte Punkte Fokus insgesamt, davon werden 2 sofort verzehrt“
+      expect(c1.channeled).toBe(3);
       expect(c1.consumed).toBe(1);
-      expect(c1.total).toBe(5);
+      expect(c1.total).toBe(4);
 
       const c2 = parseFocusCost('5V2');
       expect(c2.isChanneled).toBe(false);
-      expect(c2.exhausted).toBe(5);
+      expect(c2.exhausted).toBe(3);
       expect(c2.consumed).toBe(2);
-      expect(c2.total).toBe(7);
+      expect(c2.total).toBe(5);
 
       const c3 = parseFocusCost('K1');
       expect(c3.isChanneled).toBe(true);
@@ -496,8 +497,8 @@ describe('Splittermond GRW (2. erratierte Neuauflage) - Regelverifikation anhand
       expect(calculateTotalEGSpent(allocations)).toBe(7);
 
       const finalCosts = calculateFinalSpellCosts(baseCost, allocations);
-      // 6 exhausted - 2 = 4
-      expect(finalCosts.effectiveExhausted).toBe(4);
+      // 6V2: 4 erschöpft + 2 verzehrt; 4 erschöpft - 2 = 2
+      expect(finalCosts.effectiveExhausted).toBe(2);
       expect(finalCosts.effectiveConsumed).toBe(2);
       // Standard 3 ticks Auslösezeit - 1 = 2 ticks
       expect(finalCosts.effectiveCastTicks).toBe(2);

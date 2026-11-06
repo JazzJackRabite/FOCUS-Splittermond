@@ -41,7 +41,8 @@ import { generateId } from '../../utils/id';
 import type { RollEntry } from './DiceLog';
 import { getActiveRollModifiers } from '../../utils/conditionModifiers';
 import { wuerfeln } from '../../utils/wuerfeln';
-import { SituativeBoni, useSituativeBoni } from './SituativeBoni';
+import { SituativeBoni, useSituativeBoni, useZauberAnpassungen, ZauberAnpassungen } from './SituativeBoni';
+import { kostenAnwenden, zauberdauerAnpassen } from '../../regelwerk/wirkungen';
 
 export interface CastSpellSuccessResult {
   spell: Spell;
@@ -103,6 +104,12 @@ interface CastSpellModalProps {
 
 type RollType = 'standard' | 'safe' | 'risk';
 
+/** Fokuskosten in Buchschreibweise (z. B. „K4V1“, „3“) */
+function kostenText(c: { isChanneled: boolean; exhausted: number; channeled: number; consumed: number }): string {
+  const gesamt = (c.isChanneled ? c.channeled : c.exhausted) + c.consumed;
+  return `${c.isChanneled ? 'K' : ''}${gesamt}${c.consumed ? `V${c.consumed}` : ''}`;
+}
+
 export const CastSpellModal: React.FC<CastSpellModalProps> = ({
   spell: rawSpell,
   schoolSkillTotal,
@@ -122,7 +129,12 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
 }) => {
   const modalHeadingId = useId();
   const spell = useMemo(() => getFullSpellInfo(rawSpell), [rawSpell]);
-  const baseCost = useMemo(() => parseFocusCost(spell.cost), [spell.cost]);
+  const grundkosten = useMemo(() => parseFocusCost(spell.cost), [spell.cost]);
+  // Kosten- und Zauberdauer-Änderungen aus Meisterschaften (nur mit Regelpaketen)
+  const zauberWirk = useZauberAnpassungen(schoolSkillName, grundkosten.isChanneled);
+  const baseCost = useMemo(() => kostenAnwenden(grundkosten, zauberWirk.kosten), [grundkosten, zauberWirk.kosten]);
+  const kostenGeaendert = baseCost !== grundkosten;
+  const zauberdauer = useMemo(() => zauberdauerAnpassen(spell.castTime, zauberWirk.dauer), [spell.castTime, zauberWirk.dauer]);
 
   // Step 1: Difficulty & Roll Modifiers
   const [difficulty, setDifficulty] = useState<number>(15);
@@ -185,8 +197,9 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
 
   // Calculate final focus costs after applying EG savings and enhancements
   const finalCosts = useMemo(() => {
-    return calculateFinalSpellCosts(baseCost, allocations, permissibleMods.specificEnhancements);
-  }, [baseCost, allocations, permissibleMods.specificEnhancements]);
+    const f = calculateFinalSpellCosts(baseCost, allocations, permissibleMods.specificEnhancements);
+    return zauberWirk.labels.length ? { ...f, modificationsSummary: [...zauberWirk.labels, ...f.modificationsSummary] } : f;
+  }, [baseCost, allocations, permissibleMods.specificEnhancements, zauberWirk.labels]);
 
   const handleToggleEnhancement = (enh: SpecificSpellEnhancement) => {
     setAllocations((prev) => {
@@ -389,7 +402,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
         school: spell.school,
         grade: spell.grade,
         channeledFocus: finalCosts.effectiveChanneled,
-        castTime: spell.castTime,
+        castTime: zauberdauer,
         duration: spell.duration,
         range: spell.range,
         startedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -522,7 +535,10 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
               <span className="text-[11px] text-stone-600 font-medium flex items-center justify-center sm:justify-start gap-1">
                 <Clock className="w-3.5 h-3.5 text-[#C5A059]" /> Zauberdauer
               </span>
-              <p className="font-bold text-[#1B365D] mt-0.5 text-sm sm:text-base">{spell.castTime || '—'}</p>
+              <p className="font-bold text-[#1B365D] mt-0.5 text-sm sm:text-base">
+                {zauberdauer || '—'}
+                {zauberdauer !== spell.castTime && <span className="line-through text-xs text-stone-400 font-normal ml-1">{spell.castTime}</span>}
+              </p>
             </div>
             <div className="bg-white/70 rounded-lg p-2.5 border border-[#d1c4b0]/50 text-center sm:text-left">
               <span className="text-[11px] text-stone-600 font-medium flex items-center justify-center sm:justify-start gap-1">
@@ -542,7 +558,10 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
               <span className="text-[11px] text-stone-600 font-medium flex items-center justify-center sm:justify-start gap-1">
                 <Flame className="w-3.5 h-3.5 text-[#8B263E]" /> Grundkosten
               </span>
-              <p className="font-bold text-[#8B263E] mt-0.5 text-sm sm:text-base">{spell.cost || '0'}</p>
+              <p className="font-bold text-[#8B263E] mt-0.5 text-sm sm:text-base">
+                {kostenGeaendert ? kostenText(baseCost) : spell.cost || '0'}
+                {kostenGeaendert && <span className="line-through text-xs text-stone-400 font-normal ml-1">{spell.cost}</span>}
+              </p>
             </div>
             <div className="bg-white/70 rounded-lg p-2.5 border border-[#d1c4b0]/50 text-center sm:text-left">
               <span className="text-[11px] text-stone-600 font-medium flex items-center justify-center sm:justify-start gap-1">
@@ -551,6 +570,8 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
               <p className="font-bold text-[#1B365D] mt-0.5 text-sm sm:text-base truncate">{spell.range || '—'}</p>
             </div>
           </div>
+
+          <ZauberAnpassungen anpassungen={zauberWirk.anpassungen} gewaehlt={zauberWirk.gewaehlt} onToggle={zauberWirk.umschalten} />
 
           {/* Spell Description Collapsible */}
           {spell.description && (

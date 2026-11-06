@@ -36,24 +36,25 @@ describe('magicRules - parseFocusCost', () => {
     const result5v2 = parseFocusCost('5V2');
     expect(result5v2.isChanneled).toBe(false);
     expect(result5v2.channeled).toBe(0);
-    expect(result5v2.exhausted).toBe(5);
+    // GRW: V ist Teil der Gesamtkosten (5V2 = 5 Fokus, davon 2 verzehrt)
+    expect(result5v2.exhausted).toBe(3);
     expect(result5v2.consumed).toBe(2);
-    expect(result5v2.total).toBe(7);
+    expect(result5v2.total).toBe(5);
 
     const result12v3 = parseFocusCost('12V3');
     expect(result12v3.isChanneled).toBe(false);
     expect(result12v3.channeled).toBe(0);
-    expect(result12v3.exhausted).toBe(12);
+    expect(result12v3.exhausted).toBe(9);
     expect(result12v3.consumed).toBe(3);
-    expect(result12v3.total).toBe(15);
+    expect(result12v3.total).toBe(12);
   });
 
   it('parses channeled with consumed (e.g. K4V1)', () => {
     const result = parseFocusCost('K4V1');
     expect(result.isChanneled).toBe(true);
-    expect(result.channeled).toBe(4);
+    expect(result.channeled).toBe(3);
     expect(result.consumed).toBe(1);
-    expect(result.total).toBe(5);
+    expect(result.total).toBe(4);
   });
 
   it('handles empty or dash cost', () => {
@@ -89,9 +90,9 @@ describe('magicRules - enhancements & info', () => {
   it('matches user example scenario: Feuerstrahl with 3 EG', () => {
     // Example from prompt:
     // Difficulty: 18, Roll: 27 -> diff: 9 -> 3 EG
-    // Base cost: 5V2 (5 exhausted, 2 consumed)
+    // Base cost: 5V2 (3 exhausted, 2 consumed)
     // Allocations: 1 EG for +1 damage, 2 EG to save 2 exhausted focus
-    // Final focus costs: 3 exhausted, 2 consumed
+    // Final focus costs: 1 exhausted (minimum 1), 2 consumed
     const egCalc = calculateSpellEG(27, 18);
     expect(egCalc.isSuccess).toBe(true);
     expect(egCalc.differenz).toBe(9);
@@ -108,10 +109,10 @@ describe('magicRules - enhancements & info', () => {
     const baseCost = parseFocusCost('5V2');
     const finalCosts = calculateFinalSpellCosts(baseCost, allocations);
 
-    expect(finalCosts.effectiveExhausted).toBe(3);
+    expect(finalCosts.effectiveExhausted).toBe(1);
     expect(finalCosts.effectiveConsumed).toBe(2);
     expect(finalCosts.effectiveChanneled).toBe(0);
-    expect(finalCosts.totalFocus).toBe(5);
+    expect(finalCosts.totalFocus).toBe(3);
   });
 
   it('handles spell failure: exhausts negative EG focus', () => {
@@ -165,9 +166,9 @@ describe('magicRules - enhancements & info', () => {
   });
 
   it('saves consumed focus (3 EG per 1 consumed FO) and applies specific enhancement focus costs', () => {
-    // Spell costs 4V2 (4 exhausted focus, 2 consumed focus)
+    // Spell costs 4V2 (2 exhausted focus, 2 consumed focus)
     const baseCost = parseFocusCost('4V2');
-    expect(baseCost.exhausted).toBe(4);
+    expect(baseCost.exhausted).toBe(2);
     expect(baseCost.consumed).toBe(2);
 
     const availableEnhancements = [
@@ -175,7 +176,7 @@ describe('magicRules - enhancements & info', () => {
         id: 'enh-1',
         egCost: 2,
         focusCostRaw: '+1V1',
-        focusDelta: parseFocusCost('1V1'), // 1 exhausted, 1 consumed
+        focusDelta: parseFocusCost('1V1'), // 0 exhausted, 1 consumed
         description: 'Zusätzlicher Effekt',
         raw: '2 EG (Kosten +1V1): Zusätzlicher Effekt',
       },
@@ -191,8 +192,8 @@ describe('magicRules - enhancements & info', () => {
     expect(calculateTotalEGSpent(allocations, availableEnhancements)).toBe(5);
 
     const finalCosts = calculateFinalSpellCosts(baseCost, allocations, availableEnhancements);
-    // Base exhausted: 4, save: 0, enh: +1 -> 5
-    expect(finalCosts.effectiveExhausted).toBe(5);
+    // Base exhausted: 2, save: 0, enh: +0 -> 2
+    expect(finalCosts.effectiveExhausted).toBe(2);
     // Base consumed: 2, save: -1, enh: +1 -> 2
     expect(finalCosts.effectiveConsumed).toBe(2);
     expect(finalCosts.modificationsSummary).toContain('-1 Verzehrter Fokus (3 EG)');

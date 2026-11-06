@@ -243,8 +243,12 @@ export function wirkungenFuerCharakter(state: Pick<CharacterState, 'strengthsLis
   if (!k) return null;
   const ids: string[] = [];
   for (const s of state.strengthsList ?? []) { const i = idNachName(k, 'staerke', s.name); if (i) ids.push(i); }
-  for (const [skill, liste] of Object.entries(state.masteries ?? {})) for (const m of liste) { const i = meisterschaftId(k, m.name, skill); if (i) ids.push(i); }
-  const liste = wirkungenDesCharakters(k, ids);
+  const fertigkeitJeId: Record<string, string[]> = {};
+  for (const [skill, liste] of Object.entries(state.masteries ?? {})) for (const m of liste) {
+    const i = meisterschaftId(k, m.name, skill);
+    if (i) { ids.push(i); (fertigkeitJeId[i] ??= []).push(skill); }
+  }
+  const liste = wirkungenDesCharakters(k, ids, fertigkeitJeId);
   return { liste, fertigkeitsBoni: fertigkeitsBoni(k, liste), werteBoni: werteBoni(liste) };
 }
 
