@@ -245,6 +245,13 @@ export function calculateCharacter(state: CharacterState): CharacterCalculationR
     robustBonus = regelwerk.lpAusStaerken;
     foBonusFromStrengths = regelwerk.foAusStaerken;
   }
+  // 5b. Dauerhafte Wirkungen von Meisterschaften auf abgeleitete Werte (z. B. Sprinter GSW +1, Gute Reflexe VTD +1), nur mit Regelpaketen
+  const wirkungen = wirkungenFuerCharakter(state);
+  if (regelwerk && wirkungen) {
+    for (const [wert, b] of Object.entries(wirkungen.werteBoni)) {
+      if (wert in derived) (derived as unknown as Record<string, number>)[wert] += b.summe;
+    }
+  }
 
   const lpMod = Number(state.playState?.lpModifier) || 0;
   const rawMaxLP = derived.LP + robustBonus + lpMod;
@@ -425,7 +432,6 @@ export function calculateCharacter(state: CharacterState): CharacterCalculationR
   // 12. Helpers
   const getSkillValue = (skill: string) => (skillsBase[skill] ?? 0) + (skillsXp[skill] ?? 0);
 
-  const wirkungen = wirkungenFuerCharakter(state);
   const getSkillBonus = (skill: string) => wirkungen?.fertigkeitsBoni[skill]?.summe ?? 0;
 
   const getSkillTotal = (skill: string): number | null => {

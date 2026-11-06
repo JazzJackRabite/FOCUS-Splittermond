@@ -11,10 +11,11 @@ import { situativeBoni, type SituativerBonus, type WurfArtKontext } from '../../
 export function useSituativeBoni(art: WurfArtKontext, fertigkeit: string) {
   const ctx = useContext(CharacterContext);
   const liste = ctx?.calc?.wirkungen?.liste;
+  const attribute = ctx?.calc?.currentAttributes;
   const boni = useMemo(() => {
     const k = aktiverKatalog();
-    return k && liste ? situativeBoni(k, liste, art, fertigkeit) : [];
-  }, [liste, art, fertigkeit]);
+    return k && liste ? situativeBoni(k, liste, art, fertigkeit, attribute) : [];
+  }, [liste, art, fertigkeit, attribute]);
   const [gewaehlt, setGewaehlt] = useState<Set<string>>(new Set());
   const umschalten = (id: string) => setGewaehlt(g => { const n = new Set(g); if (n.has(id)) n.delete(id); else n.add(id); return n; });
   const aktiv = boni.filter(b => gewaehlt.has(b.id) && b.wert !== null);

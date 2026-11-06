@@ -21,7 +21,7 @@ const namen = (l: ReturnType<typeof situativeBoni>) => l.map(x => `${x.quelle}:$
 
 describe('Situative Boni je Wurf', () => {
   it('Probe: Fertigkeitsbonus nur für die passende Fertigkeit, allgemeine Probenboni immer', () => {
-    expect(namen(situativeBoni(K, liste, 'probe', 'Wahrnehmung'))).toEqual(['Feine Nase:2', 'Orientierungssinn:3']);
+    expect(namen(situativeBoni(K, liste, 'probe', 'Wahrnehmung'))).toEqual(['Feine Nase:2', 'Orientierungssinn:3', 'Jäger des Übernatürlichen:3']);
     expect(namen(situativeBoni(K, liste, 'probe', 'Athletik'))).toEqual(['Orientierungssinn:3']);
   });
   it('Angriff: Angriffsbonus verrechenbar, Zusatzschaden nur als Hinweis', () => {
@@ -55,5 +55,14 @@ describe('Probendialog', () => {
   it('ohne Charakterkontext kein Abschnitt', () => {
     render(<RollModal skillName="Wahrnehmung" baseValue={10} onClose={() => {}} />);
     expect(screen.queryByTestId('situative-boni')).toBeNull();
+  });
+});
+
+describe('Attributwerte als Bonus', () => {
+  it('Begabter Späher: Bonus in Höhe der Intuition mit Splitterpunkt', () => {
+    const l = wirkungenDesCharakters(K, ['grw:meisterschaft:wahrnehmung:begabter-spaeher']);
+    const b = situativeBoni(K, l, 'probe', 'Wahrnehmung', { INT: 3 });
+    expect(b.map(x => [x.quelle, x.wert])).toEqual([['Begabter Späher', 3]]);
+    expect(situativeBoni(K, l, 'probe', 'Wahrnehmung').map(x => x.wert)).toEqual([null]);
   });
 });

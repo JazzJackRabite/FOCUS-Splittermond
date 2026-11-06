@@ -5,7 +5,7 @@ import { wirkungKurz, type CharakterWirkung, type WirkungsStatus } from '../../r
 
 const GRUPPEN: { status: WirkungsStatus; titel: string; hinweis: string; offen: boolean }[] = [
   { status: 'verrechnet', titel: 'Eingerechnet', hinweis: 'In Fertigkeits- und abgeleiteten Werten enthalten.', offen: true },
-  { status: 'dauerhaft', titel: 'Dauerhaft', hinweis: 'Gilt immer, steht aber nicht als Zahl auf dem Bogen.', offen: true },
+  { status: 'dauerhaft', titel: 'Dauerhaft', hinweis: 'Gilt immer. Behinderung, Tick-Zuschlag und Wundabzüge rechnet der Editor teils schon ein; der Rest steht nicht als Zahl auf dem Bogen.', offen: true },
   { status: 'bedingt', titel: 'In bestimmten Lagen', hinweis: 'Nur wenn die Bedingung erfüllt ist – selbst anwenden.', offen: false },
   { status: 'manoever', titel: 'Bei Manövern', hinweis: 'Nur beim Einsatz des Manövers.', offen: false },
 ];

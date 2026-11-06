@@ -7,7 +7,7 @@
  */
 import type { Katalog } from './katalog';
 import { regelIdsErmitteln } from './ids';
-import { fertigkeitsBoni, wirkungenDesCharakters, type CharakterWirkung, type FertigkeitsBonus } from './wirkungen';
+import { fertigkeitsBoni, werteBoni, wirkungenDesCharakters, type CharakterWirkung, type FertigkeitsBonus } from './wirkungen';
 import type { Eintrag, Ergebnis } from './typen';
 import { erfuellt, type BedingungsCharakter } from './bedingungen';
 import { abgeleiteteWerte } from './abgeleitet';
@@ -235,7 +235,7 @@ export function grossmeisterAb(): number {
 }
 
 // ---------------------------------------------------------------- Wirkungen
-export interface CharakterWirkungen { liste: CharakterWirkung[]; fertigkeitsBoni: Record<string, FertigkeitsBonus> }
+export interface CharakterWirkungen { liste: CharakterWirkung[]; fertigkeitsBoni: Record<string, FertigkeitsBonus>; werteBoni: Record<string, FertigkeitsBonus> }
 
 /** Wirkungen der Stärken und Meisterschaften des Charakters; null ohne Regelpakete */
 export function wirkungenFuerCharakter(state: Pick<CharacterState, 'strengthsList' | 'masteries'>): CharakterWirkungen | null {
@@ -245,7 +245,7 @@ export function wirkungenFuerCharakter(state: Pick<CharacterState, 'strengthsLis
   for (const s of state.strengthsList ?? []) { const i = idNachName(k, 'staerke', s.name); if (i) ids.push(i); }
   for (const [skill, liste] of Object.entries(state.masteries ?? {})) for (const m of liste) { const i = meisterschaftId(k, m.name, skill); if (i) ids.push(i); }
   const liste = wirkungenDesCharakters(k, ids);
-  return { liste, fertigkeitsBoni: fertigkeitsBoni(k, liste) };
+  return { liste, fertigkeitsBoni: fertigkeitsBoni(k, liste), werteBoni: werteBoni(liste) };
 }
 
 // ---------------------------------------------------------------- Regel-IDs beim Speichern

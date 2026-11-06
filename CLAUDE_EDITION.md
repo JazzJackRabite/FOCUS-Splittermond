@@ -132,6 +132,17 @@ Repository `JazzJackRabite/FOKUS-1.0-claudeedition` (Branch `main`; entstanden a
   Bücher genau einmal in der Liste).
 - Noch nicht im Editor: Nachschlage-Inhalte wie Gottheiten, Reliktkräfte, Abrichtungen, Golembausteine, Feenwelten.
 
+## Stand 11 (06.11.2026): Wirkungen vollständig gesichtet
+
+- Neue Regeldaten (`public/regelpakete/grw.srp.json`): Die Wirkungen aller Stärken, Meisterschaften und Zauber sind gesichtet –
+  jeder Satz mit Zahl ist entweder strukturiert erfasst oder bewusst Text (mit Grund). Gruppe A (Charakter und Würfe) und
+  B (Zaubermechanik: Kosten, Zauberdauer, Schaden …). Über alle Bücher 804 Wirkungen statt bisher 296.
+- Neue Felder: `gruppe` (A/B), `pro_eg`, `einheit`, `quelle_wirkung` („erfassung“ = gesichtet), Träger `gegner` (Würfe anderer
+  gegen den Charakter), Werte auch als Attributkürzel (z. B. „VER“ bei Begabter Alchemist).
+- Editor: Meisterschaften mit dauerhaften Wirkungen auf abgeleitete Werte werden eingerechnet (z. B. Sprinter GSW +1, Gute Reflexe
+  VTD +1, Blitzreflexe INI −3); situative Boni in Höhe eines Attributs werden mit dem Attributwert angeboten.
+- Buchpakete neu erzeugt: Wer Bücher schon hochgeladen hat, lädt sie neu hoch.
+
 ## Nächste Schritte
 
 Die geplanten Schritte sind erledigt. Offen bleiben Ideen wie Spielhilfen für bedingte Wirkungen (z. B. Bonus gegen Typus per Klick

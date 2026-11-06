@@ -84,3 +84,22 @@ describe.skipIf(!MAGIE || !fs.existsSync(MAGIE))('Wirkungen mit „Die Magie“ 
     expect(Object.fromEntries(Object.entries(w.fertigkeitsBoni).map(([k, v]) => [k, v.summe]))).toEqual({ 'Anführen': 2, Darbietung: 1, Diplomatie: 1 });
   });
 });
+
+describe('Meisterschaften auf abgeleitete Werte (dauerhaft)', () => {
+  beforeAll(() => setzeAktivenKatalog(K, false));
+  afterAll(() => setzeAktivenKatalog(null, false));
+  it('Sprinter GSW +1, Gute Reflexe VTD +1, Blitzreflexe INI −3', () => {
+    const ohne = calculateCharacter(charakter({}));
+    const mit = calculateCharacter(charakter({ masteries: { Athletik: [M('Sprinter')], 'Schlösser und Fallen': [M('Gute Reflexe')], Akrobatik: [M('Blitzreflexe')] } }));
+    expect(mit.derived.GSW - ohne.derived.GSW).toBe(1);
+    expect(mit.derived.VTD - ohne.derived.VTD).toBe(1);
+    expect(mit.derived.INI - ohne.derived.INI).toBe(-3);
+    expect(Object.keys(mit.wirkungen!.werteBoni).sort()).toEqual(['GSW', 'INI', 'VTD']);
+  });
+  it('bedingte Werte (Ausweichen I) werden nicht eingerechnet', () => {
+    const ohne = calculateCharacter(charakter({}));
+    const mit = calculateCharacter(charakter({ masteries: { Akrobatik: [M('Ausweichen I')] } }));
+    expect(mit.derived.VTD).toBe(ohne.derived.VTD);
+    expect(mit.wirkungen!.liste.map(x => x.status)).toContain('bedingt');
+  });
+});

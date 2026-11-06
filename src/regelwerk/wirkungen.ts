@@ -3,6 +3,7 @@
  *
  * - verrechnet: gilt „immer“ für den Charakter selbst und lässt sich eindeutig einrechnen:
  *     · Bonus/Malus auf benannte Fertigkeiten (z. B. Einfühlsamkeit: +2 Empathie) → Fertigkeitswert
+ *     · Meisterschaften auf abgeleitete Werte (z. B. Sprinter: GSW +1, Gute Reflexe: VTD +1, Blitzreflexe: INI −3) → abgeleitete Werte
  *     · Stärken mit Modifikatoren auf abgeleitete Werte (z. B. Hoher Geistiger Widerstand) → schon in abgeleiteteWerte()
  * - dauerhaft: gilt „immer“, ist aber kein Zahlenwert des Bogens (Resistenzen, Immunitäten) → nur Anzeige
  * - bedingt / zauber / manoever: gilt nur in einer Lage, solange ein Zauber wirkt oder beim Manöver → nur Anzeige
@@ -18,6 +19,11 @@ export interface Wirkung {
   auf?: string;
   traeger: string;
   bedingung?: string | null;
+  bezug_gruppe?: string;
+  gruppe?: 'A' | 'B';
+  pro_eg?: number | null;
+  einheit?: string;
+  quelle_wirkung?: string;
   fertigkeit_refs?: { id: string; text: string }[];
   zustand_ref?: { id: string; text: string };
   schadensart?: string;
@@ -37,6 +43,9 @@ export interface CharakterWirkung {
 }
 
 const FUER_CHARAKTER = new Set(['selbst', 'selbst_und_verbuendete']);
+/** abgeleitete Werte, die der Editor führt; Meisterschaftswirkungen darauf werden eingerechnet */
+const ABGELEITET = new Set(['GSW', 'INI', 'VTD', 'KW', 'GW', 'LP', 'FO']);
+const VORZEICHEN: Record<string, number> = { bonus: 1, wert_erhoeht: 1, malus: -1, wert_gesenkt: -1 };
 
 function status(k: Katalog, quelle: string, w: Wirkung): WirkungsStatus {
   if (w.gilt === 'solange der Zauber wirkt') return 'zauber';
@@ -44,6 +53,7 @@ function status(k: Katalog, quelle: string, w: Wirkung): WirkungsStatus {
   if (w.gilt !== 'immer') return 'bedingt';
   if ((w.art === 'bonus' || w.art === 'malus') && w.bezug === 'fertigkeit' && typeof w.wert === 'number' && w.fertigkeit_refs?.length) return 'verrechnet';
   const e = k.get(quelle);
+  if (e?.typ === 'meisterschaft' && ABGELEITET.has(String(w.bezug)) && typeof w.wert === 'number' && VORZEICHEN[w.art] !== undefined) return 'verrechnet';
   if (e?.typ === 'staerke' && (e.daten.abgeleitete_werte_modifikatoren ?? []).some((m: { bedingt?: unknown }) => !m.bedingt)) return 'verrechnet';
   return 'dauerhaft';
 }
@@ -85,17 +95,51 @@ export function fertigkeitsBoni(k: Katalog, liste: CharakterWirkung[]): Record<s
   return out;
 }
 
+/** Dauerhafte Änderungen abgeleiteter Werte durch Meisterschaften (Stärken stecken schon in abgeleiteteWerte()) */
+export function werteBoni(liste: CharakterWirkung[]): Record<string, { summe: number; quellen: { name: string; wert: number }[] }> {
+  const out: Record<string, { summe: number; quellen: { name: string; wert: number }[] }> = {};
+  for (const cw of liste) {
+    const w = cw.wirkung;
+    if (cw.status !== 'verrechnet' || cw.quelleTyp !== 'meisterschaft' || !ABGELEITET.has(String(w.bezug)) || typeof w.wert !== 'number') continue;
+    const v = (VORZEICHEN[w.art] ?? 0) * w.wert;
+    if (!v) continue;
+    const b = (out[String(w.bezug)] ??= { summe: 0, quellen: [] });
+    b.summe += v; b.quellen.push({ name: cw.quelleName, wert: v });
+  }
+  return out;
+}
+
+const BEZUG_TEXT: Record<string, string> = {
+  proben: 'Proben', angriff: 'Angriffe', nahkampfangriff: 'Nahkampfangriffe', fernkampfangriff: 'Fernkampfangriffe', aktive_abwehr: 'Aktive Abwehr',
+  widerstaende: 'Widerstandswerte', fertigkeitsproben_und_widerstaende: 'Fertigkeitsproben und Widerstandswerte', schaden: 'Schaden', wundabzug: 'Wundabzüge',
+  behinderung: 'Behinderung', tick_zuschlag: 'Tick-Zuschlag', maximalbonus: 'Höchstbonus', traglast: 'Last', wgs: 'WGS', zustandsabzug: 'Abzüge aus Zuständen',
+  zauber: 'Zauber', zauberkosten: 'Zauberkosten', zauberdauer: 'Zauberdauer', reichweite: 'Reichweite', wirkungsdauer: 'Wirkungsdauer', schwierigkeit: 'Schwierigkeit',
+  erfolgsgrade: 'Erfolgsgrade', zauberschaden: 'Zauberschaden', sonstiges: '',
+};
+function bezugText(w: Wirkung): string {
+  if (w.bezug === 'fertigkeit' && w.fertigkeit_refs?.length) return w.fertigkeit_refs.map(r => r.text).join(', ');
+  const b = String(w.bezug ?? '');
+  if (b.startsWith('attributproben:')) return `Proben mit ${b.slice(15)}`;
+  if (b.startsWith('attribut:')) return b.slice(9);
+  return BEZUG_TEXT[b] ?? b;
+}
+
 /** Kurztext einer Wirkung für die Anzeige */
 export function wirkungKurz(w: Wirkung): string {
-  const z = typeof w.wert === 'number' ? (w.art === 'malus' || w.art === 'wert_gesenkt' ? `−${w.wert}` : `+${w.wert}`) : w.wert ?? '';
+  const z = (w.art === 'malus' || w.art === 'wert_gesenkt' ? '−' : '+') + (w.wert ?? '') + (w.pro_eg ? ` (+${w.pro_eg} je EG)` : '');
   switch (w.art) {
-    case 'bonus': case 'malus': return `${z} auf ${(w.auf ?? w.bezug ?? '').replace(/^(?:seine[nrs]?|ihre[nrs]?|den|die|das) /, '')}`.trim();
-    case 'wert_erhoeht': case 'wert_gesenkt': return `${w.bezug ?? ''} ${z}`.trim();
+    case 'bonus': case 'malus': return `${z} auf ${(w.auf ?? bezugText(w)).replace(/^(?:seine[nrs]?|ihre[nrs]?|den|die|das) /, '')}`.trim();
+    case 'wert_erhoeht': case 'wert_gesenkt': return `${bezugText(w)} ${z}`.trim();
     case 'schaden_gesenkt': return `${w.schadensart ?? 'Schaden'} −${w.wert}`;
     case 'immunitaet': return `immun gegen ${w.zustand_ref?.text ?? ''}`.trim();
     case 'zusatzschaden': return `${w.wert} zusätzlicher Schaden`;
     case 'sr_ignorieren': return `${w.wert} SR ignorieren`;
     case 'zustand': return `Zustand ${w.zustand_ref?.text ?? ''}`.trim();
+    case 'wert_gesetzt': return `${w.bezug ?? ''} = ${w.wert}`;
+    case 'heilung': return `heilt ${w.wert} ${w.bezug ?? ''}`.trim();
+    case 'schaden': return `${w.wert} Schaden`;
+    case 'kosten_gesenkt': return `Kosten −${w.wert}`;
+    case 'kosten_erhoeht': return `Kosten +${w.wert}`;
     default: return w.beleg;
   }
 }
@@ -123,14 +167,25 @@ const FERNKAMPF = new Set(['Schusswaffen', 'Wurfwaffen']);
  *   (Wirkungen „beim Manöver“ stecken in der Manöverauswahl und erscheinen hier nicht)
  * - Zauber: Boni auf Zauber; Schadensboni als Hinweis
  */
-export function situativeBoni(k: Katalog, liste: CharakterWirkung[], art: WurfArtKontext, fertigkeit: string): SituativerBonus[] {
+const ATTR_EDITOR: Record<string, string> = { AUS: 'AUS', BEW: 'BEW', INT: 'INT', KON: 'KON', MYS: 'MYS', STÄ: 'STA', VER: 'VER', WIL: 'WIL' };
+
+/** Wert einer Wirkung als Zahl: Zahl direkt, Attributkürzel (z. B. „VER“ bei Begabter Alchemist) über die Attribute des Charakters */
+export function wertAlsZahl(wert: unknown, attribute?: Record<string, number>): number | null {
+  if (typeof wert === 'number') return wert;
+  const a = ATTR_EDITOR[String(wert)];
+  if (a && attribute && typeof attribute[a] === 'number') return attribute[a];
+  return null;
+}
+
+export function situativeBoni(k: Katalog, liste: CharakterWirkung[], art: WurfArtKontext, fertigkeit: string, attribute?: Record<string, number>): SituativerBonus[] {
   const out: SituativerBonus[] = [];
   const nahkampf = !FERNKAMPF.has(fertigkeit);
   liste.forEach((cw, i) => {
     // Manöver-Wirkungen stecken in der Manöverauswahl des Angriffs; hier nur bedingte Wirkungen
     if (cw.status !== 'bedingt') return;
     const w = cw.wirkung;
-    const zahl = typeof w.wert === 'number' ? (w.art === 'malus' ? -w.wert : w.wert) : null;
+    const roh = wertAlsZahl(w.wert, attribute);
+    const zahl = roh === null ? null : (w.art === 'malus' ? -roh : roh);
     let passt = false; let nurHinweis = false;
     if ((w.art === 'bonus' || w.art === 'malus') && cw.status === 'bedingt') {
       if (w.bezug === 'fertigkeit') passt = (w.fertigkeit_refs ?? []).some(r => (k.get(r.id)?.name ?? r.text) === fertigkeit);
@@ -143,7 +198,8 @@ export function situativeBoni(k: Katalog, liste: CharakterWirkung[], art: WurfAr
       passt = true; nurHinweis = true;
     }
     if (!passt) return;
-    out.push({ id: `${cw.quelle}#${i}`, quelle: cw.quelleName, wert: nurHinweis ? null : zahl, text: wirkungKurz(w), bedingung: w.bedingung, beleg: w.beleg });
+    const text = typeof w.wert === 'string' && roh !== null ? `${wirkungKurz(w)} (= ${roh})` : wirkungKurz(w);
+    out.push({ id: `${cw.quelle}#${i}`, quelle: cw.quelleName, wert: nurHinweis ? null : zahl, text, bedingung: w.bedingung, beleg: w.beleg });
   });
   return out;
 }
