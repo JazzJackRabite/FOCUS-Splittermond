@@ -172,6 +172,26 @@ anwenden) oder Werte der Begleiter im Kampf.
 - Editor: Boni auf „Proben“ nur bei den zugeordneten Fertigkeiten bzw. bei „alle Proben“; ohne Zuordnung nicht im Würfeldialog
   (weiter in der Karte „Wirkungen“). Tests angepasst. 246 Tests grün.
 
+## Stand 14 (06.11.2026): Relikte bauen (Relikt-Werkstatt im Inventar)
+
+- Neue Karte „Relikte“ im Inventar mit der Relikt-Werkstatt (`components/relikte/ReliktKarte.tsx`, Logik in `regelwerk/relikte.ts`):
+  Name, Grundgegenstand aus der Ausrüstungsliste (oder frei), Gegenstandsart, Punkte; Bausteine aus den Regelpaketen hinzufügen,
+  mit Anzahl, Zaubergrad und Zauber (Zauberverankerung), Stufe (Stärke) oder freier Auswahl (Schwerpunkt, Schadensart, Typus …).
+  Punktezähler und Warnungen (Punkte überschritten, Höchstzahl, falsche Gegenstandsart, fehlende Auswahl, Merkmal nötig,
+  Materialqualität, nur eine Variante, mehr als die Höchstpunkte). Es wird nur gewarnt, nichts gesperrt.
+- Jedes Relikt hat einen Inventareintrag (Kategorie „Relikt“, Werte des Grundgegenstands, Bausteine in der Beschreibung);
+  Speichern aktualisiert ihn, Löschen entfernt beides. Neue Felder `relikte` im Charakter (Speichern, Laden, Import).
+  Die Karte zeigt die Punkte der Ressource Relikt und die in Relikten vergebenen Punkte.
+- Alle Regeln kommen aus den Paketen (`daten.relikt_baukasten`, `daten.baustein`), nichts davon steht im Code. Nur mit dem
+  Grundregelwerk: 8 Verbesserungen (S. 142) und 3 Strukturgeber-Wirkungen (S. 254). Mondstahlklingen bringt weitere
+  Verbesserungen und legendäre Kräfte, Die Götter göttliche Kräfte und besondere Materialien.
+- Neues GRW-Paket in `public/regelpakete` (Herstellung, Verbesserungen, Artefaktwirkungen; 1539 Einträge). Buchpakete neu hochladen.
+- Noch nicht: Wertänderungen der Bausteine auf Waffe/Rüstung, GW/KW und Zauberverankerung im Magie-Bereich (nächster Stand);
+  Wachsen mit Chronik und beseelte Gegenstände (danach).
+- Tests: `regelwerk/__tests__/relikte.test.tsx` (Baukasten, Kosten wie im GRW-Beispiel S. 142, Warnungen, Inventareintrag,
+  Reducer, Werkstatt; mit `FOKUS_BUECHER` die Bausteine der Erweiterungen). Referenz des Python-Laders für den Katalog neu erzeugt.
+  251 Tests grün (mit Büchern).
+
 ## Tab „Begleiter“, Teil 1: Tiere (Branch `begleiter-tab`)
 
 - Neuer Tab **Begleiter** (nach Inventar, freigeschaltet wie die anderen Spiel-Tabs). Die Karte „Begleiter“ ist aus dem Inventar

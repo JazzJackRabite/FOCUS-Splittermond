@@ -554,6 +554,21 @@ export function validateCharacterImport(data: unknown): Partial<CharacterState> 
       }));
     if (b.length) result.begleiter = b;
   }
+  if (Array.isArray(data.relikte)) {
+    const r = (data.relikte as unknown[]).filter((x): x is Record<string, unknown> => !!x && typeof x === 'object'
+      && typeof (x as Record<string, unknown>).id === 'string' && typeof (x as Record<string, unknown>).inventarId === 'string'
+      && Array.isArray((x as Record<string, unknown>).bausteine))
+      .map((x) => ({
+        id: String(x.id), name: String(x.name ?? 'Relikt'), punkte: Number(x.punkte) || 0, art: String(x.art ?? 'gegenstand'),
+        ...(typeof x.basisId === 'string' ? { basisId: x.basisId } : {}), ...(typeof x.basisName === 'string' ? { basisName: x.basisName } : {}),
+        ...(typeof x.notiz === 'string' ? { notiz: x.notiz } : {}), inventarId: String(x.inventarId),
+        bausteine: (x.bausteine as unknown[]).filter((b): b is Record<string, unknown> => !!b && typeof b === 'object' && typeof (b as Record<string, unknown>).id === 'string')
+          .map(b => ({ id: String(b.id), anzahl: Number(b.anzahl) || 1,
+            ...(typeof b.name === 'string' ? { name: b.name } : {}), ...(typeof b.grad === 'number' ? { grad: b.grad } : {}),
+            ...(typeof b.stufe === 'number' ? { stufe: b.stufe } : {}), ...(typeof b.auswahl === 'string' ? { auswahl: b.auswahl } : {}) })),
+      }));
+    if (r.length) result.relikte = r;
+  }
 
   // Regel-IDs (Claude-Edition): nur Zuordnungen Text → Text übernehmen
   if (data.regelIds && typeof data.regelIds === 'object' && !Array.isArray(data.regelIds)) {
