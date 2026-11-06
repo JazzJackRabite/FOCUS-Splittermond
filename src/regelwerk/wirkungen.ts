@@ -25,6 +25,8 @@ export interface Wirkung {
   einheit?: string;
   quelle_wirkung?: string;
   fertigkeit_refs?: { id: string; text: string }[];
+  /** bezug „proben“: gilt für jede Probe (sonst nur für fertigkeit_refs) */
+  alle_proben?: boolean;
   zustand_ref?: { id: string; text: string };
   schadensart?: string;
   gegen_typus?: string;
@@ -169,7 +171,8 @@ const FERNKAMPF = new Set(['Schusswaffen', 'Wurfwaffen']);
 
 /**
  * Bedingte Wirkungen, die zu diesem Wurf passen könnten: Der Spieler entscheidet, ob die Lage zutrifft.
- * - Fertigkeitsboni der gewürfelten Fertigkeit (auch Waffen- und Magieschulfertigkeit), Boni auf „Proben“ allgemein
+ * - Fertigkeitsboni der gewürfelten Fertigkeit (auch Waffen- und Magieschulfertigkeit); Boni auf „Proben“ (z. B. zur Orientierung)
+ *   nur für die im Regelpaket zugeordneten Fertigkeiten, „alle Proben“ für jede
  * - Angriff: Boni auf Angriffe (Nahkampfangriffe nur im Nahkampf); Zusatzschaden, SR ignorieren und Schadensboni als Hinweis
  *   (Wirkungen „beim Manöver“ stecken in der Manöverauswahl und erscheinen hier nicht)
  * - Zauber: Boni auf Zauber; Schadensboni als Hinweis
@@ -196,7 +199,10 @@ export function situativeBoni(k: Katalog, liste: CharakterWirkung[], art: WurfAr
     let passt = false; let nurHinweis = false;
     if ((w.art === 'bonus' || w.art === 'malus') && cw.status === 'bedingt') {
       if (w.bezug === 'fertigkeit') passt = (w.fertigkeit_refs ?? []).some(r => (k.get(r.id)?.name ?? r.text) === fertigkeit);
-      else if (w.bezug === 'proben') passt = true;
+      // „Proben zur Orientierung“ u. Ä.: nur für die zugeordneten Fertigkeiten (Regelpaket: fertigkeit_refs), „alle Proben“ immer
+      else if (w.bezug === 'proben') passt = w.fertigkeit_refs?.length
+        ? w.fertigkeit_refs.some(r => (k.get(r.id)?.name ?? r.text) === fertigkeit)
+        : !!w.alle_proben;
       else if (w.bezug === 'angriff') passt = art === 'angriff';
       else if (w.bezug === 'nahkampfangriff') passt = art === 'angriff' && nahkampf;
       else if (w.bezug === 'zauber') passt = art === 'zauber' && giltFuerSchule(k, cw, fertigkeit);

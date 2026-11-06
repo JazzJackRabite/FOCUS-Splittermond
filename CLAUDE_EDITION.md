@@ -162,6 +162,16 @@ anwenden) oder Werte der Begleiter im Kampf.
 - Code: `zauberAnpassungen`, `kostenDelta`, `kostenAnwenden`, `zauberdauerAnpassen`, `giltFuerSchule` in `regelwerk/wirkungen.ts`;
   `useZauberAnpassungen`/`ZauberAnpassungen` in `components/play/SituativeBoni.tsx`. Tests: `zauberWirkungen.test.tsx`. 246 Tests grün.
 
+## Stand 13 (06.11.2026): Probenboni nur bei passenden Fertigkeiten
+
+- Fehler: Wirkungen auf „Proben“ ohne benannte Fertigkeit (z. B. Orientierungssinn „Proben zur Orientierung“, Geländekunde)
+  erschienen bei jeder Fertigkeitsprobe, auch bei Alchemie.
+- Regelpakete: solche Wirkungen tragen jetzt `fertigkeit_refs` (für welche Fertigkeiten sie gelten) oder `alle_proben: true`
+  (z. B. Kühler Kopf). Zuordnung auf der Datenseite in `wirkungen_probenbezug.json` (nur IDs); Meisterschaften ohne Eintrag
+  gelten für ihre eigene Fertigkeit. Neues GRW-Paket in `public/regelpakete`.
+- Editor: Boni auf „Proben“ nur bei den zugeordneten Fertigkeiten bzw. bei „alle Proben“; ohne Zuordnung nicht im Würfeldialog
+  (weiter in der Karte „Wirkungen“). Tests angepasst. 246 Tests grün.
+
 ## Tab „Begleiter“, Teil 1: Tiere (Branch `begleiter-tab`)
 
 - Neuer Tab **Begleiter** (nach Inventar, freigeschaltet wie die anderen Spiel-Tabs). Die Karte „Begleiter“ ist aus dem Inventar
@@ -181,6 +191,25 @@ anwenden) oder Werte der Begleiter im Kampf.
 - Code: `regelwerk/begleiter.ts` (alleTiere, abrichtungen, mehrfachGrenze, tierTraeger, pruefeAbrichtung, potenzial),
   `components/begleiter/{TierAbschnitt,WesenAbschnitt,Wertekasten}.tsx`, `features/begleiter/BegleiterView.tsx`,
   Aktion `BEGLEITER_AENDERN`, Import der neuen Felder. Tests: `begleiter.test.tsx` (mit Bestienmeister lokal).
+
+## Tab „Begleiter“, Teil 2: Gefolge (Branch `begleiter-teil2`)
+
+- Neuer Abschnitt **Gefolge** im Tab „Begleiter“ (Ressource Gefolge, GRW S. 77–78), nur Grundregelwerk nötig; Kulturen und Rassen
+  aus geladenen Buchpaketen erscheinen mit.
+- **Gefolgsmann:** Rasse und Kultur beim Hinzufügen; Rufname, Aufgabe (Leibdiener, Knappe, Leibwächter …), Notiz. Attribute
+  2 + Rassenmodifikator mit Wahl der freien Boni (auch „unterschiedlich“, „nicht Stärke“). Werte des Kulturmoduls mit derselben
+  Wahl wie bei der Erschaffung (Fertigkeitspunkte inkl. „eine Magieschule“, Stärke, Meisterschaft). Rassenstärken kommen dazu.
+  Abgeleitete Werte nach den GRW-Formeln (Heldengrad 1), Fertigkeitswert = Punkte + Attribute (Kampffertigkeiten: „+ Waffe“).
+- **Gefolge-Punkte:** 1 je Gefolgsmann, 1 je Fertigkeit auf der ersten Schwelle (6 Punkte, auch Fertigkeiten außerhalb der
+  Kultur), 1 je Meisterschaft bzw. Zauber über den freien. Frei: eine Meisterschaft je angehobener Fertigkeit, Zauber nach der
+  Erschaffungsregel (je Magieschule ab 1/3/6 Punkten einer; Zaubergrad n ab 3·n Punkten). Warnung, wenn die Ressource nicht
+  reicht oder eine Fertigkeit über dem Höchstwert des Heldengrads des Abenteurers liegt. Meisterschaften: Schwelle 1 ab 1 Punkt,
+  allgemeine Meisterschaftsgruppen über jede passende Fertigkeit.
+- Code: `regelwerk/gefolge.ts` (gefolgeWerte, kulturWerte, gruppenOptionen, meisterschaftsAngebot, zauberAngebot),
+  `components/begleiter/GefolgeAbschnitt.tsx`, Typ `Begleiter` um `art: 'gefolge'` und die Gefolge-Felder erweitert, Import.
+  Tests: `gefolge.test.tsx`.
+- Offen (nächste Teile): Vertraute aus „Die Magie“, erhobene Untote (Abnormitäten), Golems (Golem-Bausteine), Baukasten für
+  Wesen; Begleiter im Kampf-Tab; Boni aus Abrichtungen im Wertekasten.
 
 ## Google AI Studio
 

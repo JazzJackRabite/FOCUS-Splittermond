@@ -5513,6 +5513,12 @@
       "quelle_wirkung": "erfassung",
       "bezug": "proben",
       "gilt": "bedingt",
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:ueberleben",
+        "text": "Überleben"
+       }
+      ],
       "gruppe": "A"
      },
      {
@@ -5726,7 +5732,12 @@
       "art": "bonus",
       "wert": 3,
       "bezug": "proben",
-      "fertigkeit_refs": [],
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:akrobatik",
+        "text": "Akrobatik"
+       }
+      ],
       "traeger": "selbst",
       "bedingung": "Jede Fertigkeitsprobe, um auf den Beinen zu bleiben oder zu balancieren",
       "beleg": "Jede Fertigkeitsprobe, um auf den Beinen zu bleiben oder zu balancieren, erhält einen Bonus in Höhe von 3 Punkten.",
@@ -5762,7 +5773,28 @@
       "art": "bonus",
       "wert": 3,
       "bezug": "proben",
-      "fertigkeit_refs": [],
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:arkane-kunde",
+        "text": "Arkane Kunde"
+       },
+       {
+        "id": "grw:fertigkeit:geschichte-und-mythen",
+        "text": "Geschichte und Mythen"
+       },
+       {
+        "id": "grw:fertigkeit:laenderkunde",
+        "text": "Länderkunde"
+       },
+       {
+        "id": "grw:fertigkeit:naturkunde",
+        "text": "Naturkunde"
+       },
+       {
+        "id": "grw:fertigkeit:strassenkunde",
+        "text": "Straßenkunde"
+       }
+      ],
       "traeger": "selbst",
       "bedingung": "Jede Probe, um sich an etwas zu erinnern oder Wissen abzurufen (siehe S. 150)",
       "beleg": "Jede Probe, um sich an etwas zu erinnern oder Wissen abzurufen (siehe S. 150), erhält einen Bonus in Höhe von 3 Punkten.",
@@ -6094,7 +6126,28 @@
       "art": "bonus",
       "wert": 2,
       "bezug": "proben",
-      "fertigkeit_refs": [],
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:anfuehren",
+        "text": "Anführen"
+       },
+       {
+        "id": "grw:fertigkeit:darbietung",
+        "text": "Darbietung"
+       },
+       {
+        "id": "grw:fertigkeit:diplomatie",
+        "text": "Diplomatie"
+       },
+       {
+        "id": "grw:fertigkeit:empathie",
+        "text": "Empathie"
+       },
+       {
+        "id": "grw:fertigkeit:redegewandtheit",
+        "text": "Redegewandtheit"
+       }
+      ],
       "traeger": "selbst",
       "bedingung": "Im sozialen Umgang mit Personen, die dieselbe Kulturkunde besitzen",
       "beleg": "Im sozialen Umgang mit Personen, die dieselbe Kulturkunde besitzen, erhält der Abenteurer einen leicht positiven Umstand (Bonus in Höhe von 2 Punkten).",
@@ -6241,7 +6294,12 @@
       "auf": "alle Proben zur Orientierung",
       "traeger": "selbst",
       "bedingung": "zur Orientierung",
-      "fertigkeit_refs": [],
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:ueberleben",
+        "text": "Überleben"
+       }
+      ],
       "beleg": "Er erhält stets einen Bonus in Höhe von 3 Punkten auf alle Proben zur Orientierung.",
       "gilt": "bedingt",
       "gruppe": "A"
@@ -6455,7 +6513,28 @@
       "auf": "alle damit verbundenen Proben",
       "traeger": "selbst",
       "bedingung": null,
-      "fertigkeit_refs": [],
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:anfuehren",
+        "text": "Anführen"
+       },
+       {
+        "id": "grw:fertigkeit:darbietung",
+        "text": "Darbietung"
+       },
+       {
+        "id": "grw:fertigkeit:diplomatie",
+        "text": "Diplomatie"
+       },
+       {
+        "id": "grw:fertigkeit:empathie",
+        "text": "Empathie"
+       },
+       {
+        "id": "grw:fertigkeit:redegewandtheit",
+        "text": "Redegewandtheit"
+       }
+      ],
       "beleg": "Wird er in einen Sozialen Konflikt verwickelt, erhält er einen Bonus in Höhe von 2 Punkten auf alle damit verbundenen Proben.",
       "gilt": "bedingt",
       "gruppe": "A"
@@ -6513,7 +6592,12 @@
       "art": "bonus",
       "wert": 1,
       "bezug": "proben",
-      "fertigkeit_refs": [],
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:tierfuehrung",
+        "text": "Tierführung"
+       }
+      ],
       "traeger": "selbst",
       "bedingung": "Jede Probe im Umgang mit Wesen des Typus Tier",
       "beleg": "Jede Probe im Umgang mit Wesen des Typus Tier erhält einen Bonus in Höhe von 1 Punkt.",
@@ -6617,7 +6701,28 @@
       "art": "bonus",
       "wert": 2,
       "bezug": "proben",
-      "fertigkeit_refs": [],
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:anfuehren",
+        "text": "Anführen"
+       },
+       {
+        "id": "grw:fertigkeit:darbietung",
+        "text": "Darbietung"
+       },
+       {
+        "id": "grw:fertigkeit:diplomatie",
+        "text": "Diplomatie"
+       },
+       {
+        "id": "grw:fertigkeit:empathie",
+        "text": "Empathie"
+       },
+       {
+        "id": "grw:fertigkeit:redegewandtheit",
+        "text": "Redegewandtheit"
+       }
+      ],
       "traeger": "selbst",
       "bedingung": "Hält er sich mindestens eine Woche lang in einer fremden Region auf",
       "beleg": "Hält er sich mindestens eine Woche lang in einer fremden Region auf, erhält er temporär bis zu seiner Abreise einen Bonus in Höhe von 2 Punkten im Umgang mit Personen der fremden Kultur.",
@@ -15741,7 +15846,12 @@
       "art": "malus",
       "wert": 3,
       "bezug": "proben",
-      "fertigkeit_refs": [],
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:alchemie",
+        "text": "Alchemie"
+       }
+      ],
       "traeger": "selbst",
       "bedingung": "Wenn er Alchemika herstellt",
       "beleg": "Wenn er Alchemika herstellt, kann er einen Malus in Höhe von 3 Punkten in Kauf nehmen, um die benötigte Zeit aller Proben zu halbieren.",
@@ -16768,6 +16878,12 @@
       "quelle_wirkung": "erfassung",
       "bezug": "proben",
       "gilt": "bedingt",
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:anfuehren",
+        "text": "Anführen"
+       }
+      ],
       "gruppe": "A"
      }
     ],
@@ -17287,6 +17403,7 @@
       "bezug": "proben",
       "pro_eg": 1,
       "gilt": "bedingt",
+      "alle_proben": true,
       "gruppe": "A"
      }
     ],
@@ -17395,7 +17512,12 @@
       "auf": "alle Proben zum Springen",
       "traeger": "selbst",
       "bedingung": "zum Springen und Überwinden von Hindernissen",
-      "fertigkeit_refs": [],
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:athletik",
+        "text": "Athletik"
+       }
+      ],
       "beleg": "Er erhält einen Bonus in Höhe von 3 Punkten auf alle Proben zum Springen und Überwinden von Hindernissen.",
       "gilt": "bedingt",
       "gruppe": "A"
@@ -17467,7 +17589,12 @@
       "auf": "Proben zum Überwinden von Hindernissen",
       "traeger": "selbst",
       "bedingung": "zum Überwinden von Hindernissen und kann Hindernisse bis Brusthöhe bei erfolgreicher Probe nehmen, ohne in der Bewegung verlangsamt zu werden",
-      "fertigkeit_refs": [],
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:athletik",
+        "text": "Athletik"
+       }
+      ],
       "beleg": "Er erhält einen Bonus in Höhe von weiteren 3 Punkten auf Proben zum Überwinden von Hindernissen und kann Hindernisse bis Brusthöhe bei erfolgreicher Probe nehmen, ohne in der Bewegung verlangsamt zu werden.",
       "gilt": "bedingt",
       "gruppe": "A"
@@ -17503,7 +17630,12 @@
       "art": "bonus",
       "wert": 5,
       "bezug": "proben",
-      "fertigkeit_refs": [],
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:athletik",
+        "text": "Athletik"
+       }
+      ],
       "traeger": "selbst",
       "bedingung": "Bei einem Kraftakt",
       "beleg": "Bei einem Kraftakt erhält er einen Bonus in Höhe von 5 Punkten.",
@@ -18461,7 +18593,12 @@
       "auf": "seine Proben",
       "traeger": "selbst",
       "bedingung": null,
-      "fertigkeit_refs": [],
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:heilkunde",
+        "text": "Heilkunde"
+       }
+      ],
       "beleg": "Ist er selbst der Heiler, erhält er einen Bonus in Höhe von 1 Punkt auf seine Proben.",
       "gilt": "bedingt",
       "gruppe": "A"
@@ -18827,6 +18964,12 @@
       "bezug": "proben",
       "pro_eg": 1,
       "gilt": "bedingt",
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:diplomatie",
+        "text": "Diplomatie"
+       }
+      ],
       "gruppe": "A"
      }
     ],
@@ -19708,7 +19851,12 @@
       "auf": "Proben",
       "traeger": "selbst",
       "bedingung": "um Lügen zu durchschauen",
-      "fertigkeit_refs": [],
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:empathie",
+        "text": "Empathie"
+       }
+      ],
       "beleg": "Er erhält einen Bonus in Höhe von 3 Punkten auf Proben, um Lügen zu durchschauen.",
       "gilt": "bedingt",
       "gruppe": "A"
@@ -19765,6 +19913,7 @@
       "quelle_wirkung": "erfassung",
       "bezug": "proben",
       "gilt": "bedingt",
+      "alle_proben": true,
       "gruppe": "A"
      }
     ],
@@ -19810,6 +19959,7 @@
       "quelle_wirkung": "erfassung",
       "bezug": "proben",
       "gilt": "bedingt",
+      "alle_proben": true,
       "gruppe": "A"
      }
     ],
@@ -19886,7 +20036,16 @@
       "art": "bonus",
       "wert": 3,
       "bezug": "proben",
-      "fertigkeit_refs": [],
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:redegewandtheit",
+        "text": "Redegewandtheit"
+       },
+       {
+        "id": "grw:fertigkeit:entschlossenheit",
+        "text": "Entschlossenheit"
+       }
+      ],
       "traeger": "selbst",
       "bedingung": "Auf Proben, um andere zu belügen oder einfach nur seine wahren Motive oder Emotionen zu bewahren",
       "beleg": "Auf Proben, um andere zu belügen oder einfach nur seine wahren Motive oder Emotionen zu bewahren, erhält er einen Bonus in Höhe von 3 Punkten.",
@@ -20161,6 +20320,12 @@
       "quelle_wirkung": "erfassung",
       "bezug": "proben",
       "gilt": "bedingt",
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:erkenntnismagie",
+        "text": "Erkenntnismagie"
+       }
+      ],
       "gruppe": "A"
      }
     ],
@@ -20559,7 +20724,16 @@
       "auf": "Proben zur Bearbeitung von Metallen",
       "traeger": "selbst",
       "bedingung": "zur Bearbeitung von Metallen, Gestein und Edelsteinen",
-      "fertigkeit_refs": [],
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:handwerk",
+        "text": "Handwerk"
+       },
+       {
+        "id": "grw:fertigkeit:edelhandwerk",
+        "text": "Edelhandwerk"
+       }
+      ],
       "beleg": "Der Abenteurer erhält einen Bonus in Höhe von 2 Punkten auf Proben zur Bearbeitung von Metallen, Gestein und Edelsteinen.",
       "gilt": "bedingt",
       "gruppe": "A"
@@ -20604,7 +20778,12 @@
       "auf": "alle Proben",
       "traeger": "selbst",
       "bedingung": "um zu verhindern, selber in Brand zu geraten",
-      "fertigkeit_refs": [],
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:ueberleben",
+        "text": "Überleben"
+       }
+      ],
       "beleg": "Der Zauberer erhält einen Bonus in Höhe von 3 Punkten auf alle Proben, um ein Feuer auf profanem Weg zu entzünden und zu löschen oder um zu verhindern, selber in Brand zu geraten.",
       "gilt": "bedingt",
       "gruppe": "A"
@@ -21211,6 +21390,12 @@
       "quelle_wirkung": "erfassung",
       "bezug": "proben",
       "gilt": "bedingt",
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:fingerfertigkeit",
+        "text": "Fingerfertigkeit"
+       }
+      ],
       "gruppe": "A"
      }
     ],
@@ -21352,6 +21537,7 @@
       "bezug": "proben",
       "pro_eg": 1,
       "gilt": "bedingt",
+      "alle_proben": true,
       "gruppe": "A"
      }
     ],
@@ -21630,6 +21816,12 @@
       "quelle_wirkung": "erfassung",
       "bezug": "proben",
       "gilt": "bedingt",
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:handgemenge",
+        "text": "Handgemenge"
+       }
+      ],
       "gruppe": "A"
      }
     ],
@@ -22725,6 +22917,12 @@
       "quelle_wirkung": "erfassung",
       "bezug": "proben",
       "gilt": "bedingt",
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:heimlichkeit",
+        "text": "Heimlichkeit"
+       }
+      ],
       "gruppe": "A"
      },
      {
@@ -22734,7 +22932,12 @@
       "auf": "seine Probe",
       "traeger": "selbst",
       "bedingung": null,
-      "fertigkeit_refs": [],
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:heimlichkeit",
+        "text": "Heimlichkeit"
+       }
+      ],
       "beleg": "Ist er bei einem Hinterhalt alleine, erhält er einen Bonus in Höhe von 3 Punkten auf seine Probe.",
       "gilt": "bedingt",
       "gruppe": "A"
@@ -22953,6 +23156,12 @@
       "quelle_wirkung": "erfassung",
       "bezug": "proben",
       "gilt": "bedingt",
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:heimlichkeit",
+        "text": "Heimlichkeit"
+       }
+      ],
       "gruppe": "A"
      }
     ],
@@ -23321,6 +23530,12 @@
       "quelle_wirkung": "erfassung",
       "bezug": "proben",
       "gilt": "bedingt",
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:illusionsmagie",
+        "text": "Illusionsmagie"
+       }
+      ],
       "gruppe": "A"
      }
     ],
@@ -23455,7 +23670,16 @@
       "art": "bonus",
       "wert": 2,
       "bezug": "proben",
-      "fertigkeit_refs": [],
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:redegewandtheit",
+        "text": "Redegewandtheit"
+       },
+       {
+        "id": "grw:fertigkeit:heimlichkeit",
+        "text": "Heimlichkeit"
+       }
+      ],
       "traeger": "selbst",
       "bedingung": "Der Zauberer hat so tiefen Einblick in Betrügereien",
       "beleg": "Der Zauberer hat so tiefen Einblick in Betrügereien erhalten, dass er auf Proben zum Verkleiden und zum Lügen einen Bonus in Höhe von 2 Punkten erhält.",
@@ -24862,6 +25086,7 @@
       "bezug": "proben",
       "pro_eg": 1,
       "gilt": "bedingt",
+      "alle_proben": true,
       "gruppe": "A"
      }
     ],
@@ -25884,6 +26109,12 @@
       "bezug": "proben",
       "pro_eg": 1,
       "gilt": "bedingt",
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:redegewandtheit",
+        "text": "Redegewandtheit"
+       }
+      ],
       "gruppe": "A"
      }
     ],
@@ -26049,7 +26280,12 @@
       "auf": "alle Proben erhält",
       "traeger": "selbst",
       "bedingung": null,
-      "fertigkeit_refs": [],
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:redegewandtheit",
+        "text": "Redegewandtheit"
+       }
+      ],
       "beleg": "Der Abenteurer besitzt eine Identität, die er so gut beherrscht, dass er einen Bonus in Höhe von 5 Punkten auf alle Proben erhält, andere von seiner Identität zu überzeugen.",
       "gilt": "bedingt",
       "gruppe": "A"
@@ -26371,7 +26607,12 @@
       "auf": "Proben",
       "traeger": "selbst",
       "bedingung": null,
-      "fertigkeit_refs": [],
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:wahrnehmung",
+        "text": "Wahrnehmung"
+       }
+      ],
       "beleg": "Der Zauberer erhält einen Bonus in Höhe von 3 Punkten auf Proben, um Überraschungen oder Hinterhalte zu erkennen.",
       "gilt": "bedingt",
       "gruppe": "A"
@@ -26426,6 +26667,7 @@
       "bezug": "proben",
       "pro_eg": 1,
       "gilt": "bedingt",
+      "alle_proben": true,
       "gruppe": "A"
      }
     ],
@@ -26465,6 +26707,16 @@
       "bezug": "proben",
       "pro_eg": 1,
       "gilt": "bedingt",
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:schloesser-und-fallen",
+        "text": "Schlösser und Fallen"
+       },
+       {
+        "id": "grw:fertigkeit:wahrnehmung",
+        "text": "Wahrnehmung"
+       }
+      ],
       "gruppe": "A"
      }
     ],
@@ -26617,6 +26869,16 @@
       "quelle_wirkung": "erfassung",
       "bezug": "proben",
       "gilt": "bedingt",
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:schloesser-und-fallen",
+        "text": "Schlösser und Fallen"
+       },
+       {
+        "id": "grw:fertigkeit:wahrnehmung",
+        "text": "Wahrnehmung"
+       }
+      ],
       "gruppe": "A"
      }
     ],
@@ -26656,7 +26918,16 @@
       "art": "bonus",
       "wert": 3,
       "bezug": "proben",
-      "fertigkeit_refs": [],
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:athletik",
+        "text": "Athletik"
+       },
+       {
+        "id": "grw:fertigkeit:schloesser-und-fallen",
+        "text": "Schlösser und Fallen"
+       }
+      ],
       "traeger": "selbst",
       "bedingung": null,
       "beleg": "Er kann ein Schloss gewaltsam mit einem Bonus in Höhe von 3 Punkten öffnen.",
@@ -26710,6 +26981,16 @@
       "quelle_wirkung": "erfassung",
       "bezug": "proben",
       "gilt": "bedingt",
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:akrobatik",
+        "text": "Akrobatik"
+       },
+       {
+        "id": "grw:fertigkeit:athletik",
+        "text": "Athletik"
+       }
+      ],
       "gruppe": "A"
      }
     ],
@@ -27633,7 +27914,12 @@
       "art": "bonus",
       "wert": 3,
       "bezug": "proben",
-      "fertigkeit_refs": [],
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:akrobatik",
+        "text": "Akrobatik"
+       }
+      ],
       "traeger": "selbst",
       "bedingung": "Proben, um das Gleichgewicht zu halten oder zu Balancieren",
       "beleg": "Proben, um das Gleichgewicht zu halten oder zu Balancieren, erhalten einen Bonus in Höhe von 3 Punkten.",
@@ -27674,7 +27960,16 @@
       "auf": "alle Proben zur Orientierung",
       "traeger": "selbst",
       "bedingung": "zur Orientierung",
-      "fertigkeit_refs": [],
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:ueberleben",
+        "text": "Überleben"
+       },
+       {
+        "id": "grw:fertigkeit:seefahrt",
+        "text": "Seefahrt"
+       }
+      ],
       "beleg": "Der Abenteurer erhält, sofern die Sterne sichtbar sind, einen Bonus in Höhe von 3 Punkten auf alle Proben zur Orientierung.",
       "gilt": "bedingt",
       "gruppe": "A"
@@ -28941,7 +29236,12 @@
       "auf": "Proben zur Besänftigung des Tieres",
       "traeger": "selbst",
       "bedingung": "zur Besänftigung des Tieres",
-      "fertigkeit_refs": [],
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:tierfuehrung",
+        "text": "Tierführung"
+       }
+      ],
       "beleg": "Gelingt dies, erhält er einen Bonus in Höhe von 1 Punkt (+1 pro Erfolgsgrad) auf Proben zur Besänftigung des Tieres.",
       "gilt": "bedingt",
       "pro_eg": 1,
@@ -29052,7 +29352,12 @@
       "auf": "Proben",
       "traeger": "selbst",
       "bedingung": null,
-      "fertigkeit_refs": [],
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:heilkunde",
+        "text": "Heilkunde"
+       }
+      ],
       "beleg": "Er erhält einen Bonus in Höhe von 3 Punkten auf Proben, um Vergiftungen, Erkrankungen oder das Wirken schädlicher Magie zu diagnostizieren.",
       "gilt": "bedingt",
       "gruppe": "A"
@@ -29091,7 +29396,16 @@
       "auf": "Proben",
       "traeger": "selbst",
       "bedingung": "des Typus Geisterwesen zu bemerken oder zu identifizieren",
-      "fertigkeit_refs": [],
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:wahrnehmung",
+        "text": "Wahrnehmung"
+       },
+       {
+        "id": "grw:fertigkeit:arkane-kunde",
+        "text": "Arkane Kunde"
+       }
+      ],
       "beleg": "Der Zauberer erhält einen Bonus in Höhe von 3 Punkten auf Proben, um Wesen des Typus Geisterwesen zu bemerken oder zu identifizieren.",
       "gilt": "bedingt",
       "gruppe": "A"
@@ -29315,7 +29629,12 @@
       "auf": "alle passenden Proben in diesem Gelände",
       "traeger": "selbst",
       "bedingung": null,
-      "fertigkeit_refs": [],
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:ueberleben",
+        "text": "Überleben"
+       }
+      ],
       "beleg": "Er erhält einen Bonus in Höhe von 2 Punkten auf alle passenden Proben in diesem Gelände.",
       "gilt": "bedingt",
       "gruppe": "A"
@@ -29429,7 +29748,12 @@
       "art": "bonus",
       "wert": 6,
       "bezug": "proben",
-      "fertigkeit_refs": [],
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:ueberleben",
+        "text": "Überleben"
+       }
+      ],
       "traeger": "selbst",
       "bedingung": "Alle Proben zur Orientierung",
       "beleg": "Alle Proben zur Orientierung erhalten einen Bonus in Höhe von 6 Punkten.",
@@ -29509,6 +29833,12 @@
       "quelle_wirkung": "erfassung",
       "bezug": "proben",
       "gilt": "bedingt",
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:ueberleben",
+        "text": "Überleben"
+       }
+      ],
       "gruppe": "A"
      }
     ],
@@ -29912,6 +30242,12 @@
       "quelle_wirkung": "erfassung",
       "bezug": "proben",
       "gilt": "bedingt",
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:verwandlungsmagie",
+        "text": "Verwandlungsmagie"
+       }
+      ],
       "gruppe": "A"
      }
     ],
@@ -30037,6 +30373,12 @@
       "quelle_wirkung": "erfassung",
       "bezug": "proben",
       "gilt": "bedingt",
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:wahrnehmung",
+        "text": "Wahrnehmung"
+       }
+      ],
       "gruppe": "A"
      }
     ],
@@ -30092,6 +30434,16 @@
       "quelle_wirkung": "erfassung",
       "bezug": "proben",
       "gilt": "bedingt",
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:wahrnehmung",
+        "text": "Wahrnehmung"
+       },
+       {
+        "id": "grw:fertigkeit:handwerk",
+        "text": "Handwerk"
+       }
+      ],
       "gruppe": "A"
      }
     ],
@@ -30656,7 +31008,16 @@
       "auf": "Proben zur Vorhersage des Wetters",
       "traeger": "selbst",
       "bedingung": "zur Vorhersage des Wetters",
-      "fertigkeit_refs": [],
+      "fertigkeit_refs": [
+       {
+        "id": "grw:fertigkeit:ueberleben",
+        "text": "Überleben"
+       },
+       {
+        "id": "grw:fertigkeit:naturkunde",
+        "text": "Naturkunde"
+       }
+      ],
       "beleg": "Der Zauberer erhält einen Bonus in Höhe von 6 Punkten auf Proben zur Vorhersage des Wetters.",
       "gilt": "bedingt",
       "gruppe": "A"

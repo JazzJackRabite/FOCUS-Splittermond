@@ -5,7 +5,7 @@
 import React from 'react';
 import fs from 'fs';
 import path from 'path';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { baseCharacterReducer, DEFAULT_STATE } from '../../hooks/useCharacterState';
 import { CharacterContext } from '../../context/CharacterContext';
@@ -140,8 +140,11 @@ describe.skipIf(!MAGIE || !fs.existsSync(MAGIE))('Beschworene Wesen mit „Die M
 });
 
 describe.skipIf(!BESTIEN || !fs.existsSync(BESTIEN))('Abrichtungen mit „Bestienmeister“ (lokal)', () => {
-  const { katalog: KB } = erstelleKatalog(b, [buchpaketLesen(fs.readFileSync(BESTIEN, 'utf-8'), b.manifest)]);
-  const liste = abrichtungen(KB);
+  let KB = K; let liste: ReturnType<typeof abrichtungen> = [];
+  beforeAll(() => {
+    KB = erstelleKatalog(b, [buchpaketLesen(fs.readFileSync(BESTIEN, 'utf-8'), b.manifest)]).katalog;
+    liste = abrichtungen(KB);
+  });
   const A = (n: string) => liste.find(a => a.name === n)!;
   const pferd: Begleiter = { id: 'grw:kreatur:pferd', art: 'tier', name: 'Pferd', kreatur: 3 };
   const wolf: Begleiter = { id: 'grw:kreatur:wolf', art: 'tier', name: 'Wolf', kreatur: 4 };

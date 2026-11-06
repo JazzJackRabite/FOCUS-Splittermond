@@ -20,16 +20,17 @@ const liste = wirkungenDesCharakters(K, IDS);
 const namen = (l: ReturnType<typeof situativeBoni>) => l.map(x => `${x.quelle}:${x.wert}`);
 
 describe('Situative Boni je Wurf', () => {
-  it('Probe: Fertigkeitsbonus nur für die passende Fertigkeit, allgemeine Probenboni immer', () => {
-    expect(namen(situativeBoni(K, liste, 'probe', 'Wahrnehmung'))).toEqual(['Feine Nase:2', 'Orientierungssinn:3', 'Jäger des Übernatürlichen:3']);
-    expect(namen(situativeBoni(K, liste, 'probe', 'Athletik'))).toEqual(['Orientierungssinn:3']);
+  it('Probe: Fertigkeitsbonus nur für die passende Fertigkeit, „Proben zur Orientierung“ nur bei Überleben', () => {
+    expect(namen(situativeBoni(K, liste, 'probe', 'Wahrnehmung'))).toEqual(['Feine Nase:2', 'Jäger des Übernatürlichen:3']);
+    expect(namen(situativeBoni(K, liste, 'probe', 'Überleben'))).toEqual(['Orientierungssinn:3', 'Jäger des Übernatürlichen:3']);
+    expect(namen(situativeBoni(K, liste, 'probe', 'Alchemie'))).toEqual([]);
   });
   it('Angriff: Angriffsbonus verrechenbar, Zusatzschaden nur als Hinweis', () => {
-    expect(namen(situativeBoni(K, liste, 'angriff', 'Klingenwaffen'))).toEqual(['Orientierungssinn:3', 'Jäger des Übernatürlichen:3', 'Überraschungsangriff I:null']);
+    expect(namen(situativeBoni(K, liste, 'angriff', 'Klingenwaffen'))).toEqual(['Jäger des Übernatürlichen:3', 'Überraschungsangriff I:null']);
   });
   it('Zauber: keine Angriffsboni; dauerhafte Wirkungen erscheinen nie', () => {
     const z = namen(situativeBoni(K, liste, 'zauber', 'Beherrschungsmagie'));
-    expect(z).toEqual(['Orientierungssinn:3']);
+    expect(z).toEqual([]);
   });
 });
 
@@ -48,7 +49,7 @@ describe('Probendialog', () => {
     expect(screen.queryByText('Gesamt-Modifikator:')).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: /Feine Nase/ }));
     expect(screen.getByText('Gesamt-Modifikator:').nextSibling?.textContent).toBe('+2');
-    fireEvent.click(screen.getByRole('button', { name: /Orientierungssinn/ }));
+    fireEvent.click(screen.getByRole('button', { name: /Jäger des Übernatürlichen/ }));
     expect(screen.getByText('Gesamt-Modifikator:').nextSibling?.textContent).toBe('+5');
   });
 
