@@ -455,6 +455,9 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
   };
 
   // EG Allocation Handlers with boundary and cost checking
+  // GRW S. 221–222: verzehrter Fokus ist einsparbar, solange 1 erschöpfter oder kanalisierter Punkt bleibt
+  const maxVerzehrtSparen = baseCost.exhausted + baseCost.channeled >= 1 ? baseCost.consumed : Math.max(0, baseCost.consumed - 1);
+
   const handleModifyAllocation = (
     field: keyof SpellEGAllocations,
     costPerUnit: number,
@@ -1405,9 +1408,9 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                       <button
                         type="button"
                         onClick={() =>
-                          handleModifyAllocation('saveConsumedFocus', 3, 1, Math.max(0, baseCost.consumed - 1))
+                          handleModifyAllocation('saveConsumedFocus', 3, 1, maxVerzehrtSparen)
                         }
-                        disabled={remainingEG < 3 || allocations.saveConsumedFocus >= Math.max(0, baseCost.consumed - 1)}
+                        disabled={remainingEG < 3 || allocations.saveConsumedFocus >= maxVerzehrtSparen}
                         className="w-7 h-7 rounded-lg bg-[#1B365D] text-white flex items-center justify-center hover:brightness-110 disabled:opacity-30"
                       >
                         <Plus className="w-3.5 h-3.5" />
@@ -1567,7 +1570,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                       <div className="font-bold text-sm text-[#1B365D] flex items-center gap-1.5">
                         <span>Wirkungsbereich erweitern</span>
                         <span className="text-[10px] bg-[#f3e5cf] text-[#1B365D] border border-[#C5A059]/40 font-semibold px-1.5 py-0.5 rounded">
-                          je 1 EG = +Bereich
+                          je 3 EG = +Grundbereich
                         </span>
                       </div>
                       <p className="text-xs text-gray-500">
@@ -1577,7 +1580,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                     <div className="flex items-center gap-2 shrink-0">
                       <button
                         type="button"
-                        onClick={() => handleModifyAllocation('expandArea', 1, -1)}
+                        onClick={() => handleModifyAllocation('expandArea', 3, -1)}
                         disabled={allocations.expandArea <= 0}
                         className="w-7 h-7 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-gray-100 disabled:opacity-30"
                       >
@@ -1586,8 +1589,8 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                       <span className="font-bold font-mono text-sm w-5 text-center">{allocations.expandArea}</span>
                       <button
                         type="button"
-                        onClick={() => handleModifyAllocation('expandArea', 1, 1)}
-                        disabled={remainingEG < 1}
+                        onClick={() => handleModifyAllocation('expandArea', 3, 1)}
+                        disabled={remainingEG < 3}
                         className="w-7 h-7 rounded-lg bg-[#1B365D] text-white flex items-center justify-center hover:brightness-110 disabled:opacity-30"
                       >
                         <Plus className="w-3.5 h-3.5" />

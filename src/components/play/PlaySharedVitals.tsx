@@ -22,7 +22,7 @@ import { generateId } from '../../utils/id';
 import type { StatusCondition, HealthSlot, ChanneledSpell } from '../../types';
 import { TakeDamageModal } from './TakeDamageModal';
 import { HealModal } from './HealModal';
-import { getActiveSpellModifiers } from '../../utils/magicRules';
+import { getActiveSpellModifiers, zauberHoechstbonus } from '../../utils/magicRules';
 
 // ============================================================================
 // Compound Stepper Button Component (matches user's screenshot)
@@ -194,7 +194,9 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
   const totalDamage = consumedLP + exhaustedLP + channeledLP;
 
   const focusAvailable = maxFO - focus.exhausted - focus.channeled - focus.consumed;
-  const activeSpellMods = useMemo(() => getActiveSpellModifiers(channeledSpells), [channeledSpells]);
+  // Zauberboni auf abgeleitete Werte sind auf den Höchstbonus aus Zauberei begrenzt (GRW S. 18–19)
+  const hoechstbonusZauber = zauberHoechstbonus(calc);
+  const activeSpellMods = useMemo(() => getActiveSpellModifiers(channeledSpells, hoechstbonusZauber), [channeledSpells, hoechstbonusZauber]);
   const effectiveWoundPenalty = Math.min(0, currentWoundPenalty + activeSpellMods.woundPenaltyReduction);
   const woundPenaltyDisplay = effectiveWoundPenalty;
 
@@ -1554,7 +1556,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
         />
       )}
 
-      {/* ── Heal Modal (GRW S. 165–167) ── */}
+      {/* ── Heal Modal (GRW S. 119–120, 173–174) ── */}
       {showHealModal && (
         <HealModal
           onClose={() => setShowHealModal(false)}

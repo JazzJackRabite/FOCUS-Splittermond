@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useId } from 'react';
+import React, { useState, useMemo, useEffect, useId, useContext } from 'react';
 import {
   Sword,
   Shield,
@@ -19,9 +19,13 @@ import type { StatusCondition, ChanneledSpell } from '../../types';
 import type { RollEntry } from './DiceLog';
 import { getActiveRollModifiers } from '../../utils/conditionModifiers';
 import {
+  begrenzeZauberbonus,
   getActiveSpellRollBonuses,
   getSpellWeaponDamageBonus,
+  istWaffenlos,
+  zauberHoechstbonus,
 } from '../../utils/magicRules';
+import { CharacterContext } from '../../context/CharacterContext';
 import {
   calculateAttackEG,
   getAvailableCombatManeuvers,
@@ -101,11 +105,15 @@ type RollType = 'standard' | 'safe' | 'risk';
 import { wuerfeln } from '../../utils/wuerfeln';
 import { SituativeBoni, useSituativeBoni } from './SituativeBoni';
 
+
+/** Stabile leere Liste: ein `= []` als Vorgabe erzeugt bei jedem Rendern ein neues Array und löst über den Effekt unten eine Endlosschleife aus. */
+const KEINE_ZAUBER: ChanneledSpell[] = [];
+
 export const AttackModal: React.FC<AttackModalProps> = ({
   target,
   characterMasteries = [],
   conditions = [],
-  channeledSpells = [],
+  channeledSpells = KEINE_ZAUBER,
   woundPenalty = 0,
   splitterpunkte,
   onClose,
@@ -181,16 +189,18 @@ export const AttackModal: React.FC<AttackModalProps> = ({
   }, [targetVTD, targetCover]);
 
   // Splittermond GRW: Aktive kanalisierte Zauber (Aura des Anführers, Beflügelte Waffe, Flammende Waffe etc.)
+  // Waffenlose Angriffe kommen ohne Ausrüstungs-ID an – sonst träfen Waffenzauber ohne Zielangabe auch sie.
+  const waffenId = istWaffenlos(weapon.id, weapon.name) ? 'waffenlos' : weapon.id;
   const spellAttackBonuses = useMemo(() => {
-    return getActiveSpellRollBonuses(channeledSpells, skillName, true, weapon.id);
-  }, [channeledSpells, skillName, weapon.id]);
+    return getActiveSpellRollBonuses(channeledSpells, skillName, true, waffenId);
+  }, [channeledSpells, skillName, waffenId]);
 
   const [activeSpellBonusIds, setActiveSpellBonusIds] = useState<Set<string>>(() => {
-    return new Set(spellAttackBonuses.map((b) => b.id));
+    return new Set(spellAttackBonuses.filter((b) => b.active).map((b) => b.id));
   });
 
   useEffect(() => {
-    setActiveSpellBonusIds(new Set(spellAttackBonuses.map((b) => b.id)));
+    setActiveSpellBonusIds(new Set(spellAttackBonuses.filter((b) => b.active).map((b) => b.id)));
   }, [spellAttackBonuses]);
 
   const toggleSpellBonus = (id: string) => {
@@ -202,17 +212,20 @@ export const AttackModal: React.FC<AttackModalProps> = ({
     });
   };
 
-  const spellAttackBonusTotal = useMemo(() => {
+  // Höchstbonus aus Zauberei (GRW S. 18–19): 3 zu Spielbeginn, +1 je Heldengrad
+  const hoechstbonusZauber = zauberHoechstbonus(useContext(CharacterContext)?.calc);
+  const spellAttackBonusRoh = useMemo(() => {
     return spellAttackBonuses
       .filter((b) => activeSpellBonusIds.has(b.id))
       .reduce((sum, b) => sum + b.bonus, 0);
   }, [spellAttackBonuses, activeSpellBonusIds]);
+  const spellAttackBonusTotal = begrenzeZauberbonus(spellAttackBonusRoh, hoechstbonusZauber);
 
   const spellWeaponDamage = useMemo(() => {
-    return getSpellWeaponDamageBonus(channeledSpells, weapon.id);
-  }, [channeledSpells, weapon.id]);
+    return getSpellWeaponDamageBonus(channeledSpells, waffenId, weapon.name);
+  }, [channeledSpells, waffenId, weapon.name]);
 
-  const extraSpellDmg = (spellWeaponDamage.fireDamage || 0) + (spellWeaponDamage.lightDamage || 0);
+  const extraSpellDmg = spellWeaponDamage.totalDamage;
 
   // Total modifier applied to the 2W10 roll
   const totalAttackModifier =
@@ -342,7 +355,6 @@ export const AttackModal: React.FC<AttackModalProps> = ({
   const handleRollDamage = () => {
     const rate = selectedManeuver.egDamageRate ?? 1;
     const egBonus = egDamageSpent * rate;
-    const extraSpellDmg = (spellWeaponDamage.fireDamage || 0) + (spellWeaponDamage.lightDamage || 0);
 
     const res = executeAttackDamageRoll({
       baseFormula: weapon.damage || '1W6',
@@ -625,7 +637,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
             <SituativeBoni boni={situativ.boni} gewaehlt={situativ.gewaehlt} onToggle={situativ.umschalten} dunkel />
 
             {/* Splittermond GRW: Aktive Zauber-Wirkungen (Aura des Anführers, Beflügelte Waffe, Flammende Waffe, etc.) */}
-            {(spellAttackBonuses.length > 0 || spellWeaponDamage.fireDamage > 0 || spellWeaponDamage.lightDamage > 0) && (
+            {(spellAttackBonuses.length > 0 || spellWeaponDamage.totalDamage > 0) && (
               <div className="bg-[#10241b] border border-[#27593c] rounded-xl p-3 text-xs space-y-2">
                 <div className="flex justify-between items-center">
                   <span className="font-bold text-emerald-300 flex items-center gap-1.5 uppercase tracking-wide text-[11px]">
@@ -634,6 +646,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                   {spellAttackBonusTotal > 0 && (
                     <span className="font-mono font-bold px-2 py-0.5 rounded bg-emerald-800 text-emerald-100 border border-emerald-600">
                       AT-Bonus: +{spellAttackBonusTotal}
+                      {spellAttackBonusRoh > spellAttackBonusTotal && ` (von +${spellAttackBonusRoh}, Höchstbonus GRW S. 18)`}
                     </span>
                   )}
                 </div>
@@ -658,18 +671,10 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                       </button>
                     );
                   })}
-                  {spellWeaponDamage.fireDamage > 0 && (
+                  {spellWeaponDamage.totalDamage > 0 && (
                     <span className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-orange-950/80 text-orange-200 border border-orange-700 shadow-xs">
                       <Flame size={12} className="text-orange-400" />
-                      <span>Flammende Waffe</span>
-                      <span className="font-mono font-bold text-orange-300">+{spellWeaponDamage.fireDamage} Feuer</span>
-                    </span>
-                  )}
-                  {spellWeaponDamage.lightDamage > 0 && (
-                    <span className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-yellow-950/80 text-yellow-200 border border-yellow-700 shadow-xs">
-                      <Sparkles size={12} className="text-yellow-400" />
-                      <span>Waffe des Lichtes</span>
-                      <span className="font-mono font-bold text-yellow-300">+{spellWeaponDamage.lightDamage} Licht</span>
+                      <span>{spellWeaponDamage.bonusText}</span>
                     </span>
                   )}
                 </div>

@@ -679,7 +679,7 @@ export function baseCharacterReducer(
         if (nextTempHPUsed >= nextTempHP) {
           nextTempHP = 0;
           nextTempHPUsed = 0;
-          // Splittermond GRW S. 244: Lebenskraft stärken endet automatisch, wenn alle Temp-LP aufgebraucht sind
+          // Splittermond GRW S. 235: Lebenskraft stärken endet automatisch, wenn alle Temp-LP aufgebraucht sind
           const autoEndIndex = currentChanneledSpells.findIndex(
             (s) => s.name.trim().toLowerCase() === 'lebenskraft stärken'
           );

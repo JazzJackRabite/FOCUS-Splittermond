@@ -25,6 +25,7 @@ import {
   getFullSpellInfo,
   parseFocusCost,
   getActiveSpellModifiers,
+  zauberHoechstbonus,
   getWeaponEnchantments,
 } from '../../utils/magicRules';
 import { generateId } from '../../utils/id';
@@ -198,7 +199,8 @@ export const CombatMagicTab: React.FC = () => {
   } = calc;
 
   const channeledSpells = state.playState?.channeledSpells ?? [];
-  const activeSpellMods = useMemo(() => getActiveSpellModifiers(channeledSpells), [channeledSpells]);
+  const hoechstbonusZauber = zauberHoechstbonus(calc);
+  const activeSpellMods = useMemo(() => getActiveSpellModifiers(channeledSpells, hoechstbonusZauber), [channeledSpells, hoechstbonusZauber]);
 
   // Modals for adding weapon and armor
   const [showAddWeaponModal, setShowAddWeaponModal] = useState(false);
@@ -459,7 +461,7 @@ export const CombatMagicTab: React.FC = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-[#d1c4b0]/40">
                   <button
                     type="button"
-                    onClick={() => session.openRollForWeapon('Waffenlos', 'Handgemenge', 0, 15, { damage: '1W6', wgs: 5, attributes: 'Stumpf' })}
+                    onClick={() => session.openRollForWeapon('Waffenlos', 'Handgemenge', 0, 15, { id: 'waffenlos', damage: '1W6', wgs: 5, attributes: 'Stumpf' })}
                     className="w-full bg-[#1B365D] hover:bg-[#254a80] text-[#f3e5cf] border border-[#C5A059] px-3 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
                     title="Angriffsprobe & Manöver öffnen (2W10 + AT vs. VTD)"
                   >
@@ -468,7 +470,7 @@ export const CombatMagicTab: React.FC = () => {
                   </button>
                   <button
                     type="button"
-                    onClick={() => session.handleRollDiceFormula('1W6', 'Waffenloser Schaden')}
+                    onClick={() => session.handleRollDiceFormula(getWeaponEnchantments({ id: 'waffenlos', name: 'Waffenlos', damage: '1W6' }, channeledSpells).damageRollFormula, 'Waffenloser Schaden')}
                     className="damage-roll-btn w-full px-3 py-2 rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer flex items-center justify-center gap-1.5 active:scale-95"
                     title="Schaden würfeln (1W6)"
                   >

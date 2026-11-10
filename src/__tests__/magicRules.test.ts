@@ -437,11 +437,13 @@ describe('useCharacterState - spell actions', () => {
       const atkBonuses = getActiveSpellRollBonuses(channeled, 'Klingenwaffen', true);
       expect(atkBonuses.find((b) => b.source === 'Aura des Anführers')?.bonus).toBe(2);
 
+      // Flammende Waffe und Waffe des Lichtes sind nicht kombinierbar (Typen Schaden und Waffe, GRW S. 229/250):
+      // es zählt nur ein Zusatzschaden.
       const weaponDmg = getSpellWeaponDamageBonus(channeled);
+      expect(weaponDmg.totalDamage).toBe(1);
       expect(weaponDmg.fireDamage).toBe(1);
-      expect(weaponDmg.lightDamage).toBe(1);
+      expect(weaponDmg.lightDamage).toBe(0);
       expect(weaponDmg.bonusText).toContain('Flammende Waffe');
-      expect(weaponDmg.bonusText).toContain('Waffe des Lichtes');
     });
   });
 
@@ -686,30 +688,34 @@ describe('useCharacterState - spell actions', () => {
         selectedEnhancementIds: ['enh-1'],
         enhancements: ['Verstärkung: Der Schaden erhöht sich zusätzlich um 1 Punkt. [Kosten +K1V1] (1 EG)'],
       };
-      const dmg = getSpellWeaponDamageBonus([enhancedKrallen]);
+      // Krallen wirken auf waffenlose Angriffe (GRW S. 234), nicht auf Waffen
+      const dmg = getSpellWeaponDamageBonus([enhancedKrallen], 'waffenlos');
       expect(dmg.bonusText).toContain('Krallen verstärkt');
+      expect(dmg.totalDamage).toBe(1);
+      expect(getSpellWeaponDamageBonus([enhancedKrallen], 'w-katar', 'Katar').totalDamage).toBe(0);
     });
 
     it('correctly parses enhancement focus deltas with parseEnhancementFocusDelta', () => {
+      // Die Zahl hinter V ist Teil der genannten Punkte (GRW S. 221–222: „1 Punkt verzehrter Fokus … Kosten -(K)1V1“)
       const dK1V1 = parseEnhancementFocusDelta('+K1V1');
-      expect(dK1V1.channeled).toBe(1);
+      expect(dK1V1.channeled).toBe(0);
       expect(dK1V1.consumed).toBe(1);
-      expect(dK1V1.total).toBe(2);
+      expect(dK1V1.total).toBe(1);
 
       const dK2V2 = parseEnhancementFocusDelta('+K2V2');
-      expect(dK2V2.channeled).toBe(2);
+      expect(dK2V2.channeled).toBe(0);
       expect(dK2V2.consumed).toBe(2);
-      expect(dK2V2.total).toBe(4);
+      expect(dK2V2.total).toBe(2);
 
       const d1V1 = parseEnhancementFocusDelta('+1V1');
-      expect(d1V1.exhausted).toBe(1);
+      expect(d1V1.exhausted).toBe(0);
       expect(d1V1.consumed).toBe(1);
-      expect(d1V1.total).toBe(2);
+      expect(d1V1.total).toBe(1);
 
       const d2V1 = parseEnhancementFocusDelta('+2V1');
-      expect(d2V1.exhausted).toBe(2);
+      expect(d2V1.exhausted).toBe(1);
       expect(d2V1.consumed).toBe(1);
-      expect(d2V1.total).toBe(3);
+      expect(d2V1.total).toBe(2);
     });
 
     it('correctly calculates final costs for Flammende Waffe with +K1V1 enhancement', () => {
@@ -729,9 +735,10 @@ describe('useCharacterState - spell actions', () => {
         { ...INITIAL_EG_ALLOCATIONS, selectedEnhancementIds: ['enh-1'] },
         specificEnhancements
       );
-      expect(finalCosts.effectiveChanneled).toBe(4);
+      // K4V1 + K1V1 = K5V2: 3 kanalisiert, 2 verzehrt
+      expect(finalCosts.effectiveChanneled).toBe(3);
       expect(finalCosts.effectiveConsumed).toBe(2);
-      expect(finalCosts.totalFocus).toBe(6);
+      expect(finalCosts.totalFocus).toBe(5);
     });
 
     it('applies Flammende Waffe and Waffe des Lichtes enhanced damage (+2)', () => {
@@ -771,9 +778,11 @@ describe('useCharacterState - spell actions', () => {
       expect(befluegelt.equipmentType).toBe('weapon');
       expect(befluegelt.allowsUnarmed).toBe(false);
 
+      // Magische Rüstung hat die Reichweite „Zauberer“ (GRW S. 237): sie umhüllt den Körper, kein Ausrüstungsstück
       const ruestung = isEquipmentTargetingSpell('Magische Rüstung');
-      expect(ruestung.targetsEquipment).toBe(true);
-      expect(ruestung.equipmentType).toBe('armor');
+      expect(ruestung.targetsEquipment).toBe(false);
+      expect(isEquipmentTargetingSpell({ name: 'Steinhaut', target: 'Haut, Rüstung', range: 'Zauberer' }).targetsEquipment).toBe(false);
+      expect(isEquipmentTargetingSpell({ name: 'Geisterdolch', target: 'Herbeirufung, Waffe', range: 'Zauberer' }).targetsEquipment).toBe(false);
 
       const feuerstrahl = isEquipmentTargetingSpell('Feuerstrahl');
       expect(feuerstrahl.targetsEquipment).toBe(false);

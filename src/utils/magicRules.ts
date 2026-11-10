@@ -231,59 +231,21 @@ export interface PermissibleSpellModifications {
 }
 
 /**
- * Parst die zusätzlichen Fokus-Kosten (Delta) einer spezifischen Zauber-Verstärkung.
- * Im Gegensatz zu absoluten Spruchkosten (wo z. B. K4V1 bedeutet: insgesamt 4 Fokus, davon 1 verzehrt)
- * ist ein Delta additiv:
- * - "+K1V1" bedeutet: +1 Kanalisierter Fokus UND +1 Verzehrter Fokus (+2 FO gesamt).
- * - "+1V1" bedeutet: +1 Erschöpfter Fokus UND +1 Verzehrter Fokus (+2 FO gesamt).
- * - "+K2V2" bedeutet: +2 Kanalisierter Fokus UND +2 Verzehrter Fokus (+4 FO gesamt).
- * - "+2V1" bedeutet: +2 Erschöpfter Fokus UND +1 Verzehrter Fokus (+3 FO gesamt).
+ * Parst die zusätzlichen Fokuskosten einer Zauber-Verstärkung („Kosten +K1V1“).
+ *
+ * Die Schreibweise ist dieselbe wie bei den Grundkosten: Die Zahl hinter V ist ein Teil der genannten Punkte, nicht
+ * zusätzlich. Beleg (GRW S. 221–222, Verzehrter Fokus): „Für je 3 EG kann 1 Punkt verzehrter Fokus eingespart werden
+ * (Kosten -(K)1V1)“ – „1V1“ ist also genau 1 Punkt, und der ist verzehrt.
+ * - "+K1V1": +1 Punkt, davon 1 verzehrt  (K4V1 → K5V2)
+ * - "+1V1":  +1 Punkt, davon 1 verzehrt  (4V1 → 5V2)
+ * - "+K2V2": +2 Punkte, beide verzehrt   (K8V2 → K10V4)
+ * - "+2V1":  +2 Punkte, davon 1 verzehrt
+ * - "+K1":   +1 kanalisierter Punkt
  */
 export function parseEnhancementFocusDelta(rawInput?: string | null): ParsedFocusCost {
   const raw = String(rawInput ?? '0').trim();
-  if (!raw || raw === '0' || raw === 'frei' || raw === 'Frei') {
-    return { isChanneled: false, exhausted: 0, channeled: 0, consumed: 0, total: 0, raw: '0' };
-  }
-
-  let exhausted = 0;
-  let channeled = 0;
-  let consumed = 0;
-  let isChanneled = false;
-
-  // Extract V (Verzehrt): z. B. "V1", "V2"
-  const vMatch = raw.match(/V(\d+)/i);
-  if (vMatch) {
-    consumed = parseInt(vMatch[1], 10) || 0;
-  }
-
-  // Extract K (Kanalisiert): z. B. "+K1V1", "K2V2", "+K1"
-  const hasK = /K/i.test(raw);
-  if (hasK) {
-    isChanneled = true;
-    const kMatch = raw.match(/K(\d+)/i);
-    if (kMatch) {
-      channeled = parseInt(kMatch[1], 10) || 0;
-    } else {
-      channeled = 1;
-    }
-  } else {
-    // Non-channeled: z. B. "+1V1", "+2V1", "+2"
-    const cleaned = raw.replace(/^\+/, '').trim();
-    const numMatch = cleaned.match(/^(\d+)(?=V|$)/i);
-    if (numMatch) {
-      exhausted = parseInt(numMatch[1], 10) || 0;
-    }
-  }
-
-  const total = exhausted + channeled + consumed;
-  return {
-    isChanneled,
-    exhausted,
-    channeled,
-    consumed,
-    total,
-    raw,
-  };
+  const delta = parseFocusCost(raw.replace(/^\+\s*/, ''));
+  return { ...delta, raw: delta.total === 0 ? '0' : raw };
 }
 
 /**
@@ -393,7 +355,7 @@ export interface SpellEGAllocations {
   increaseRange: number;       // 1 EG per base range increase
   increaseDuration: number;    // 2 EG per base duration increase
   reduceCastTime: number;      // 3 EG per -1 tick cast time reduction (max 2)
-  expandArea: number;          // 1 EG per area expansion step
+  expandArea: number;          // 3 EG per base area increase (GRW S. 221–222)
   selectedEnhancementIds: string[]; // List of specific enhancement IDs selected
   customEnhancementEG: number; // EG spent on spell-specific enhancement
   customEnhancementText: string;
@@ -442,7 +404,7 @@ export function calculateTotalEGSpent(
     (allocations.increaseRange || 0) * 1 +
     (allocations.increaseDuration || 0) * 2 +
     (allocations.reduceCastTime || 0) * 3 +
-    (allocations.expandArea || 0) * 1 +
+    (allocations.expandArea || 0) * 3 + // GRW S. 221–222: Wirkungsbereich je 3 EG
     specificEG +
     (allocations.customEnhancementEG || 0)
   );
@@ -482,10 +444,12 @@ export function calculateFinalSpellCosts(
     effectiveChanneled -= reduction;
   }
 
-  // 3 EG saves 1 consumed focus (minimum cost: 1 if originally > 0)
+  // 3 EG sparen 1 Punkt verzehrten Fokus (GRW S. 221–222: „Die Mindestkosten betragen 1 erschöpften oder kanalisierten
+  // Fokuspunkt“). Der verzehrte Anteil darf also ganz entfallen, solange ein nicht verzehrter Punkt bleibt.
   let effectiveConsumed = parsedBase.consumed;
   if (effectiveConsumed > 0 && allocations.saveConsumedFocus > 0) {
-    const maxReduction = Math.max(0, effectiveConsumed - 1);
+    const restBleibt = effectiveExhausted + effectiveChanneled >= 1;
+    const maxReduction = restBleibt ? effectiveConsumed : Math.max(0, effectiveConsumed - 1);
     const reduction = Math.min(maxReduction, allocations.saveConsumedFocus);
     effectiveConsumed -= reduction;
   }
@@ -514,7 +478,7 @@ export function calculateFinalSpellCosts(
     modificationsSummary.push(`-${allocations.reduceCastTime} Ticks Auslösezeit (${allocations.reduceCastTime * 3} EG)`);
   }
   if (allocations.expandArea > 0) {
-    modificationsSummary.push(`+${allocations.expandArea} Stufe(n) Wirkungsbereich (${allocations.expandArea} EG)`);
+    modificationsSummary.push(`+${allocations.expandArea}x Grundwirkungsbereich (${allocations.expandArea * 3} EG)`);
   }
 
   if (allocations.selectedEnhancementIds && availableEnhancements) {
@@ -734,6 +698,8 @@ export interface ActiveSpellModifiers {
   kwBonus: number;
   gswBonus: number;
   woundPenaltyReduction: number;
+  /** Hinweise, wenn Boni begrenzt wurden oder ein Zauber wegen eines stärkeren gleichen Typs nicht zählt */
+  hinweise: string[];
   breakdown: Array<{
     spellName: string;
     vtd?: number;
@@ -747,292 +713,131 @@ export interface ActiveSpellModifiers {
 }
 
 /**
- * Prüft, ob ein aktiver kanalisierter Zauber durch eine spezifische Zauber-Verstärkung verstärkt wurde.
+ * Prüft, ob ein aktiver Zauber mit seiner Verstärkungsoption gewirkt wurde. Jeder Zauber hat genau eine Verstärkung und
+ * sie ist nur einmal wählbar (GRW S. 221–222), deshalb genügt „eine Verstärkung gewählt“. Für ältere Einträge ohne
+ * `selectedEnhancementIds` wird der Text der Notizen durchsucht.
  */
 export function isSpellEnhanced(cs: import('../types').ChanneledSpell, searchPatterns: string[] = []): boolean {
-  if (cs.selectedEnhancementIds && cs.selectedEnhancementIds.length > 0) {
-    if (searchPatterns.length === 0) return true;
-    if (cs.selectedEnhancementIds.some((id) => id.startsWith('enh-'))) {
-      const notes = (cs.notes || '').toLowerCase();
-      const enhancements = (cs.enhancements || []).join(' ').toLowerCase();
-      const combined = `${notes} ${enhancements}`;
-      if (searchPatterns.some((p) => combined.includes(p.toLowerCase()))) return true;
-      return true;
-    }
-  }
-  const notes = (cs.notes || '').toLowerCase();
-  const enhancements = (cs.enhancements || []).join(' ').toLowerCase();
-  const combined = `${notes} ${enhancements}`;
+  if (cs.selectedEnhancementIds && cs.selectedEnhancementIds.length > 0) return true;
+  const combined = `${cs.notes || ''} ${(cs.enhancements || []).join(' ')}`.toLowerCase();
+  if (/verstärk|\+\s*k?\d+v\d+/.test(combined)) return true;
   return searchPatterns.some((p) => combined.includes(p.toLowerCase()));
 }
 
+type ZauberWerte = { vtd?: number; sr?: number; gw?: number; kw?: number; gsw?: number; wund?: number };
+
 /**
- * Ermittelt Boni auf abgeleitete Kampfeigenschaften (VTD, SR, GW, KW, GSW, Wundabzüge)
- * aus aktuell aktiven kanalisierten Zaubern nach Splittermond GRW.
+ * Wirkungen kanalisierter GRW-Zauber auf Kampfwerte, geprüft gegen die Zauberbeschreibungen im Regelpaket
+ * (public/regelpakete/grw.srp.json). `v` = Werte mit gewählter Verstärkung (ersetzen die Grundwerte).
+ * `typ`: Zauber desselben Typs sind nicht kombinierbar (Zaubertext: „nicht mit anderen Zaubern kombinierbar, die
+ * ebenfalls den Typus Haut / die Typen Rüstung und Schutzfeld besitzen“) – es zählt nur der stärkste.
+ * „Widerstandswerte“ sind VTD, GW und KW (GRW S. 15).
  */
-export function getActiveSpellModifiers(channeledSpells: import('../types').ChanneledSpell[] = []): ActiveSpellModifiers {
-  let vtdBonus = 0;
-  let srBonus = 0;
-  let gwBonus = 0;
-  let kwBonus = 0;
-  let gswBonus = 0;
-  let woundPenaltyReduction = 0;
+export const ZAUBER_KAMPFWERTE: Record<string, { basis: ZauberWerte; v?: ZauberWerte; typ?: 'haut' | 'schutzfeld' }> = {
+  'steinhaut': { basis: { vtd: 2, sr: 2 }, v: { vtd: 2, sr: 3 }, typ: 'haut' },                 // S. 246
+  'rindenhaut': { basis: { vtd: 1, sr: 1 }, v: { vtd: 1, sr: 2 }, typ: 'haut' },                // S. 240
+  'stahlhaut': { basis: { vtd: 4, sr: 4 }, v: { vtd: 4, sr: 5 }, typ: 'haut' },                 // S. 245
+  'eins mit dem feuer': { basis: { sr: 5 } },                                                   // S. 225
+  'leib aus licht': { basis: { sr: 4 } },                                                       // S. 235
+  'schattenleib': { basis: { sr: 4 } },                                                         // S. 241
+  'magische rüstung': { basis: { vtd: 2 }, v: { vtd: 3 }, typ: 'schutzfeld' },                  // S. 237
+  'magischer panzer': { basis: { vtd: 4 }, v: { vtd: 5 }, typ: 'schutzfeld' },                  // S. 237
+  'eiserne aura': { basis: { vtd: 2 } },                                                        // S. 226
+  'aura des anführers': { basis: { vtd: 2, gw: 2, kw: 2 } },                                    // S. 224
+  'widerstände erhöhen': { basis: { vtd: 2, gw: 2, kw: 2 }, v: { vtd: 3, gw: 3, kw: 3 } },      // S. 252
+  'hohe segnung': { basis: { vtd: 2, gw: 2, kw: 2 }, v: { vtd: 3, gw: 3, kw: 3 } },             // S. 233
+  'segnung': { basis: { vtd: 1, gw: 1, kw: 1 }, v: { vtd: 2, gw: 2, kw: 2 } },                  // S. 244
+  'aura der entschlossenheit': { basis: { gw: 1 } },                                            // S. 223
+  'beschleunigen': { basis: { gsw: 2 }, v: { gsw: 4 } },                                        // S. 224
+  'schmerzen widerstehen': { basis: { wund: 3 }, v: { wund: 4 } },                              // S. 243
+  'schmerzen ignorieren': { basis: { wund: 6 }, v: { wund: 8 } },                               // S. 243
+  'aura der schmerzlosigkeit': { basis: { wund: 999 } },                                        // S. 223
+};
+
+/** Zauber ohne Zahl auf dem Bogen: nur als Hinweis am aktiven Zauber (Grundwirkung / mit Verstärkung) */
+const ZAUBER_HINWEISE: Record<string, [string, string?]> = {
+  'kleiner magieschutz': ['Gegen das Ziel gerichtete Zauber: Malus 1', 'Gegen das Ziel gerichtete Zauber: Malus 2'],       // S. 234
+  'großer magieschutz': ['Gegen das Ziel gerichtete Zauber: Malus 4', 'Gegen das Ziel gerichtete Zauber: Malus 6'],        // S. 232
+  'schutz vor kälte': ['Kälteschaden um 4 gesenkt', 'Kälteschaden um 6 gesenkt'],                                          // S. 244
+  'schutz vor elektrizität': ['Elektrizitätsschaden um 6 gesenkt', 'Elektrizitätsschaden um 8 gesenkt'],                   // S. 243
+  'schutz vor elementen': ['Elementarschaden um 10 gesenkt', 'Elementarschaden um 12 gesenkt'],                            // S. 243
+  'über wasser gehen': ['', '+2 GSW auf dem Wasser'],                                                                      // S. 248
+  'geistreise': ['', 'SR 5 in der Geisterwelt'],                                                                           // S. 231
+};
+
+/**
+ * Höchstbonus aus der Quelle Zauberei auf eine Probe oder einen abgeleiteten Wert: zu Spielbeginn 3, je Heldengrad +1
+ * (GRW S. 18–19, S. 88–89). Ausrüstung ist eine eigene Quelle mit eigenem Höchstbonus.
+ */
+export function zauberHoechstbonus(calc?: { regelwerk?: { hoechstbonus?: number } | null; heldengrad?: { name?: string } } | null): number {
+  const ausPaket = calc?.regelwerk?.hoechstbonus;
+  if (typeof ausPaket === 'number' && ausPaket > 0) return ausPaket;
+  const m = (calc?.heldengrad?.name ?? '').match(/Heldengrad\s*(\d)/);
+  return 3 + Math.max(0, (m ? Number(m[1]) : 1) - 1);
+}
+
+/**
+ * Ermittelt Boni auf Kampfwerte (VTD, SR, GW, KW, GSW, Wundabzüge) aus aktiven Zaubern nach Splittermond GRW.
+ * `hoechstbonus`: Höchstbonus aus Zauberei (siehe zauberHoechstbonus). VTD, GW, KW und GSW sind abgeleitete Werte und
+ * werden darauf begrenzt; die Schadensreduktion ist kein abgeleiteter Wert und bleibt unbegrenzt.
+ */
+export function getActiveSpellModifiers(
+  channeledSpells: import('../types').ChanneledSpell[] = [],
+  hoechstbonus?: number
+): ActiveSpellModifiers {
   const breakdown: ActiveSpellModifiers['breakdown'] = [];
+  const hinweise: string[] = [];
+  const kandidaten: Array<{ cs: import('../types').ChanneledSpell; w: ZauberWerte; typ?: string; verstaerkt: boolean }> = [];
 
   for (const cs of channeledSpells) {
     const name = (cs.name || '').trim().toLowerCase();
-
-    if (name === 'steinhaut') {
-      // GRW S. 246: +2 VTD, +2 SR. Bei 2 EG (+K2V2): SR erhöht sich auf 3 Punkte.
-      const hasSREnhancement = isSpellEnhanced(cs, ['sr 3', 'sr auf 3', '+k2v2', '3 punkte', 'erhöht sich auf 3']);
-      const spellSR = hasSREnhancement ? 3 : 2;
-      const spellVTD = 2;
-      vtdBonus += spellVTD;
-      srBonus += spellSR;
-      breakdown.push({
-        spellName: cs.name,
-        vtd: spellVTD,
-        sr: spellSR,
-        description: `+${spellVTD} VTD, +${spellSR} SR${hasSREnhancement ? ' (verstärkt)' : ''}`,
-      });
-    } else if (name === 'rindenhaut') {
-      // GRW S. 244: +1 VTD, +1 SR
-      vtdBonus += 1;
-      srBonus += 1;
-      breakdown.push({
-        spellName: cs.name,
-        vtd: 1,
-        sr: 1,
-        description: '+1 VTD, +1 SR',
-      });
-    } else if (name === 'stahlhaut') {
-      // GRW S. 246: +4 VTD, +4 SR
-      vtdBonus += 4;
-      srBonus += 4;
-      breakdown.push({
-        spellName: cs.name,
-        vtd: 4,
-        sr: 4,
-        description: '+4 VTD, +4 SR',
-      });
-    } else if (name === 'eins mit dem feuer') {
-      // GRW S. 243: +5 SR
-      srBonus += 5;
-      breakdown.push({
-        spellName: cs.name,
-        sr: 5,
-        description: '+5 SR',
-      });
-    } else if (name === 'leib aus licht') {
-      // GRW S. 244: +4 SR
-      srBonus += 4;
-      breakdown.push({
-        spellName: cs.name,
-        sr: 4,
-        description: '+4 SR',
-      });
-    } else if (name === 'schattenleib') {
-      // GRW S. 245: +4 SR
-      srBonus += 4;
-      breakdown.push({
-        spellName: cs.name,
-        sr: 4,
-        description: '+4 SR',
-      });
-    } else if (name === 'magische rüstung') {
-      // GRW S. 244: +2 VTD. Bei 1 EG (+K1V1): Erhöhung beträgt 3 Punkte (+3 VTD).
-      const hasEnh = isSpellEnhanced(cs, ['3 punkte', '+k1v1', 'beträgt 3', 'erhöhung beträgt 3']);
-      const vtd = hasEnh ? 3 : 2;
-      vtdBonus += vtd;
-      breakdown.push({
-        spellName: cs.name,
-        vtd,
-        description: `+${vtd} VTD${hasEnh ? ' (verstärkt)' : ''}`,
-      });
-    } else if (name === 'magischer panzer') {
-      // GRW S. 244: +4 VTD. Bei 1 EG (+K3V3): Erhöhung beträgt 5 Punkte (+5 VTD).
-      const hasEnh = isSpellEnhanced(cs, ['5 punkte', '+k3v3', 'beträgt 5', 'erhöhung beträgt 5']);
-      const vtd = hasEnh ? 5 : 4;
-      vtdBonus += vtd;
-      breakdown.push({
-        spellName: cs.name,
-        vtd,
-        description: `+${vtd} VTD${hasEnh ? ' (verstärkt)' : ''}`,
-      });
-    } else if (name === 'eiserne aura') {
-      // GRW S. 243: +2 VTD
-      vtdBonus += 2;
-      breakdown.push({
-        spellName: cs.name,
-        vtd: 2,
-        description: '+2 VTD',
-      });
-    } else if (name === 'aura des anführers') {
-      // GRW S. 241: +2 VTD, +2 GW, +2 KW
-      vtdBonus += 2;
-      gwBonus += 2;
-      kwBonus += 2;
-      breakdown.push({
-        spellName: cs.name,
-        vtd: 2,
-        gw: 2,
-        kw: 2,
-        description: '+2 VTD, +2 GW, +2 KW',
-      });
-    } else if (name === 'widerstände erhöhen') {
-      // GRW S. 246: +2 GW, +2 KW. Bei 2 EG (+K3V3): Der Bonus erhöht sich auf 3 Punkte (+3 GW, +3 KW).
-      const hasEnh = isSpellEnhanced(cs, ['3 punkte', '+k3v3', 'auf 3', 'erhöht sich auf 3']);
-      const val = hasEnh ? 3 : 2;
-      gwBonus += val;
-      kwBonus += val;
-      breakdown.push({
-        spellName: cs.name,
-        gw: val,
-        kw: val,
-        description: `+${val} GW, +${val} KW${hasEnh ? ' (verstärkt)' : ''}`,
-      });
-    } else if (name === 'kleiner magieschutz') {
-      // GRW S. 235: Malus 1 auf gegnerische Zauber (+1 GW/KW). Bei 1 EG (+K1V1): Malus 2 (+2 GW/KW).
-      const hasEnh = isSpellEnhanced(cs, ['2 punkte', '+k1v1', 'auf 2', 'erhöht sich auf 2']);
-      const val = hasEnh ? 2 : 1;
-      gwBonus += val;
-      kwBonus += val;
-      breakdown.push({
-        spellName: cs.name,
-        gw: val,
-        kw: val,
-        description: `+${val} GW, +${val} KW (Kleiner Magieschutz${hasEnh ? ' verstärkt' : ''})`,
-      });
-    } else if (name === 'großer magieschutz') {
-      // GRW S. 233: Malus 4 auf gegnerische Zauber (+4 GW/KW). Bei 1 EG (+K3V3): Malus 6 (+6 GW/KW).
-      const hasEnh = isSpellEnhanced(cs, ['6 punkte', '+k3v3', 'auf 6', 'erhöht sich auf 6']);
-      const val = hasEnh ? 6 : 4;
-      gwBonus += val;
-      kwBonus += val;
-      breakdown.push({
-        spellName: cs.name,
-        gw: val,
-        kw: val,
-        description: `+${val} GW, +${val} KW (Großer Magieschutz${hasEnh ? ' verstärkt' : ''})`,
-      });
-    } else if (name === 'hohe segnung') {
-      // GRW S. 244: +2 auf alle Proben und Widerstandswerte
-      gwBonus += 2;
-      kwBonus += 2;
-      breakdown.push({
-        spellName: cs.name,
-        gw: 2,
-        kw: 2,
-        description: '+2 GW, +2 KW (+2 Fertigkeiten)',
-      });
-    } else if (name === 'segnung') {
-      // GRW S. 245: +1 auf alle Proben und Widerstandswerte
-      gwBonus += 1;
-      kwBonus += 1;
-      breakdown.push({
-        spellName: cs.name,
-        gw: 1,
-        kw: 1,
-        description: '+1 GW, +1 KW (+1 Fertigkeiten)',
-      });
-    } else if (name === 'aura der entschlossenheit') {
-      // GRW S. 241: +1 GW
-      gwBonus += 1;
-      breakdown.push({
-        spellName: cs.name,
-        gw: 1,
-        description: '+1 GW',
-      });
-    } else if (name === 'beschleunigen') {
-      // GRW S. 242: +2 GSW
-      gswBonus += 2;
-      breakdown.push({
-        spellName: cs.name,
-        gsw: 2,
-        description: '+2 GSW',
-      });
-    } else if (name === 'über wasser gehen') {
-      // GRW S. 250: Bei 1 EG (+K3V3): Die Geschwindigkeit erhöht sich um 2 Punkte auf Wasser.
-      const hasEnh = isSpellEnhanced(cs, ['2 punkte', '+k3v3', 'geschwindigkeit']);
-      if (hasEnh) {
-        gswBonus += 2;
-        breakdown.push({
-          spellName: cs.name,
-          gsw: 2,
-          description: '+2 GSW (auf Wasser verstärkt)',
-        });
-      }
-    } else if (name === 'schutz vor kälte') {
-      // GRW S. 245: Senkt Kälteschaden um 4. Bei 2 EG (+K1V1): um 6 Punkte gesenkt.
-      const hasEnh = isSpellEnhanced(cs, ['6 punkte', '+k1v1', 'um 6']);
-      const val = hasEnh ? 6 : 4;
-      breakdown.push({
-        spellName: cs.name,
-        description: `Kälteschaden um ${val} gesenkt${hasEnh ? ' (verstärkt)' : ''}`,
-      });
-    } else if (name === 'schutz vor elektrizität') {
-      // GRW S. 245: Senkt Blitzschaden um 6. Bei 1 EG (+K2V2): um 8 Punkte gesenkt.
-      const hasEnh = isSpellEnhanced(cs, ['8 punkte', '+k2v2', 'um 8']);
-      const val = hasEnh ? 8 : 6;
-      breakdown.push({
-        spellName: cs.name,
-        description: `Blitzschaden um ${val} gesenkt${hasEnh ? ' (verstärkt)' : ''}`,
-      });
-    } else if (name === 'schutz vor elementen') {
-      // GRW S. 245: Senkt Elementschaden um 8. Bei 1 EG (+K4V4): um 12 Punkte gesenkt.
-      const hasEnh = isSpellEnhanced(cs, ['12 punkte', '+k4v4', 'um 12']);
-      const val = hasEnh ? 12 : 8;
-      breakdown.push({
-        spellName: cs.name,
-        description: `Elementschaden um ${val} gesenkt${hasEnh ? ' (verstärkt)' : ''}`,
-      });
-    } else if (name === 'geistreise') {
-      // GRW S. 232: Bei 1 EG (+K5V5): SR 5 in der Geisterwelt.
-      const hasEnh = isSpellEnhanced(cs, ['5 punkte', '+k5v5', 'sr 5', 'geisterwelt']);
-      if (hasEnh) {
-        srBonus += 5;
-        breakdown.push({
-          spellName: cs.name,
-          sr: 5,
-          description: '+5 SR (in Geisterwelt)',
-        });
-      }
-    } else if (name === 'schmerzen widerstehen') {
-      // GRW S. 245: Eventuelle Wundabzüge sinken um 3 Punkte.
-      woundPenaltyReduction = Math.max(woundPenaltyReduction, 3);
-      breakdown.push({
-        spellName: cs.name,
-        woundPenaltyReduction: 3,
-        description: 'Wundabzug um 3 gesenkt',
-      });
-    } else if (name === 'schmerzen ignorieren') {
-      // GRW S. 245: Eventuelle Wundabzüge sinken um 6 Punkte.
-      woundPenaltyReduction = Math.max(woundPenaltyReduction, 6);
-      breakdown.push({
-        spellName: cs.name,
-        woundPenaltyReduction: 6,
-        description: 'Wundabzug um 6 gesenkt',
-      });
-    } else if (name === 'aura der schmerzlosigkeit') {
-      // GRW S. 241: Wundabzüge werden ignoriert.
-      woundPenaltyReduction = Math.max(woundPenaltyReduction, 999);
-      breakdown.push({
-        spellName: cs.name,
-        woundPenaltyReduction: 999,
-        description: 'Wundabzüge ignoriert',
-      });
+    const verstaerkt = isSpellEnhanced(cs);
+    const eintrag = ZAUBER_KAMPFWERTE[name];
+    if (eintrag) {
+      kandidaten.push({ cs, w: verstaerkt && eintrag.v ? eintrag.v : eintrag.basis, typ: eintrag.typ, verstaerkt: verstaerkt && !!eintrag.v });
+      continue;
+    }
+    const hinweis = ZAUBER_HINWEISE[name];
+    if (hinweis) {
+      const text = verstaerkt && hinweis[1] ? hinweis[1] : hinweis[0];
+      if (text) breakdown.push({ spellName: cs.name, description: `${text}${verstaerkt && hinweis[1] ? ' (verstärkt)' : ''}` });
     }
   }
 
-  return {
-    vtdBonus,
-    srBonus,
-    gwBonus,
-    kwBonus,
-    gswBonus,
-    woundPenaltyReduction,
-    breakdown,
-  };
+  // Nicht kombinierbare Typen: nur der stärkste Zauber zählt
+  const staerke = (w: ZauberWerte) => (w.vtd ?? 0) + (w.sr ?? 0);
+  const bester: Record<string, (typeof kandidaten)[number]> = {};
+  for (const k of kandidaten) if (k.typ && (!bester[k.typ] || staerke(k.w) > staerke(bester[k.typ].w))) bester[k.typ] = k;
+
+  let vtdBonus = 0, srBonus = 0, gwBonus = 0, kwBonus = 0, gswBonus = 0, woundPenaltyReduction = 0;
+  for (const k of kandidaten) {
+    if (k.typ && bester[k.typ] !== k) {
+      hinweise.push(`${k.cs.name} zählt nicht: nicht kombinierbar mit ${bester[k.typ].cs.name}`);
+      breakdown.push({ spellName: k.cs.name, description: `zählt nicht (nicht kombinierbar mit ${bester[k.typ].cs.name})` });
+      continue;
+    }
+    const w = k.w;
+    vtdBonus += w.vtd ?? 0; srBonus += w.sr ?? 0; gwBonus += w.gw ?? 0; kwBonus += w.kw ?? 0; gswBonus += w.gsw ?? 0;
+    woundPenaltyReduction = Math.max(woundPenaltyReduction, w.wund ?? 0);
+    const teile = [
+      w.vtd ? `+${w.vtd} VTD` : '', w.sr ? `+${w.sr} SR` : '', w.gw ? `+${w.gw} GW` : '', w.kw ? `+${w.kw} KW` : '', w.gsw ? `+${w.gsw} GSW` : '',
+      w.wund ? (w.wund >= 999 ? 'Wundabzüge ignoriert' : `Wundabzug um ${w.wund} gesenkt`) : '',
+    ].filter(Boolean);
+    breakdown.push({
+      spellName: k.cs.name, vtd: w.vtd, sr: w.sr, gw: w.gw, kw: w.kw, gsw: w.gsw, woundPenaltyReduction: w.wund,
+      description: `${teile.join(', ')}${k.verstaerkt ? ' (verstärkt)' : ''}`,
+    });
+  }
+
+  if (hoechstbonus !== undefined) {
+    const kappen = (wert: number, label: string) => {
+      if (wert > hoechstbonus) { hinweise.push(`${label}: Zauberbonus ${wert} auf Höchstbonus ${hoechstbonus} begrenzt (GRW S. 18)`); return hoechstbonus; }
+      return wert;
+    };
+    vtdBonus = kappen(vtdBonus, 'VTD'); gwBonus = kappen(gwBonus, 'GW'); kwBonus = kappen(kwBonus, 'KW'); gswBonus = kappen(gswBonus, 'GSW');
+  }
+
+  return { vtdBonus, srBonus, gwBonus, kwBonus, gswBonus, woundPenaltyReduction, hinweise, breakdown };
 }
 
 export interface ActiveSpellRollBonus {
@@ -1040,12 +845,17 @@ export interface ActiveSpellRollBonus {
   source: string;
   bonus: number;
   description: string;
+  /** false: nur in bestimmten Lagen – wird angeboten, ist aber nicht vorausgewählt */
   active: boolean;
 }
 
+const KAMPFFERTIGKEITEN = ['handgemenge', 'hiebwaffen', 'kettenwaffen', 'klingenwaffen', 'schusswaffen', 'stangenwaffen', 'wurfwaffen'];
+
 /**
- * Ermittelt situationsbezogene Probenboni aus aktiven kanalisierten Zaubern
- * für Fertigkeits-, Attributs- und Kampfwürfe (GRW S. 241–246).
+ * Probenboni aus aktiven GRW-Zaubern für Fertigkeits- und Angriffswürfe, geprüft gegen die Zauberbeschreibungen im
+ * Regelpaket. Einträge mit `active: false` gelten nur in einer Lage (z. B. Sicht verbessern: nur Proben, die die Sicht
+ * betreffen) und sind deshalb nicht vorausgewählt. Die Summe ist auf den Höchstbonus aus Zauberei begrenzt
+ * (siehe begrenzeZauberbonus).
  */
 export function getActiveSpellRollBonuses(
   channeledSpells: import('../types').ChanneledSpell[] = [],
@@ -1056,276 +866,142 @@ export function getActiveSpellRollBonuses(
   const result: ActiveSpellRollBonus[] = [];
   const cleanSkill = (skillName || '').trim();
   const lowerSkill = cleanSkill.toLowerCase();
-  const attrs = SKILL_DATA[cleanSkill] || [];
+  const attrs: string[] = SKILL_DATA[cleanSkill] || [];
+  const istAngriff = isCombatAttack || KAMPFFERTIGKEITEN.includes(lowerSkill);
+  const waffenlos = istWaffenlos(weaponId);
 
-  const usesAttr = (attr: string) => {
-    if (cleanSkill.toUpperCase().startsWith(attr)) return true;
-    if (attrs && attrs.includes(attr)) return true;
-    if (['klingenwaffen', 'handgemenge', 'stangenwaffen', 'hiebwaffen', 'kettenwaffen'].includes(lowerSkill) && (attr === 'BEW' || attr === 'STA')) return true;
-    if (lowerSkill === 'schusswaffen' && (attr === 'BEW' || attr === 'INT')) return true;
-    if (lowerSkill === 'wurfwaffen' && (attr === 'BEW' || attr === 'STA')) return true;
-    return false;
+  const neu = (cs: import('../types').ChanneledSpell, kurz: string, bonus: number, description: string, active = true) =>
+    result.push({ id: `spell-bonus-${cs.id}-${kurz}`, source: cs.name, bonus, description, active });
+
+  // Attributszauber: bei Fertigkeiten über deren Attribute. Bei Angriffen hängen die Attribute von der Waffe ab
+  // (GRW-Waffentabelle), die der Editor nicht kennt – dort anbieten, aber nicht vorauswählen.
+  const attribut = (cs: import('../types').ChanneledSpell, kurz: string, attr: string, attrName: string, bonus: number, verstaerkt: boolean) => {
+    if (istAngriff) neu(cs, kurz, bonus, `+${bonus}, wenn ${attrName} ein Attribut der Waffe ist${verstaerkt ? ' (verstärkt)' : ''}`, false);
+    else if (attrs.includes(attr) || cleanSkill.toUpperCase() === attr || lowerSkill === attrName.toLowerCase()) neu(cs, kurz, bonus, `+${bonus} auf Proben mit ${attrName}${verstaerkt ? ' (verstärkt)' : ''}`);
   };
 
   for (const cs of channeledSpells) {
     const name = (cs.name || '').trim().toLowerCase();
+    const v = isSpellEnhanced(cs);
 
-    // 1. Pauschale Fertigkeitsboni
-    if (name === 'hohe segnung') {
-      result.push({
-        id: `spell-bonus-${cs.id}-hohe-segnung`,
-        source: 'Hohe Segnung',
-        bonus: 2,
-        description: '+2 auf alle Fertigkeitsproben',
-        active: true,
-      });
-    } else if (name === 'segnung') {
-      result.push({
-        id: `spell-bonus-${cs.id}-segnung`,
-        source: 'Segnung',
-        bonus: 1,
-        description: '+1 auf alle Fertigkeitsproben',
-        active: true,
-      });
-    }
+    // 1. Alle Fertigkeitsproben
+    if (name === 'hohe segnung') neu(cs, 'hohe-segnung', v ? 3 : 2, `+${v ? 3 : 2} auf alle Fertigkeitsproben${v ? ' (verstärkt)' : ''}`);         // S. 233
+    else if (name === 'segnung') neu(cs, 'segnung', v ? 2 : 1, `+${v ? 2 : 1} auf alle Fertigkeitsproben${v ? ' (verstärkt)' : ''}`);              // S. 244
 
-    // 2. Angriffsboni im Kampf
-    if (isCombatAttack || ['handgemenge', 'hiebwaffen', 'kettenwaffen', 'klingenwaffen', 'schusswaffen', 'stangenwaffen', 'wurfwaffen'].includes(lowerSkill)) {
-      if (name === 'aura des anführers') {
-        result.push({
-          id: `spell-bonus-${cs.id}-aura-anfuehrer`,
-          source: 'Aura des Anführers',
-          bonus: 2,
-          description: '+2 auf alle Angriffe',
-          active: true,
-        });
+    // 2. Angriffe
+    if (istAngriff) {
+      if (name === 'aura des anführers') neu(cs, 'aura-anfuehrer', 2, '+2 auf alle Angriffe');                                                   // S. 224
+      if (name === 'beflügelte waffe' && !waffenlos && zielTrifft(cs, weaponId)) {
+        neu(cs, 'befluegelte-waffe', v ? 3 : 2, `+${v ? 3 : 2} auf Angriffe mit der verzauberten Waffe${v ? ' (verstärkt)' : ''}`);                // S. 224
       }
-      if (name === 'beflügelte waffe') {
-        // Beflügelte Waffe targets a specific weapon (Waffenlos cannot be enchanted)
-        const isTargeted = !weaponId || (cs.targetItemId ? cs.targetItemId === weaponId : true);
-        if (isTargeted && weaponId !== 'waffenlos') {
-          const hasEnh = isSpellEnhanced(cs, ['3 punkte', '+k1v1', 'auf 3', 'erhöht sich auf 3']);
-          const bonus = hasEnh ? 3 : 2;
-          result.push({
-            id: `spell-bonus-${cs.id}-befluegelte-waffe`,
-            source: 'Beflügelte Waffe',
-            bonus,
-            description: `+${bonus} auf Angriffe mit verzauberter Waffe${hasEnh ? ' (verstärkt)' : ''}`,
-            active: true,
-          });
-        }
+      if (name === 'waffe des lichtes' && !waffenlos && zielTrifft(cs, weaponId)) {
+        neu(cs, 'waffe-des-lichtes', 2, '+2 nur gegen Untote, Geisterwesen und Schattenwesen', false);                                           // S. 250
       }
     }
 
-    // 3. Probenboni auf Attribute
-    if (name === 'katzenreflexe' && usesAttr('BEW')) {
-      result.push({
-        id: `spell-bonus-${cs.id}-katzenreflexe`,
-        source: 'Katzenreflexe',
-        bonus: 2,
-        description: '+2 auf Proben mit Beweglichkeit',
-        active: true,
-      });
-    }
-    if (name === 'bärenstärke' && usesAttr('STA')) {
-      const hasEnh = isSpellEnhanced(cs, ['5 punkte', '+k4v4', 'auf 5', 'erhöht sich auf 5']);
-      const bonus = hasEnh ? 5 : 4;
-      result.push({
-        id: `spell-bonus-${cs.id}-baerenstaerke`,
-        source: 'Bärenstärke',
-        bonus,
-        description: `+${bonus} auf Proben mit Stärke${hasEnh ? ' (verstärkt)' : ''}`,
-        active: true,
-      });
-    }
-    if (name === 'eulengespür' && usesAttr('INT')) {
-      result.push({
-        id: `spell-bonus-${cs.id}-eulengespuer`,
-        source: 'Eulengespür',
-        bonus: 3,
-        description: '+3 auf Proben mit Intuition',
-        active: true,
-      });
-    }
-    if (name === 'inneres leuchten' && usesAttr('AUS')) {
-      result.push({
-        id: `spell-bonus-${cs.id}-inneres-leuchten`,
-        source: 'Inneres Leuchten',
-        bonus: 4,
-        description: '+4 auf Proben mit Ausstrahlung',
-        active: true,
-      });
-    }
+    // 3. Attribute
+    if (name === 'katzenreflexe') attribut(cs, 'katzenreflexe', 'BEW', 'Beweglichkeit', 2, false);                                               // S. 234
+    if (name === 'bärenstärke') attribut(cs, 'baerenstaerke', 'STA', 'Stärke', v ? 5 : 4, v);                                                    // S. 224
+    if (name === 'eulengespür') attribut(cs, 'eulengespuer', 'INT', 'Intuition', v ? 4 : 3, v);                                                  // S. 227
+    if (name === 'inneres leuchten') attribut(cs, 'inneres-leuchten', 'AUS', 'Ausstrahlung', v ? 5 : 4, v);                                      // S. 233
 
-    // 4. Spezifische Fertigkeitsboni
-    if (name === 'sinne verstärken' && lowerSkill === 'wahrnehmung') {
-      result.push({
-        id: `spell-bonus-${cs.id}-sinne-verstaerken`,
-        source: 'Sinne verstärken',
-        bonus: 5,
-        description: '+5 auf Wahrnehmung',
-        active: true,
-      });
+    // 4. Einzelne Fertigkeiten
+    if (lowerSkill === 'wahrnehmung') {
+      if (name === 'sinne verstärken') neu(cs, 'sinne-verstaerken', v ? 7 : 5, `+${v ? 7 : 5} auf Wahrnehmung${v ? ' (verstärkt)' : ''}`);        // S. 245
+      if (name === 'sicht verbessern') neu(cs, 'sicht', v ? 5 : 3, `+${v ? 5 : 3} nur auf Proben, die die Sicht betreffen`, false);               // S. 244
+      if (name === 'gehör verbessern') neu(cs, 'gehoer', v ? 5 : 3, `+${v ? 5 : 3} nur auf Proben, die das Gehör betreffen`, false);              // S. 231
+      if (name === 'nebelsicht' && v) neu(cs, 'nebelsicht', 2, '+2 nur in nebliger Umgebung', false);                                            // S. 239
     }
-    if ((name === 'sicht verbessern' || name === 'gehör verbessern') && lowerSkill === 'wahrnehmung') {
-      result.push({
-        id: `spell-bonus-${cs.id}-${name}`,
-        source: cs.name,
-        bonus: 3,
-        description: '+3 auf Wahrnehmung',
-        active: true,
-      });
+    if (lowerSkill === 'heimlichkeit') {
+      if (name === 'aura der schatten' || name === 'schattenleib') neu(cs, 'schatten', 7, '+7 auf Heimlichkeit');                                // S. 223, 241
+      if (name === 'verhüllung') neu(cs, 'verhuellung', v ? 5 : 3, `+${v ? 5 : 3} auf Heimlichkeit${v ? ' (verstärkt)' : ''}`);                   // S. 249
     }
-    if (name === 'nebelsicht' && lowerSkill === 'wahrnehmung') {
-      const hasEnh = isSpellEnhanced(cs, ['2 punkte', '+k1v1', 'wahrnehmung']);
-      if (hasEnh) {
-        result.push({
-          id: `spell-bonus-${cs.id}-nebelsicht`,
-          source: 'Nebelsicht',
-          bonus: 2,
-          description: '+2 auf Wahrnehmung in nebliger Umgebung',
-          active: true,
-        });
-      }
-    }
-    if ((name === 'aura der schatten' || name === 'schattenleib') && lowerSkill === 'heimlichkeit') {
-      result.push({
-        id: `spell-bonus-${cs.id}-${name}`,
-        source: cs.name,
-        bonus: 7,
-        description: '+7 auf Heimlichkeit',
-        active: true,
-      });
-    }
-    if (name === 'verhüllung' && lowerSkill === 'heimlichkeit') {
-      result.push({
-        id: `spell-bonus-${cs.id}-verhuellung`,
-        source: 'Verhüllung',
-        bonus: 3,
-        description: '+3 auf Heimlichkeit',
-        active: true,
-      });
-    }
-    if (name === 'spinnenlauf' && (lowerSkill === 'klettern' || lowerSkill === 'akrobatik')) {
-      result.push({
-        id: `spell-bonus-${cs.id}-spinnenlauf`,
-        source: 'Spinnenlauf',
-        bonus: 4,
-        description: '+4 auf Klettern / Akrobatik',
-        active: true,
-      });
-    }
+    if (name === 'aura der entschlossenheit' && lowerSkill === 'entschlossenheit') neu(cs, 'entschlossenheit', 2, '+2 auf Entschlossenheit');    // S. 223
+    // Klettern gehört zu Athletik; Akrobatik nur gegen das Herabstürzen
+    if (name === 'spinnenlauf' && lowerSkill === 'athletik') neu(cs, 'spinnenlauf', v ? 6 : 4, `+${v ? 6 : 4} nur auf Proben zum Klettern`, false); // S. 245
+    if (name === 'spinnenlauf' && lowerSkill === 'akrobatik') neu(cs, 'spinnenlauf', v ? 6 : 4, `+${v ? 6 : 4} nur, um nicht von einer Wand zu stürzen`, false);
     if (name === 'zunge des diplomaten' && (lowerSkill === 'diplomatie' || lowerSkill === 'redegewandtheit')) {
-      const hasEnh = isSpellEnhanced(cs, ['2 punkte', '+k1v1', 'auf 2', 'erhöht sich auf 2']);
-      const bonus = hasEnh ? 2 : 1;
-      result.push({
-        id: `spell-bonus-${cs.id}-zunge-diplomat`,
-        source: 'Zunge des Diplomaten',
-        bonus,
-        description: `+${bonus} auf Diplomatie / Redegewandtheit${hasEnh ? ' (verstärkt)' : ''}`,
-        active: true,
-      });
+      neu(cs, 'zunge-diplomat', v ? 2 : 1, `+${v ? 2 : 1} auf Diplomatie und Redegewandtheit${v ? ' (verstärkt)' : ''}`);                         // S. 253
     }
-    if (name === 'weg durch die natur' && (lowerSkill === 'überleben' || lowerSkill === 'naturkunde')) {
-      result.push({
-        id: `spell-bonus-${cs.id}-weg-natur`,
-        source: 'Weg durch die Natur',
-        bonus: 3,
-        description: '+3 auf Überleben & Naturkunde beim Reisen',
-        active: true,
-      });
-    }
-    if (name === 'freund der tiere' && lowerSkill === 'tierführung') {
-      result.push({
-        id: `spell-bonus-${cs.id}-freund-tiere`,
-        source: 'Freund der Tiere',
-        bonus: 1,
-        description: '+1 auf Tierführung',
-        active: true,
-      });
-    }
+    if (name === 'weg durch die natur' && lowerSkill === 'überleben') neu(cs, 'weg-natur', 3, '+3 nur auf Proben mit Bezug auf das Reisen', false); // S. 251
+    if (name === 'freund der tiere' && lowerSkill === 'tierführung') neu(cs, 'freund-tiere', 1, '+1 auf Tierführung');                           // S. 230
   }
 
   return result;
 }
 
+/**
+ * Summe der gewählten Zauberboni einer Probe, begrenzt auf den Höchstbonus aus Zauberei (GRW S. 18–19: „Der maximale
+ * Bonus, den eine Probe oder ein Abgeleiteter Wert erhalten kann, beträgt zu Spielbeginn 3 Punkte aus jeder der beiden
+ * Quellen Ausrüstung und Zauberei“).
+ */
+export function begrenzeZauberbonus(summe: number, hoechstbonus: number): number {
+  return Math.min(summe, Math.max(0, hoechstbonus));
+}
+
+/** Waffenloser Angriff (Kennung „waffenlos“ oder die Ausrüstungs-ID der GRW-Liste) */
+export function istWaffenlos(weaponId?: string, weaponName?: string): boolean {
+  return (weaponId ?? '').toLowerCase().endsWith('waffenlos') || (weaponName ?? '').trim().toLowerCase() === 'waffenlos';
+}
+
+/** Trifft ein Waffenzauber diese Waffe? Mit gespeichertem Ziel nur genau diese Waffe; ohne Ziel (ältere Einträge) jede. */
+function zielTrifft(cs: import('../types').ChanneledSpell, weaponId?: string, weaponName?: string): boolean {
+  if (cs.targetItemId) return cs.targetItemId === weaponId;
+  if (cs.targetItemName) return !!weaponName && cs.targetItemName.toLowerCase() === weaponName.toLowerCase();
+  return true;
+}
+
 export interface SpellWeaponDamageBonus {
   fireDamage: number;
   lightDamage: number;
+  /** übriger Zusatzschaden (Geschoss verzaubern, Krallen, Schockgriff) */
+  otherDamage: number;
+  /** Summe aller Zusatzschäden */
+  totalDamage: number;
   bonusText: string;
 }
 
 /**
- * Ermittelt zusätzlichen Waffenschaden durch aktive kanalisierte Zauber (z. B. Flammende Waffe +1).
- * Wenn eine weaponId übergeben wird, werden Zauber nur eingerechnet, wenn sie diese Waffe verzaubern.
- * Waffenloser Kampf (waffenlos) kann niemals mit Waffenverzauberungen belegt werden (GRW S. 229).
+ * Zusatzschaden aus aktiven Zaubern für einen Angriff, geprüft gegen die Zauberbeschreibungen im Regelpaket.
+ * - Waffenzauber (Typus Waffe) wirken nur auf die verzauberte Waffe. Für waffenlose Angriffe sind die Zauber des Typus
+ *   Hand da (Flammenhand, Schockgriff) sowie Krallen; Waffenzauber auf waffenlose Angriffe lässt der Editor nicht zu
+ *   (Auslegung: „Eine Waffe wird …“, keine eigene Regelstelle).
+ * - Flammende Waffe, Waffe des Lichtes und Geschoss verzaubern sind untereinander nicht kombinierbar (Typen Schaden und
+ *   Waffe) – es zählt der höchste Zusatzschaden.
  */
 export function getSpellWeaponDamageBonus(
   channeledSpells: import('../types').ChanneledSpell[] = [],
-  weaponId?: string
+  weaponId?: string,
+  weaponName?: string
 ): SpellWeaponDamageBonus {
-  if (weaponId === 'waffenlos') {
-    return {
-      fireDamage: 0,
-      lightDamage: 0,
-      bonusText: '',
-    };
-  }
-
-  let fireDamage = 0;
-  let lightDamage = 0;
+  const waffenlos = istWaffenlos(weaponId, weaponName);
+  let fireDamage = 0, lightDamage = 0, otherDamage = 0;
   const parts: string[] = [];
+  type Waffenschaden = { art: 'fire' | 'light' | 'other'; dmg: number; text: string };
+  let waffe = null as Waffenschaden | null;
 
   for (const cs of channeledSpells) {
-    // If weaponId is provided: check if this weapon is targeted
-    const isTargeted = !weaponId || (cs.targetItemId ? cs.targetItemId === weaponId : true);
-    if (!isTargeted) continue;
-
     const name = (cs.name || '').trim().toLowerCase();
-    if (name === 'flammende waffe') {
-      // GRW S. 229: Grundwert +1 Feuerschaden. Bei 2 EG (+K1V1): Die Klinge richtet 2 Punkte Feuerschaden an.
-      const isEnhanced = isSpellEnhanced(cs, ['2 punkte', '2 punkte feuerschaden', '+k1v1', 'richtet 2 punkte']);
-      const dmg = isEnhanced ? 2 : 1;
-      fireDamage += dmg;
-      parts.push(`+${dmg} Feuerschaden (Flammende Waffe${isEnhanced ? ' verstärkt' : ''})`);
-    } else if (name === 'waffe des lichtes') {
-      // GRW S. 250: Grundwert +1 Lichtschaden. Bei 1 EG (+K2V2): Zusatzschaden erhöht sich auf 2 Punkte Lichtschaden.
-      const isEnhanced = isSpellEnhanced(cs, ['2 punkte', '2 punkte lichtschaden', '+k2v2', 'erhöht sich auf 2']);
-      const dmg = isEnhanced ? 2 : 1;
-      lightDamage += dmg;
-      parts.push(`+${dmg} Lichtschaden (Waffe des Lichtes${isEnhanced ? ' verstärkt' : ''})`);
-    } else if (name === 'flammenhand') {
-      // GRW S. 229: Bei 1 EG (+K1V1): Schaden erhöht sich um 2 Punkte echten Feuerschaden.
-      const isEnhanced = isSpellEnhanced(cs, ['2 punkte', 'echten feuerschaden', '+k1v1', 'schaden erhöht sich um 2']);
-      if (isEnhanced) {
-        fireDamage += 2;
-        parts.push('+2 echter Feuerschaden (Flammenhand verstärkt)');
-      }
-    } else if (name === 'krallen') {
-      const hasEnh = isSpellEnhanced(cs, ['zusätzlich um 1', '+k1v1', '+1', 'schaden erhöht sich']);
-      if (hasEnh) {
-        parts.push('+1 Schaden (Krallen verstärkt)');
-      }
-    } else if (name === 'schockgriff') {
-      const hasEnh = isSpellEnhanced(cs, ['2 punkte', '+k1v1', 'elektritzitätsschaden', 'elektrizitätsschaden']);
-      if (hasEnh) {
-        parts.push('+2 echter Elektrizitätsschaden (Schockgriff verstärkt)');
-      }
+    const v = isSpellEnhanced(cs);
+    if (waffenlos) {
+      if (name === 'flammenhand' && v) { fireDamage += 2; parts.push('+2 echter Feuerschaden (Flammenhand verstärkt)'); }                        // S. 229
+      else if (name === 'schockgriff' && v) { otherDamage += 2; parts.push('+2 echter Elektrizitätsschaden (Schockgriff verstärkt)'); }          // S. 243
+      else if (name === 'krallen' && v) { otherDamage += 1; parts.push('+1 Schaden (Krallen verstärkt)'); }                                      // S. 234
+      continue;
     }
+    if (!zielTrifft(cs, weaponId, weaponName)) continue;
+    let k = null as Waffenschaden | null;
+    if (name === 'flammende waffe') k = { art: 'fire', dmg: v ? 2 : 1, text: `Feuerschaden (Flammende Waffe${v ? ' verstärkt' : ''})` };           // S. 229
+    else if (name === 'waffe des lichtes') k = { art: 'light', dmg: v ? 2 : 1, text: `Lichtschaden (Waffe des Lichtes${v ? ' verstärkt' : ''})` }; // S. 250
+    else if (name === 'geschoss verzaubern') k = { art: 'other', dmg: v ? 3 : 2, text: `Schaden (Geschoss verzaubern${v ? ' verstärkt' : ''})` };  // S. 232
+    if (k && (!waffe || k.dmg > waffe.dmg)) waffe = k;
+  }
+  if (waffe) {
+    if (waffe.art === 'fire') fireDamage += waffe.dmg; else if (waffe.art === 'light') lightDamage += waffe.dmg; else otherDamage += waffe.dmg;
+    parts.push(`+${waffe.dmg} ${waffe.text}`);
   }
 
-  return {
-    fireDamage,
-    lightDamage,
-    bonusText: parts.join(', '),
-  };
-}
-
-export interface EquipmentSpellTargetCheck {
-  isEquipmentSpell: boolean;
-  equipmentType: 'weapon' | 'armor' | 'item' | null;
-  targetCategory: string;
-  constraintNote?: string;
+  return { fireDamage, lightDamage, otherDamage, totalDamage: fireDamage + lightDamage + otherDamage, bonusText: parts.join(', ') };
 }
 
 export interface EquipmentSpellTargetCheck {
@@ -1342,8 +1018,15 @@ export interface EquipmentSpellTargetCheck {
  * (z. B. Flammende Waffe auf Waffen; Rüstung schwächen auf Rüstung; Gegenstand verbessern auf Gegenstand).
  */
 export function isEquipmentTargetingSpell(
-  spellOrName: string | { name?: string; target?: string; description?: string }
+  spellOrName: string | { name?: string; target?: string; description?: string; range?: string }
 ): EquipmentSpellTargetCheck {
+  const KEIN_ZIEL: EquipmentSpellTargetCheck = { isEquipmentSpell: false, targetsEquipment: false, equipmentType: null, targetCategory: '', allowsUnarmed: true };
+  const reichweite = typeof spellOrName === 'object' ? (spellOrName.range || '').trim().toLowerCase() : '';
+  const nameVorab = (typeof spellOrName === 'string' ? spellOrName : spellOrName.name || '').trim().toLowerCase();
+  // Reichweite „Zauberer“: der Zauber wirkt auf den Zauberer selbst (Magische Rüstung, Magischer Panzer, Steinhaut,
+  // Geisterdolch …), nicht auf ein Ausrüstungsstück. Rüstung schwächen trifft die Rüstung eines Gegners.
+  if (reichweite === 'zauberer' || ['magische rüstung', 'magischer panzer', 'rüstung schwächen'].includes(nameVorab)) return KEIN_ZIEL;
+
   const name = typeof spellOrName === 'string'
     ? spellOrName.trim().toLowerCase()
     : (spellOrName.name || '').trim().toLowerCase();
@@ -1368,16 +1051,12 @@ export function isEquipmentTargetingSpell(
       equipmentType: 'weapon',
       targetCategory: 'Waffe',
       allowsUnarmed: false,
-      constraintNote: 'Nur hergestellte Waffen im Inventar. Waffenloser Kampf kann nicht verzaubert werden (GRW S. 229).',
+      constraintNote: 'Nur Waffen aus dem Inventar. Für waffenlose Angriffe gibt es eigene Zauber (z. B. Flammenhand, Schockgriff, Krallen).',
     };
   }
 
   // Spells targeting armors / shields
-  const isArmorSpell =
-    name === 'rüstung schwächen' ||
-    name === 'magische rüstung' ||
-    name === 'magischer panzer' ||
-    (target.includes('rüstung') && !target.includes('haut'));
+  const isArmorSpell = target.includes('rüstung') && !target.includes('haut');
 
   if (isArmorSpell) {
     return {
@@ -1469,97 +1148,50 @@ export function getWeaponEnchantments(
   weapon: { id?: string; name: string; damage?: string },
   channeledSpells: import('../types').ChanneledSpell[] = []
 ): WeaponEnchantmentInfo {
-  // Waffenloser Kampf (waffenlos) kann keine Waffenverzauberungen empfangen
-  if (weapon.id === 'waffenlos' || weapon.name.toLowerCase() === 'waffenlos') {
-    return {
-      hasEnchantment: false,
-      fireDamage: 0,
-      lightDamage: 0,
-      atBonus: 0,
-      spells: [],
-      extraDamageText: '',
-      damageFormulaDisplay: weapon.damage || '1W6',
-      damageRollFormula: weapon.damage || '1W6',
-      buttonDamageLabel: `${weapon.damage || '1W6'} Schaden`,
-    };
-  }
-
-  let fireDamage = 0;
-  let lightDamage = 0;
-  let atBonus = 0;
+  const baseDamage = weapon.damage || '1W6';
+  const schaden = getSpellWeaponDamageBonus(channeledSpells, weapon.id, weapon.name);
   const spells: WeaponEnchantmentInfo['spells'] = [];
+  let atBonus = 0;
 
-  for (const cs of channeledSpells) {
-    const name = (cs.name || '').trim().toLowerCase();
-
-    // Zielabgleich:
-    // Wenn targetItemId gesetzt ist: muss mit weapon.id übereinstimmen
-    // Wenn targetItemId NICHT gesetzt ist, aber targetItemName vorhanden: Namensabgleich
-    // Wenn beides fehlt: generische Wirkung auf hergestellte Waffen
-    const isTargeted = cs.targetItemId
-      ? cs.targetItemId === weapon.id
-      : cs.targetItemName
-      ? cs.targetItemName.toLowerCase() === weapon.name.toLowerCase()
-      : true;
-
-    if (!isTargeted) continue;
-
-    if (name === 'flammende waffe') {
-      const isEnhanced = isSpellEnhanced(cs, ['2 punkte', '2 punkte feuerschaden', '+k1v1', 'richtet 2 punkte']);
-      const dmg = isEnhanced ? 2 : 1;
-      fireDamage += dmg;
-      spells.push({
-        name: 'Flammende Waffe',
-        description: `+${dmg} Feuerschaden`,
-        badgeText: `+${dmg} Feuer`,
-        badgeVariant: 'fire',
-      });
-    } else if (name === 'waffe des lichtes') {
-      const isEnhanced = isSpellEnhanced(cs, ['2 punkte', '2 punkte lichtschaden', '+k2v2', 'erhöht sich auf 2']);
-      const dmg = isEnhanced ? 2 : 1;
-      lightDamage += dmg;
-      atBonus += 2;
-      spells.push({
-        name: 'Waffe des Lichtes',
-        description: `+${dmg} Lichtschaden (+2 AT gg. Untote/Geister/Schatten)`,
-        badgeText: `+${dmg} Licht`,
-        badgeVariant: 'light',
-      });
-    } else if (name === 'beflügelte waffe') {
-      const isEnhanced = isSpellEnhanced(cs, ['3 punkte', '+3', 'um 3 punkte', '+k1v1']);
-      const bonus = isEnhanced ? 3 : 2;
-      atBonus += bonus;
-      spells.push({
-        name: 'Beflügelte Waffe',
-        description: `+${bonus} AT Nahkampf`,
-        badgeText: `+${bonus} AT`,
-        badgeVariant: 'magic',
-      });
+  if (!istWaffenlos(weapon.id, weapon.name)) {
+    for (const cs of channeledSpells) {
+      if (!zielTrifft(cs, weapon.id, weapon.name)) continue;
+      const name = (cs.name || '').trim().toLowerCase();
+      const v = isSpellEnhanced(cs);
+      if (name === 'flammende waffe' && schaden.fireDamage > 0) {
+        spells.push({ name: 'Flammende Waffe', description: `+${schaden.fireDamage} Feuerschaden`, badgeText: `+${schaden.fireDamage} Feuer`, badgeVariant: 'fire' });
+      } else if (name === 'waffe des lichtes') {
+        // Der Angriffsbonus +2 gilt nur gegen Untote, Geisterwesen und Schattenwesen und steht deshalb nicht im AT-Wert
+        spells.push({
+          name: 'Waffe des Lichtes',
+          description: `${schaden.lightDamage > 0 ? `+${schaden.lightDamage} Lichtschaden, ` : ''}+2 AT nur gegen Untote, Geisterwesen, Schattenwesen`,
+          badgeText: schaden.lightDamage > 0 ? `+${schaden.lightDamage} Licht` : 'Licht',
+          badgeVariant: 'light',
+        });
+      } else if (name === 'beflügelte waffe') {
+        const bonus = v ? 3 : 2;
+        atBonus += bonus;
+        spells.push({ name: 'Beflügelte Waffe', description: `+${bonus} auf Angriffe`, badgeText: `+${bonus} AT`, badgeVariant: 'magic' });
+      }
     }
   }
 
-  const hasEnchantment = spells.length > 0;
-  const totalExtraDamage = fireDamage + lightDamage;
   const extraDamageParts: string[] = [];
-  if (fireDamage > 0) extraDamageParts.push(`+${fireDamage} Feuer`);
-  if (lightDamage > 0) extraDamageParts.push(`+${lightDamage} Licht`);
+  if (schaden.fireDamage > 0) extraDamageParts.push(`+${schaden.fireDamage} Feuer`);
+  if (schaden.lightDamage > 0) extraDamageParts.push(`+${schaden.lightDamage} Licht`);
+  if (schaden.otherDamage > 0) extraDamageParts.push(`+${schaden.otherDamage} Zauber`);
   const extraDamageText = extraDamageParts.join(', ');
 
-  const baseDamage = weapon.damage || '1W6';
-  const damageFormulaDisplay = extraDamageText ? `${baseDamage} (${extraDamageText})` : baseDamage;
-  const damageRollFormula = combineDamageFormula(baseDamage, totalExtraDamage);
-  const buttonDamageLabel = extraDamageText ? `${baseDamage} (${extraDamageText}) Schaden` : `${baseDamage} Schaden`;
-
   return {
-    hasEnchantment,
-    fireDamage,
-    lightDamage,
+    hasEnchantment: spells.length > 0 || schaden.totalDamage > 0,
+    fireDamage: schaden.fireDamage,
+    lightDamage: schaden.lightDamage,
     atBonus,
     spells,
     extraDamageText,
-    damageFormulaDisplay,
-    damageRollFormula,
-    buttonDamageLabel,
+    damageFormulaDisplay: extraDamageText ? `${baseDamage} (${extraDamageText})` : baseDamage,
+    damageRollFormula: combineDamageFormula(baseDamage, schaden.totalDamage),
+    buttonDamageLabel: extraDamageText ? `${baseDamage} (${extraDamageText}) Schaden` : `${baseDamage} Schaden`,
   };
 }
 

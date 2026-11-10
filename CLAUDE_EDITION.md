@@ -256,7 +256,10 @@ anwenden) oder Werte der Begleiter im Kampf.
 - Offen: Vertraute aus „Die Magie“, Baukasten für beschwörbare Wesen (Magie S. 193–196) und für Bestien (Bestienmeister),
   Begleiter im Kampf-Tab, Boni aus Abrichtungen im Wertekasten, fehlende Bestiarium-Werte auf der Datenseite.
 
-## Stand 6 (08.11.2026): Regelkonforme Zaubermodifikationen, Ausrüstungsverzauberung & Würfellogik
+## Stand 15 (08.–10.11.2026, Google AI Studio): Zaubermodifikationen, Ausrüstungsverzauberung, Schadens- und Heildialog
+
+> Von Gemini in AI Studio erstellt (Commit 3124029), dort als „Stand 6“ eingetragen. Geprüft und korrigiert in Stand 16 –
+> wo die Angaben unten davon abweichen, gilt Stand 16.
 
 - **Spezifische Zauber-Verstärkungen & Fokuskosten (`utils/magicRules.ts`):**
   - Parse-Logik für komplexe Fokuskosten-Deltas (`+K1V1`, `+K2V2`, `+1V1`, `+3V3`) aus Spruchbeschreibungen (`parseEnhancementFocusDelta`).
@@ -279,6 +282,55 @@ anwenden) oder Werte der Begleiter im Kampf.
   - Zusammenführung von Grundschaden und statischen Boni zu validen Standard-Würfelformeln (`1W6+1` + `2` $\rightarrow$ `1W6+3`, statt `1W6+1+2`).
   - Robuster Dice-Parser in `handleRollDiceFormula`, der auch mehrteilige Modifikatoren problemlos auflöst.
 - **Tests:** 43 Unit-Tests in `src/__tests__/magicRules.test.ts` sichern Fokuskosten, Verstärkungen, Ausrüstungsbindung und Formelkombinierung ab.
+
+## Stand 16 (10.11.2026): Prüfung des AI-Studio-Stands gegen das Grundregelwerk
+
+Geprüft wurde Commit 3124029 (Stand 15) vollständig: Regeln gegen die Texte im GRW-Regelpaket, Typprüfung, Tests, Build.
+
+**In Ordnung:** Schwierigkeit aller 419 Zaubereinträge in `data/spells.ts` (stimmt mit dem GRW überein, sonst nichts an den
+Zauberdaten geändert); Heilwerte von Selbstheilung, Leichte Heilung, Heilung, Wiederherstellung; Splitterpunkt senkt Schaden
+um 5 (S. 81); Lebenskraft stärken/Aura der Lebenskraft mit zusätzlichen Lebenspunkten und automatischem Ende; Wundabzüge nur
+aus echtem Schaden; Würfelformeln zusammenfassen. Die Funktionen aus Stand 9–13 sind erhalten.
+
+**Behoben – Abstürze**
+- Proben- und Angriffsdialog hingen in einer Endlosschleife, wenn keine Zauberliste übergeben wurde (`channeledSpells = []`
+  als Vorgabe erzeugt je Rendern ein neues Array, der Effekt setzt daraufhin wieder den Zustand). Dadurch lief auch die
+  Testsuite nicht mehr durch.
+- `ChanneledSpellsTracker`: `useMemo` stand hinter einer frühen Rückgabe → Absturz, sobald der erste Zauber aktiv wird.
+
+**Behoben – Regeln**
+- Verstärkungskosten: „+K1V1“ wurde als +2 Fokus gerechnet. Die Zahl hinter V ist Teil der genannten Punkte (GRW S. 221–222:
+  „1 Punkt verzehrter Fokus … Kosten -(K)1V1“). Flammende Waffe verstärkt kostet K5V2, nicht K6V2.
+- Höchstbonus aus Zauberei fehlte (GRW S. 18–19: 3 Punkte je Quelle, +1 je Heldengrad). Zauberboni auf Proben und auf
+  VTD/GW/KW/GSW werden jetzt begrenzt; die Schadensreduktion ist kein abgeleiteter Wert und bleibt unbegrenzt.
+- Nicht kombinierbare Zauber wurden addiert (Typus Haut; Rüstung und Schutzfeld; Schaden und Waffe) – jetzt zählt der stärkste.
+- Werte: Schutz vor Elementen 10 (nicht 8); Widerstände erhöhen, Segnung, Hohe Segnung auch auf VTD (Widerstandswerte =
+  VTD, GW, KW, S. 15); Magieschutz ist ein Malus auf gegnerische Zauber, kein Bonus auf GW/KW; fehlende Verstärkungen
+  ergänzt (Rindenhaut, Stahlhaut, Beschleunigen, Schmerzen widerstehen/ignorieren, Eulengespür, Inneres Leuchten, Sinne
+  verstärken, Sicht/Gehör verbessern, Verhüllung, Spinnenlauf, Segnung, Hohe Segnung); Aura der Entschlossenheit +2
+  Entschlossenheit; Spinnenlauf gilt für Athletik (Klettern), nicht für eine Fertigkeit „Klettern“; Weg durch die Natur
+  nur Überleben.
+- Boni, die nur in einer Lage gelten, sind nicht mehr vorausgewählt (Sicht/Gehör verbessern, Nebelsicht, Spinnenlauf, Weg
+  durch die Natur, Waffe des Lichtes +2 nur gegen Untote/Geisterwesen/Schattenwesen – stand vorher fest im AT-Wert).
+  Bärenstärke & Co. bei Angriffen ebenso: die Attribute hängen von der Waffe ab, die der Editor nicht kennt.
+- Waffenzauber: trafen im Angriffsdialog auch waffenlose Angriffe (dort fehlte die Waffen-ID); Flammenhand, Schockgriff und
+  Krallen wirkten auf Waffen statt waffenlos.
+- Magische Rüstung/Magischer Panzer verlangten eine Rüstung aus dem Inventar – sie wirken auf den Zauberer (Reichweite
+  „Zauberer“); Rüstung schwächen trifft einen Gegner.
+- Erfolgsgrade (schon im Ausgangsstand falsch): Wirkungsbereich kostet 3 EG je Stufe (nicht 1); verzehrter Fokus ist ganz
+  einsparbar, solange 1 erschöpfter oder kanalisierter Punkt bleibt (S. 221–222).
+- Seitenangaben korrigiert: Heilkunde S. 119–120, Heilung S. 173–174, Schaden S. 172–173, Zustände S. 168–169 (statt
+  S. 162–167, 202–205, 238); Zauberseiten nach dem Regelpaket. „Erste Hilfe (EG LP)“ ist keine GRW-Mechanik – im
+  Heildialog sind die Methoden nur Beschriftungen, die Menge wird von Hand eingetragen.
+- Die Aussage „Waffenloser Kampf kann nicht verzaubert werden (GRW S. 229)“ ist eine Auslegung, keine Regelstelle; der
+  Editor behält sie bei (für waffenlose Angriffe gibt es Flammenhand, Schockgriff, Krallen).
+
+**Technik:** Die Zauberwerte stehen jetzt in einer Tabelle (`ZAUBER_KAMPFWERTE` in `utils/magicRules.ts`), die ein Test gegen
+die Zaubertexte des Regelpakets prüft (`src/__tests__/zauberwirkungenGrw.test.tsx`). 314 Tests grün, Build läuft.
+
+**Offen:** Die Tabellen gelten nur für GRW-Zauber (Namen fest im Code); Zauber aus Buchpaketen wirken nicht automatisch.
+Wiederherstellung entfernt eine feste Liste von Zuständen statt „Zustände, die Folge von Angriffen sind“. Unbenutzte
+Dateien aus AI Studio im Repository: `public/assets/aistudio/*.png`, `.aistudio/`, leere `src/data/splittermond_grw.sqlite`.
 
 ## Google AI Studio
 

@@ -51,7 +51,7 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
   // Splitterpunkt: Schaden um 5 Punkte reduzieren (GRW S. 81)
   const [useSplitter, setUseSplitter] = useState<boolean>(false);
 
-  // Zustände durch Schaden (GRW S. 164-165, S. 202-205)
+  // Zustände durch Schaden (GRW S. 168–169)
   const [activeConditions, setActiveConditions] = useState<Record<string, { active: boolean; level: number }>>({
     Blutend: { active: false, level: 1 },
     Brennend: { active: false, level: 1 },
@@ -220,7 +220,7 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
                 Schaden erleiden
               </h3>
               <p className="text-[11px] text-[#C5A059] leading-tight">
-                Grundregelwerk (GRW S. 162–165 &amp; S. 81)
+                Grundregelwerk (GRW S. 172–173 &amp; S. 81)
               </p>
             </div>
           </div>
@@ -293,10 +293,10 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
             </div>
           </div>
 
-          {/* 2. Schadenstyp (GRW S. 162–163) */}
+          {/* 2. Schadenstyp (GRW S. 172–173) */}
           <div className="bg-[#182333] border border-[#2b3a50] rounded-lg p-3 sm:p-3.5 space-y-2">
             <label className="block text-xs font-bold text-[#C5A059] uppercase tracking-wider">
-              2. Schadenstyp (GRW S. 162–163)
+              2. Schadenstyp (GRW S. 172–173)
             </label>
             <div className="grid grid-cols-3 gap-2">
               {/* Echter Schaden */}
@@ -352,7 +352,7 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
             </div>
           </div>
 
-          {/* 3. Schadensreduktion (SR / Panzerung) (GRW S. 162) */}
+          {/* 3. Schadensreduktion (SR / Panzerung) */}
           <div className="bg-[#182333] border border-[#2b3a50] rounded-lg p-3 sm:p-3.5 space-y-2">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-[#C5A059] uppercase tracking-wider flex items-center gap-1.5 cursor-pointer">
@@ -446,10 +446,10 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
             </div>
           )}
 
-          {/* 6. Zustände hinzufügen (GRW S. 164–165, S. 202–205) */}
+          {/* 6. Zustände hinzufügen (GRW S. 168–169) */}
           <div className="bg-[#182333] border border-[#2b3a50] rounded-lg p-3 sm:p-3.5 space-y-2.5">
             <label className="block text-xs font-bold text-[#C5A059] uppercase tracking-wider">
-              5. Zustände durch den Treffer (GRW S. 164–165, S. 202–205)
+              5. Zustände durch den Treffer (GRW S. 168–169)
             </label>
 
             {/* Quick condition toggles */}
@@ -562,7 +562,7 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
             )}
           </div>
 
-          {/* 7. Wundstufen-Vorschau (GRW S. 163) */}
+          {/* 7. Wundstufen-Vorschau (GRW S. 172) */}
           <div className="bg-[#111824] border border-[#2c3d54] rounded-lg p-3 space-y-1.5">
             <div className="flex items-center justify-between text-xs">
               <span className="text-stone-400 font-semibold">Wundstufen-Vorschau:</span>

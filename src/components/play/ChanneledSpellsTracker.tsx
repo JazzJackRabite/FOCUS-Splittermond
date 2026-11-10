@@ -31,6 +31,8 @@ export const ChanneledSpellsTracker: React.FC<ChanneledSpellsTrackerProps> = ({
   isCombatDashboard = false,
 }) => {
   const [expandedSpellId, setExpandedSpellId] = useState<string | null>(null);
+  // Hooks müssen vor jeder frühen Rückgabe stehen (sonst Absturz, sobald der erste Zauber aktiv wird oder der letzte endet)
+  const activeMods = useMemo(() => getActiveSpellModifiers(channeledSpells), [channeledSpells]);
 
   if (channeledSpells.length === 0) {
     if (!isCombatDashboard) return null;
@@ -48,7 +50,6 @@ export const ChanneledSpellsTracker: React.FC<ChanneledSpellsTrackerProps> = ({
   }
 
   const totalChanneledFO = channeledSpells.reduce((sum, s) => sum + s.channeledFocus, 0);
-  const activeMods = useMemo(() => getActiveSpellModifiers(channeledSpells), [channeledSpells]);
 
   return (
     <div

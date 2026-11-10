@@ -43,7 +43,7 @@ export const HealModal: React.FC<HealModalProps> = ({
   );
   const totalDamageCount = consumedCount + exhaustedCount + channeledCount;
 
-  // Selected healing method (GRW S. 165-167)
+  // Selected healing method (GRW S. 119–120, 173–174)
   const [method, setMethod] = useState<HealMethodType>('manual');
 
   // Amount to heal
@@ -63,7 +63,7 @@ export const HealModal: React.FC<HealModalProps> = ({
     setMethod(selected);
     const newConditionsToRemove = new Set(conditionsToRemove);
 
-    // Auto-select "Blutend" removal if Erste Hilfe or Wundversorgung is selected (GRW S. 165)
+    // Auto-select "Blutend" removal if Erste Hilfe or Wundversorgung is selected (GRW S. 119–120)
     if (selected === 'erste_hilfe' || selected === 'wundversorgung') {
       activeConditions.forEach((c) => {
         if (c.key === 'Blutend') {
@@ -131,7 +131,7 @@ export const HealModal: React.FC<HealModalProps> = ({
     };
   }, [healAmount, priority, consumedCount, exhaustedCount, channeledCount]);
 
-  // Wound preview simulation (GRW S. 163)
+  // Wound preview simulation (GRW S. 172)
   const woundPreview = useMemo(() => {
     const HEALTH_LEVEL_NAMES = ['Unverletzt', 'Angeschlagen', 'Verletzt', 'Schwer verletzt', 'Todgeweiht'];
     const WOUND_PENALTIES = [0, -1, -2, -4, -8];
@@ -169,9 +169,9 @@ export const HealModal: React.FC<HealModalProps> = ({
 
     const methodNameMap: Record<HealMethodType, string> = {
       manual: 'Heilung',
-      erste_hilfe: 'Erste Hilfe (GRW S. 165)',
-      wundversorgung: 'Wundversorgung (GRW S. 165-166)',
-      heilmagie: 'Heilmagie (GRW S. 238)',
+      erste_hilfe: 'Erste Hilfe (Heilkunde, GRW S. 119–120)',
+      wundversorgung: 'Wundversorgung (Heilkunde, GRW S. 119–120)',
+      heilmagie: 'Heilmagie',
       heiltrank: 'Heiltrank / Elixier',
       verschnaufpause: 'Verschnaufpause / Rast',
     };
@@ -203,7 +203,7 @@ export const HealModal: React.FC<HealModalProps> = ({
                 Heilung anwenden
               </h3>
               <p className="text-[11px] text-emerald-400 leading-tight">
-                Grundregelwerk (GRW S. 165–167: Erste Hilfe, Wundversorgung &amp; Heilmagie)
+                Grundregelwerk (GRW S. 119–120 Heilkunde, S. 173–174 Heilung)
               </p>
             </div>
           </div>
@@ -240,10 +240,10 @@ export const HealModal: React.FC<HealModalProps> = ({
             </div>
           </div>
 
-          {/* 1. Heilmethode (GRW S. 165-167) */}
+          {/* 1. Heilmethode (GRW S. 119–120, 173–174) */}
           <div className="bg-[#182333] border border-[#2b3a50] rounded-lg p-3 sm:p-3.5 space-y-2">
             <label className="block text-xs font-bold text-emerald-400 uppercase tracking-wider">
-              1. Heilmethode / Kontext (GRW S. 165–167)
+              1. Heilmethode / Kontext (GRW S. 119–120, 173–174)
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
               <button
@@ -272,7 +272,7 @@ export const HealModal: React.FC<HealModalProps> = ({
                   <span>Erste Hilfe</span>
                   <Activity size={12} className="text-emerald-400" />
                 </div>
-                <div className="text-[10px] text-stone-400 leading-tight">GRW S. 165 (EG LP)</div>
+                <div className="text-[10px] text-stone-400 leading-tight">Heilkunde, GRW S. 119–120</div>
               </button>
 
               <button
@@ -288,7 +288,7 @@ export const HealModal: React.FC<HealModalProps> = ({
                   <span>Wundversorgung</span>
                   <Plus size={12} className="text-emerald-400" />
                 </div>
-                <div className="text-[10px] text-stone-400 leading-tight">GRW S. 165–166</div>
+                <div className="text-[10px] text-stone-400 leading-tight">Heilkunde, GRW S. 119–120</div>
               </button>
 
               <button
@@ -517,11 +517,11 @@ export const HealModal: React.FC<HealModalProps> = ({
             </div>
           </div>
 
-          {/* 4. Zustände lindern / entfernen (GRW S. 164–165) */}
+          {/* 4. Zustände lindern / entfernen (GRW S. 168–169) */}
           <div className="bg-[#182333] border border-[#2b3a50] rounded-lg p-3 sm:p-3.5 space-y-2">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-emerald-400 uppercase tracking-wider">
-                4. Zustände beenden (GRW S. 164–165)
+                4. Zustände beenden (GRW S. 168–169)
               </label>
               <span className="text-[11px] text-stone-400">
                 {activeConditions.length} aktiv
@@ -573,7 +573,7 @@ export const HealModal: React.FC<HealModalProps> = ({
             )}
           </div>
 
-          {/* 5. Wundstufen-Vorschau (GRW S. 163) */}
+          {/* 5. Wundstufen-Vorschau (GRW S. 172) */}
           <div className="bg-[#111824] border border-[#2c3d54] rounded-lg p-3 space-y-1.5">
             <div className="flex items-center justify-between text-xs">
               <span className="text-stone-400 font-semibold">Wundstufen-Verbesserung:</span>

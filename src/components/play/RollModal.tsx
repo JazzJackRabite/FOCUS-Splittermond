@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useContext } from 'react';
 import { X, Sparkles, RotateCw, Zap, Check } from 'lucide-react';
 import DiceIcon from '../ui/DiceIcon';
 import type { RollEntry } from './DiceLog';
@@ -9,7 +9,8 @@ import {
   isSkillAffectedByBehinderung,
   type ActiveRollModifier,
 } from '../../utils/conditionModifiers';
-import { getActiveSpellRollBonuses, type ActiveSpellRollBonus } from '../../utils/magicRules';
+import { begrenzeZauberbonus, getActiveSpellRollBonuses, zauberHoechstbonus } from '../../utils/magicRules';
+import { CharacterContext } from '../../context/CharacterContext';
 import { SituativeBoni, useSituativeBoni } from './SituativeBoni';
 
 // ---------------------------------------------------------------
@@ -19,6 +20,10 @@ import { SituativeBoni, useSituativeBoni } from './SituativeBoni';
 type RollType = 'standard' | 'safe' | 'risk';
 
 import { wuerfeln, type WurfErgebnis as RollResult } from '../../utils/wuerfeln';
+
+/** Stabile leere Liste: ein `= []` als Vorgabe erzeugt bei jedem Rendern ein neues Array und löst über den Effekt unten eine Endlosschleife aus. */
+const KEINE_ZAUBER: ChanneledSpell[] = [];
+
 export { wuerfeln };
 
 // ---------------------------------------------------------------
@@ -144,7 +149,7 @@ export const RollModal: React.FC<RollModalProps> = ({
   woundPenalty = 0,
   healthLevelName = 'Unverletzt',
   conditions = [],
-  channeledSpells = [],
+  channeledSpells = KEINE_ZAUBER,
   activeModifiers,
   behinderung = 0,
   splitterPoints = 0,
@@ -181,11 +186,11 @@ export const RollModal: React.FC<RollModalProps> = ({
   }, [channeledSpells, skillName]);
 
   const [activeSpellBonusIds, setActiveSpellBonusIds] = useState<Set<string>>(() => {
-    return new Set(spellBonuses.map((b) => b.id));
+    return new Set(spellBonuses.filter((b) => b.active).map((b) => b.id));
   });
 
   useEffect(() => {
-    setActiveSpellBonusIds(new Set(spellBonuses.map((b) => b.id)));
+    setActiveSpellBonusIds(new Set(spellBonuses.filter((b) => b.active).map((b) => b.id)));
   }, [spellBonuses]);
 
   const toggleSpellBonus = (id: string) => {
@@ -197,11 +202,14 @@ export const RollModal: React.FC<RollModalProps> = ({
     });
   };
 
-  const spellBonusTotal = useMemo(() => {
+  // Höchstbonus aus Zauberei (GRW S. 18–19): 3 zu Spielbeginn, +1 je Heldengrad
+  const hoechstbonusZauber = zauberHoechstbonus(useContext(CharacterContext)?.calc);
+  const spellBonusRoh = useMemo(() => {
     return spellBonuses
       .filter((b) => activeSpellBonusIds.has(b.id))
       .reduce((sum, b) => sum + b.bonus, 0);
   }, [spellBonuses, activeSpellBonusIds]);
+  const spellBonusTotal = begrenzeZauberbonus(spellBonusRoh, hoechstbonusZauber);
 
   const [extraModifier, setExtraModifier] = useState(0);
   const [extraModifierStr, setExtraModifierStr] = useState('0');
@@ -406,10 +414,12 @@ export const RollModal: React.FC<RollModalProps> = ({
               </span>
               <span className="text-xs font-bold font-mono px-2 py-0.5 rounded-md border bg-emerald-800 text-white border-emerald-900">
                 Bonus: +{spellBonusTotal}
+                {spellBonusRoh > spellBonusTotal && ` (von +${spellBonusRoh})`}
               </span>
             </div>
             <p className="text-xs text-emerald-950/80 mb-2 leading-relaxed">
-              Automatisch aus aktiven Zaubern aktiviert. Zum Abwählen anklicken:
+              Aus aktiven Zaubern. Anklicken zum Ab- oder Zuwählen; durchgestrichene gelten nur in bestimmten Lagen.
+              {spellBonusRoh > spellBonusTotal && ` Zauberboni sind auf den Höchstbonus +${hoechstbonusZauber} begrenzt (GRW S. 18).`}
             </p>
             <div className="flex flex-wrap gap-1.5">
               {spellBonuses.map((b) => {

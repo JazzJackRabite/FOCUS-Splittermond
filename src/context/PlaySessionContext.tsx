@@ -429,15 +429,14 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
 
     // Splittermond GRW: Automatische Gutschrift temporärer Lebenspunkte bei Lebenskraft stärken & Aura der Lebenskraft
     if (spellNameClean === 'lebenskraft stärken') {
-      const hasExtra = (castResult.modificationsSummary || []).some(
-        (m) => m.toLowerCase().includes('8 zusätzliche') || m.toLowerCase().includes('+k2v2') || m.toLowerCase().includes('8')
-      );
+      // Die Verstärkung (1 EG, Kosten +K2V2) gibt insgesamt 8 statt 6 zusätzliche Lebenspunkte (GRW S. 235)
+      const hasExtra = (castResult.modificationsSummary || []).some((m) => m.toLowerCase().startsWith('verstärkung:'));
       const tempAmount = hasExtra ? 8 : 6;
       dispatch({ type: 'PLAY_ADD_TEMP_HP', payload: { amount: tempAmount } });
-      toast.success(`💚 +${tempAmount} temporäre LP erhalten (GRW S. 244)!`);
+      toast.success(`💚 +${tempAmount} temporäre LP erhalten (GRW S. 235)!`);
     } else if (spellNameClean === 'aura der lebenskraft') {
       dispatch({ type: 'PLAY_ADD_TEMP_HP', payload: { amount: 10 } });
-      toast.success(`💚 +10 temporäre LP erhalten (GRW S. 241)!`);
+      toast.success(`💚 +10 temporäre LP erhalten (GRW S. 223)!`);
     }
 
     // Direkte Selbstheilung oder Zustandsbehebung
