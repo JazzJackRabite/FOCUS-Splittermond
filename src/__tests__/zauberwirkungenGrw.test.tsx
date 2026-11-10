@@ -5,10 +5,13 @@
 import React from 'react';
 import fs from 'node:fs';
 import path from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { Katalog } from '../regelwerk/katalog';
+import { setzeAktivenKatalog } from '../regelwerk/bruecke';
+import { basisAusDateien } from '../regelwerk/__tests__/hilfen';
+import { spielwerteDesZaubers } from '../regelwerk/zauberwerte';
 import { render } from '@testing-library/react';
 import {
-  ZAUBER_KAMPFWERTE,
   INITIAL_EG_ALLOCATIONS,
   begrenzeZauberbonus,
   calculateFinalSpellCosts,
@@ -22,27 +25,34 @@ import {
 import { ChanneledSpellsTracker } from '../components/play/ChanneledSpellsTracker';
 import type { ChanneledSpell } from '../types';
 
-const paket = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../public/regelpakete/grw.srp.json'), 'utf8'));
-const ZAUBER: Record<string, { wirkung: string; erfolgsgrade: string }> = {};
-for (const e of paket.eintraege) if (e.typ === 'zauber') ZAUBER[e.name.toLowerCase()] = { wirkung: e.daten.wirkung ?? '', erfolgsgrade: e.daten.erfolgsgrade ?? '' };
+const basis = basisAusDateien();
+const K = new Katalog(basis.manifest, [basis.basis]);
+beforeAll(() => setzeAktivenKatalog(K, false));
+afterAll(() => setzeAktivenKatalog(null, false));
 
 const zauber = (name: string, verstaerkt = false, extra: Partial<ChanneledSpell> = {}): ChanneledSpell =>
   ({ id: `cs-${name}`, name, channeledFocus: 4, ...(verstaerkt ? { selectedEnhancementIds: ['enh-1'] } : {}), ...extra }) as ChanneledSpell;
 
-describe('Tabelle der Kampfwerte stimmt mit den Zaubertexten des GRW überein', () => {
-  it('jeder Zauber existiert, Grundwerte stehen in der Wirkung, verstärkte Werte in den Erfolgsgraden', () => {
-    for (const [name, e] of Object.entries(ZAUBER_KAMPFWERTE)) {
-      const z = ZAUBER[name];
-      expect(z, `Zauber „${name}“ fehlt im GRW`).toBeTruthy();
-      for (const [feld, wert] of Object.entries(e.basis)) {
-        if (wert >= 999) { expect(z.wirkung, name).toMatch(/ignoriert/); continue; }
-        expect(z.wirkung, `${name}: Grundwert ${feld} ${wert}`).toMatch(new RegExp(`(?<!\\d)${wert}(?!\\d) Punkt`));
-      }
-      const geaendert = Object.entries(e.v ?? {}).filter(([feld, wert]) => (e.basis as Record<string, number>)[feld] !== wert);
-      for (const [feld, wert] of geaendert) {
-        expect(z.erfolgsgrade, `${name}: verstärkter Wert ${feld} ${wert}`).toMatch(new RegExp(`(?<!\\d)${wert}(?!\\d) Punkt`));
-      }
-    }
+describe('Zauberwerte kommen aus dem Regelpaket (daten.spielwerte), nicht aus dem Code', () => {
+  it('GRW-Paket: Grundwert, verstärkter Wert, Typus und „nicht kombinierbar“', () => {
+    const stein = spielwerteDesZaubers(K, 'Steinhaut')!;
+    expect(stein.werte).toEqual([{ bezug: 'VTD', wert: 2 }, { bezug: 'SR', wert: 2, verstaerkt: 3 }]);
+    expect(stein.nichtKombinierbar).toEqual(['Haut']);
+    expect(spielwerteDesZaubers(K, 'Flammende Waffe')!.werte[0]).toMatchObject({ bezug: 'zusatzschaden', wert: 1, verstaerkt: 2, ziel: 'waffe' });
+    expect(spielwerteDesZaubers(K, 'Heilung')!.werte).toEqual([{ bezug: 'heilung_lp', wert: 16, verstaerkt: 24 }]);
+  });
+  it('ohne Regelpaket gibt es keine Zauberwirkungen (kein Rückfall auf eine Tabelle im Code)', () => {
+    expect(getActiveSpellModifiers([zauber('Steinhaut')], undefined, null).vtdBonus).toBe(0);
+  });
+  it('ein Zauber aus einem Buchpaket wirkt genauso (Beispielpaket mit erfundenem Zauber)', () => {
+    const buch = { info: { id: 'test', datei: 't.json', eintraege: 1, abhaengigkeiten: ['grw'] }, erwarteteEintraege: 1, paket: { paket: { id: 'test', titel: 'Test' }, eintraege: [{
+      id: 'test:zauber:probehaut', typ: 'zauber', name: 'Probehaut', aktion: 'neu', quelle: { buch: 'Test' },
+      daten: { typus: ['Haut'], spielwerte: { werte: [{ bezug: 'VTD', wert: 3 }, { bezug: 'SR', wert: 1, verstaerkt: 2 }], nicht_kombinierbar: ['Haut'] } },
+    }] } } as never;
+    const mitBuch = new Katalog(basis.manifest, [basis.basis, buch]);
+    const m = getActiveSpellModifiers([zauber('Probehaut', true), zauber('Rindenhaut')], undefined, mitBuch);
+    expect([m.vtdBonus, m.srBonus]).toEqual([3, 2]);
+    expect(m.hinweise[0]).toContain('Rindenhaut zählt nicht');
   });
 });
 
@@ -83,7 +93,7 @@ describe('Zauberwerte nach GRW', () => {
   it('Magieschutz ist ein Malus auf gegnerische Zauber, kein Bonus auf GW/KW; Schutz vor Elementen senkt um 10', () => {
     const m = getActiveSpellModifiers([zauber('Großer Magieschutz'), zauber('Schutz vor Elementen')]);
     expect([m.gwBonus, m.kwBonus]).toEqual([0, 0]);
-    expect(m.breakdown.map((b) => b.description).join(' | ')).toContain('um 10 gesenkt');
+    expect(m.breakdown.map((b) => b.description).join(' | ')).toContain('−10');
   });
   it('Spinnenlauf gilt für Klettern (Athletik), Weg durch die Natur nur für Überleben – beide nur in der passenden Lage', () => {
     const s = getActiveSpellRollBonuses([zauber('Spinnenlauf')], 'Athletik');

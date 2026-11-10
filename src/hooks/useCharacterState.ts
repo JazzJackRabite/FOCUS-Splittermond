@@ -19,6 +19,8 @@ import { STRENGTHS_DATA } from '../data/strengths';
 import { generateId } from '../utils/id';
 import { getSkillXpCost, getAttrXpCost } from '../utils/costCalculations';
 import { referenceCharacterResources } from '../utils/gameResourceManager';
+import { aktiverKatalog } from '../regelwerk/bruecke';
+import { spielwerteDesZaubers } from '../regelwerk/zauberwerte';
 
 function createLogEntry(
   category: AdvancementLogEntry['category'],
@@ -679,9 +681,10 @@ export function baseCharacterReducer(
         if (nextTempHPUsed >= nextTempHP) {
           nextTempHP = 0;
           nextTempHPUsed = 0;
-          // Splittermond GRW S. 235: Lebenskraft stärken endet automatisch, wenn alle Temp-LP aufgebraucht sind
+          // Zauber, die laut Regelpaket enden, sobald ihre zusätzlichen Lebenspunkte aufgebraucht sind (z. B. Lebenskraft stärken)
+          const katalog = aktiverKatalog();
           const autoEndIndex = currentChanneledSpells.findIndex(
-            (s) => s.name.trim().toLowerCase() === 'lebenskraft stärken'
+            (s) => !!spielwerteDesZaubers(katalog, s.name)?.werte.some((x) => x.bezug === 'zusatz_lp' && x.endet_wenn_verbraucht)
           );
           if (autoEndIndex !== -1) {
             const endedSpell = currentChanneledSpells[autoEndIndex];

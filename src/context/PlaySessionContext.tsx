@@ -8,6 +8,8 @@ import type {
   StatusCondition,
 } from '../types';
 import { useCharacter } from './CharacterContext';
+import { aktiverKatalog } from '../regelwerk/bruecke';
+import { lpWirkung } from '../regelwerk/zauberwerte';
 import { grossmeisterAb } from '../regelwerk/bruecke';
 import { generateId } from '../utils/id';
 import { SKILL_CATEGORIES, SKILL_DATA, ALL_CONDITIONS } from '../data/rules';
@@ -438,18 +440,14 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
     );
 
     const spellName = castResult.spell.name;
-    const spellNameClean = spellName.trim().toLowerCase();
 
-    // Splittermond GRW: Automatische Gutschrift temporärer Lebenspunkte bei Lebenskraft stärken & Aura der Lebenskraft
-    if (spellNameClean === 'lebenskraft stärken') {
-      // Die Verstärkung (1 EG, Kosten +K2V2) gibt insgesamt 8 statt 6 zusätzliche Lebenspunkte (GRW S. 235)
-      const hasExtra = (castResult.modificationsSummary || []).some((m) => m.toLowerCase().startsWith('verstärkung:'));
-      const tempAmount = hasExtra ? 8 : 6;
-      dispatch({ type: 'PLAY_ADD_TEMP_HP', payload: { amount: tempAmount } });
-      toast.success(`💚 +${tempAmount} temporäre LP erhalten (GRW S. 235)!`);
-    } else if (spellNameClean === 'aura der lebenskraft') {
-      dispatch({ type: 'PLAY_ADD_TEMP_HP', payload: { amount: 10 } });
-      toast.success(`💚 +10 temporäre LP erhalten (GRW S. 223)!`);
+    // Zusätzliche Lebenspunkte (z. B. Lebenskraft stärken, Aura der Lebenskraft): Wert aus den Regelpaketen, mit der
+    // gewählten Verstärkung der verstärkte Wert
+    const mitVerstaerkung = (castResult.modificationsSummary || []).some((m) => m.toLowerCase().startsWith('verstärkung:'));
+    const zusatzLp = lpWirkung(aktiverKatalog(), spellName, 'zusatz_lp', mitVerstaerkung);
+    if (zusatzLp && typeof zusatzLp.lp === 'number' && zusatzLp.lp > 0) {
+      dispatch({ type: 'PLAY_ADD_TEMP_HP', payload: { amount: zusatzLp.lp } });
+      toast.success(`💚 +${zusatzLp.lp} temporäre LP erhalten (${spellName})!`);
     }
 
     // Direkte Selbstheilung oder Zustandsbehebung
@@ -552,8 +550,7 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
     );
 
     // Wenn Lebenskraft stärken oder Aura der Lebenskraft abgebrochen wird, verfallen verbleibende Temp-LP
-    const sName = (spell.name || '').trim().toLowerCase();
-    if (sName === 'lebenskraft stärken' || sName === 'aura der lebenskraft') {
+    if (lpWirkung(aktiverKatalog(), spell.name || '', 'zusatz_lp', false)) {
       dispatch({ type: 'PLAY_REMOVE_TEMP_HP', payload: { amount: 999 } });
       toast(`Temporäre Lebenspunkte aus '${spell.name}' sind verfallen.`);
     }

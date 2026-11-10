@@ -13,7 +13,7 @@
    "pdf_datei": "Splittermond_GRW_dritte-erratierte-Neuauflage-1.pdf",
    "pdf_sha256": "f824ffc4850360d07e1633bdc27cc922dd2ae498320187e7e9e3def3a5dd6cc3",
    "datenbank_datei": "GRW_2026-10-27_mit-Fertigkeiten-und-Mondzeichen.sqlite",
-   "datenbank_sha256": "d533986cd493844e34f0c58eebc92e5c2d1c35b3034856cbd8e1952a2b6a7fee"
+   "datenbank_sha256": "22ccae7deaf39d7cce62a4833f97d9ef90ada82a20d49b56af3ef38a8fc0c131"
   },
   "seitenangaben": "buch_seiten = gedruckte Seitenzahl im Buch; pdf_seiten = Seite in der PDF-Datei"
  },
@@ -32066,7 +32066,22 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 1,
+       "bezug": "GW"
+      },
+      {
+       "wert": 2,
+       "bezug": "fertigkeit",
+       "fertigkeiten": [
+        "grw:fertigkeit:entschlossenheit"
+       ]
+      }
+     ]
+    }
    }
   },
   {
@@ -32213,7 +32228,20 @@
      ]
     },
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "spielwerte": {
+     "werte": [
+      {
+       "bezug": "zusatz_lp",
+       "wert": 10
+      }
+     ],
+     "nicht_kombinierbar": [
+      "Körper stärken",
+      "Leben"
+     ],
+     "quelle": "tabelle"
+    }
    }
   },
   {
@@ -32301,7 +32329,18 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 7,
+       "bezug": "fertigkeit",
+       "fertigkeiten": [
+        "grw:fertigkeit:heimlichkeit"
+       ]
+      }
+     ]
+    }
    }
   },
   {
@@ -32371,7 +32410,16 @@
      ]
     },
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "spielwerte": {
+     "werte": [
+      {
+       "bezug": "wundabzug",
+       "wert": "alle"
+      }
+     ],
+     "quelle": "tabelle"
+    }
    }
   },
   {
@@ -32594,7 +32642,28 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 2,
+       "bezug": "GW"
+      },
+      {
+       "wert": 2,
+       "bezug": "KW"
+      },
+      {
+       "wert": 2,
+       "bezug": "VTD"
+      },
+      {
+       "wert": 2,
+       "bezug": "angriff"
+      }
+     ],
+     "quelle": "tabelle"
+    }
    }
   },
   {
@@ -32687,7 +32756,19 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 2,
+       "lage": true,
+       "bezug": "fertigkeit",
+       "fertigkeiten": [
+        "grw:fertigkeit:zaehigkeit"
+       ]
+      }
+     ]
+    }
    }
   },
   {
@@ -32772,7 +32853,17 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 4,
+       "bezug": "attribut",
+       "attribut": "Stärke",
+       "verstaerkt": 5
+      }
+     ]
+    }
    }
   },
   {
@@ -32856,7 +32947,17 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 2,
+       "bezug": "angriff",
+       "ziel": "waffe",
+       "verstaerkt": 3
+      }
+     ]
+    }
    }
   },
   {
@@ -33011,7 +33112,16 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 2,
+       "bezug": "GSW",
+       "verstaerkt": 4
+      }
+     ]
+    }
    }
   },
   {
@@ -33954,7 +34064,16 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 5,
+       "bezug": "SR"
+      }
+     ],
+     "quelle": "tabelle"
+    }
    }
   },
   {
@@ -34248,7 +34367,15 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 2,
+       "bezug": "VTD"
+      }
+     ]
+    }
    }
   },
   {
@@ -35168,7 +35295,17 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 2,
+       "lage": true,
+       "bezug": "GW",
+       "verstaerkt": 3
+      }
+     ]
+    }
    }
   },
   {
@@ -35253,7 +35390,17 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 3,
+       "bezug": "attribut",
+       "attribut": "Intuition",
+       "verstaerkt": 4
+      }
+     ]
+    }
    }
   },
   {
@@ -36221,7 +36368,22 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 1,
+       "bezug": "zusatzschaden",
+       "ziel": "waffe",
+       "schadensart": "Feuerschaden",
+       "verstaerkt": 2
+      }
+     ],
+     "nicht_kombinierbar": [
+      "Schaden",
+      "Waffe"
+     ]
+    }
    }
   },
   {
@@ -36293,7 +36455,22 @@
      ]
     },
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "spielwerte": {
+     "werte": [
+      {
+       "bezug": "zusatzschaden",
+       "wert": 0,
+       "verstaerkt": 2,
+       "ziel": "waffenlos",
+       "schadensart": "Feuerschaden"
+      }
+     ],
+     "nicht_kombinierbar": [
+      "Hand"
+     ],
+     "quelle": "tabelle"
+    }
    }
   },
   {
@@ -37007,7 +37184,18 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 1,
+       "bezug": "fertigkeit",
+       "fertigkeiten": [
+        "grw:fertigkeit:tierfuehrung"
+       ]
+      }
+     ]
+    }
    }
   },
   {
@@ -37760,7 +37948,20 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 3,
+       "lage": true,
+       "bezug": "fertigkeit",
+       "fertigkeiten": [
+        "grw:fertigkeit:wahrnehmung"
+       ],
+       "verstaerkt": 5
+      }
+     ]
+    }
    }
   },
   {
@@ -38326,7 +38527,21 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 2,
+       "bezug": "zusatzschaden",
+       "ziel": "waffe",
+       "verstaerkt": 3
+      }
+     ],
+     "nicht_kombinierbar": [
+      "Schaden",
+      "Waffe"
+     ]
+    }
    }
   },
   {
@@ -38488,7 +38703,20 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 2,
+       "lage": true,
+       "bezug": "fertigkeit",
+       "fertigkeiten": [
+        "grw:fertigkeit:heilkunde",
+        "grw:fertigkeit:heilungsmagie"
+       ]
+      }
+     ]
+    }
    }
   },
   {
@@ -39249,7 +39477,17 @@
      ]
     },
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "spielwerte": {
+     "werte": [
+      {
+       "bezug": "heilung_lp",
+       "wert": 16,
+       "verstaerkt": 24
+      }
+     ],
+     "quelle": "tabelle"
+    }
    }
   },
   {
@@ -39414,7 +39652,32 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "bezug": "alle_fertigkeiten",
+       "wert": 2,
+       "verstaerkt": 3
+      },
+      {
+       "bezug": "VTD",
+       "wert": 2,
+       "verstaerkt": 3
+      },
+      {
+       "bezug": "GW",
+       "wert": 2,
+       "verstaerkt": 3
+      },
+      {
+       "bezug": "KW",
+       "wert": 2,
+       "verstaerkt": 3
+      }
+     ],
+     "quelle": "tabelle"
+    }
    }
   },
   {
@@ -39495,7 +39758,17 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 4,
+       "bezug": "attribut",
+       "attribut": "Ausstrahlung",
+       "verstaerkt": 5
+      }
+     ]
+    }
    }
   },
   {
@@ -39826,7 +40099,16 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 2,
+       "bezug": "attribut",
+       "attribut": "Beweglichkeit"
+      }
+     ]
+    }
    }
   },
   {
@@ -40345,7 +40627,18 @@
      ]
     },
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "spielwerte": {
+     "werte": [
+      {
+       "bezug": "zusatzschaden",
+       "wert": 0,
+       "verstaerkt": 1,
+       "ziel": "waffenlos"
+      }
+     ],
+     "quelle": "tabelle"
+    }
    }
   },
   {
@@ -40881,7 +41174,22 @@
      ]
     },
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "spielwerte": {
+     "werte": [
+      {
+       "bezug": "zusatz_lp",
+       "wert": 6,
+       "verstaerkt": 8,
+       "endet_wenn_verbraucht": true
+      }
+     ],
+     "nicht_kombinierbar": [
+      "Körper stärken",
+      "Leben"
+     ],
+     "quelle": "tabelle"
+    }
    }
   },
   {
@@ -41090,7 +41398,16 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 4,
+       "bezug": "SR"
+      }
+     ],
+     "quelle": "tabelle"
+    }
    }
   },
   {
@@ -41156,7 +41473,17 @@
      ]
     },
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "spielwerte": {
+     "werte": [
+      {
+       "bezug": "heilung_lp",
+       "wert": 6,
+       "verstaerkt": 10
+      }
+     ],
+     "quelle": "tabelle"
+    }
    }
   },
   {
@@ -41868,7 +42195,19 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 2,
+       "bezug": "fertigkeit",
+       "fertigkeiten": [
+        "grw:fertigkeit:darbietung"
+       ],
+       "verstaerkt": 3
+      }
+     ]
+    }
    }
   },
   {
@@ -42121,7 +42460,19 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 1,
+       "bezug": "fertigkeit",
+       "fertigkeiten": [
+        "grw:fertigkeit:arkane-kunde"
+       ],
+       "verstaerkt": 2
+      }
+     ]
+    }
    }
   },
   {
@@ -42547,7 +42898,20 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 2,
+       "bezug": "VTD",
+       "verstaerkt": 3
+      }
+     ],
+     "nicht_kombinierbar": [
+      "Rüstung",
+      "Schutzfeld"
+     ]
+    }
    }
   },
   {
@@ -42709,7 +43073,20 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 4,
+       "bezug": "VTD",
+       "verstaerkt": 5
+      }
+     ],
+     "nicht_kombinierbar": [
+      "Rüstung",
+      "Schutzfeld"
+     ]
+    }
    }
   },
   {
@@ -43749,7 +44126,21 @@
      ]
     },
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "spielwerte": {
+     "werte": [
+      {
+       "bezug": "fertigkeit",
+       "wert": 0,
+       "verstaerkt": 2,
+       "fertigkeiten": [
+        "grw:fertigkeit:wahrnehmung"
+       ],
+       "lage": true
+      }
+     ],
+     "quelle": "tabelle"
+    }
    }
   },
   {
@@ -44447,7 +44838,23 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 1,
+       "bezug": "VTD"
+      },
+      {
+       "wert": 1,
+       "bezug": "SR",
+       "verstaerkt": 2
+      }
+     ],
+     "nicht_kombinierbar": [
+      "Haut"
+     ]
+    }
    }
   },
   {
@@ -45129,7 +45536,23 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 4,
+       "bezug": "SR"
+      },
+      {
+       "wert": 7,
+       "bezug": "fertigkeit",
+       "fertigkeiten": [
+        "grw:fertigkeit:heimlichkeit"
+       ]
+      }
+     ],
+     "quelle": "tabelle"
+    }
    }
   },
   {
@@ -45658,7 +46081,18 @@
       "gegen_typus": "Lichtwesen"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 1,
+       "lage": true,
+       "bezug": "zusatzschaden",
+       "ziel": "waffe",
+       "schadensart": "Schattenschaden"
+      }
+     ]
+    }
    }
   },
   {
@@ -46072,7 +46506,16 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 6,
+       "bezug": "wundabzug",
+       "verstaerkt": 8
+      }
+     ]
+    }
    }
   },
   {
@@ -46156,7 +46599,16 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 3,
+       "bezug": "wundabzug",
+       "verstaerkt": 4
+      }
+     ]
+    }
    }
   },
   {
@@ -46229,7 +46681,22 @@
      ]
     },
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "spielwerte": {
+     "werte": [
+      {
+       "bezug": "zusatzschaden",
+       "wert": 0,
+       "verstaerkt": 2,
+       "ziel": "waffenlos",
+       "schadensart": "Elektrizitätsschaden"
+      }
+     ],
+     "nicht_kombinierbar": [
+      "Hand"
+     ],
+     "quelle": "tabelle"
+    }
    }
   },
   {
@@ -46458,7 +46925,26 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 1,
+       "bezug": "VTD",
+       "verstaerkt": 2
+      },
+      {
+       "wert": 1,
+       "bezug": "GW",
+       "verstaerkt": 2
+      },
+      {
+       "wert": 1,
+       "bezug": "KW",
+       "verstaerkt": 2
+      }
+     ]
+    }
    }
   },
   {
@@ -46943,7 +47429,17 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 3,
+       "lage": true,
+       "bezug": "KW",
+       "verstaerkt": 4
+      }
+     ]
+    }
    },
    "hinweise": [
     "Ungewöhnliches/fehlendes Satzschlusszeichen im Druck bestätigt: erfolgsgrade"
@@ -47461,7 +47957,19 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 3,
+       "bezug": "fertigkeit",
+       "fertigkeiten": [
+        "grw:fertigkeit:wahrnehmung"
+       ],
+       "verstaerkt": 5
+      }
+     ]
+    }
    }
   },
   {
@@ -47541,7 +48049,32 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "bezug": "alle_fertigkeiten",
+       "wert": 1,
+       "verstaerkt": 2
+      },
+      {
+       "bezug": "VTD",
+       "wert": 1,
+       "verstaerkt": 2
+      },
+      {
+       "bezug": "GW",
+       "wert": 1,
+       "verstaerkt": 2
+      },
+      {
+       "bezug": "KW",
+       "wert": 1,
+       "verstaerkt": 2
+      }
+     ],
+     "quelle": "tabelle"
+    }
    }
   },
   {
@@ -47607,7 +48140,17 @@
      ]
     },
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "spielwerte": {
+     "werte": [
+      {
+       "bezug": "heilung_lp",
+       "wert": 3,
+       "verstaerkt": 6
+      }
+     ],
+     "quelle": "tabelle"
+    }
    }
   },
   {
@@ -47702,7 +48245,20 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 3,
+       "lage": true,
+       "bezug": "fertigkeit",
+       "fertigkeiten": [
+        "grw:fertigkeit:wahrnehmung"
+       ],
+       "verstaerkt": 5
+      }
+     ]
+    }
    }
   },
   {
@@ -47792,7 +48348,19 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 5,
+       "bezug": "fertigkeit",
+       "fertigkeiten": [
+        "grw:fertigkeit:wahrnehmung"
+       ],
+       "verstaerkt": 7
+      }
+     ]
+    }
    }
   },
   {
@@ -47877,7 +48445,22 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "bezug": "fertigkeit",
+       "wert": 4,
+       "verstaerkt": 6,
+       "fertigkeiten": [
+        "grw:fertigkeit:athletik",
+        "grw:fertigkeit:akrobatik"
+       ],
+       "lage": true
+      }
+     ],
+     "quelle": "tabelle"
+    }
    }
   },
   {
@@ -48340,7 +48923,23 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 4,
+       "bezug": "VTD"
+      },
+      {
+       "wert": 4,
+       "bezug": "SR",
+       "verstaerkt": 5
+      }
+     ],
+     "nicht_kombinierbar": [
+      "Haut"
+     ]
+    }
    }
   },
   {
@@ -48435,7 +49034,26 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 1,
+       "lage": true,
+       "bezug": "VTD"
+      },
+      {
+       "wert": 1,
+       "lage": true,
+       "bezug": "GW"
+      },
+      {
+       "wert": 1,
+       "lage": true,
+       "bezug": "KW"
+      }
+     ]
+    }
    }
   },
   {
@@ -48574,7 +49192,13 @@
      ]
     },
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "spielwerte": {
+     "werte": [],
+     "nicht_kombinierbar": [
+      "Hand"
+     ]
+    }
    }
   },
   {
@@ -48677,7 +49301,23 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 2,
+       "bezug": "VTD"
+      },
+      {
+       "wert": 2,
+       "bezug": "SR",
+       "verstaerkt": 3
+      }
+     ],
+     "nicht_kombinierbar": [
+      "Haut"
+     ]
+    }
    }
   },
   {
@@ -50268,7 +50908,18 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 2,
+       "bezug": "fertigkeit",
+       "fertigkeiten": [
+        "grw:fertigkeit:heimlichkeit"
+       ]
+      }
+     ]
+    }
    }
   },
   {
@@ -51056,7 +51707,19 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 3,
+       "bezug": "fertigkeit",
+       "fertigkeiten": [
+        "grw:fertigkeit:heimlichkeit"
+       ],
+       "verstaerkt": 5
+      }
+     ]
+    }
    }
   },
   {
@@ -51815,7 +52478,29 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 1,
+       "bezug": "zusatzschaden",
+       "ziel": "waffe",
+       "schadensart": "Lichtschaden",
+       "verstaerkt": 2
+      },
+      {
+       "wert": 2,
+       "lage": true,
+       "bezug": "angriff",
+       "ziel": "waffe"
+      }
+     ],
+     "nicht_kombinierbar": [
+      "Schaden",
+      "Waffe"
+     ],
+     "quelle": "tabelle"
+    }
    }
   },
   {
@@ -52360,7 +53045,19 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 3,
+       "lage": true,
+       "bezug": "fertigkeit",
+       "fertigkeiten": [
+        "grw:fertigkeit:ueberleben"
+       ]
+      }
+     ]
+    }
    }
   },
   {
@@ -52603,7 +53300,26 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 2,
+       "bezug": "VTD",
+       "verstaerkt": 3
+      },
+      {
+       "wert": 2,
+       "bezug": "GW",
+       "verstaerkt": 3
+      },
+      {
+       "wert": 2,
+       "bezug": "KW",
+       "verstaerkt": 3
+      }
+     ]
+    }
    }
   },
   {
@@ -52669,7 +53385,16 @@
      ]
     },
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "spielwerte": {
+     "werte": [
+      {
+       "bezug": "heilung_lp",
+       "wert": "alle"
+      }
+     ],
+     "quelle": "tabelle"
+    }
    }
   },
   {
@@ -53565,7 +54290,20 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "spielwerte": {
+     "werte": [
+      {
+       "wert": 1,
+       "bezug": "fertigkeit",
+       "fertigkeiten": [
+        "grw:fertigkeit:diplomatie",
+        "grw:fertigkeit:redegewandtheit"
+       ],
+       "verstaerkt": 2
+      }
+     ]
+    }
    }
   },
   {

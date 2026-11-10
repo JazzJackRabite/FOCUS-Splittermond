@@ -325,8 +325,7 @@ aus echtem Schaden; Würfelformeln zusammenfassen. Die Funktionen aus Stand 9–
 - Die Aussage „Waffenloser Kampf kann nicht verzaubert werden (GRW S. 229)“ ist eine Auslegung, keine Regelstelle; der
   Editor behält sie bei (für waffenlose Angriffe gibt es Flammenhand, Schockgriff, Krallen).
 
-**Technik:** Die Zauberwerte stehen jetzt in einer Tabelle (`ZAUBER_KAMPFWERTE` in `utils/magicRules.ts`), die ein Test gegen
-die Zaubertexte des Regelpakets prüft (`src/__tests__/zauberwirkungenGrw.test.tsx`). 314 Tests grün, Build läuft.
+**Technik:** Die Zauberwerte standen in Stand 16 als geprüfte Tabelle im Code; seit Stand 17 kommen sie aus den Regelpaketen. 314 Tests grün, Build läuft.
 
 **Offen:** Die Tabellen gelten nur für GRW-Zauber (Namen fest im Code); Zauber aus Buchpaketen wirken nicht automatisch.
 Wiederherstellung entfernt eine feste Liste von Zuständen statt „Zustände, die Folge von Angriffen sind“. Unbenutzte
@@ -348,6 +347,24 @@ Dateien aus AI Studio im Repository: `public/assets/aistudio/*.png`, `.aistudio/
   – ohne Splitterpunkte, temporäre LP und Zustände des Helden). Fokus: erschöpfen/kanalisieren/verzehren, Kanalisierung beenden,
   Zauber ziehen Fokus automatisch ab. Verschnaufpause, Zurücksetzen. Kurzanzeige ♥/FO im Kopf jedes Begleiters. Feld `zustand`.
 - Tests: `begleiterSpiel.test.tsx` (7). 334 grün mit allen Büchern (bekannter Relikte-Test mit älteren Buchpaketen ausgenommen).
+## Stand 17 (10.11.2026): Zauberwerte aus den Regelpaketen statt aus dem Code
+
+- Die Tabellen nach Zaubernamen aus Stand 15/16 (`ZAUBER_KAMPFWERTE`, Probenboni, Zusatzschaden, Heilwerte, Liste der
+  Waffenzauber) sind entfernt. Was ein aktiver Zauber ändert, steht jetzt im Regelpaket am Zauber (`daten.spielwerte`:
+  Bezug, Wert, verstärkter Wert, Fertigkeiten, Attribut, Lage, Ziel, Schadensart; `nicht_kombinierbar` nach Typus) und gilt
+  damit auch für Zauber aus hochgeladenen Büchern.
+- Neu `src/regelwerk/zauberwerte.ts` (Kampfwerte, Probenboni, Waffenschaden, Heilung/zusätzliche Lebenspunkte aus dem
+  Katalog; Höchstbonus, „nicht kombinierbar“, Verstärkung). `utils/magicRules.ts` reicht nur noch durch. Ob ein Zauber ein
+  Ausrüstungsstück verzaubert, ergibt sich aus Typus und Reichweite; die Schadensformel einer Verstärkung aus ihrem Text.
+- Datenseite: `Werkzeuge/regelpakete/zauber_spielwerte.py` + `zauber_spielwerte.json` (nur IDs, Zahlen, Kennwörter);
+  89 Zauber mit Spielwerten (57 GRW, 32 aus Büchern). Die Prüfsuite prüft jede Zahl gegen den Zaubertext.
+  Neues GRW-Paket in `public/regelpakete`; Buchpakete neu hochladen.
+- Ohne geladenes Regelpaket haben Zauber keine automatische Wirkung (kein Rückfall auf eine Tabelle im Code).
+- Noch nach Zaubername im Code: Erfrischung und Giftbann heben einen Zustand auf (`calculateSpellHealing`).
+- Die Zauber aus den Büchern sind nur automatisch abgeleitet, nicht einzeln gesichtet; Werte, die nur in einer Lage gelten,
+  rechnet der Editor nicht fest ein.
+- Tests: `zauberwirkungenGrw.test.tsx` (u. a. ein erfundener Buchzauber wirkt wie ein GRW-Zauber). 316 Tests grün ohne
+  Bücher, 114 im Ordner `regelwerk` mit allen Büchern; Build läuft.
 
 ## Google AI Studio
 

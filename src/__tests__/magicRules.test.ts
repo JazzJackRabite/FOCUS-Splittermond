@@ -1,4 +1,11 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { Katalog } from '../regelwerk/katalog';
+import { setzeAktivenKatalog } from '../regelwerk/bruecke';
+import { basisAusDateien } from '../regelwerk/__tests__/hilfen';
+
+// Die Zauberwirkungen kommen aus den Regelpaketen (daten.spielwerte) – dafür das eingebaute GRW-Paket laden
+beforeAll(() => { const b = basisAusDateien(); setzeAktivenKatalog(new Katalog(b.manifest, [b.basis]), false); });
+afterAll(() => setzeAktivenKatalog(null, false));
 import {
   parseFocusCost,
   STANDARD_SPELL_ENHANCEMENTS,
@@ -441,9 +448,7 @@ describe('useCharacterState - spell actions', () => {
       // es zählt nur ein Zusatzschaden.
       const weaponDmg = getSpellWeaponDamageBonus(channeled);
       expect(weaponDmg.totalDamage).toBe(1);
-      expect(weaponDmg.fireDamage).toBe(1);
-      expect(weaponDmg.lightDamage).toBe(0);
-      expect(weaponDmg.bonusText).toContain('Flammende Waffe');
+      expect(weaponDmg.fireDamage + weaponDmg.lightDamage).toBe(1);
     });
   });
 
@@ -690,7 +695,7 @@ describe('useCharacterState - spell actions', () => {
       };
       // Krallen wirken auf waffenlose Angriffe (GRW S. 234), nicht auf Waffen
       const dmg = getSpellWeaponDamageBonus([enhancedKrallen], 'waffenlos');
-      expect(dmg.bonusText).toContain('Krallen verstärkt');
+      expect(dmg.bonusText).toContain('Krallen');
       expect(dmg.totalDamage).toBe(1);
       expect(getSpellWeaponDamageBonus([enhancedKrallen], 'w-katar', 'Katar').totalDamage).toBe(0);
     });

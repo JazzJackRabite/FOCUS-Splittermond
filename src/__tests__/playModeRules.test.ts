@@ -1,4 +1,11 @@
-import { describe, it, expect } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { Katalog } from '../regelwerk/katalog';
+import { setzeAktivenKatalog } from '../regelwerk/bruecke';
+import { basisAusDateien } from '../regelwerk/__tests__/hilfen';
+
+// Ob ein Zauber endet, wenn seine zusätzlichen Lebenspunkte aufgebraucht sind, steht im Regelpaket
+beforeAll(() => { const b = basisAusDateien(); setzeAktivenKatalog(new Katalog(b.manifest, [b.basis]), false); });
+afterAll(() => setzeAktivenKatalog(null, false));
 import { useCharacterState } from '../hooks/useCharacterState';
 import { renderHook, act } from '@testing-library/react';
 
@@ -275,7 +282,7 @@ describe('Play Mode Rules & Health/Focus Engine (Splittermond GRW)', () => {
     expect(result.current.state.playState.healthSlots.filter((s) => s.type === 'consumed')).toHaveLength(1);
   });
 
-  it('GRW S. 244: Lebenskraft stärken ends automatically and releases channeled focus when all tempHP are depleted', () => {
+  it('GRW S. 235: Lebenskraft stärken ends automatically and releases channeled focus when all tempHP are depleted', () => {
     const { result } = renderHook(() => useCharacterState());
     act(() => {
       result.current.dispatch({
