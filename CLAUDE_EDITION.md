@@ -347,6 +347,7 @@ Dateien aus AI Studio im Repository: `public/assets/aistudio/*.png`, `.aistudio/
   – ohne Splitterpunkte, temporäre LP und Zustände des Helden). Fokus: erschöpfen/kanalisieren/verzehren, Kanalisierung beenden,
   Zauber ziehen Fokus automatisch ab. Verschnaufpause, Zurücksetzen. Kurzanzeige ♥/FO im Kopf jedes Begleiters. Feld `zustand`.
 - Tests: `begleiterSpiel.test.tsx` (7). 334 grün mit allen Büchern (bekannter Relikte-Test mit älteren Buchpaketen ausgenommen).
+
 ## Stand 17 (10.11.2026): Zauberwerte aus den Regelpaketen statt aus dem Code
 
 - Die Tabellen nach Zaubernamen aus Stand 15/16 (`ZAUBER_KAMPFWERTE`, Probenboni, Zusatzschaden, Heilwerte, Liste der
@@ -363,8 +364,8 @@ Dateien aus AI Studio im Repository: `public/assets/aistudio/*.png`, `.aistudio/
 - Noch nach Zaubername im Code: Erfrischung und Giftbann heben einen Zustand auf (`calculateSpellHealing`).
 - Die Zauber aus den Büchern sind nur automatisch abgeleitet, nicht einzeln gesichtet; Werte, die nur in einer Lage gelten,
   rechnet der Editor nicht fest ein.
-- Tests: `zauberwirkungenGrw.test.tsx` (u. a. ein erfundener Buchzauber wirkt wie ein GRW-Zauber). 316 Tests grün ohne
-  Bücher, 114 im Ordner `regelwerk` mit allen Büchern; Build läuft.
+- Tests: `zauberwirkungenGrw.test.tsx` (u. a. ein erfundener Buchzauber wirkt wie ein GRW-Zauber). 323 Tests grün ohne
+  Bücher (zusammen mit Begleiter Teil 4), 114 im Ordner `regelwerk` mit allen Büchern vor dem Zusammenführen; Build läuft.
 
 ## Google AI Studio
 
