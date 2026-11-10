@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Sparkles,
   ZapOff,
@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import type { ChanneledSpell } from '../../types';
 import { SourceBadge } from '../ui/SourceBadge';
-import { getFullSpellInfo } from '../../utils/magicRules';
+import { getFullSpellInfo, getActiveSpellModifiers } from '../../utils/magicRules';
 
 interface ChanneledSpellsTrackerProps {
   channeledSpells: ChanneledSpell[];
@@ -31,6 +31,8 @@ export const ChanneledSpellsTracker: React.FC<ChanneledSpellsTrackerProps> = ({
   isCombatDashboard = false,
 }) => {
   const [expandedSpellId, setExpandedSpellId] = useState<string | null>(null);
+  // Hooks müssen vor jeder frühen Rückgabe stehen (sonst Absturz, sobald der erste Zauber aktiv wird oder der letzte endet)
+  const activeMods = useMemo(() => getActiveSpellModifiers(channeledSpells), [channeledSpells]);
 
   if (channeledSpells.length === 0) {
     if (!isCombatDashboard) return null;
@@ -79,6 +81,7 @@ export const ChanneledSpellsTracker: React.FC<ChanneledSpellsTrackerProps> = ({
           const isExpanded = expandedSpellId === spell.id;
           const currentRound = spell.activeRounds ?? 1;
           const currentTicks = spell.activeTicks ?? 0;
+          const buff = activeMods.breakdown.find((b) => b.spellName.toLowerCase() === (spell.name || '').toLowerCase());
           const spellInfo = getFullSpellInfo({
             name: spell.name,
             school: spell.school || '',
@@ -107,6 +110,17 @@ export const ChanneledSpellsTracker: React.FC<ChanneledSpellsTrackerProps> = ({
                       <span className="font-bold text-sm text-[#1B365D] block truncate">
                         {spell.name}
                       </span>
+                      {buff && (
+                        <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-1.5 py-0.5 rounded-md shadow-2xs">
+                          {buff.description}
+                        </span>
+                      )}
+                      {spell.targetItemName && (
+                        <span className="text-[11px] font-bold text-amber-900 bg-amber-100 border border-amber-300 px-1.5 py-0.5 rounded-md shadow-2xs flex items-center gap-1">
+                          <Tag size={10} className="text-amber-700" />
+                          <span>Ziel: {spell.targetItemName}</span>
+                        </span>
+                      )}
                       <SourceBadge
                         source={spellInfo.source || 'GRW'}
                         page={spellInfo.page}

@@ -11,7 +11,7 @@ import { validateCharacterImport } from '../../utils/importValidation';
 import { Katalog } from '../katalog';
 import { basisAusDateien } from './hilfen';
 import { setzeAktivenKatalog } from '../bruecke';
-import { betaeubungsimmun, fokusFrei, gesundheitsstufen, lebenslage } from '../vitals';
+import { betaeubungsimmun, fokusFrei, gesundheitsfelder, gesundheitsstufen, lebenslage, schadenEintragen } from '../vitals';
 import { wirfFormel } from '../../components/begleiter/BegleiterSpiel';
 import { fertigkeitenAusText } from '../../components/begleiter/Wertekasten';
 import { gefolgeWerte } from '../gefolge';
@@ -30,12 +30,18 @@ describe('Lebenspunkte und Fokus', () => {
     expect(betaeubungsimmun(K, ['Betäubungsimmunität'])).toBe(true);
     expect(betaeubungsimmun(K, ['Dunkelsicht'])).toBe(false);
   });
-  it('Wundabzug nur aus echtem Schaden; außer Gefecht bei allen LP', () => {
+  it('Wundabzug nur aus echtem Schaden; Stufe des letzten verlorenen LP (wie beim Abenteurer); außer Gefecht bei allen LP', () => {
     const st = gesundheitsstufen(K).stufen;
+    expect(lebenslage(5, st, { schaden: 5 })).toMatchObject({ stufenName: 'Unverletzt', wundabzug: 0 });
     expect(lebenslage(5, st, { schaden: 6 })).toMatchObject({ gesamt: 25, frei: 19, stufenName: 'Angeschlagen', wundabzug: -1 });
     expect(lebenslage(5, st, { betaeubung: 12 })).toMatchObject({ stufenName: 'Verletzt', wundabzug: 0 });
     expect(lebenslage(5, st, { schaden: 25 })).toMatchObject({ ausser: true, stufenName: 'Außer Gefecht', frei: 0 });
     expect(fokusFrei(10, { fokus: { erschoepft: 2, kanalisiert: 3, verzehrt: 1 } })).toBe(4);
+  });
+  it('Schaden eintragen: Überlauf von Betäubung wird echter Schaden; Felder für die Modale', () => {
+    expect(schadenEintragen(10, { schaden: 2 }, 'consumed', 20)).toEqual({ schaden: 10 });
+    expect(schadenEintragen(10, { schaden: 2, betaeubung: 6 }, 'exhausted', 4)).toEqual({ schaden: 4, betaeubung: 6, kanalisiert: 0 });
+    expect(gesundheitsfelder(5, { schaden: 1, betaeubung: 2, kanalisiert: 1 }).map(f => f.type)).toEqual(['consumed', 'exhausted', 'exhausted', 'channeled', 'empty']);
   });
   it('Würfelformeln und Fertigkeitstexte', () => {
     const r = wirfFormel('2W6−1')!;
@@ -74,12 +80,21 @@ describe('Tab „Begleiter“: würfeln und Lebenspunkte', () => {
     // Wolf ist Schwächlich: 3 Gesundheitsstufen (Unverletzt, Verletzt, Todgeweiht)
     expect(within(v).getByText(`LP ${lp * 3}/${lp * 3}`)).toBeTruthy();
     expect(within(v).getByText(/3 Stufen \(Schwächlich\)/)).toBeTruthy();
-    fireEvent.change(within(v).getByLabelText('Menge Lebenspunkte'), { target: { value: String(lp + 1) } });
-    fireEvent.click(within(v).getByRole('button', { name: 'Schaden' }));
+    // Schaden-Modal: lp + 1 echter Schaden → Stufe 2 (Verletzt, −2)
+    fireEvent.click(within(v).getByRole('button', { name: /Schaden erleiden/ }));
+    expect(screen.getByText('Grauzahn: Schaden erleiden')).toBeTruthy();
+    expect(screen.queryByText(/Splitterpunkt/)).toBeNull();
+    fireEvent.change(screen.getAllByRole('spinbutton')[0], { target: { value: String(lp + 1) } });
+    fireEvent.click(screen.getByRole('button', { name: new RegExp(`${lp + 1} echten Schaden anwenden`) }));
     expect(within(v).getByText(`LP ${lp * 2 - 1}/${lp * 3}`)).toBeTruthy();
     expect(within(v).getByText('Wundabzug -2')).toBeTruthy();
-    fireEvent.click(within(v).getByRole('button', { name: 'Heilen' }));
+    // Heilen-Modal
+    fireEvent.click(within(v).getByRole('button', { name: /Heilen/ }));
+    expect(screen.getByText('Grauzahn: Heilung anwenden')).toBeTruthy();
+    fireEvent.change(screen.getAllByRole('spinbutton')[0], { target: { value: String(lp + 1) } });
+    fireEvent.click(screen.getByRole('button', { name: new RegExp(`${lp + 1} LP heilen`) }));
     expect(within(v).queryByText(/Wundabzug/)).toBeNull();
+    expect(within(v).getByText(`LP ${lp * 3}/${lp * 3}`)).toBeTruthy();
 
     fireEvent.click(within(tiere).getByRole('button', { name: /^Probe Wahrnehmung würfeln$/ }));
     expect(screen.getByText(/Grauzahn: Wahrnehmung/)).toBeTruthy();

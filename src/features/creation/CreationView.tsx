@@ -24,6 +24,7 @@ import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
 import { AddItemModal } from '../../components/modals/AddItemModal';
 import { SpellModal } from '../../components/modals/SpellModal';
 import { MasteryModal } from '../../components/modals/MasteryModal';
+import { XpAddModal } from '../../components/modals/XpAddModal';
 import { AdvancementLog } from '../../components/advancement/AdvancementLog';
 import { ErschaffungRegelwerk } from '../../components/creation/ErschaffungRegelwerk';
 import type { ConfirmDialogState } from '../../hooks/useModals';
@@ -78,6 +79,7 @@ export function CreationView() {
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [showSpellModal, setShowSpellModal] = useState(false);
   const [masteryModalOpen, setMasteryModalOpen] = useState(false);
+  const [showXpModal, setShowXpModal] = useState(false);
   const [activeSkillForMastery, setActiveSkillForMastery] = useState<{ name: string; val: number } | null>(null);
   const [activeSkillForSpell, setActiveSkillForSpell] = useState<string | null>(null);
   const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogState | null>(null);
@@ -184,10 +186,40 @@ export function CreationView() {
     toast.success('Letztes Ereignis rückgängig gemacht');
   };
 
+  const handleToggleCreationMode = () => {
+    if (mode === 'creation') {
+      if (!calc.isCreationComplete) {
+        toast.error('Die Charaktererschaffung ist noch nicht vollständig!');
+        return;
+      }
+      setConfirmDialog({
+        title: 'Charaktererschaffung abschließen?',
+        message: 'Ist die Charaktererschaffung abgeschlossen? Sobald du dies bestätigst, darfst du deinen Charakter steigern und spielen.',
+        onConfirm: () => {
+          dispatch({ type: 'SET_CREATION_FINALIZED', payload: true });
+          dispatch({ type: 'SET_MODE', payload: 'xp' });
+          setConfirmDialog(null);
+          toast.success('Charaktererschaffung abgeschlossen! Steigerung und Spielen freigeschaltet.');
+        },
+      });
+    } else {
+      setConfirmDialog({
+        title: 'Erschaffung modifizieren?',
+        message: 'Bist du sicher, dass du die Charaktererschaffung modifizieren möchtest?',
+        onConfirm: () => {
+          dispatch({ type: 'SET_CREATION_FINALIZED', payload: false });
+          dispatch({ type: 'SET_MODE', payload: 'creation' });
+          setConfirmDialog(null);
+        },
+      });
+    }
+  };
+
   return (
     <>
       {confirmDialog && (
         <ConfirmDialog
+          title={confirmDialog.title}
           message={confirmDialog.message}
           onConfirm={confirmDialog.onConfirm}
           onCancel={() => setConfirmDialog(null)}
@@ -248,15 +280,27 @@ export function CreationView() {
           spells={spellsList}
         />
       )}
+      {showXpModal && (
+        <XpAddModal
+          onClose={() => setShowXpModal(false)}
+          onAdd={(val, note) => {
+            dispatch({ type: 'ADD_XP_WITH_NOTE', payload: { amount: val, note } });
+          }}
+        />
+      )}
 
       <div className="p-4 lg:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8 flex-grow relative z-10 w-full">
         {/* LEFT COLUMN */}
         <div className="lg:col-span-5 space-y-8">
           <StatusWidget
             mode={mode} creationUsage={creationUsage} xpAvailable={xpAvailable}
+            xpTotal={state.xpTotal}
+            heldengrad={heldengrad}
             freeMasteries={totalFreeSlotsAvailable} freeSpells={totalFreeSpellSlots}
             onUndo={handleUndoAdvancement}
             canUndo={canUndoAdvancement}
+            onAddXp={() => setShowXpModal(true)}
+            onToggleCreationMode={handleToggleCreationMode}
           />
 
           {/* Character Info */}

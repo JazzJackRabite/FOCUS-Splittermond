@@ -24,6 +24,9 @@ import { getMasteryDetails } from '../../utils/gameResourceManager';
 import {
   getFullSpellInfo,
   parseFocusCost,
+  getActiveSpellModifiers,
+  zauberHoechstbonus,
+  getWeaponEnchantments,
 } from '../../utils/magicRules';
 import { generateId } from '../../utils/id';
 import type { InventoryItem, Spell } from '../../types';
@@ -194,6 +197,10 @@ export const CombatMagicTab: React.FC = () => {
     gearVtdBonus,
     currentWoundPenalty,
   } = calc;
+
+  const channeledSpells = state.playState?.channeledSpells ?? [];
+  const hoechstbonusZauber = zauberHoechstbonus(calc);
+  const activeSpellMods = useMemo(() => getActiveSpellModifiers(channeledSpells, hoechstbonusZauber), [channeledSpells, hoechstbonusZauber]);
 
   // Modals for adding weapon and armor
   const [showAddWeaponModal, setShowAddWeaponModal] = useState(false);
@@ -454,7 +461,7 @@ export const CombatMagicTab: React.FC = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-[#d1c4b0]/40">
                   <button
                     type="button"
-                    onClick={() => session.openRollForWeapon('Waffenlos', 'Handgemenge', 0, 15, { damage: '1W6', wgs: 5, attributes: 'Stumpf' })}
+                    onClick={() => session.openRollForWeapon('Waffenlos', 'Handgemenge', 0, 15, { id: 'waffenlos', damage: '1W6', wgs: 5, attributes: 'Stumpf' })}
                     className="w-full bg-[#1B365D] hover:bg-[#254a80] text-[#f3e5cf] border border-[#C5A059] px-3 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
                     title="Angriffsprobe & Manöver öffnen (2W10 + AT vs. VTD)"
                   >
@@ -463,7 +470,7 @@ export const CombatMagicTab: React.FC = () => {
                   </button>
                   <button
                     type="button"
-                    onClick={() => session.handleRollDiceFormula('1W6', 'Waffenloser Schaden')}
+                    onClick={() => session.handleRollDiceFormula(getWeaponEnchantments({ id: 'waffenlos', name: 'Waffenlos', damage: '1W6' }, channeledSpells).damageRollFormula, 'Waffenloser Schaden')}
                     className="damage-roll-btn w-full px-3 py-2 rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer flex items-center justify-center gap-1.5 active:scale-95"
                     title="Schaden würfeln (1W6)"
                   >
@@ -477,14 +484,17 @@ export const CombatMagicTab: React.FC = () => {
               {weapons.map((w) => {
                 const skillName = w.weaponSkill || 'Klingenwaffen';
                 const skillVal = getSkillValue(skillName);
-                const effectiveAT = skillVal;
                 const itemSrc = getItemSource(w);
+                const enchantments = getWeaponEnchantments(w, channeledSpells);
+                const effectiveAT = skillVal + enchantments.atBonus;
                 return (
                   <div
                     key={w.id}
                     className={`rounded-xl border p-4 shadow-2xs transition-all space-y-3 ${
                       w.equipped
-                        ? 'bg-[#faf6ee] border-[#C5A059] ring-1 ring-[#C5A059]/30'
+                        ? enchantments.hasEnchantment
+                          ? 'bg-[#faf6ee] border-[#C5A059] ring-2 ring-amber-400/60 shadow-md'
+                          : 'bg-[#faf6ee] border-[#C5A059] ring-1 ring-[#C5A059]/30'
                         : 'bg-white/80 border-[#d1c4b0] opacity-85 hover:opacity-100'
                     }`}
                   >
@@ -510,6 +520,12 @@ export const CombatMagicTab: React.FC = () => {
                               {w.category}
                             </span>
                           )}
+                          {enchantments.hasEnchantment && (
+                            <span className="text-[10px] bg-amber-100 text-amber-900 border border-amber-300 font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-2xs">
+                              <Sparkles size={11} className="text-amber-600" />
+                              <span>{enchantments.spells.map((s) => s.name).join(', ')}</span>
+                            </span>
+                          )}
                           <SourceBadge
                             source={itemSrc.source}
                             page={itemSrc.page}
@@ -518,10 +534,21 @@ export const CombatMagicTab: React.FC = () => {
                               description: w.desc || w.attributes,
                               stats: [
                                 { label: 'Fertigkeit', value: skillName },
-                                { label: 'Schaden', value: w.damage || '—' },
+                                { label: 'Schaden', value: enchantments.damageFormulaDisplay },
                                 { label: 'WGS', value: String(w.wgs || '—') },
                                 ...(w.range ? [{ label: 'Reichweite', value: w.range }] : []),
                                 ...(w.attributes ? [{ label: 'Merkmale', value: w.attributes, colSpan: true }] : []),
+                                ...(enchantments.hasEnchantment
+                                  ? [
+                                      {
+                                        label: 'Verzauberung',
+                                        value: enchantments.spells
+                                          .map((s) => `${s.name}: ${s.description}`)
+                                          .join('; '),
+                                        colSpan: true,
+                                      },
+                                    ]
+                                  : []),
                               ],
                             }}
                           />
@@ -562,6 +589,14 @@ export const CombatMagicTab: React.FC = () => {
                         <span className="text-[10px] uppercase font-bold text-stone-500 block leading-tight">AT</span>
                         <span className="text-base font-bold font-mono text-[#1B365D] mt-0.5 block">
                           {effectiveAT}
+                          {enchantments.atBonus > 0 && (
+                            <span
+                              className="text-emerald-700 text-xs font-bold font-mono ml-1"
+                              title="Bonus durch Zauber"
+                            >
+                              (+{enchantments.atBonus})
+                            </span>
+                          )}
                           {currentWoundPenalty !== 0 && (
                             <span className="text-red-600 text-xs font-normal"> ({currentWoundPenalty})</span>
                           )}
@@ -571,6 +606,11 @@ export const CombatMagicTab: React.FC = () => {
                         <span className="text-[10px] uppercase font-bold text-stone-500 block leading-tight">Schaden</span>
                         <span className="text-base font-bold font-mono text-red-700 mt-0.5 block">
                           {w.damage || '1W6'}
+                          {enchantments.extraDamageText && (
+                            <span className="text-orange-600 text-xs font-bold font-mono ml-1 block sm:inline">
+                              ({enchantments.extraDamageText})
+                            </span>
+                          )}
                         </span>
                       </div>
                       <div className="bg-white/80 rounded-lg border border-[#d1c4b0]/70 p-2 text-center shadow-2xs">
@@ -606,16 +646,24 @@ export const CombatMagicTab: React.FC = () => {
                         title={`Angriff & Manöver mit ${w.name} öffnen (2W10 + AT vs. VTD)`}
                       >
                         <DiceIcon size={15} fill="#C5A059" stroke="#1B365D" />
-                        <span>Angriff ({skillName})</span>
+                        <span>
+                          Angriff ({skillName})
+                          {enchantments.atBonus > 0 && ` +${enchantments.atBonus}`}
+                        </span>
                       </button>
                       <button
                         type="button"
-                        onClick={() => session.handleRollDiceFormula(w.damage || '1W6', `${w.name} Schaden`)}
+                        onClick={() =>
+                          session.handleRollDiceFormula(
+                            enchantments.damageRollFormula,
+                            `${w.name} Schaden${enchantments.extraDamageText ? ` (${enchantments.extraDamageText})` : ''}`
+                          )
+                        }
                         className="damage-roll-btn w-full px-3 py-2 rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer flex items-center justify-center gap-1.5 active:scale-95"
-                        title={`Schaden würfeln (${w.damage || '1W6'})`}
+                        title={`Schaden würfeln (${enchantments.damageRollFormula})`}
                       >
-                        <span className="text-xs">🎲</span>
-                        <span className="tracking-wide text-white font-extrabold">{w.damage || '1W6'} Schaden</span>
+                        <DiceIcon size={15} />
+                        <span className="tracking-wide text-white font-extrabold">{enchantments.buttonDamageLabel}</span>
                       </button>
                     </div>
                   </div>
@@ -648,8 +696,16 @@ export const CombatMagicTab: React.FC = () => {
                   Rüstung (SR)
                 </span>
                 <span className="text-lg sm:text-xl font-bold text-[#1B365D] font-mono mt-0.5">
-                  {derived.SR}
+                  {derived.SR + activeSpellMods.srBonus}
                   {armorSR > 0 && <span className="text-xs text-amber-700 ml-1 font-semibold">({armorSR})</span>}
+                  {activeSpellMods.srBonus > 0 && (
+                    <span
+                      className="text-xs text-emerald-600 ml-1 font-semibold"
+                      title={`+${activeSpellMods.srBonus} SR durch Zauber (${activeSpellMods.breakdown.filter((b) => b.sr).map((b) => b.spellName).join(', ')})`}
+                    >
+                      +{activeSpellMods.srBonus} Zauber
+                    </span>
+                  )}
                 </span>
               </div>
 
@@ -658,8 +714,16 @@ export const CombatMagicTab: React.FC = () => {
                   Verteidigung
                 </span>
                 <span className="text-lg sm:text-xl font-bold text-[#1B365D] font-mono mt-0.5">
-                  {derived.VTD}
+                  {derived.VTD + activeSpellMods.vtdBonus}
                   {gearVtdBonus > 0 && <span className="text-xs text-emerald-600 ml-1 font-semibold">+{gearVtdBonus}</span>}
+                  {activeSpellMods.vtdBonus > 0 && (
+                    <span
+                      className="text-xs text-emerald-600 ml-1 font-semibold"
+                      title={`+${activeSpellMods.vtdBonus} VTD durch Zauber (${activeSpellMods.breakdown.filter((b) => b.vtd).map((b) => b.spellName).join(', ')})`}
+                    >
+                      +{activeSpellMods.vtdBonus} Zauber
+                    </span>
+                  )}
                 </span>
               </div>
 

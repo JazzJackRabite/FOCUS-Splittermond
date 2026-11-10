@@ -669,6 +669,9 @@ export function baseCharacterReducer(
       let nextTempHPUsed = state.playState.tempHPUsed ?? 0;
       const availableTemp = Math.max(0, nextTempHP - nextTempHPUsed);
 
+      let currentFocus = state.playState.focus;
+      let currentChanneledSpells = state.playState.channeledSpells;
+
       if (availableTemp > 0) {
         const absorb = Math.min(availableTemp, remainingDamage);
         remainingDamage -= absorb;
@@ -676,13 +679,33 @@ export function baseCharacterReducer(
         if (nextTempHPUsed >= nextTempHP) {
           nextTempHP = 0;
           nextTempHPUsed = 0;
+          // Splittermond GRW S. 235: Lebenskraft stärken endet automatisch, wenn alle Temp-LP aufgebraucht sind
+          const autoEndIndex = currentChanneledSpells.findIndex(
+            (s) => s.name.trim().toLowerCase() === 'lebenskraft stärken'
+          );
+          if (autoEndIndex !== -1) {
+            const endedSpell = currentChanneledSpells[autoEndIndex];
+            currentChanneledSpells = currentChanneledSpells.filter((_, idx) => idx !== autoEndIndex);
+            const freedFO = endedSpell.channeledFocus;
+            currentFocus = {
+              ...currentFocus,
+              channeled: Math.max(0, currentFocus.channeled - freedFO),
+              exhausted: currentFocus.exhausted + freedFO,
+            };
+          }
         }
       }
 
       if (remainingDamage <= 0) {
         return {
           ...state,
-          playState: { ...state.playState, tempHP: nextTempHP, tempHPUsed: nextTempHPUsed },
+          playState: {
+            ...state.playState,
+            tempHP: nextTempHP,
+            tempHPUsed: nextTempHPUsed,
+            focus: currentFocus,
+            channeledSpells: currentChanneledSpells,
+          },
         };
       }
 
@@ -759,6 +782,8 @@ export function baseCharacterReducer(
           conditions: newConditions,
           tempHP: nextTempHP,
           tempHPUsed: nextTempHPUsed,
+          focus: currentFocus,
+          channeledSpells: currentChanneledSpells,
         },
       };
     }

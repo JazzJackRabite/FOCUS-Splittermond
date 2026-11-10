@@ -5,6 +5,7 @@
  *   Monstermerkmals gelesen („Auf diesen Stufen werden die Regeln für die Stufen … angewendet“).
  * - Immunität gegen Betäubungsschaden (z. B. Konstrukt) ebenfalls aus der Merkmalsbeschreibung.
  * - Betäubungs- und kanalisierter Schaden verursachen keine Wundabzüge (wundabzuege.nur_echter_schaden).
+ * - Stufe wie beim Abenteurer (characterCalculations): die Stufe, in der der letzte verlorene Lebenspunkt liegt.
  */
 import type { Katalog } from './katalog';
 import { ABGELEITET_ID } from './abgeleitet';
@@ -60,10 +61,10 @@ export interface Lebenslage {
 export function lebenslage(lp: number, stufen: Gesundheitsstufe[], z: BegleiterZustand = {}): Lebenslage {
   const gesamt = Math.max(0, lp) * stufen.length;
   const schaden = z.schaden ?? 0; const verloren = Math.min(gesamt, schaden + (z.betaeubung ?? 0) + (z.kanalisiert ?? 0));
-  const idx = (n: number) => (lp > 0 ? Math.min(stufen.length - 1, Math.floor(n / lp)) : 0);
+  const idx = (n: number) => (lp > 0 && n > 0 ? Math.min(stufen.length - 1, Math.floor((n - 1) / lp)) : 0);
   const ausser = gesamt > 0 && verloren >= gesamt;
-  const stufe = idx(Math.min(verloren, gesamt - 1));
-  const echte = stufen[idx(Math.min(schaden, gesamt - 1))];
+  const stufe = idx(verloren);
+  const echte = stufen[idx(Math.min(schaden, gesamt))];
   return {
     lp, stufen, gesamt, verloren, frei: gesamt - verloren, stufe,
     wundabzug: schaden > 0 ? echte.wundabzug : 0, stufenName: ausser ? 'Außer Gefecht' : stufen[stufe]?.name ?? '',
@@ -75,4 +76,27 @@ export function lebenslage(lp: number, stufen: Gesundheitsstufe[], z: BegleiterZ
 export function fokusFrei(fo: number, z: BegleiterZustand = {}): number {
   const f = z.fokus ?? {};
   return Math.max(0, fo - (f.erschoepft ?? 0) - (f.kanalisiert ?? 0) - (f.verzehrt ?? 0));
+}
+
+/** Gesundheitsfelder im Format der Modale (Schaden, Betäubung, kanalisiert, frei) */
+export function gesundheitsfelder(gesamt: number, z: BegleiterZustand = {}): { type: 'empty' | 'exhausted' | 'consumed' | 'channeled' }[] {
+  const s = z.schaden ?? 0; const b = z.betaeubung ?? 0; const k = z.kanalisiert ?? 0;
+  return Array.from({ length: gesamt }, (_, i) => ({ type: i < s ? 'consumed' : i < s + b ? 'exhausted' : i < s + b + k ? 'channeled' : 'empty' }));
+}
+
+/** Schaden eintragen; Betäubungs- und kanalisierter Schaden über die letzte Stufe hinaus wird zu echtem Schaden */
+export function schadenEintragen(gesamt: number, z: BegleiterZustand, art: 'consumed' | 'exhausted' | 'channeled', menge: number): BegleiterZustand {
+  const s = z.schaden ?? 0; const b = z.betaeubung ?? 0; const k = z.kanalisiert ?? 0;
+  if (art === 'consumed') return { ...z, schaden: Math.min(gesamt, s + menge) };
+  const frei = Math.max(0, gesamt - s - b - k);
+  const passt = Math.min(frei, menge); const ueber = menge - passt;
+  const neu = art === 'exhausted' ? { ...z, betaeubung: b + passt } : { ...z, kanalisiert: k + passt };
+  if (ueber > 0) {
+    // Überlauf verdrängt Betäubung/kanalisiert und wird echter Schaden
+    const s2 = Math.min(gesamt, s + ueber);
+    const rest = Math.max(0, gesamt - s2);
+    const b2 = Math.min(neu.betaeubung ?? 0, rest); const k2 = Math.min(neu.kanalisiert ?? 0, rest - b2);
+    return { ...neu, schaden: s2, betaeubung: b2, kanalisiert: k2 };
+  }
+  return neu;
 }

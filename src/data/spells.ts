@@ -14,6 +14,9 @@ export interface Spell {
     damage?: string;
     source: string;
     page?: number;
+    difficulty?: string;
+    difficultyType?: 'fest' | 'VTD' | 'GW' | 'KW';
+    difficultyValue?: number;
 }
 
 export const SPELLS_DB: Spell[] = [
@@ -29,7 +32,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer ist in der Lage, mit seinen normalen Sinnen eine Illusion zu durchschauen. Dies erfordert eine Wahrnehmung-Probe gegen die um drei Punkte erhöhte Schwierigkeit des Illusionszaubers.\n\nErfolgsgrade:\n• Auslösezeit, Verstärken (s. u.) • 2 EG (Kosten +K1V1): Die Probe geht gegen die normale Schwierigkeit des Illusionszaubers.",
         "source": "GRW",
         "page": 251,
-        "damage": ""
+        "damage": "",
+        "difficulty": "15",
+        "difficultyType": "fest",
+        "difficultyValue": 15
     },
     {
         "name": "Zauberer behindern",
@@ -43,7 +49,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Führt das Ziel gerade einen Zaubervorgang durch, wird die Zauberdauer um 4 Ticks verlängert. Bricht es den Vorgang ab, entfällt die Verlängerung.\n\nErfolgsgrade:\n• Auslösezeit, Reichweite, Verstärken (s. u.) • 2 EG (Kosten +1V1): Die Zauberdauer des Ziels wird um 5 Ticks verlängert.",
         "source": "GRW",
         "page": 253,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Geistiger Widerstand des Ziels",
+        "difficultyType": "GW"
     },
     {
         "name": "Beherrschung aufheben",
@@ -57,7 +65,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Alle momentan auf das Ziel wirkenden Beherrschungszauber werden aufgehoben, solange sie maximal Grad 3 aufweisen.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +3V3): Es werden Zauber bis Grad 5 aufgehoben.",
         "source": "GRW",
         "page": 224,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Erkenntnis stören",
@@ -71,7 +82,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Gegen Erkenntniszauber erhält der Zauberer einen Bonus in Höhe von 2 Punkten auf seinen Geistigen Widerstand.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Der Bonus erhöht sich auf 3 Punkte.",
         "source": "GRW",
         "page": 227,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Magie erschöpfen",
@@ -85,7 +99,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "8 unverbrauchte Fokuspunkte des Opfers gelten als erschöpft.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +1V1): Es werden 12 Fokuspunkte betroffen.",
         "source": "GRW",
         "page": 237,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Geistiger Widerstand des Ziels",
+        "difficultyType": "GW"
     },
     {
         "name": "Untote schwächen",
@@ -99,7 +115,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Ein Wesen des Typus Untoter erhält einen Malus in Höhe von 4 Punkten auf alle Proben.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K1V1): Der Malus erhöht sich auf 6 Punkte.",
         "source": "GRW",
         "page": 249,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Körperlicher Widerstand des Ziels",
+        "difficultyType": "KW"
     },
     {
         "name": "Verwandlung beenden",
@@ -113,7 +131,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Alle momentan auf das Ziel wirkenden Verwandlungszauber werden aufgehoben, solange sie maximal Grad 3 aufweisen.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +3V3): Es werden Zauber bis Grad 5 aufgehoben.",
         "source": "GRW",
         "page": 250,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Fluch brechen",
@@ -127,7 +148,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Alle momentan auf das Ziel wirkenden Zauber des Typus Fluch bzw. Zustände mit der Ursache Fluch werden aufgehoben, solange die verursachenden Zauber maximal Grad 3 aufweisen.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +2V2): Es werden Zauber und Ursachen bis Grad 5 aufgehoben.",
         "source": "GRW",
         "page": 229,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Gegenzauber",
@@ -141,7 +165,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Führt das Ziel gerade einen Zaubervorgang durch, erhält es einen Malus in Höhe von 8 Punkten auf seine Probe.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +2V2): Der Malus erhöht sich auf 12 Punkte.",
         "source": "GRW",
         "page": 231,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Geistiger Widerstand des Ziels",
+        "difficultyType": "GW"
     },
     {
         "name": "Schutz aufheben",
@@ -155,7 +181,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Ein vom Zauberer bestimmter Zauber bis maximal Grad 2, der mindestens einen der Typen Haut, Rüstung, Schild oder Schutzfeld aufweist, wird beendet.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +3V3): Es werden entsprechende Zauber bis Grad 3 aufgehoben.",
         "source": "GRW",
         "page": 243,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Untote bannen",
@@ -169,7 +198,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Ein Wesen des Typus Untoter wird vernichtet, wenn ihm eine Zähigkeit-Probe gegen 15 misslingt. Gelingt die Probe, erleidet das Wesen 3W6 Schaden.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +2V2): Ein zweites Wesen mit gleichem oder geringerem Körperlichen Widerstand wird betroffen.",
         "source": "GRW",
         "page": 249,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Körperlicher Widerstand des Ziels",
+        "difficultyType": "KW"
     },
     {
         "name": "Lichtbann",
@@ -183,7 +214,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Ein einzelner Lichtzauber wird aufgehoben, solange er maximal Grad 3 aufweist. Handelt es sich um einen Zauber mit Wirkungsbereich, genügt es, wenn sich ein Teil von diesem innerhalb der Reichweite befindet.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +3V3): Es wird ein Zauber bis Grad 5 aufgehoben.",
         "source": "GRW",
         "page": 236,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Magie verzehren",
@@ -197,7 +231,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "18 unverbrauchte Fokuspunkte des Opfers gelten als verzehrt. Verfügt das Opfer nicht mehr über eine ausreichende Anzahl an unverbrauchten Fokuspunkten, werden auch erschöpfte Punkte betroffen.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +3V3): Es werden 24 Fokuspunkte betroffen.",
         "source": "GRW",
         "page": 237,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Geistiger Widerstand des Ziels",
+        "difficultyType": "GW"
     },
     {
         "name": "Schattenbann",
@@ -211,7 +247,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Ein einzelner Schattenzauber wird aufgehoben, solange er maximal Grad 3 aufweist. Handelt es sich um einen Zauber mit Wirkungsbereich, genügt es, wenn sich ein Teil von diesem innerhalb der Reichweite befindet.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +3V3): Es wird ein Zauber bis Grad 5 aufgehoben.",
         "source": "GRW",
         "page": 241,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Zauber bannen",
@@ -225,7 +264,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Ein nicht kanalisierter Zauber wird aufgehoben, solange er maximal Grad 3 aufweist. Handelt es sich um einen Zauber mit Wirkungsbereich, genügt es, wenn sich ein Teil von diesem innerhalb der Reichweite befindet. Ein kanalisierter Zauber bis maximal Grad 3 wird nur aufgehoben, sofern dem Zauberer dieses Zaubers eine Entschlossenheit-Probe gegen 21 misslingt.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +3V3): Es werden nach den obigen Regeln Zauber bis Grad 4 aufgehoben.",
         "source": "GRW",
         "page": 252,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Zauber unterdrücken",
@@ -239,7 +281,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Ein kanalisierter Zauber wird während der Wirkungsdauer unterdrückt, solange er maximal Grad 3 aufweist.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K3V3): Es werden Zauber bis Grad 4 unterdrückt.",
         "source": "GRW",
         "page": 253,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Zone der Bannung",
@@ -253,7 +298,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Innerhalb des Wirkungsbereichs erhalten alle Zauberproben einen Malus in Höhe von 4 Punkten.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 2 EG (Kosten +K3V3): Der Malus erhöht sich auf 6 Punkte.",
         "source": "GRW",
         "page": 253,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Aura der Kontramagie",
@@ -267,7 +315,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Wird im Wirkungsbereich ein Zauber gewirkt, verliert der Zauberer, der ihn ausgelöst hat, 8 Lebenspunkte.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 1 EG (Kosten +K4V4): Der Verlust beträgt 10 Lebenspunkte.",
         "source": "GRW",
         "page": 223,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Feenwesen bannen",
@@ -281,7 +332,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Ein Wesen des Typus Feenwesen wird zurück in die Feenwelt geworfen. Innerhalb dieser kann der Zauber nicht angewandt werden.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +4V4): Ein zweites Wesen gleichen oder niedrigeren Körperlichen Widerstands kann gebannt werden.",
         "source": "GRW",
         "page": 227,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Körperlicher Widerstand des Ziels",
+        "difficultyType": "KW"
     },
     {
         "name": "Zauber zurückwerfen",
@@ -295,7 +348,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Wird der Zauberer direktes Opfer eines Zaubers, vermag er diesen auf den Anwender zurückzuwerfen. Dazu muss ihm eine Entschlossenheit-Probe gelingen, deren Schwierigkeit der Schwierigkeit des ursprünglichen Zaubers + 3 entspricht. Gelingt die Probe, wirkt der Zauber auf den ursprünglichen Urheber. Misslingt die Probe, wirkt der Zauber regulär auf den Zauberer.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K4V4): Die Schwierigkeit der Entschlossenheit-Probe beträgt die ursprüngliche Schwierigkeit des Zaubers.",
         "source": "GRW",
         "page": 253,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Totaler Zauberbann",
@@ -309,7 +365,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Alle auf dem Ziel liegenden Zauber werden aufgehoben. Ist das Ziel ein beschworenes Wesen, wird es zusätzlich zurück in seine Domäne geworfen. Handelt es sich um einen Zauber mit Wirkungsbereich, genügt es, wenn sich ein Teil von diesem innerhalb der Reichweite befindet. Handelt es sich bei dem Ziel um ein Artefakt bis maximal Artefaktqualität 5, so wird die Wirkung des Artefaktes für 30 Minuten blockiert.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +5V5): Die Auswirkungen des Zauber erstrecken sich auf bis zu 2 Ziele.",
         "source": "GRW",
         "page": 248,
-        "damage": ""
+        "damage": "",
+        "difficulty": "30",
+        "difficultyType": "fest",
+        "difficultyValue": 30
     },
     {
         "name": "Einstellung verbessern",
@@ -323,7 +382,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer verbessert die Einstellung des Ziels gegenüber einer von ihm bestimmten Person, Idee oder Sache um 1 Stufe (maximal auf Aufgeschlossen). Dieser Zauber benötigt weder Formel noch Geste.\n\nErfolgsgrade:\n• Auslösezeit, Verstärken (s. u.) • 2 EG (Kosten +K1V1): Die Einstellung verbessert sich um insgesamt 2 Stufen (maximal auf Hilfsbereit).",
         "source": "GRW",
         "page": 226,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Geistiger Widerstand des Ziels",
+        "difficultyType": "GW"
     },
     {
         "name": "Einstellung verschlechtern",
@@ -337,7 +398,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer verschlechtert die Einstellung des Ziels gegenüber einer von ihm bestimmten Person, Idee oder Sache um 1 Stufe (maximal auf Ablehnend). Dieser Zauber benötigt weder Formel noch Geste.\n\nErfolgsgrade:\n• Auslösezeit, Verstärken (s. u.) • 2 EG (Kosten +K1V1): Die Einstellung verschlechtert sich um insgesamt 2 Stufen (maximal auf Feindlich).",
         "source": "GRW",
         "page": 226,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Geistiger Widerstand des Ziels",
+        "difficultyType": "GW"
     },
     {
         "name": "Furcht",
@@ -351,7 +414,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Das Ziel erhält den Zustand Angsterfüllt.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus, Wirkungsdauer • 2 EG (Kosten +1V1): Das Ziel ist nicht in der Lage, den Zauberer anzugreifen. Dieser Effekt hält genauso lange an wie der Zustand Angsterfüllt.",
         "source": "GRW",
         "page": 230,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Geistiger Widerstand des Ziels",
+        "difficultyType": "GW"
     },
     {
         "name": "Moral erhöhen",
@@ -365,7 +430,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Moral des Ziels wird einer vom Zauberer benannten Unternehmung gegenüber erhöht. Dadurch wird es immun gegen den Zustand Angsterfüllt, wenn es ihm noch nicht unterliegt.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Das Ziel wird zusätzlich immun gegen den Zustand Panisch, wenn es ihm noch nicht unterliegt.",
         "source": "GRW",
         "page": 238,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Verstummen",
@@ -379,7 +447,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Das Ziel verliert seine Stimme und kann auch keine anderen Laute verursachen, die darauf basieren. In Bezug auf das Wirken von Zaubern gelten hierdurch die Regeln zur weggelassenen Komponente Formel (S. 198).\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K1V1): Ein zweites Wesen gleichen oder niedrigeren Geistigen Widerstands verstummt.",
         "source": "GRW",
         "page": 250,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Geistiger Widerstand des Ziels",
+        "difficultyType": "GW"
     },
     {
         "name": "Verwirren",
@@ -393,7 +463,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Geist des Ziels wird verwirrt, wodurch es einen Malus in Höhe von 1 Punkt für alle Proben erhält, in die sein Verstand einfließt.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K1V1): Der Malus erhöht sich auf 2 Punkte.",
         "source": "GRW",
         "page": 250,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Geistiger Widerstand des Ziels",
+        "difficultyType": "GW"
     },
     {
         "name": "Gedankenschutz",
@@ -407,7 +479,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Gegen Beherrschungszauber erhält das Ziel einen Bonus in Höhe von 3 Punkten auf seinen Geistigen Widerstand.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Der Bonus erhöht sich auf 4 Punkte.",
         "source": "GRW",
         "page": 230,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Magische Fessel",
@@ -421,7 +496,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Dem Geist des Ziels fällt es schwerer, seinen Körper zu Bewegungen anzuregen, wodurch alle auf Beweglichkeit beruhenden Proben einen Malus in Höhe von 2 Punkten erhalten.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Der Malus erhöht sich auf 3 Punkte.",
         "source": "GRW",
         "page": 237,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Geistiger Widerstand des Ziels",
+        "difficultyType": "GW"
     },
     {
         "name": "Schlaf",
@@ -435,7 +512,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Das Ziel erhält den Zustand Benommen 3.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +2V2): Das Ziel erhält stattdessen den Zustand Schlafend.",
         "source": "GRW",
         "page": 242,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Geistiger Widerstand des Ziels",
+        "difficultyType": "GW"
     },
     {
         "name": "Suggestion",
@@ -449,7 +528,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Betroffene erhält eine Suggestion nach Willen des Zauberers, sei es eine Idee, ein Vorurteil oder Ähnliches. Sprechen nichts Offensichtliches oder die moralischen Prinzipien der Person dagegen, hält er diese für seine eigene Eingebung und wird sie gemäß seinem Naturell verfolgen. Dieser Zauber unterliegt nicht den Regeln zur maximalen Wirkungsweite kanalisierter Zauber (S. 195) und benötigt weder Formel noch Geste.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K2V2): Das Ziel wird die Suggestion selbst dann als seine Idee erachten, wenn Offensichtliches dagegen spricht, aber weiterhin seinen eigenen moralischen Grundsätzen folgen.",
         "source": "GRW",
         "page": 247,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Geistiger Widerstand des Ziels",
+        "difficultyType": "GW"
     },
     {
         "name": "Beherrschung aufheben",
@@ -463,7 +544,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Alle momentan auf das Ziel wirkenden Beherrschungszauber werden aufgehoben, solange sie maximal Grad 3 aufweisen.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +3V3): Es werden Zauber bis Grad 5 aufgehoben.",
         "source": "GRW",
         "page": 224,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Erinnerungslücke",
@@ -477,7 +561,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Sämtliche Erinnerungen an Ereignisse der vergangenen Stunde werden aus dem Gedächtnis des Ziels entfernt.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +3V3): Sämtliche Erinnerungen an Ereignisse seit der letzten Ruhephase werden entfernt.",
         "source": "GRW",
         "page": 227,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Geistiger Widerstand des Ziels",
+        "difficultyType": "GW"
     },
     {
         "name": "Halluzination",
@@ -491,7 +577,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Wahrnehmung des Ziels wird um eine einzelne vom Zauberer bestimmte Halluzination ergänzt, die nicht von der Realität unterschieden werden kann. Hierbei kann nicht das gesamte Umfeld verändert werden, sondern der Umgebung nur etwas hinzugefügt werden. Die Halluzination darf nicht größer als menschengroß sein und kann keine Geräusche machen, sich aber bewegen. Entsprechend kann beispielsweise die Illusion einer verfolgenden Riesenspinne geschaffen werden, nicht aber einer sich mit dem Opfer unterhaltenden Person. Dieser Zauber benötigt weder Formel noch Geste.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K3V3): Es kann eine zweite Halluzination erschaffen werden.",
         "source": "GRW",
         "page": 233,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Geistiger Widerstand des Ziels",
+        "difficultyType": "GW"
     },
     {
         "name": "Lähmung",
@@ -505,7 +593,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Das Ziel erhält den Zustand Lahm.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Ein zweites in Reichweite befindliches Ziel mit gleichem oder niedrigerem Körperlichen Widerstand kann verzaubert werden.",
         "source": "GRW",
         "page": 235,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Körperlicher Widerstand des Ziels",
+        "difficultyType": "KW"
     },
     {
         "name": "Tiere beherrschen",
@@ -519,7 +609,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Ein einzelnes Wesen des Typus Tier bis maximal Größenklasse 7 wird unter den Willen des Zauberers gezwungen. Es kann einfache Kommandos im Rahmen seiner natürlichen Fähigkeiten ausführen. Das Wesen bewegt sich nicht ohne explizite Anweisung aus der Wirkungsweite des kanalisierten Zaubers (Seite 195) hinaus.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K2V2): Ein zweites Wesen gleichen oder niedrigeren Geistigen Widerstands kann beherrscht werden.",
         "source": "GRW",
         "page": 247,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Geistiger Widerstand des Ziels",
+        "difficultyType": "GW"
     },
     {
         "name": "Tierischer Bote",
@@ -533,7 +625,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Ein einzelnes Wesen des Typus Tier bis maximal Größenklasse 3, das dem Zauberer gegenüber mindestens die Einstellung Neutral aufweist, überbringt eine schriftliche Nachricht an einen dem Zauberer bekannten Ort und verschwindet anschließend. Innerhalb eines Tages können Landtiere zwischen 10 (z.B. kleine Säugetiere) und 50 km (z.B. Wölfe oder Wildschweine) zurücklegen, Vögel sogar zwischen 50 (Singvögel) und 200 km (weit wandernde Zugvögel).\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsdauer • 1 EG (Kosten +1V1): Das Tier überbringt die Botschaft nicht nur an einen Ort, sondern dort sogar einer bestimmten, dem Zauberer bekannten Person.",
         "source": "GRW",
         "page": 247,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Geistiger Widerstand des Ziels",
+        "difficultyType": "GW"
     },
     {
         "name": "Unauffälligkeit",
@@ -547,7 +641,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer wird so unauffällig, dass vorbeikommende Personen achtlos an ihm vorbeigehen und er sich durch Volksmassen bewegen kann, ohne bemerkt zu werden. Der Zauber hilft nur eingeschränkt, wenn gezielt nach dem Zauberer gesucht wird oder Personen besonders aufmerksam auf alle Passanten achten (wie etwa Wachen am Burgtor), gibt dann jedoch einen Bonus in Höhe von 2 Punkten auf Heimlichkeit-Proben.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K1V1): Der Bonus steigt auf 3 Punkte.",
         "source": "GRW",
         "page": 248,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Feenwesen beherrschen",
@@ -561,7 +658,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer unterwirft ein Wesen des Typus Feenwesen seinen Befehlen. Es folgt allen seinen Anweisungen unabhängig aller Konsequenzen. Das Wesen bewegt sich nicht ohne explizite Anweisung aus der Wirkungsweite des kanalisierten Zaubers (S. 195) hinaus.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K4V4): Ein zweites Wesen gleichen oder niedrigeren Geistigen Widerstands kann beherrscht werden.",
         "source": "GRW",
         "page": 228,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Geistiger Widerstand des Ziels",
+        "difficultyType": "GW"
     },
     {
         "name": "Gedächtnis verändern",
@@ -575,7 +674,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Erinnerungen, die bis zu einer Stunde zurückliegen, werden nach Belieben des Zauberers verändert.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +4V4): Die Erinnerungen dürfen bis zu einer Woche zurückliegen.",
         "source": "GRW",
         "page": 230,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Geistiger Widerstand des Ziels",
+        "difficultyType": "GW"
     },
     {
         "name": "Willenloser Diener",
@@ -589,7 +690,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer unterwirft ein kulturschaffendes Wesen seinen Befehlen. Es folgt allen seinen Anweisungen, sofern sie ihm nicht unmittelbar und unabwendbar den Tod bedeuten. Das Wesen bewegt sich nicht ohne explizite Anweisung aus der Wirkungsweite des kanalisierten Zaubers (S. 195) hinaus. Mit diesem Zauber belegte Wesen sind mit einer Empathie-Probe gegen 27 als von einem Beherrschungszauber beeinflusst erkennbar.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K4V4): Ein zweites Wesen gleichen oder niedrigeren Geistigen Widerstands kann beherrscht werden.",
         "source": "GRW",
         "page": 252,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Geistiger Widerstand des Ziels",
+        "difficultyType": "GW"
     },
     {
         "name": "Marionette",
@@ -603,7 +706,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer übernimmt die Kontrolle über den Körper des Ziels (max. GK 7) und bestimmt dessen Handlungen. Seine Sinne werden durch jene des Betroffenen ersetzt, während dieser zwar bei Bewusstsein bleibt und die Kontrolle über seinen Geist behält, jedoch keine eigenständigen Tätigkeiten mehr vollführen kann. Mit diesem Zauber belegte Wesen sind mit einer Empathie-Probe gegen 27 als von einem Beherrschungszauber beeinflusst erkennbar.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K5V5): Zusätzlich zu den Sinnen des Ziels verfügt der Zauberer auch über die eigenen.",
         "source": "GRW",
         "page": 238,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Geistiger Widerstand des Ziels",
+        "difficultyType": "GW"
     },
     {
         "name": "Schicksalsband",
@@ -617,7 +722,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer gibt dem Ziel eine einzelne Anweisung, jeder Verstoß dagegen verursacht 4W6 Punkte Schaden. Handelt es sich um einen längerfristigen Auftrag, wird der Schaden am Ende jeden Tages verursacht, an dem das Ziel sich nicht zumindest bemüht, auf dessen Erfolg hinzuwirken.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsdauer • 2 EG (Kosten +4V4): Der Zauberer kann zwei miteinander verknüpfte Anweisungen geben, wodurch es jedoch nicht zu einer Verdoppelung des Schadens kommt.",
         "source": "GRW",
         "page": 242,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Geistiger Widerstand des Ziels",
+        "difficultyType": "GW"
     },
     {
         "name": "Stoß",
@@ -631,7 +738,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Das Ziel wird 1 Meter zurückgestoßen und verliert 1 Tick.\n\nErfolgsgrade:\n• Auslösezeit, Reichweite, Verstärken (s. u.) • 1 EG (Kosten +1V1): Dem Ziel muss zusätzlich eine Akrobatik-Probe gegen 15 gelingen, um nicht zu stürzen und den Zustand liegend zu erhalten.",
         "source": "GRW",
         "page": 246,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Körperlicher Widerstand des Ziels",
+        "difficultyType": "KW"
     },
     {
         "name": "Zauberfeder",
@@ -645,7 +754,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Eine Schreibfeder notiert alles, was der Zauberer sagt. Pergament und Tinte werden normal verbraucht. Wird die Feder erneut berührt, endet der Zauber.\n\nErfolgsgrade:\n• Auslösezeit, Verstärken (s. u.) • 2 EG (Kosten +K1V1): Die Feder vermag zusätzlich Bilder nach einer Beschreibung zu zeichnen. Die Qualität hängt von einer Edelhandwerk-Probe des Zauberers ab.",
         "source": "GRW",
         "page": 253,
-        "damage": ""
+        "damage": "",
+        "difficulty": "15",
+        "difficultyType": "fest",
+        "difficultyValue": 15
     },
     {
         "name": "Beschleunigen",
@@ -659,7 +771,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Geschwindigkeit des Zauberers erhöht sich um 2 Punkte.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Die Geschwindigkeit erhöht sich um insgesamt 4 Punkte.",
         "source": "GRW",
         "page": 224,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Gegenstand bewegen",
@@ -673,7 +788,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer kann einen Gegenstand bis Last 2, der nicht von einer anderen Person kontrolliert wird, mit Hilfe seiner Geisteskraft und einer Geschwindigkeit von 1 durch die Luft bewegen oder manipulieren. Dabei kann er nur einfache Bewegungen wie etwa das Drehen eines Schlüssels im Schloss durchführen, nicht aber feinmotorische Tätigkeiten wie das Öffnen eines Schlosses mit einem Dietrich.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Es kann ein Gegenstand bis Last 4 bewegt werden.",
         "source": "GRW",
         "page": 230,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Sanfter Fall",
@@ -687,7 +805,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Erleidet der Zauberer Fallschaden, wird dieser um eine Stufe gesenkt. Die Begrenzung für die Abfederung eines Sturzes (siehe S. 174) zählt hierbei nicht.\n\nErfolgsgrade:\n• Auslösezeit, Verstärken (s. u.) • 2 EG (Kosten +K1V1): Fallschaden wird um 2 Stufen gesenkt.",
         "source": "GRW",
         "page": 240,
-        "damage": ""
+        "damage": "",
+        "difficulty": "15",
+        "difficultyType": "fest",
+        "difficultyValue": 15
     },
     {
         "name": "Sprung",
@@ -701,7 +822,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die normale Grund-Sprungweite des Abenteurers wird für einen Sprung verdreifacht.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +1V1): Die Grund-Sprungweite wird verfünffacht.",
         "source": "GRW",
         "page": 245,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Standfest",
@@ -715,7 +839,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Wird versucht, den Zauberer zurückzudrängen oder umzuwerfen, erhält er einen Bonus in Höhe von 2 Punkten auf die entsprechende Fertigkeit bzw. von 1 Punkt auf den entsprechenden Widerstandswert, um dem entgegen zu wirken.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K1V1): Der Bonus beträgt 4 bzw. 2 Punkte.",
         "source": "GRW",
         "page": 245,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Katzenreflexe",
@@ -729,7 +856,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erhält einen Bonus in Höhe von 2 Punkten auf alle Proben, in die seine Beweglichkeit einfließt.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Die Initiative des Zauberers ist außerdem um 2 Punkte gesenkt.",
         "source": "GRW",
         "page": 234,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Lasten heben",
@@ -743,7 +873,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer kann bis zu 6 Punkte Last auf telekinetischem Weg tragen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Der Zauberer kann insgesamt bis zu 8 Punkte Last tragen.",
         "source": "GRW",
         "page": 235,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Lähmung",
@@ -757,7 +890,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Das Ziel erhält den Zustand Lahm.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Ein zweites in Reichweite befindliches Ziel mit gleichem oder niedrigerem Körperlichen Widerstand kann verzaubert werden.",
         "source": "GRW",
         "page": 235,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Körperlicher Widerstand des Ziels",
+        "difficultyType": "KW"
     },
     {
         "name": "Schwere Arme",
@@ -771,7 +906,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Das Ziel kann seine Arme nur schwer heben. Alle seine Proben für Nahkampfangriffe und Fernkampfangriffe erhalten einen Malus in Höhe von 2 Punkten.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Der Malus erhöht sich auf 3 Punkte.",
         "source": "GRW",
         "page": 244,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Körperlicher Widerstand des Ziels",
+        "difficultyType": "KW"
     },
     {
         "name": "Levitieren",
@@ -785,7 +922,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer beginnt zu schweben und kann sich mit einer Geschwindigkeit von 1 fortbewegen. Es ist ihm dabei nicht möglich, höher als 10 Meter aufzusteigen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K3V3): Die Geschwindigkeit erhöht sich auf 2, die Maximalhöhe auf 15 Meter.",
         "source": "GRW",
         "page": 236,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Schloss öffnen",
@@ -799,7 +939,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauber öffnet ein maximal durchschnittliches Schloss.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +3V3): Der Zauber öffnet ein maximal gutes Schloss.",
         "source": "GRW",
         "page": 242,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Spinnenlauf",
@@ -813,7 +956,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erhält einen Bonus auf Proben zum Klettern in Höhe von 4 Punkten. Auch Proben, um etwa per Akrobatik nicht von einer Wand herabzustürzen, erhalten diesen Bonus. Darüber hinaus kann der Zauberer die Mali durch fehlende Ausrüstung ignorieren.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K3V3): Der Bonus erhöht sich auf 6 Punkte.",
         "source": "GRW",
         "page": 245,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Spurlos in der Wildnis",
@@ -827,7 +973,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer und bis zu drei weitere beim Auslösen des Zaubers festgelegte Wesen seiner Wahl hinterlassen kaum eine Fährte. Jagdkunst-Proben zu ihrer Verfolgung erhalten einen Malus in Höhe von 6 Punkten. Dieser gilt nur für Spuren, die innerhalb des Wirkungsbereichs hinterlassen wurden.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 2 EG (Kosten +K2V2): Es können bis zu fünf Personen bestimmt werden.",
         "source": "GRW",
         "page": 245,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Weg durch die Natur",
@@ -841,7 +990,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer und bis zu drei weitere beim Auslösen des Zaubers festgelegte Wesen seiner Wahl bewegen sich mit Leichtigkeit durch die Natur. Jegliches Terrain zählt für sie maximal als Rand der Wildnis und sie erhalten einen Bonus in Höhe von 3 Punkten auf Überleben-Proben mit Bezug auf das Reisen. Die Boni gelten nur während des Aufenthalts im Wirkungsbereich.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 2 EG (Kosten +K3V3): Es können bis zu fünf Personen bestimmt werden.",
         "source": "GRW",
         "page": 251,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Durch Wände gehen",
@@ -855,7 +1007,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer kann sich durch eine Wand bewegen, die nicht dicker als 1 m ist.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +4V4): Eine Wand mit einer Stärke von bis zu 2 m kann durchquert werden.",
         "source": "GRW",
         "page": 225,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Komm zu mir",
@@ -869,7 +1024,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Das Ziel wird umgehend und auf möglichst direktem Weg zum Zauberer bewegt. Hindernisse werden dabei umgangen. Die Bewegung erfolgt sofortig und ohne Zeitverlust mit Auslösen des Zaubers. Sollte das Ziel sich gerade in einer kontinuierlichen Aktion befunden haben, muss es eine Entschlossenheit-Probe wie nach den Regeln zur Störung kontinuierlicher Aktionen (S. 167) ablegen. Die Schwierigkeit hierfür beträgt 18. Das Ziel kann nicht von Gelegenheitsangriffen von Gegnern getroffen werden, von denen es sich weg oder an denen es sich vorbei bewegt.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +4V4): Das Ziel kann von Gelegenheitsangriffen getroffen werden, sofern der Zauberer dies wünscht.",
         "source": "GRW",
         "page": 234,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Körperlicher Widerstand des Ziels",
+        "difficultyType": "KW"
     },
     {
         "name": "Über Wasser gehen",
@@ -883,7 +1040,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer kann über Wasserflächen gehen, als handelte es sich um festes Gestein, auch vermag er nicht unter Wasser gezogen zu werden. Handelt es sich um ein fließendes Gewässer, wird er zusammen mit der obersten Wasserschicht abgetrieben, während bei starkem Wellengang Akrobatik-Proben verlangt werden können, um Stürze zu vermeiden.\n\nErfolgsgrade:\n– • Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K3V3): Die Geschwindigkeit des Zauberers erhöht sich um 2 Punkte, wenn er sich auf dem Wasser fortbewegt.",
         "source": "GRW",
         "page": 248,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Fliegen",
@@ -897,7 +1057,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erhebt sich in die Lüfte und kann sich mit einer Geschwindigkeit fortbewegen, die seiner doppelten Mystik entspricht.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K5V5): Die Geschwindigkeit entspricht seiner vierfachen Mystik.",
         "source": "GRW",
         "page": 229,
-        "damage": ""
+        "damage": "",
+        "difficulty": "30",
+        "difficultyType": "fest",
+        "difficultyValue": 30
     },
     {
         "name": "Schattensprung",
@@ -911,7 +1074,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer tritt in einen Schatten hinein und im selben Moment aus einem anderen Schatten heraus, der maximal 50 Meter entfernt sein darf. Er muss den zweiten Schatten sehen können.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +4V4): Der Zauberer kann ein Wesen bis maximal Größenklasse 6 mitnehmen, indem er es berührt.",
         "source": "GRW",
         "page": 242,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Magie erkennen",
@@ -925,7 +1091,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Das Ziel erkennt die Stärke der Magie in seinem direkten Sichtbereich. Möchte es anschließend ein Objekt oder einen Ort untersuchen, erhält es einen Bonus in Höhe von 1 Punkt auf eine eventuelle Arkane Kunde-Probe.\n\nErfolgsgrade:\n• Auslösezeit, Reichweite, Verstärken (s. u.), Wirkungsdauer • 1 EG (Kosten +1V1): Der Bonus erhöht sich auf 2 Punkte.",
         "source": "GRW",
         "page": 237,
-        "damage": ""
+        "damage": "",
+        "difficulty": "15",
+        "difficultyType": "fest",
+        "difficultyValue": 15
     },
     {
         "name": "Magischer Kompass",
@@ -939,7 +1108,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erkennt intuitiv die Himmelsrichtungen, wodurch er einen Bonus in Höhe von 2 Punkten auf alle Proben zur Orientierung erhält.\n\nErfolgsgrade:\n• Auslösezeit, Verstärken (s. u.) • 1 EG (Kosten +1V1): Der Bonus erhöht sich auf 3 Punkte.",
         "source": "GRW",
         "page": 237,
-        "damage": ""
+        "damage": "",
+        "difficulty": "15",
+        "difficultyType": "fest",
+        "difficultyValue": 15
     },
     {
         "name": "Alarm",
@@ -953,7 +1125,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer wird alarmiert, wenn eines oder mehrere Wesen der Größenklasse 2 oder höher den Wirkungsbereich betritt. Er vermag dabei keinen genauen Ort zu bestimmen, sondern lediglich die pure Anwesenheit festzustellen, ebenso wenig kann er Angaben zur Anzahl machen. Es ist möglich, bis zu zehn bestimmte Wesen seiner Wahl von der Alarmierung auszunehmen.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich, Wirkungsdauer • 1 EG (Kosten +1V1): Der Zauberer weiß, in welcher Richtung sich die Wesen befinden, ohne jedoch die Entfernung zu kennen.",
         "source": "GRW",
         "page": 223,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Gehör verbessern",
@@ -967,7 +1142,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erhält einen Bonus in Höhe von 3 Punkten auf jede Wahrnehmung-Probe, die sein Gehör betrifft.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Der Bonus erhöht sich auf 5 Punkte.",
         "source": "GRW",
         "page": 231,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Hauch der Geister",
@@ -981,7 +1159,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer verspürt ein leichtes Frösteln, wenn sich ein Wesen des Typus Geisterwesen im Wirkungsbereich aufhält.\n\nErfolgsgrade:\n• Auslösezeit, Verstärken (s. u.), Wirkungsbereich • 1 EG (Kosten +K1V1): Der Zauberer weiß, in welcher Richtung sich die Geister befinden, ohne jedoch die Entfernung zu kennen.",
         "source": "GRW",
         "page": 233,
-        "damage": ""
+        "damage": "",
+        "difficulty": "15",
+        "difficultyType": "fest",
+        "difficultyValue": 15
     },
     {
         "name": "Katzenaugen",
@@ -995,7 +1176,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Lichtverhältnisse verbessern sich für den Zauberer um 1 Stufe.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Die Lichtverhältnisse verbessern sich für den Zauberer um insgesamt 2 Stufen.",
         "source": "GRW",
         "page": 233,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Magische Botschaft",
@@ -1009,7 +1193,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer übermittelt dem Ziel eine gedankliche Botschaft aus maximal 5 Worten. Er muss das Ziel entweder kennen oder sehen. Das Ziel hört die Botschaft in der Stimme des Zauberers.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +1V1): Es können maximal 15 Worte übermittelt werden.",
         "source": "GRW",
         "page": 237,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Nebelsicht",
@@ -1023,7 +1210,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Aus Nebel, Dampf und Wolken resultierende Abzüge auf die Sicht können ignoriert werden.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Der Zaubernde erhält sogar einen Bonus in Höhe von 2 Punkten auf Wahrnehmung-Proben in nebliger Umgebung.",
         "source": "GRW",
         "page": 239,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Sicht verbessern",
@@ -1037,7 +1227,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erhält einen Bonus in Höhe von 3 Punkten auf jede Wahrnehmung-Probe, die seine Sicht betrifft.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Der Bonus erhöht sich auf 5 Punkte.",
         "source": "GRW",
         "page": 244,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Text verschlüsseln",
@@ -1051,7 +1244,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer macht ein Schriftstück von einer Seite unlesbar, Buchstaben erscheinen verschwommen oder wild durcheinander gewürfelt. Wird ein von ihm bestimmtes Losungswort gesprochen, nimmt der Text wieder seine ursprüngliche Form an.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +1V1): Es wird ein ganzes Buch unlesbar gemacht.",
         "source": "GRW",
         "page": 247,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Wahrer Blick",
@@ -1065,7 +1261,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer ist in der Lage, mit seinen normalen Sinnen eine Illusion zu durchschauen. Dies erfordert eine Wahrnehmung-Probe gegen die um drei Punkte erhöhte Schwierigkeit des Illusionszaubers.\n\nErfolgsgrade:\n• Auslösezeit, Verstärken (s. u.) • 2 EG (Kosten +K1V1): Die Probe geht gegen die normale Schwierigkeit des Illusionszaubers.",
         "source": "GRW",
         "page": 251,
-        "damage": ""
+        "damage": "",
+        "difficulty": "15",
+        "difficultyType": "fest",
+        "difficultyValue": 15
     },
     {
         "name": "Einstellung erspüren",
@@ -1079,7 +1278,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erfährt die Einstellung des Ziels gegenüber einer Person, einer Angelegenheit oder einer Idee, mit der das Ziel in diesem Moment konfrontiert ist. Dieser Zauber benötigt weder Formel noch Geste.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +2V2): Während Sozialer Konflikte mit dem Ziel erhält der Zauberer für bis zu eine Stunde einen Bonus in Höhe von 2 Punkten auf die im Rahmen des Konfliktes verwendeten Fertigkeiten.",
         "source": "GRW",
         "page": 225,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Geistiger Widerstand des Ziels",
+        "difficultyType": "GW"
     },
     {
         "name": "Erkenntnis stören",
@@ -1093,7 +1294,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Gegen Erkenntniszauber erhält der Zauberer einen Bonus in Höhe von 2 Punkten auf seinen Geistigen Widerstand.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Der Bonus erhöht sich auf 3 Punkte.",
         "source": "GRW",
         "page": 227,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Geistersprache",
@@ -1107,7 +1311,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer kann mit Wesen des Typus Geisterwesen kommunizieren. Diese sind ihm gegenüber nicht notwendigerweise freundlich gesonnen, aber in der Regel zumindest interessiert.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Die Einstellung von Wesen des Typus Geisterwesen gegenüber dem Zauberer verbessert sich um 1 Stufe.",
         "source": "GRW",
         "page": 231,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Schriftverständnis",
@@ -1121,7 +1328,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer vermag jede natürliche, diesseitige Schrift zu lesen. Er erhält dabei lediglich ein intuitives Verständnis für das Geschriebene, bemerkt also etwa keine stilistischen Feinheiten. Kodierte Texte in fremden Schriften werden zwar verstanden, ihr Inhalt wird aber nicht entschlüsselt.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Der Zauberer vermag auch jede Schrift zu schreiben.",
         "source": "GRW",
         "page": 243,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Sechster Sinn",
@@ -1135,7 +1345,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer verfügt über einen sechsten Sinn. Er erhält einen Bonus in Höhe von 3 Punkten auf Wahrnehmung-Proben, um eine Überraschung abzuwehren.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K1V1): Das Bonus erhöht sich auf 5 Punkte.",
         "source": "GRW",
         "page": 244,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Sprachverständnis",
@@ -1149,7 +1362,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer vermag jede natürliche diesseitige Sprache zu verstehen. Er erhält dabei lediglich ein intuitives Verständnis für das Gesagte, bemerkt also etwa keine stilistischen Feinheiten. Geheimsprachen oder ähnliche Kunstprodukte werden nicht übersetzt, ebenso wie eine Verständigung in fremden Sprachen über diesen Zauber nicht möglich ist. Auch ist es nicht möglich, Gelesenes zu verstehen, nur das gesprochene Wort ist betroffen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Der Zauberer vermag es auch, stilistische Feinheiten zu verstehen.",
         "source": "GRW",
         "page": 245,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Tiersinne",
@@ -1163,7 +1379,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer nimmt die Welt statt durch seine eigenen Sinne durch die eines beim Zaubervorgang berührten Wesens mit dem Typus Tier bis maximal Größenklasse 5 wahr, das dem Zauberer gegenüber mindestens die Einstellung Neutral aufweist. Währenddessen kann er seine eigenen Sinne nicht benutzen, sondern sieht, riecht, fühlt und hört nur das, was das Tier in diesem Moment wahrnimmt.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K1V1): Der Zauberer kann neben den Tiersinnen auch noch seine normalen Sinne benutzen.",
         "source": "GRW",
         "page": 247,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Wasser finden",
@@ -1177,7 +1396,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erfährt die Richtung der nächsten Quelle trinkbaren Wassers.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Der Zauberer erfährt zusätzlich die Entfernung der nächsten Trinkwasserquelle.",
         "source": "GRW",
         "page": 251,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Geisterblick",
@@ -1191,7 +1413,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer kann seinen parallelen Standort in der Geisterwelt sehen, hören und riechen, als wäre er dort. Eine Interaktion ist jedoch nicht möglich. Während der Wirkungsdauer ist der Zauberer nicht dazu in der Lage, sein Umfeld wahrzunehmen.\n\nErfolgsgrade:\n• Auslösezeit, Verstärken (s. u.) • 1 EG (Kosten +K1V1): Der Zauberer ist dazu in der Lage, während der Wirkungsdauer sein Umfeld wahrzunehmen.",
         "source": "GRW",
         "page": 231,
-        "damage": ""
+        "damage": "",
+        "difficulty": "15",
+        "difficultyType": "fest",
+        "difficultyValue": 15
     },
     {
         "name": "Gift erkennen",
@@ -1205,7 +1430,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauber offenbart die Wirkung und den Grad aller derzeit im Körper befindlichen Gifte. Zudem gewährt er einen Bonus in Höhe von 2 Punkten auf damit im Zusammenhang stehende Heilkunde- oder Heilungsmagie-Proben.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +1V1): Zusätzlich wird die ursprüngliche und noch übrige Wirkungsdauer der einzelnen Gifte offenbart, ebenso wie die Anwendungsweise.",
         "source": "GRW",
         "page": 232,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Magisches Schlüsselloch",
@@ -1219,7 +1447,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer kann durch eine bis zu 20 cm dicke Wand sehen, als ob es sich um dünnes milchiges Glas handelt.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K3V3): Der Zauberer kann durch bis zu 1 m Wand hindurchschauen.",
         "source": "GRW",
         "page": 238,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Magisches Zwiegespräch",
@@ -1233,7 +1464,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer kann einem einzelnen und beim Zaubervorgang bestimmten Ziel gedankliche Botschaften in Form von Worten übertragen, sodass ein Gespräch möglich ist, wenn beide Seiten den Zauber beherrschen und wirken. Er muss das Ziel entweder kennen oder sehen. Dieser Zauber benötigt keine Formel.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K3V3): Zusätzlich zu Worten können auch Bilder übermittelt werden.",
         "source": "GRW",
         "page": 238,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Sinne verstärken",
@@ -1247,7 +1481,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erhält einen Bonus in Höhe von 5 Punkten auf jede Wahrnehmung-Probe.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K3V3): Der Bonus erhöht sich auf 7 Punkte.",
         "source": "GRW",
         "page": 245,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Fernsicht",
@@ -1261,7 +1498,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer kann einen bis zu 10 Kilometer entfernten Ort sehen, hören und riechen, als wäre er dort. Eine Interaktion ist jedoch nicht möglich. Es können nur solche Plätze ausgewählt werden, die von der Position des Zauberers aus sichtbar sind. Auch lassen sich weder der genaue Punkt noch die Blickrichtung verändern, nachdem der Zauber einmal gewirkt wurde. Während der Wirkungsdauer ist der Zauberer nicht dazu in der Lage, sein Umfeld wahrzunehmen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K4V4): Der Zauberer ist dazu in der Lage, während der Wirkungsdauer sein Umfeld wahrzunehmen.",
         "source": "GRW",
         "page": 228,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Gedankenlesen",
@@ -1275,7 +1515,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erhält Einblick in die aktuellen Gedankengänge der Zielperson, kann aber nicht in seine Erinnerungen eindringen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 3 EG (Kosten +K4V4): Der Zauberer kann auch gezielt in die Erinnerungen des Ziels eindringen, was pro einzelner Erinnerung etwa 1 Stunde dauert.",
         "source": "GRW",
         "page": 230,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Geistiger Widerstand des Ziels",
+        "difficultyType": "GW"
     },
     {
         "name": "Nachtsicht",
@@ -1289,7 +1531,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Lichtverhältnisse verbessern sich für den Zauberer um 3 Stufen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K3V3): Die Lichtverhältnisse verbessern sich um insgesamt 4 Stufen.",
         "source": "GRW",
         "page": 239,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Prophezeiung",
@@ -1303,7 +1548,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erhält eine undeutliche Weissagung über die nahe Zukunft oder das Schicksal einer Person, eines Gegenstands oder einer Unternehmung.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus • 3 EG (Kosten +3V3): Der Zauberer erhält eine deutlichere Weissagung.",
         "source": "GRW",
         "page": 240,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Tiersprache",
@@ -1317,7 +1565,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer ist in der Lage, mit einem bestimmten Wesen des Typus Tier begrenzt zu kommunizieren, solange es ihm gegenüber mindestens die Einstellung Neutral aufweist. Es handelt sich nicht um ein echtes Gespräch, vielmehr kann er dem Wesen Fragen stellen, die diese im Rahmen seiner Sinneswahrnehmung, Denkfähigkeit und Laune beantworten kann.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsdauer • 2 EG (Kosten +4V4): Der Zauber wirkt auch mit Wesen des Typus Monster.",
         "source": "GRW",
         "page": 247,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Allverständnis",
@@ -1331,7 +1582,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer vermag das gesprochene Wort jedes Wesens zu verstehen, gleich ob es aus dem Diesseits stammt oder aus den Anderswelten kommt. Seine eigene Sprache wird hiervon jedoch nicht betroffen, andere Wesen können ihn nicht auf magische Weise verstehen. Der Zauberer erfährt auf magische Weise den Sinn des Gesagten, sodass er etwa keine Inschriften lesen kann.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsdauer • 2 EG (Kosten +5V5): Alle Wesen können außerdem verstehen, was der Zauberer sagt.",
         "source": "GRW",
         "page": 223,
-        "damage": ""
+        "damage": "",
+        "difficulty": "30",
+        "difficultyType": "fest",
+        "difficultyValue": 30
     },
     {
         "name": "Spuren der Vergangenheit",
@@ -1345,7 +1599,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erhält eine Vision seines Aufenthaltsortes aus früheren Zeiten. Ein umgekehrt chronologischer Strom an Bildern und Eindrücken aus der Vergangenheit stürzt über ihn herein, wobei die ältesten Eindrücke 100 Jahre zurückliegen. Auf diesem Wege lassen sich lediglich größere Veränderungen rekonstruieren, nicht einzelne Taten.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus • 3 EG (Kosten +5V5): Die ältesten Eindrücke liegen 1000 Jahre zurück.",
         "source": "GRW",
         "page": 245,
-        "damage": ""
+        "damage": "",
+        "difficulty": "30",
+        "difficultyType": "fest",
+        "difficultyValue": 30
     },
     {
         "name": "Härte",
@@ -1359,7 +1616,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Härte eines unbelebten Objekts erhöht sich um 1 Punkt.\n\nErfolgsgrade:\n• Auslösezeit, Verstärken (s. u.) • 1 EG (Kosten +K1V1): Die Härte erhöht sich um insgesamt 2 Punkte.",
         "source": "GRW",
         "page": 233,
-        "damage": ""
+        "damage": "",
+        "difficulty": "15",
+        "difficultyType": "fest",
+        "difficultyValue": 15
     },
     {
         "name": "Stein",
@@ -1373,7 +1633,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erschafft ein bis zu faustgroßes Objekt aus Stein, das eine einfache geometrische Form aufweist.\n\nErfolgsgrade:\n• Auslösezeit, Verstärken (s. u.), Wirkungsdauer • 1 EG (Kosten +1V1): Wird der Stein als Geschoss oder Wurfwaffe verwendet, erhöht sich der Schaden um 1 Punkt.",
         "source": "GRW",
         "page": 246,
-        "damage": ""
+        "damage": "",
+        "difficulty": "15",
+        "difficultyType": "fest",
+        "difficultyValue": 15
     },
     {
         "name": "Felsgeschoss",
@@ -1387,7 +1650,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer schleudert dem Ziel ein Felsgeschoss entgegen, welches 1W10 Punkte Felsschaden verursacht. Zudem bedarf es einer gelungenen Akrobatik- oder Athletik-Probe gegen 15 (erhöht um die Fertigkeitspunkte des Zauberers in der verwendeten Magieschule), um nicht vom Aufprall umgeworfen zu werden und als liegend zu gelten.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Schaden, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +1V1): Die Schwierigkeit der Akrobatik-Probe beträgt 20 + Fertigkeitspunkte des Zauberers.",
         "source": "GRW",
         "page": 228,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Verteidigung des Ziels",
+        "difficultyType": "VTD"
     },
     {
         "name": "Last",
@@ -1401,7 +1666,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Last eines Objekts wird um 3 Stufen erhöht, es wird auf magische Weise schwerer. Dadurch wird das Objekt schwieriger zu transportieren.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Die Last wird um insgesamt 5 Stufen erhöht.",
         "source": "GRW",
         "page": 235,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Standfest",
@@ -1415,7 +1683,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Wird versucht, den Zauberer zurückzudrängen oder umzuwerfen, erhält er einen Bonus in Höhe von 2 Punkten auf die entsprechende Fertigkeit bzw. von 1 Punkt auf den entsprechenden Widerstandswert, um dem entgegen zu wirken.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K1V1): Der Bonus beträgt 4 bzw. 2 Punkte.",
         "source": "GRW",
         "page": 245,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Steinfaust",
@@ -1429,7 +1700,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Eine Hand des Zauberers verwandelt sich in Stein. Seine waffenlosen Nahkampfangriffe verursachen dadurch echten Schaden statt Betäubungsschaden, außerdem erhält er im Handgemenge das Waffenmerkmal Defensiv 1 (S. 186). Dieser Zauber ist nicht mit anderen Zaubern des Typus Hand kombinierbar.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Zusätzlich richtet der Zauberer im unbewaffneten Nahkampf 2 Punkte echten Felsschaden an.",
         "source": "GRW",
         "page": 246,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Erde zu Schlamm",
@@ -1443,7 +1717,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Im Wirkungsbereich befindliche Erde verwandelt sich in Schlamm und wird zu Schwierigem Gelände. Der Boden trocknet nach Wirken des Zaubers auf natürliche Weise.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 1 EG (Kosten +2V2): Erde im Wirkungsbereich wird zu Sehr Schwierigem Gelände.",
         "source": "GRW",
         "page": 226,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Erdstoß",
@@ -1457,7 +1734,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Ein Erdstoß erschüttert den Wirkungsbereich. Gebäude erleiden Schaden in Höhe von 15 Punkten, während Wesen eine Akrobatik-Probe gegen 20 gelingen muss, um nicht zu Boden zu fallen und als liegend zu gelten.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Verzehrter Fokus, Verstärken (s. u.), Wirkungsbereich • 2 EG (Kosten +2V2): Der Schaden gegen Gebäude erhöht sich auf 18, die Schwierigkeit der Akrobatik-Probe auf 25.",
         "source": "GRW",
         "page": 227,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Felswesen rufen I",
@@ -1471,7 +1751,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer beschwört ein Wesen der Typen Felswesen und Magisches Wesen I, das all seinen Anweisungen folgt.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K2V2): Es wird ein zweites Wesen der gleichen Art beschworen.",
         "source": "GRW",
         "page": 228,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Steinhaut",
@@ -1485,7 +1768,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Haut des Zauberers wird hart wie Fels. Er erhält einen Bonus in Höhe von jeweils 2 Punkten auf seine Verteidigung und seine Schadensreduktion. Dieser Zauber ist nicht mit anderen Zaubern kombinierbar, die ebenfalls den Typus Haut besitzen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K2V2): Der Bonus auf die SR erhöht sich auf 3 Punkte.",
         "source": "GRW",
         "page": 246,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Steinwand",
@@ -1499,7 +1785,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erschafft eine schnurgerade und unverrückbare Wand aus festem Stein von 20 cm Dicke mit einer beliebig verteilbaren Fläche von bis zu 10 m². Ihre Härte beträgt 4 Punkte, ihre Haltbarkeit 12 Punkte. Sie kann also zerstört werden, was den Zauber beendet. Die maximale Wirkungsweite kanalisierter Zauber (S. 195) gilt für diesen Zauber als verzehnfacht.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Die Härte erhöht sich auf 6 Punkte, die Haltbarkeit auf 18 Punkte.",
         "source": "GRW",
         "page": 246,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Fels formen",
@@ -1513,7 +1802,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer kann 5 Kubikmeter Stein verformen, als handelte es sich um warmen Wachs. Sollen spezifische Objekte gebildet werden, können Edelhandwerk-Proben verlangt werden.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K3V3): Es können weitere 5 Kubikmeter verformt werden.",
         "source": "GRW",
         "page": 228,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Felshände",
@@ -1527,7 +1819,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Zwei steinerne Klauen schießen aus dem Boden empor und führen Nahkampfangriffe gegen vom Zauberer bestimmte Ziele durch. Als Kampffertigkeitswert gilt der Fertigkeitswert in Felsmagie, die Verteidigung beträgt 18, die Waffengeschwindigkeit 10, der Felsschaden 1W6+3 und die Schadensreduktion 4, zudem verfügt jede Klaue über 5 Lebenspunkte und eine Gesundheitsstufe. An Meisterschaften kann Umklammern eingesetzt werden. Die Klauen sind ortsgebunden und können lediglich Ziele in Nahkampfentfernung zu ihnen angreifen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K3V3): Es erscheinen insgesamt drei Felsklauen.",
         "source": "GRW",
         "page": 228,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Magnetismus",
@@ -1541,7 +1836,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Boden im Wirkungsbereich wird stark magnetisch. Kampfhandlungen mit Metallwaffen erhalten einen Malus in Höhe von 4 Punkten, zudem verdoppelt sich die Behinderung von Metallrüstungen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 1 EG (Kosten +K3V3): Der Malus erhöht sich auf 5 Punkte.",
         "source": "GRW",
         "page": 238,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Stahlhaut",
@@ -1555,7 +1853,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Haut des Zauberers wird hart wie Stahl und schimmert metallisch. Er erhält einen Bonus in Höhe von jeweils 4 Punkten auf seine Verteidigung und seine Schadensreduktion. Dieser Zauber ist nicht mit anderen Zaubern kombinierbar, die ebenfalls den Typus Haut besitzen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K4V4): Der Bonus auf die SR erhöht sich auf 5 Punkte.",
         "source": "GRW",
         "page": 245,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Unzerstörbar",
@@ -1569,7 +1870,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Ein unbelebtes Objekt kann nicht mehr beschädigt oder zerstört werden. Es erhält seine übliche Verformbarkeit bei, ebenso wie sein Gewicht. Auf die Schutzwirkung von Rüstungen oder den Schaden von Waffen hat dieser Zauber keine Auswirkungen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 3 EG (Kosten +K4V4): Sollte es sich um eine Rüstung handeln, steigt außerdem deren Schadensreduktion um 1 Punkt.",
         "source": "GRW",
         "page": 249,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Versteinern",
@@ -1583,7 +1887,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Das Ziel des Zaubers wird in unnatürlich harten Stein (Härte 8, Haltbarkeit 16) verwandelt. Es kann seine Umwelt noch wahrnehmen, sich aber nicht mehr bewegen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K4V4): Die Härte steigt auf 10, die Haltbarkeit auf 20.",
         "source": "GRW",
         "page": 250,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Körperlicher Widerstand des Ziels",
+        "difficultyType": "KW"
     },
     {
         "name": "Erdbeben",
@@ -1597,7 +1903,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Ein Erdbeben erschüttert den Wirkungsbereich. Gebäude erleiden Schaden in Höhe von 50 Punkten, während Wesen eine Akrobatik-Probe gegen 35 gelingen muss, um nicht zu Boden zu fallen und als liegend zu gelten.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 2 EG (Kosten +5V5): Der Schaden gegen Gebäude erhöht sich auf 60, die Schwierigkeit der Akrobatik-Probe auf 40.",
         "source": "GRW",
         "page": 226,
-        "damage": ""
+        "damage": "",
+        "difficulty": "30",
+        "difficultyType": "fest",
+        "difficultyValue": 30
     },
     {
         "name": "Felszerstörung",
@@ -1611,7 +1920,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Erde und Fels im Umkreis sowie alle daraus bestehenden Konstruktionen oder Wesen erleiden 75 Punkte Schaden.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 2 EG (Kosten +5V5): Der Schaden erhöht sich auf 100 Punkte.",
         "source": "GRW",
         "page": 228,
-        "damage": ""
+        "damage": "",
+        "difficulty": "30",
+        "difficultyType": "fest",
+        "difficultyValue": 30
     },
     {
         "name": "Flamme",
@@ -1625,7 +1937,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Eine Flamme entsteht in der Hand des Zauberers oder auf einem Objekt, mit der etwa eine Pfeife entzündet werden kann. Größere Objekte lassen sich mit diesem Zauber nicht anzünden\n\nErfolgsgrade:\n• Auslösezeit, Verstärken (s. u.), Wirkungsdauer • 1 EG (Kosten +1V1): Es kann mit dem richtigen Material auch bis zur Größe eines Lagerfeuers Feuer entzündet werden.",
         "source": "GRW",
         "page": 229,
-        "damage": ""
+        "damage": "",
+        "difficulty": "15",
+        "difficultyType": "fest",
+        "difficultyValue": 15
     },
     {
         "name": "Wärme",
@@ -1639,7 +1954,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Hitzestufe erhöht sich für den Zauberer um 1 Stufe bzw. die Kältestufe sinkt um 1 Stufe.\n\nErfolgsgrade:\n• Auslösezeit, Verstärken (s. u.) • 2 EG (Kosten +K1V1): Die Hitzestufe erhöht bzw. die Kältestufe senkt sich um insgesamt 2 Stufen.",
         "source": "GRW",
         "page": 251,
-        "damage": ""
+        "damage": "",
+        "difficulty": "15",
+        "difficultyType": "fest",
+        "difficultyValue": 15
     },
     {
         "name": "Entzünden",
@@ -1653,7 +1971,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Ein unbelebtes und auf natürlichem Wege brennbares Objekt erhält für 30 Ticks den Zustand Brennend 1.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +1V1): Der Zustand endet nicht nach 30 Ticks, sondern erst wenn das Objekt verbrannt ist oder das Feuer gelöscht wurde.",
         "source": "GRW",
         "page": 226,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Feuerstrahl",
@@ -1667,7 +1988,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer wirft einen Feuerstrahl auf einen Gegner. Der Getroffene erleidet 2W6+5 Punkte Feuerschaden.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Schaden, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +1V1): Das Ziel erhält zusätzlich für 30 Ticks den Zustand Brennend 1.",
         "source": "GRW",
         "page": 228,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Verteidigung des Ziels",
+        "difficultyType": "VTD"
     },
     {
         "name": "Flammende Waffe",
@@ -1681,7 +2004,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Eine Waffe wird mit Flammen überzogen. Sie leuchtet fackelhell und richtet 1 Punkt zusätzlichen Feuerschaden an, ohne dabei den Träger einzuschränken. Dieser Zauber ist nicht mit anderen Zaubern kombinierbar, die ebenfalls die Typen Schaden und Waffe aufweisen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K1V1): Die Klinge richtet 2 Punkte Feuerschaden an.",
         "source": "GRW",
         "page": 229,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Flammenhand",
@@ -1695,7 +2021,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Hand des Zauberers wird mit Flammen überzogen, so dass sie fackelhell leuchtet. Im unbewaffneten Nahkampf richtet der Zauber echten Feuerschaden an und hat mit seinen waffenlosen Angriffen das Waffenmerkmal Scharf 2 (S. 186), ohne dass er dabei selbst eingeschränkt ist. Dieser Zauber ist nicht mit anderen Zaubern des Typus Hand kombinierbar.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Die Hand leuchtet nicht so hell wie eine Fackel, sondern so hell wie ein Lagerfeuer. Der Schaden erhöht sich um 2 Punkte echten Feuerschaden.",
         "source": "GRW",
         "page": 229,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Schutz vor Feuer",
@@ -1709,7 +2038,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Sämtlicher gegen den Zauberer gerichteter Feuerschaden wird um 4 Punkte gesenkt. Die Hitzestufe (S. 174) gilt für ihn als um 1 reduziert.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Entsprechender Schaden wird um 6 Punkte gesenkt.",
         "source": "GRW",
         "page": 244,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Flammenherrschaft",
@@ -1723,7 +2055,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer beherrscht ein bereits brennendes, natürliches Feuer der Stufen 1-3. Er kann es sowohl abschwächen, also den Brandschaden um eine Stufe senken, als auch heißer brennen lassen und damit den Brandschaden um 1 Stufe erhöhen. Außerdem vermag er es in einfache Formen zu dirigieren.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K2V2): Es kann auch ein Feuer der Stufen 4-5 beherrscht werden.",
         "source": "GRW",
         "page": 229,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Kometenwurf",
@@ -1737,7 +2072,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Ein Wurfgeschoss wird mit magischer Macht aufgeladen. Wird es anschließend geworfen, erleiden alle Wesen und Objekte in 5 Metern Umkreis um den Aufprallort 1W6+3 Punkte Feuerschaden. Der Zauber endet automatisch nach dem Auftreffen oder nachdem die Wirkungsdauer verstrichen ist.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Schaden, Verstärken (s. u.), Verzehrter Fokus, Wirkungsdauer • 2 EG (Kosten +3V3): Die Ziele erhalten zusätzlich für 30 Ticks den Zustand Brennend 1.",
         "source": "GRW",
         "page": 234,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Metall erhitzen",
@@ -1751,7 +2089,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Ein metallenes Objekt erhitzt sich so stark, dass eine ausreichend lange Berührung den gleichen Schaden mit sich bringt wie Brandschaden der Stufe 1.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Der Schaden entspricht Brandschaden der Stufe 2.",
         "source": "GRW",
         "page": 238,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Aura der Wärme",
@@ -1765,7 +2106,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Für den Zauberer und bis zu drei weitere beim Auslösen des Zaubers festgelegte Wesen seiner Wahl gilt die vorherrschende Kältestufe als um 2 Punkte gesenkt bzw. die vorherrschende Hitzestufe als um 2 Punkte erhöht. Die Modifikation gilt nur während des Aufenthalts im Wirkungsbereich.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 2 EG (Kosten +K3V3): Es können bis zu fünf Personen bestimmt werden.",
         "source": "GRW",
         "page": 223,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Flammenkegel",
@@ -1779,7 +2123,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Ein Flammenkegel schießt vom Zauberer aus nach vorne und richtet bei allen Wesen und Objekten, die sich innerhalb des Flammenkegels aufhalten, 2W6 Punkte Feuerschaden an. Der Flammenkegel ist am Ort seines Entstehens einen halben Meter breit und wächst mit jedem Meter, den er sich vom Zauberer entfernt, um einen weiteren halben Meter in die Breite, bis zu einem Maximum von 3 Metern Breite. Wird die Reichweite des Flammenkegels vergrößert, wächst er entsprechend langsamer in die Breite.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Schaden, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +3V3): Getroffene Wesen und Objekte erhalten zusätzlich für 15 Ticks den Zustand Brennend 2.",
         "source": "GRW",
         "page": 229,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Flammenschild",
@@ -1793,7 +2140,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer umgibt sich mit einem Schild aus lodernden Flammen. Während er selbst nicht davon beeinträchtigt wird, erleidet jedes Wesen, das sich ihm für länger als 15 Ticks auf 2 Meter nähert, für 15 Ticks den Zustand Brennend 2.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K3V3): Die nötige Zeit der Nähe wird auf 5 Ticks reduziert.",
         "source": "GRW",
         "page": 229,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Feuerball",
@@ -1807,7 +2157,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer schleudert einen Feuerball auf einen Zielpunkt, der bei Aufprall explodiert und jedem Wesen und Objekt in 5 m Umkreis 2W10 Punkte Feuerschaden zufügt.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Schaden, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +6V6): Die Ziele erhalten zusätzlich für 30 Ticks den Zustand Brennend 2.",
         "source": "GRW",
         "page": 228,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Flammenwand",
@@ -1821,7 +2174,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erschafft eine schnurgerade und unverrückbare Wand aus Flammen von 20 cm Dicke mit einer beliebig verteilbaren Fläche von bis zu 10 m². Bewegen sich Wesen oder Objekte durch sie hindurch, erhalten sie 8W6 Punkte Feuerschaden. Die maximale Wirkungsweite kanalisierter Zauber (S. 195) gilt für diesen Zauber als verzehnfacht.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K4V4): Das Durchqueren verursacht zusätzlich für 30 Ticks den Zustand Brennend 1.",
         "source": "GRW",
         "page": 229,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Umgebung erhitzen",
@@ -1835,7 +2191,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Hitzestufe erhöht sich um 3 Stufen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 2 EG (Kosten +K4V4): Die Hitzestufe erhöht sich um insgesamt 5 Stufen.",
         "source": "GRW",
         "page": 248,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Eins mit dem Feuer",
@@ -1849,7 +2208,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Körper des Zauberers verwandelt sich in eine lodernde Gestalt aus Feuer, behält aber seine Statur bei. Er erhält einen Bonus in Höhe von 5 Punkten auf seine Schadensreduktion und seine Berührungen richten bei ausreichender Dauer Brandschaden 3 an, während er selbst immun gegen Hitze- und Feuerschaden ist. Kleidung und Ausrüstung sind nicht von der Verwandlung betroffen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K5V5): Gegenstände bis Last 4 werden mitverwandelt.",
         "source": "GRW",
         "page": 225,
-        "damage": ""
+        "damage": "",
+        "difficulty": "30",
+        "difficultyType": "fest",
+        "difficultyValue": 30
     },
     {
         "name": "Einäschern",
@@ -1863,7 +2225,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Das Ziel des Zaubers wird von einer explosiven Flammenwolke eingehüllt und erleidet dadurch 2W6 Punkte Feuerschaden. Außerdem erhält es für 30 Ticks den Zustand Brennend 3.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Schaden, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +3V3): Das Ziel erhält statt dem normalen Zustand für 45 Ticks den Zustand Brennend 4.",
         "source": "GRW",
         "page": 225,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Verteidigung des Ziels",
+        "difficultyType": "VTD"
     },
     {
         "name": "Ausdauer stärken",
@@ -1877,7 +2241,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Für die Bestimmung einer Überanstrengung gilt die Konstitution des Zauberers als um 2 Punkte erhöht. Zähigkeit-Proben zur Abwehr des Zustands Erschöpft erhalten einen Bonus in Höhe von 2 Punkten.\n\nErfolgsgrade:\n• Auslösezeit, Verstärken (s. u.) • 1 EG (Kosten +K1V1): Die Konstitution gilt für Überanstrengung als um 3 Punkte erhöht. Der Bonus auf Zähigkeit-Proben steigt auf 3 Punkte.",
         "source": "GRW",
         "page": 224,
-        "damage": ""
+        "damage": "",
+        "difficulty": "15",
+        "difficultyType": "fest",
+        "difficultyValue": 15
     },
     {
         "name": "Erfrischung",
@@ -1891,7 +2258,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauber unterdrückt 1 Stufe des Zustands Erschöpft.\n\nErfolgsgrade:\n• Auslösezeit, Verstärken (s. u.) • 1 EG (Kosten +K1V1): Es werden insgesamt 3 Stufen des Zustands unterdrückt.",
         "source": "GRW",
         "page": 227,
-        "damage": ""
+        "damage": "",
+        "difficulty": "15",
+        "difficultyType": "fest",
+        "difficultyValue": 15
     },
     {
         "name": "Geh noch nicht",
@@ -1905,7 +2275,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauber hält die Lebenskraft eines Sterbenden in dessen Körper. Die Wirkung der Zustände Sterbend 1 und Sterbend 2 wird ausgesetzt, während die Wirkungsdauer einer etwaigen Zustandsursache weiterläuft.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K2V2): Auch die Wirkung des Zustands Sterbend 3 wird ausgesetzt.",
         "source": "GRW",
         "page": 231,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Gift erkennen",
@@ -1919,7 +2292,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauber offenbart die Wirkung und den Grad aller derzeit im Körper befindlichen Gifte. Zudem gewährt er einen Bonus in Höhe von 2 Punkten auf damit im Zusammenhang stehende Heilkunde- oder Heilungsmagie-Proben.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +1V1): Zusätzlich wird die ursprüngliche und noch übrige Wirkungsdauer der einzelnen Gifte offenbart, ebenso wie die Anwendungsweise.",
         "source": "GRW",
         "page": 232,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Lebenskraft stärken",
@@ -1933,7 +2309,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erhält 6 zusätzliche Lebenspunkte, die im Falle erlittener Schadenspunkte zuerst verbraucht werden. Es ist möglich, dadurch temporär über einen Vorrat an Lebenspunkten zu verfügen, der über das natürliche Maximum hinausgeht (ebenso gelten die Regeln zu maximalen Boni auf abgeleitete Werte für diesen Zauber nicht). Sollte der Zauberer bereits verwundet sein, gelten weiter seine aktuellen Wundabzüge. Der Zauber endet automatisch, wenn die 6 zusätzlichen Lebenspunkte aufgebraucht wurden. Dieser Zauber ist nicht mit anderen Zaubern kombinierbar, die ebenfalls die Typen Körper stärken und Leben besitzen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Der Zauberer erhält insgesamt 8 zusätzliche Lebenspunkte.",
         "source": "GRW",
         "page": 235,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Selbstheilung",
@@ -1947,7 +2326,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauber gibt 3 Lebenspunkte.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +1V1): Es werden insgesamt 6 Lebenspunkte regeneriert.",
         "source": "GRW",
         "page": 244,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Wachstum",
@@ -1961,7 +2343,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer lässt eine Pflanze bis zur Größe eines Busches innerhalb von 1 Minute bis hin zu ihrer natürlichen Größe wachsen und reifen. Dadurch kann etwa ein Durchgang verborgen, Nahrung zur Reife gebracht oder eine Kletterhilfe geschaffen werden.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +1V1): Die Pflanze wächst bis zum Anderthalbfachen ihrer natürlichen Größe an.",
         "source": "GRW",
         "page": 250,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Heilung stärken",
@@ -1975,7 +2360,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Regeneration der Lebenspunkte in der nächsten Ruhephase wird um 5 Punkte erhöht.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +2V2): Es werden in der nächsten Ruhephase insgesamt 10 zusätzliche Lebenspunkte regeneriert.",
         "source": "GRW",
         "page": 233,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Leichte Heilung",
@@ -1989,7 +2377,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauber regeneriert 6 Lebenspunkte.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +2V2): Es werden insgesamt 10 Lebenspunkte regeneriert.",
         "source": "GRW",
         "page": 235,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Reparatur",
@@ -2003,7 +2394,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Einem demolierten oder angeschlagenen Objekt mit einer maximalen Last von 6 wird seine ursprüngliche Form zurückgegeben.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +2V2): Die maximale Last beträgt 8.",
         "source": "GRW",
         "page": 240,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Schmerzen widerstehen",
@@ -2017,7 +2411,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer wird unempfindlicher gegen Schmerzen. Eventuelle Wundabzüge sinken um 3 Punkte.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Die Wundabzüge sinken um 4 Punkte.",
         "source": "GRW",
         "page": 243,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Schutz vor Gift",
@@ -2031,7 +2428,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erhält einen Bonus in Höhe von 3 Punkten auf seinen Körperlichen Widerstand gegen Vergiftungen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Der Bonus erhöht sich auf 4 Punkte,",
         "source": "GRW",
         "page": 244,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Giftbann",
@@ -2045,7 +2445,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Alle derzeit im Körper befindlichen Gifte werden aufgehoben, solange sie maximal Grad 3 aufweisen und nicht den Zustand Siechtum verleihen.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +3V3): Es werden Gifte bis Grad 5 ohne den Zustand Siechtum aufgehoben.",
         "source": "GRW",
         "page": 232,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Heilung",
@@ -2059,7 +2462,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauber regeneriert 16 Lebenspunkte.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +3V3): Es werden insgesamt 24 Lebenspunkte regeneriert.",
         "source": "GRW",
         "page": 233,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Lebensband",
@@ -2073,7 +2479,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Sämtlicher Schaden, den ein vom Zauberer bestimmtes Wesen erleidet, wird auf ein anderes vom Zauberer bestimmtes Wesen übertragen. Zur Verzauberung müssen beide Ziele gleichzeitig berührt werden und beide müssen dem Zauber freiwillig zustimmen. Der Zauber endet automatisch mit dem Ableben des Schaden empfangenden Wesens.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K3V3): Auch die Auswirkung von Giften und Krankheiten werden übertragen.",
         "source": "GRW",
         "page": 235,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Aura der Lebenskraft",
@@ -2087,7 +2496,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer und bis zu drei weitere beim Auslösen des Zaubers festgelegte Wesen seiner Wahl erhalten jeweils 10 zusätzliche Lebenspunkte, die im Falle erlittener Schadenspunkte zuerst verbraucht werden. Es ist möglich, dadurch temporär über einen Vorrat an Lebenspunkten zu verfügen, der über das natürliche Maximum hinausgeht (und auch die maximalen Boni auf abgeleitete Werte gelten hier nicht). Sollte ein Nutznießer bereits verwundet sein, gelten weiter seine aktuellen Wundabzüge. Die zusätzlichen Punkte stehen nur während des Aufenthalts im Wirkungsbereich zur Verfügung und verfallen bei Verlassen desselben. Dieser Zauber ist nicht mit anderen Zaubern kombinierbar, die ebenfalls die Typen Körper stärken und Leben besitzen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 2 EG (Kosten +K4V4): Es können bis zu fünf Personen bestimmt werden.",
         "source": "GRW",
         "page": 223,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Schmerzen ignorieren",
@@ -2101,7 +2513,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer wird beinahe unempfindlich gegen Schmerzen. Eventuelle Wundabzüge sinken um 6 Punkte.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K4V4): Die Wundabzüge sinken um 8 Punkte.",
         "source": "GRW",
         "page": 243,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Wiederherstellung",
@@ -2115,7 +2530,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Das Ziel regeneriert alle Lebenspunkte, zudem werden alle Zustände aufgehoben, die Folge von Angriffen sind.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +4V4): Zusätzlich werden alle Gifte und Krankheiten aufgehoben, sofern sie maximal den Zustand Siechtum 2 verleihen.",
         "source": "GRW",
         "page": 252,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Aura der Schmerzlosigkeit",
@@ -2129,7 +2547,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Wundabzüge des Zauberers und bis zu drei weiterer beim Auslösen des Zaubers festgelegter Wesen seiner Wahl werden ignoriert. Dies steht den Nutznießern nur während des Aufenthalts im Wirkungsbereich zur Verfügung.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 2 EG (Kosten +K4V4): Es können bis zu fünf Personen bestimmt werden.",
         "source": "GRW",
         "page": 223,
-        "damage": ""
+        "damage": "",
+        "difficulty": "30",
+        "difficultyType": "fest",
+        "difficultyValue": 30
     },
     {
         "name": "Regeneration",
@@ -2143,7 +2564,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer regeneriert pro Tick 1 Lebenspunkt.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K5V5): Der Zauberer regeneriert pro Tick insgesamt 2 Lebenspunkte.",
         "source": "GRW",
         "page": 240,
-        "damage": ""
+        "damage": "",
+        "difficulty": "30",
+        "difficultyType": "fest",
+        "difficultyValue": 30
     },
     {
         "name": "Geräuschhexerei",
@@ -2157,7 +2581,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer lässt ein kurzes und nicht zu komplexes Geräusch wie etwa ein Türknarren oder ein Bellen entstehen. Dieser Zauber benötigt keine Formel.\n\nErfolgsgrade:\n• Auslösezeit, Reichweite, Verstärken (s. u.) • 1 EG (Kosten +1V1): Statt eines einfachen Geräuschs handelt es sich um bis zu fünf Worte mit der Stimme des Zauberers.",
         "source": "GRW",
         "page": 231,
-        "damage": ""
+        "damage": "",
+        "difficulty": "15",
+        "difficultyType": "fest",
+        "difficultyValue": 15
     },
     {
         "name": "Lichtertanz",
@@ -2171,7 +2598,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erschafft bunte, flackernde Lichter. Diese können beispielsweise Wesen ablenken oder ihm einen Bonus in Höhe von 2 Punkten auf passende Darbietung-Proben geben.\n\nErfolgsgrade:\n• Auslösezeit, Reichweite, Verstärken (s. u.), Wirkungsdauer • 3 EG (Kosten +1V1): Der Bonus auf Darbietung-Proben erhöht sich auf 3 Punkte.",
         "source": "GRW",
         "page": 236,
-        "damage": ""
+        "damage": "",
+        "difficulty": "15",
+        "difficultyType": "fest",
+        "difficultyValue": 15
     },
     {
         "name": "Erkenntnis stören",
@@ -2185,7 +2615,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Gegen Erkenntniszauber erhält der Zauberer einen Bonus in Höhe von 2 Punkten auf seinen Geistigen Widerstand.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Der Bonus erhöht sich auf 3 Punkte.",
         "source": "GRW",
         "page": 227,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Falsches Gesicht",
@@ -2199,7 +2632,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Das Gesicht des Zauberers wird durch das einer zufälligen anderen Person ersetzt. Sobald der Zauberer redet oder Grimassen schneidet, kann die Illusion mit einer Wahrnehmung-Probe gegen 21 durchschaut werden.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K1V1): Der Zauberer kann das Gesicht einer ihm vom Aussehen her bekannten Person vortäuschen.",
         "source": "GRW",
         "page": 227,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Geruch",
@@ -2213,7 +2649,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erschafft einen beliebigen Geruch. Dieser Zauber benötigt keine Formel.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 2 EG (Kosten +K1V1): Wesen im Wirkungsbereich erhalten den Zustand Benommen 1.",
         "source": "GRW",
         "page": 232,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Magische Finte",
@@ -2227,7 +2666,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Bewegungen des Ziels werden durch verwirrende Illusionen überlagert. Während der Wirkungsdauer können keinerlei Gelegenheitsangriffe gegen es durchgeführt werden. Das Fokussieren der Magie für diesen Zauber provoziert ebenfalls keine Gelegenheitsangriffe.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsdauer • 2 EG (Kosten +1V1): Normale Angriffe gegen den Zauberer erhalten einen Malus in Höhe von 1 Punkt.",
         "source": "GRW",
         "page": 237,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Objektillusion",
@@ -2241,7 +2683,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer kann ein Objekt als ein anderes ähnlicher Größe erscheinen lassen, etwa ein Stück Rinde als Münze oder einen Stock als Schwert. Lediglich die Sicht ist von dem Zauber betroffen. Das Objekt darf maximal eine Last von 4 aufweisen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K1V1): Auch die übrigen Sinne sind betroffen.",
         "source": "GRW",
         "page": 239,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Stille",
@@ -2255,7 +2700,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Alle Geräusche, die im Wirkungsbereich entstehen oder diesen passieren, werden gedämpft, wodurch entsprechende Wahrnehmung-Proben einen Malus in Höhe von 4 Punkten erhalten.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 2 EG (Kosten +K1V1): Der Malus erhöht sich auf 8 Punkte.",
         "source": "GRW",
         "page": 246,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Unauffälligkeit",
@@ -2269,7 +2717,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer wird so unauffällig, dass vorbeikommende Personen achtlos an ihm vorbeigehen und er sich durch Volksmassen bewegen kann, ohne bemerkt zu werden. Der Zauber hilft nur eingeschränkt, wenn gezielt nach dem Zauberer gesucht wird oder Personen besonders aufmerksam auf alle Passanten achten (wie etwa Wachen am Burgtor), gibt dann jedoch einen Bonus in Höhe von 2 Punkten auf Heimlichkeit-Proben.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K1V1): Der Bonus steigt auf 3 Punkte.",
         "source": "GRW",
         "page": 248,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Blenden",
@@ -2283,7 +2734,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Vor den Augen des Ziels blitzt ein grelles Licht auf, welches ihm den Zustand Geblendet 1 verleiht (nicht mehrfach gleichzeitig möglich).\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +1V1): Das Ziel erhält den Zustand Geblendet 2.",
         "source": "GRW",
         "page": 224,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Körperlicher Widerstand des Ziels",
+        "difficultyType": "KW"
     },
     {
         "name": "Kreischen",
@@ -2297,7 +2750,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Ein lautes und schrilles illusionäres Geräusch geht vom Zauberer aus, das bei allen Wesen in 5 Metern Umkreis den Zustand Benommen 2 für 30 Ticks verursacht. Der Zauberer selbst ist nicht davon betroffen.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +2V2): Die Betroffenen erhalten zusätzlich für 30 Ticks den Zustand Lahm.",
         "source": "GRW",
         "page": 234,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Trugbild",
@@ -2311,7 +2767,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erschafft eine statische Illusion bis maximal Größenklasse 6, die Sicht und Gehör betrifft.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K2V2): Die Illusion kann auch bewegt sein.",
         "source": "GRW",
         "page": 248,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Wahrer Blick",
@@ -2325,7 +2784,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer ist in der Lage, mit seinen normalen Sinnen eine Illusion zu durchschauen. Dies erfordert eine Wahrnehmung-Probe gegen die um drei Punkte erhöhte Schwierigkeit des Illusionszaubers.\n\nErfolgsgrade:\n• Auslösezeit, Verstärken (s. u.) • 2 EG (Kosten +K1V1): Die Probe geht gegen die normale Schwierigkeit des Illusionszaubers.",
         "source": "GRW",
         "page": 251,
-        "damage": ""
+        "damage": "",
+        "difficulty": "15",
+        "difficultyType": "fest",
+        "difficultyValue": 15
     },
     {
         "name": "Chamäleon",
@@ -2339,7 +2801,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer passt sich dem natürlichen Hintergrund an und ist kaum noch zu erkennen. Proben zu seiner Entdeckung erhalten einen Malus in Höhe von 4 Punkten. Wenn er sich nicht bewegt, beträgt der Malus sogar 12 Punkte.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K3V3): Der Malus erhöht sich auf 6 Punkte bzw. 18 Punkte.",
         "source": "GRW",
         "page": 225,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Halluzination",
@@ -2353,7 +2818,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Wahrnehmung des Ziels wird um eine einzelne vom Zauberer bestimmte Halluzination ergänzt, die nicht von der Realität unterschieden werden kann. Hierbei kann nicht das gesamte Umfeld verändert werden, sondern der Umgebung nur etwas hinzugefügt werden. Die Halluzination darf nicht größer als menschengroß sein und kann keine Geräusche machen, sich aber bewegen. Entsprechend kann beispielsweise die Illusion einer verfolgenden Riesenspinne geschaffen werden, nicht aber einer sich mit dem Opfer unterhaltenden Person. Dieser Zauber benötigt weder Formel noch Geste.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K3V3): Es kann eine zweite Halluzination erschaffen werden.",
         "source": "GRW",
         "page": 233,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Geistiger Widerstand des Ziels",
+        "difficultyType": "GW"
     },
     {
         "name": "Schreckgestalt",
@@ -2367,7 +2834,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Das Äußere des Zauberers nimmt die Erscheinung einer alptraumhaften Gestalt an, einschließlich dazu passender Geräusche und Gerüche. Jedes Wesen, das sich ihm auf 5 Meter nähert, erhält den Zustand Angsterfüllt, wenn sein Geistiger Widerstand nicht mindesten 24 beträgt.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K3V3): Betroffene Wesen erhalten den Zustand Panisch, wenn ihr Geistiger Widerstand nicht mind. 19 Punkte beträgt.",
         "source": "GRW",
         "page": 243,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Stimme kopieren",
@@ -2381,7 +2851,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer nimmt die Stimme einer anderen Person an. Soll es sich um jene einer bestimmten Person handeln, können nur solche Eigenheiten übernommen werden, die dem Zauberer bekannt sind. Die Täuschung kann von Bekannten der Person mit einer vergleichenden Probe auf Empathie gegen die Redegewandtheit des Zauberers bemerkt werden.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K3V3): Eine etwaige Redegewandtheit-Probe des Zauberers, um die Sprechweise überzeugend zu imitieren, erhält einen Bonus in Höhe von 3 Punkten.",
         "source": "GRW",
         "page": 246,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Erkenntnis fälschen",
@@ -2395,7 +2868,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Gedanken des Zauberers werden um einen zufälligen Strom aus Bildern und Erinnerungen ergänzt, wodurch Erkenntniszauber vom Typus Gedanken einen Malus in Höhe von 10 Punkten erhalten, wenn sie gegen den Geistigen Widerstand des Zauberers gerichtet sind. Die Existenz des täuschenden Zaubers kann nur mit einer gelungenen Wahrnehmung-Probe gegen 30 bemerkt werden.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K4V4): Der Malus erhöht sich auf 15 Punkte.",
         "source": "GRW",
         "page": 227,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Maskerade",
@@ -2409,7 +2885,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer verändert illusionär seine gesamte Gestalt und übernimmt das Aussehen einer anderen Person. Die Verkleidung erstreckt sich auf alle optischen Eigenheiten der imitierten Person, die dem Zauberer bekannt sind. Ein Muttermal am Oberschenkel ist beispielsweise nicht betroffen, wenn der Zauberer das Ziel nur mit langen Hosen gesehen hat. Ist die Person einem Gegenüber gut bekannt, vermag dieser die Täuschung zu erkennen, wenn er den Zauberer mindestens 5 Minuten beobachten kann und ihm eine Probe auf Wahrnehmung gegen 33 gelingt. Die falsche Stimme kann den Zauberer auch ohne Probe gegenüber Bekannten der Person entlarven.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K4V4): Die Maskerade erstreckt sich auch auf Stimme und Geruch, sofern sie dem Zauberer bekannt sind. Ist die Person einem Gegenüber gut bekannt, vermag dieser die Täuschung zu erkennen, wenn er sich mindestens 5 Minuten lang mit dem Zauberer auseinandersetzt und ihm eine vergleichende Empathie-Probe gegen die Redegewandtheit des Zauberers gelingt.",
         "source": "GRW",
         "page": 238,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Unsichtbares Objekt",
@@ -2423,7 +2902,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Ein Objekt bis maximal Last 10 wird unsichtbar und kann entsprechend nicht mehr gesehen werden. Es macht weiterhin Geräusche, ebenso wie es eventuell Spuren hinterlässt (etwa wenn es über sandigen Boden gerollt wird).\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K4V4): Es kann ein Gegenstand bis Last 20 unsichtbar gemacht werden.",
         "source": "GRW",
         "page": 248,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Panoptikum",
@@ -2437,7 +2919,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erschafft eine komplexe, bis zu 50 m² umfassende bewegte und alle Sinne bis auf den Tastsinn betreffende Illusion. Dies kann beispielsweise ein aufmarschierendes Heer, eine Menschenmasse im Thronsaal oder eine wütende Rinderherde sein. Der Zauber selbst unterliegt zwar den Regeln zur maximalen Wirkungsweite kanalisierter Zauber (S. 195), es genügt jedoch, wenn der Zauberer sich nah genug an einem Teil der Illusion befindet.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K5V5): Die Illusion kann bis zu 100 m² umfassen.",
         "source": "GRW",
         "page": 239,
-        "damage": ""
+        "damage": "",
+        "difficulty": "30",
+        "difficultyType": "fest",
+        "difficultyValue": 30
     },
     {
         "name": "Unsichtbarkeit",
@@ -2451,7 +2936,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer wird unsichtbar, hinterlässt jedoch weiterhin Spuren und verursacht Geräusche. Ausrüstung und Waffen werden von der Unsichtbarkeit eingeschlossen, sofern sie am Körper getragen oder in der Hand gehalten werden.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K5V5): Ein durchgehend berührter Gegenstand bis zu der Größe einer Kutsche wird von der Unsichtbarkeit eingeschlossen.",
         "source": "GRW",
         "page": 249,
-        "damage": ""
+        "damage": "",
+        "difficulty": "30",
+        "difficultyType": "fest",
+        "difficultyValue": 30
     },
     {
         "name": "Gegenstand beschädigen",
@@ -2465,7 +2953,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Ein unbelebtes Objekt erleidet 5 Schadenspunkte.\n\nErfolgsgrade:\n• Auslösezeit, Verstärken (s. u.) • 1 EG (Kosten +1V1): Der Schaden erhöht sich auf 10 Punkte.",
         "source": "GRW",
         "page": 230,
-        "damage": ""
+        "damage": "",
+        "difficulty": "15",
+        "difficultyType": "fest",
+        "difficultyValue": 15
     },
     {
         "name": "Geisterdolch",
@@ -2479,7 +2970,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erschafft eine durchscheinende Waffe mit den Werten eines Dolchs.\n\nErfolgsgrade:\n• Auslösezeit, Verstärken (s. u.) • 1 EG (Kosten +K1V1): Der Schaden der Waffe erhöht sich um 1 Punkt. Diese Verstärkung wirkt nicht, wenn der Zauber mit Zaubern kombiniert wird, die die Typen Schaden und Waffe aufweisen.",
         "source": "GRW",
         "page": 231,
-        "damage": ""
+        "damage": "",
+        "difficulty": "15",
+        "difficultyType": "fest",
+        "difficultyValue": 15
     },
     {
         "name": "Felsgeschoss",
@@ -2493,7 +2987,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer schleudert dem Ziel ein Felsgeschoss entgegen, welches 1W10 Punkte Felsschaden verursacht. Zudem bedarf es einer gelungenen Akrobatik- oder Athletik-Probe gegen 15 (erhöht um die Fertigkeitspunkte des Zauberers in der verwendeten Magieschule), um nicht vom Aufprall umgeworfen zu werden und als liegend zu gelten.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Schaden, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +1V1): Die Schwierigkeit der Akrobatik-Probe beträgt 20 + Fertigkeitspunkte des Zauberers.",
         "source": "GRW",
         "page": 228,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Verteidigung des Ziels",
+        "difficultyType": "VTD"
     },
     {
         "name": "Flammende Waffe",
@@ -2507,7 +3003,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Eine Waffe wird mit Flammen überzogen. Sie leuchtet fackelhell und richtet 1 Punkt zusätzlichen Feuerschaden an, ohne dabei den Träger einzuschränken. Dieser Zauber ist nicht mit anderen Zaubern kombinierbar, die ebenfalls die Typen Schaden und Waffe aufweisen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K1V1): Die Klinge richtet 2 Punkte Feuerschaden an.",
         "source": "GRW",
         "page": 229,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Flammenhand",
@@ -2521,7 +3020,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Hand des Zauberers wird mit Flammen überzogen, so dass sie fackelhell leuchtet. Im unbewaffneten Nahkampf richtet der Zauber echten Feuerschaden an und hat mit seinen waffenlosen Angriffen das Waffenmerkmal Scharf 2 (S. 186), ohne dass er dabei selbst eingeschränkt ist. Dieser Zauber ist nicht mit anderen Zaubern des Typus Hand kombinierbar.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Die Hand leuchtet nicht so hell wie eine Fackel, sondern so hell wie ein Lagerfeuer. Der Schaden erhöht sich um 2 Punkte echten Feuerschaden.",
         "source": "GRW",
         "page": 229,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Geschoss verzaubern",
@@ -2535,7 +3037,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Schaden von bis zu fünf Geschossen erhöht sich um jeweils 2 Punkte. Während des Abschussvorgangs unterliegen die Geschosse nicht den Regeln zur maximalen Wirkungsweite kanalisierter Zauber. Dieser Zauber ist nicht mit anderen Zaubern kombinierbar, die ebenfalls die Typen Schaden und Waffe aufweisen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Der Schaden erhöht sich um insgesamt 3 Punkte.",
         "source": "GRW",
         "page": 232,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Magischer Schlag",
@@ -2549,7 +3054,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Das Ziel wird von einem unsichtbaren magischen Angriff getroffen und erleidet 1W6+1 Punkte Schaden. Schadensreduktion wirkt gegen diesen Zauber nicht.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Schaden, Verstärken (s. u.) • 1 EG (Kosten +1V1): Das Ziel erhält zusätzlich für 30 Ticks den Zustand Erschöpft 1.",
         "source": "GRW",
         "page": 238,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Verteidigung des Ziels",
+        "difficultyType": "VTD"
     },
     {
         "name": "Schockgriff",
@@ -2563,7 +3070,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Hand des Zauberers wird von zuckenden Blitzen überzogen. Im unbewaffneten Nahkampf richten seine Angriffe echten Elektrizitätsschaden an und besitzen das Waffenmerkmal Durchdringung 1 (S. 186). Dieser Zauber ist nicht mit anderen Zaubern des Typus Hand kombinierbar.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K1V1): Zusätzlich richtet der Zauberer im unbewaffneten Nahkampf 2 Punkte echten Elektritzitätsschaden an.",
         "source": "GRW",
         "page": 243,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Einfrieren",
@@ -2577,7 +3087,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Das Ziel erleidet 1W6+3 Punkte Kälteschaden und erhält für 30 Ticks den Zustand Lahm.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Schaden, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +1V1): Das Ziel erhält zusätzlich für 30 Ticks den Zustand Benommen 1.",
         "source": "GRW",
         "page": 225,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Körperlicher Widerstand des Ziels",
+        "difficultyType": "KW"
     },
     {
         "name": "Feuerstrahl",
@@ -2591,7 +3103,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer wirft einen Feuerstrahl auf einen Gegner. Der Getroffene erleidet 2W6+5 Punkte Feuerschaden.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Schaden, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +1V1): Das Ziel erhält zusätzlich für 30 Ticks den Zustand Brennend 1.",
         "source": "GRW",
         "page": 228,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Verteidigung des Ziels",
+        "difficultyType": "VTD"
     },
     {
         "name": "Rankenpfeil",
@@ -2605,7 +3119,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Aus einem mit diesem Zauber belegten Geschoss schießen nach dem Aufprall Ranken hervor, die sich um den Getroffenen winden und ihm den Zustand Ringend verleihen. Aus diesem kann sich ganz normal durch ein Befreien aus der Umklammerung (S. 164) gelöst werden, die Schwierigkeit hierfür beträgt 24. Die Ranken können zwar abgeschlagen werden, wachsen jedoch sofort wieder nach, selbst wenn der Pfeil entfernt wurde. Eine mit einem Rankenpfeil beschossene Mauer überwuchert mit Ranken, die als Kletterhilfe dienen können. Der Zauber unterliegt nicht der Regel zur maximalen Wirkungsweite kanalisierter Zauber.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Die Schwierigkeit für das Befreien aus der Umklammerung beträgt 27.",
         "source": "GRW",
         "page": 240,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Waffe des Lichtes",
@@ -2619,7 +3136,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Schaden einer mit diesem Zauber belegten Waffe erhöht sich um 1 Punkt Lichtschaden. Angriffe mit ihr sind um 2 Punkte erleichtert, wenn sie gegen Wesen der Typen Untoter, Geisterwesen oder Schattenwesen durchgeführt werden. Außerdem verbessert sie die Lichtverhältnisse im Umkreis von 5 Metern um 1 Stufe. Dieser Zauber ist nicht mit anderen Zaubern kombinierbar, die ebenfalls die Typen Schaden und Waffe aufweisen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Der Zusatzschaden erhöht sich auf 2 Punkte Lichtschaden, die Lichtverhältnisse verbessern sich um insgesamt 2 Stufen.",
         "source": "GRW",
         "page": 250,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Beflügelte Waffe",
@@ -2633,7 +3153,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Waffe wird durch die Kraft des Windes beflügelt, was Angriffe mit ihr leichter macht. Der Benutzer der Waffe erhält einen Bonus in Höhe von 2 Punkten auf seine Proben für Angriffe mit dieser Waffe.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K1V1): Der Bonus erhöht sich auf 3 Punkte.",
         "source": "GRW",
         "page": 224,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Blitzschlag",
@@ -2647,7 +3170,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer wirft seinem Ziel einen Blitz entgegen. Der Getroffene erleidet 2W10+2 Punkte Elektrizitätsschaden mit dem Waffenmerkmal Scharf 2 (S. 186).\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Schaden, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +2V2): Das Ziel erhält zusätzlich für 30 Ticks den Zustand Benommen 1.",
         "source": "GRW",
         "page": 225,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Verteidigung des Ziels",
+        "difficultyType": "VTD"
     },
     {
         "name": "Eislanze",
@@ -2661,7 +3186,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer wirft eine Lanze aus scharfkantigen Eiskristallen auf das Ziel. Der Getroffene erleidet 2W10 Punkte Kälteschaden und den Zustand Lahm für 30 Ticks.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Schaden, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +2V1): Der Zauberer wirft zeitgleich eine weitere Eislanze auf ein zweites Ziel, das maximal so viel Punkte Verteidigung wie das Hauptziel besitzt.",
         "source": "GRW",
         "page": 226,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Verteidigung des Ziels",
+        "difficultyType": "VTD"
     },
     {
         "name": "Kometenwurf",
@@ -2675,7 +3202,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Ein Wurfgeschoss wird mit magischer Macht aufgeladen. Wird es anschließend geworfen, erleiden alle Wesen und Objekte in 5 Metern Umkreis um den Aufprallort 1W6+3 Punkte Feuerschaden. Der Zauber endet automatisch nach dem Auftreffen oder nachdem die Wirkungsdauer verstrichen ist.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Schaden, Verstärken (s. u.), Verzehrter Fokus, Wirkungsdauer • 2 EG (Kosten +3V3): Die Ziele erhalten zusätzlich für 30 Ticks den Zustand Brennend 1.",
         "source": "GRW",
         "page": 234,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Leichtes Ziel",
@@ -2689,7 +3219,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Verteidigung des Ziels wird um 2 Punkte gesenkt.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Die Verteidigung wird um 3 Punkte gesenkt.",
         "source": "GRW",
         "page": 236,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Körperlicher Widerstand des Ziels",
+        "difficultyType": "KW"
     },
     {
         "name": "Rüstung schwächen",
@@ -2703,7 +3235,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Schadensreduktion des Ziels wird um 2 Punkte gesenkt (Minimum 0). Hiervon ist nur Schadensreduktion von getragenen Rüstungen betroffen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Auch sämtliche anderen Arten von Schadensreduktion werden betroffen, wie etwa aus natürlicher Rüstung oder aus Magie.",
         "source": "GRW",
         "page": 240,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Körperlicher Widerstand des Ziels",
+        "difficultyType": "KW"
     },
     {
         "name": "Schadenswelle",
@@ -2717,7 +3251,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Eine Welle magischer Macht verursacht bei bis zu drei vom Zauberer beim Auslösen festgelegten Wesen seiner Wahl in 5 m Umkreis 2W6+3 Punkte Schaden, der Schadensreduktion ignoriert.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Schaden, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +2V2): Die Ziele erhalten zusätzlich für 30 Ticks den Zustand Erschöpft 2.",
         "source": "GRW",
         "page": 241,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Schattenpfeil",
@@ -2731,7 +3268,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer schleudert einen nadelspitzen Pfeil aus Dunkelheit auf das Ziel. Dieser verursacht 2W10 Punkte Schattenschaden und hat die Waffenmerkmale Scharf 3 und Durchdringung 2 (S. 186).\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Schaden, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +2V1): Das Ziel erhält zusätzlich für 30 Ticks den Zustand Blutend 1.",
         "source": "GRW",
         "page": 241,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Verteidigung des Ziels",
+        "difficultyType": "VTD"
     },
     {
         "name": "Säurestrahl",
@@ -2745,7 +3284,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer schießt einen Säurestrahl auf das Ziel ab, der 3W6+3 Punkte Säureschaden verursacht. Der Schaden des Zaubers hat die Waffenmerkmale Scharf 3 und Durchdringung 3 (S. 186).\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Schaden, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +2V2): Das Ziel erhält zusätzlich für 30 Ticks den Zustand Verwundet 1.",
         "source": "GRW",
         "page": 241,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Verteidigung des Ziels",
+        "difficultyType": "VTD"
     },
     {
         "name": "Flammenkegel",
@@ -2759,7 +3300,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Ein Flammenkegel schießt vom Zauberer aus nach vorne und richtet bei allen Wesen und Objekten, die sich innerhalb des Flammenkegels aufhalten, 2W6 Punkte Feuerschaden an. Der Flammenkegel ist am Ort seines Entstehens einen halben Meter breit und wächst mit jedem Meter, den er sich vom Zauberer entfernt, um einen weiteren halben Meter in die Breite, bis zu einem Maximum von 3 Metern Breite. Wird die Reichweite des Flammenkegels vergrößert, wächst er entsprechend langsamer in die Breite.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Schaden, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +3V3): Getroffene Wesen und Objekte erhalten zusätzlich für 15 Ticks den Zustand Brennend 2.",
         "source": "GRW",
         "page": 229,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Kettenblitz",
@@ -2773,7 +3317,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Bis zu drei Ziele werden nacheinander von einem Blitzschlag getroffen. Das erste Ziel muss sich in der Reichweite des Zaubers befinden, die jeweils folgenden Ziele dürfen maximal 5 Meter vom vorhergehenden Ziel entfernt stehen. Das erste Ziel erhält 3W6+6 Punkte Elektrizitätsschaden, jedes weitere dann die Hälfte des Schadens des vorhergehenden Ziels.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Schaden, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +2V2): Die Ziele erhalten zusätzlich für 30 Ticks den Zustand Benommen 2.",
         "source": "GRW",
         "page": 234,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Höchste Verteidigung der Ziele",
+        "difficultyType": "VTD"
     },
     {
         "name": "Machtexplosion",
@@ -2787,7 +3333,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer greift seinen Gegner mit roher magischer Kraft an und verursacht 5W6 Punkte Schaden. Schadensreduktion wirkt gegen diesen Zauber nicht. Das Ziel erhält für 30 Ticks den Zustand Erschöpft 2.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Schaden, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +1V1) Das Ziel erhält zusätzlich für 30 Ticks den Zustand Benommen 1.",
         "source": "GRW",
         "page": 237,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Körperlicher Widerstand des Ziels",
+        "difficultyType": "KW"
     },
     {
         "name": "Einäschern",
@@ -2801,7 +3349,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Das Ziel des Zaubers wird von einer explosiven Flammenwolke eingehüllt und erleidet dadurch 2W6 Punkte Feuerschaden. Außerdem erhält es für 30 Ticks den Zustand Brennend 3.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Schaden, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +3V3): Das Ziel erhält statt dem normalen Zustand für 45 Ticks den Zustand Brennend 4.",
         "source": "GRW",
         "page": 225,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Verteidigung des Ziels",
+        "difficultyType": "VTD"
     },
     {
         "name": "Feuerball",
@@ -2815,7 +3365,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer schleudert einen Feuerball auf einen Zielpunkt, der bei Aufprall explodiert und jedem Wesen und Objekt in 5 m Umkreis 2W10 Punkte Feuerschaden zufügt.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Schaden, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +6V6): Die Ziele erhalten zusätzlich für 30 Ticks den Zustand Brennend 2.",
         "source": "GRW",
         "page": 228,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Schadenszirkel",
@@ -2829,7 +3382,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Eine Welle magischer Macht verursacht bei bis zu fünf vom Zauberer beim Auslösen festgelegten Wesen seiner Wahl in 5 m Umkreis 3W6+3 Punkte Schaden, der Schadensreduktion ignoriert. Außerdem erhalten alle Ziele den Zustand Erschöpft 1.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Schaden, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +3V3): Den Zielen muss zusätzlich eine Akrobatik-Probe gegen 35 gelingen, um nicht umgeworfen zu werden und als liegend zu gelten. Außerdem erhalten sie für 60 Ticks den Zustand Erschöpft 2, statt des oben genannten Zustands.",
         "source": "GRW",
         "page": 241,
-        "damage": ""
+        "damage": "",
+        "difficulty": "30",
+        "difficultyType": "fest",
+        "difficultyValue": 30
     },
     {
         "name": "Licht",
@@ -2843,7 +3399,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer verbreitet einen sanften Schein, der die Lichtverhältnisse um 1 Stufe verbessert.\n\nErfolgsgrade:\n• Auslösezeit, Verstärken (s. u.), Wirkungsbereich • 1 EG (Kosten +K1V1): Die Lichtverhältnisse verbessern sich um insgesamt 2 Stufen.",
         "source": "GRW",
         "page": 236,
-        "damage": ""
+        "damage": "",
+        "difficulty": "15",
+        "difficultyType": "fest",
+        "difficultyValue": 15
     },
     {
         "name": "Lichtertanz",
@@ -2857,7 +3416,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erschafft bunte, flackernde Lichter. Diese können beispielsweise Wesen ablenken oder ihm einen Bonus in Höhe von 2 Punkten auf passende Darbietung-Proben geben.\n\nErfolgsgrade:\n• Auslösezeit, Reichweite, Verstärken (s. u.), Wirkungsdauer • 3 EG (Kosten +1V1): Der Bonus auf Darbietung-Proben erhöht sich auf 3 Punkte.",
         "source": "GRW",
         "page": 236,
-        "damage": ""
+        "damage": "",
+        "difficulty": "15",
+        "difficultyType": "fest",
+        "difficultyValue": 15
     },
     {
         "name": "Blenden",
@@ -2871,7 +3433,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Vor den Augen des Ziels blitzt ein grelles Licht auf, welches ihm den Zustand Geblendet 1 verleiht (nicht mehrfach gleichzeitig möglich).\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +1V1): Das Ziel erhält den Zustand Geblendet 2.",
         "source": "GRW",
         "page": 224,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Körperlicher Widerstand des Ziels",
+        "difficultyType": "KW"
     },
     {
         "name": "Blick in die Sonne",
@@ -2885,7 +3449,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer ist immun gegen den Zustand Geblendet, wenn dieser aus der Einwirkung von natürlichem Licht oder Lichtmagie resultiert.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K1V1): Der Zauberer ist komplett immun gegen den Zustand Geblendet.",
         "source": "GRW",
         "page": 224,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Gleißende Barriere",
@@ -2899,7 +3466,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erschafft eine schnurgerade und unverrückbare Wand aus gleißendem Licht von 20 cm Dicke mit einer beliebig verteilbaren Fläche von bis zu 10 m². Ihre Härte beträgt 2 Punkte, ihre Haltbarkeit 6 Punkte. Die Barriere erhöht die Lichtverhältnisse im Umkreis von 5 Metern um 2 Stufen. Sie kann zerstört werden, was den Zauber beendet. Die maximale Wirkungsweite kanalisierter Zauber (S. 195) gilt für diesen Zauber als verzehnfacht.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Wird die Wand im Nahkampf attackiert, erhalten die Angreifer den Zustand Geblendet 1. Außerdem verbessert sie die Lichtverhältnisse im Umkreis von 5 Metern um insgesamt 3 Stufen.",
         "source": "GRW",
         "page": 232,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Lichtkugel",
@@ -2913,7 +3483,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erschafft eine strahlende Kugel, welche die Lichtverhältnisse um 2 Stufen verbessert. Sie kann mit GSW 10 frei durch die Luft gelenkt werden, solange sie sich innerhalb der Reichweite des Zaubers und des Sichtfelds des Zauberers befindet.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Die Lichtverhältnisse werden um insgesamt 3 Stufen verbessert.",
         "source": "GRW",
         "page": 236,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Schutz vor Untoten",
@@ -2927,7 +3500,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer schafft eine Zone, innerhalb derer Wesen des Typus Untoter einen Malus in Höhe von 2 Punkten für alle Proben erhalten.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 1 EG (Kosten +K2V2): Der Malus erhöht sich auf 4 Punkte.",
         "source": "GRW",
         "page": 244,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Untote schwächen",
@@ -2941,7 +3517,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Ein Wesen des Typus Untoter erhält einen Malus in Höhe von 4 Punkten auf alle Proben.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K1V1): Der Malus erhöht sich auf 6 Punkte.",
         "source": "GRW",
         "page": 249,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Körperlicher Widerstand des Ziels",
+        "difficultyType": "KW"
     },
     {
         "name": "Gleißender Schild",
@@ -2955,7 +3533,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer umgibt sich mit einem Schild aus gleißendem Licht. Wird er im Nahkampf attackiert, erhalten die Angreifer den Zustand Geblendet 1 (max. 1 mal gleichzeitig). Zudem verbessern sich die Lichtverhältnisse im Umkreis von 10 Metern um 1 Stufe.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K2V2): Angreifer im Nahkampf erhalten den Zustand Geblendet 2, die Lichtverhältnisse verbessern sich um insgesamt 2 Stufen.",
         "source": "GRW",
         "page": 232,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Untote bannen",
@@ -2969,7 +3550,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Ein Wesen des Typus Untoter wird vernichtet, wenn ihm eine Zähigkeit-Probe gegen 15 misslingt. Gelingt die Probe, erleidet das Wesen 3W6 Schaden.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +2V2): Ein zweites Wesen mit gleichem oder geringerem Körperlichen Widerstand wird betroffen.",
         "source": "GRW",
         "page": 249,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Körperlicher Widerstand des Ziels",
+        "difficultyType": "KW"
     },
     {
         "name": "Waffe des Lichtes",
@@ -2983,7 +3566,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Schaden einer mit diesem Zauber belegten Waffe erhöht sich um 1 Punkt Lichtschaden. Angriffe mit ihr sind um 2 Punkte erleichtert, wenn sie gegen Wesen der Typen Untoter, Geisterwesen oder Schattenwesen durchgeführt werden. Außerdem verbessert sie die Lichtverhältnisse im Umkreis von 5 Metern um 1 Stufe. Dieser Zauber ist nicht mit anderen Zaubern kombinierbar, die ebenfalls die Typen Schaden und Waffe aufweisen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Der Zusatzschaden erhöht sich auf 2 Punkte Lichtschaden, die Lichtverhältnisse verbessern sich um insgesamt 2 Stufen.",
         "source": "GRW",
         "page": 250,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Lichtblitz",
@@ -2997,7 +3583,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer schleudert dem Ziel einen sengenden Lichtstrahl entgegen, der 2W6 Punkte Lichtschaden verursacht. Zudem erhält das Opfer für 30 Ticks den Zustand Geblendet 1.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Schaden, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +2V2): Der Zustand wird auf Geblendet 2 erhöht.",
         "source": "GRW",
         "page": 236,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Verteidigung des Ziels",
+        "difficultyType": "VTD"
     },
     {
         "name": "Schattenbann",
@@ -3011,7 +3599,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Ein einzelner Schattenzauber wird aufgehoben, solange er maximal Grad 3 aufweist. Handelt es sich um einen Zauber mit Wirkungsbereich, genügt es, wenn sich ein Teil von diesem innerhalb der Reichweite befindet.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +3V3): Es wird ein Zauber bis Grad 5 aufgehoben.",
         "source": "GRW",
         "page": 241,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Waffe aus Licht",
@@ -3025,7 +3616,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erschafft eine beliebige Nahkampfwaffe aus strahlendem Licht, welche die Lichtverhältnisse im Umkreis von 5 Metern um 1 Stufe verbessert.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K3V3): Der Schaden erhöht sich um 2 Punkte Lichtschaden. Diese Verstärkung ist nicht mit Zaubern kombinierbar, die die Typen Schaden und Waffe aufweisen.",
         "source": "GRW",
         "page": 250,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Inneres Leuchten",
@@ -3039,7 +3633,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer hat durch ein sanftes inneres Leuchten eine gute Wirkung auf andere. Dadurch erhält er einen Bonus in Höhe von 4 Punkten auf alle Proben, in die seine Ausstrahlung einfließt.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K4V4): Der Bonus erhöht sich auf 5 Punkte.",
         "source": "GRW",
         "page": 233,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Leib aus Licht",
@@ -3053,7 +3650,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Körper des Zauberers verwandelt sich in eine strahlende Gestalt aus Licht, behält aber seine Statur bei. Er erhält einen Bonus in Höhe von 4 Punkten auf seine Schadensreduktion und ist immun gegen den Zustand Geblendet, während alle Wesen, die ihn im Nahkampf attackieren, den Zustand Geblendet 1 erhalten. Zudem verbessern sich die Lichtverhältnisse im Umkreis von 10 Metern um 1 Stufe. Kleidung und Ausrüstung sind nicht von der Verwandlung betroffen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K4V4): Gegenstände bis Last 4 werden mitverwandelt.",
         "source": "GRW",
         "page": 235,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Lichtbrücke",
@@ -3067,7 +3667,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erschafft eine schnurgerade und unverrückbare, waagerechte Brücke aus reinem Licht mit einer beliebig verteilbaren Fläche von bis zu 10 m². Ihre Härte beträgt 7 Punkte, ihre Haltbarkeit 24 Punkte. Sie kann also zerstört werden, was den Zauber beendet. 5 m um die Brücke herum werden die Lichtverhältnisse um 1 Stufe verbessert.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K4V4): Die Fläche beträgt bis zu 20 m².",
         "source": "GRW",
         "page": 236,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Lichter Schutz",
@@ -3081,7 +3684,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer und bis zu drei weitere bei Auslösung des Zaubers festgelegte Wesen seiner Wahl werden durch die Kraft des Lichtes geschützt, solange sie sich im Wirkungsbereich des Zaubers aufhalten. Wesen der Typen Schattenwesen, Untoter und Wesen der Finsternis müssen eine Entschlossenheit-Probe gegen 27 ablegen, um sie angreifen zu können. Sollten diese Wesen ihrerseits angegriffen werden, müssen sie keine Probe ablegen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 1 EG (Kosten +K5V5): Eventuelle Angriffe oben genannter Wesen werden gegen die Nutznießer um 3 Punkte erschwert.",
         "source": "GRW",
         "page": 236,
-        "damage": ""
+        "damage": "",
+        "difficulty": "30",
+        "difficultyType": "fest",
+        "difficultyValue": 30
     },
     {
         "name": "Nacht zum Tag",
@@ -3095,7 +3701,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Lichtverhältnisse werden um 4 Stufen verbessert, zudem wird die Wirkung aller Schattenzauber unterdrückt, solange sie maximal Grad 3 aufweisen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 1 EG (Kosten +K5V5): Die Wirkung von Schattenzaubern bis Grad 5 wird unterdrückt.",
         "source": "GRW",
         "page": 239,
-        "damage": ""
+        "damage": "",
+        "difficulty": "30",
+        "difficultyType": "fest",
+        "difficultyValue": 30
     },
     {
         "name": "Freund der Tiere",
@@ -3109,7 +3718,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer wirkt vertrauter auf alle Wesen mit dem Typus Tier. Er erhält einen Bonus in Höhe von 1 Punkt auf Tierführung-Proben und die Einstellung jedes Tieres ihm gegenüber wird um 1 Stufe verbessert.\n\nErfolgsgrade:\n• Auslösezeit, Verstärken (s. u.) • 2 EG (Kosten +K1V1): Die Einstellung wird um eine weitere Stufe verbessert.",
         "source": "GRW",
         "page": 230,
-        "damage": ""
+        "damage": "",
+        "difficulty": "15",
+        "difficultyType": "fest",
+        "difficultyValue": 15
     },
     {
         "name": "Magischer Kompass",
@@ -3123,7 +3735,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erkennt intuitiv die Himmelsrichtungen, wodurch er einen Bonus in Höhe von 2 Punkten auf alle Proben zur Orientierung erhält.\n\nErfolgsgrade:\n• Auslösezeit, Verstärken (s. u.) • 1 EG (Kosten +1V1): Der Bonus erhöht sich auf 3 Punkte.",
         "source": "GRW",
         "page": 237,
-        "damage": ""
+        "damage": "",
+        "difficulty": "15",
+        "difficultyType": "fest",
+        "difficultyValue": 15
     },
     {
         "name": "Rindenhaut",
@@ -3137,7 +3752,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Haut des Zauberers wird borkig und hart. Er erhält einen Bonus in Höhe von jeweils 1 Punkt auf seine Verteidigung und seine Schadensreduktion. Dieser Zauber ist nicht mit anderen Zaubern kombinierbar, die ebenfalls den Typus Haut besitzen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K1V1): Der Bonus auf die Schadensreduktion erhöht sich auf 2 Punkte.",
         "source": "GRW",
         "page": 240,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Tiere beruhigen",
@@ -3151,7 +3769,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Einstellung eines Wesens des Typus Tier oder Monster bis maximal Größenklasse 6 wird gegenüber allen anderen Wesen auf Neutral gesetzt.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K1V1): Die Einstellung wird auf Hilfsbereit gesetzt.",
         "source": "GRW",
         "page": 247,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Geistiger Widerstand des Ziels",
+        "difficultyType": "GW"
     },
     {
         "name": "Tierischer Bote",
@@ -3165,7 +3785,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Ein einzelnes Wesen des Typus Tier bis maximal Größenklasse 3, das dem Zauberer gegenüber mindestens die Einstellung Neutral aufweist, überbringt eine schriftliche Nachricht an einen dem Zauberer bekannten Ort und verschwindet anschließend. Innerhalb eines Tages können Landtiere zwischen 10 (z.B. kleine Säugetiere) und 50 km (z.B. Wölfe oder Wildschweine) zurücklegen, Vögel sogar zwischen 50 (Singvögel) und 200 km (weit wandernde Zugvögel).\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsdauer • 1 EG (Kosten +1V1): Das Tier überbringt die Botschaft nicht nur an einen Ort, sondern dort sogar einer bestimmten, dem Zauberer bekannten Person.",
         "source": "GRW",
         "page": 247,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Geistiger Widerstand des Ziels",
+        "difficultyType": "GW"
     },
     {
         "name": "Tiersinne",
@@ -3179,7 +3801,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer nimmt die Welt statt durch seine eigenen Sinne durch die eines beim Zaubervorgang berührten Wesens mit dem Typus Tier bis maximal Größenklasse 5 wahr, das dem Zauberer gegenüber mindestens die Einstellung Neutral aufweist. Währenddessen kann er seine eigenen Sinne nicht benutzen, sondern sieht, riecht, fühlt und hört nur das, was das Tier in diesem Moment wahrnimmt.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K1V1): Der Zauberer kann neben den Tiersinnen auch noch seine normalen Sinne benutzen.",
         "source": "GRW",
         "page": 247,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Wachstum",
@@ -3193,7 +3818,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer lässt eine Pflanze bis zur Größe eines Busches innerhalb von 1 Minute bis hin zu ihrer natürlichen Größe wachsen und reifen. Dadurch kann etwa ein Durchgang verborgen, Nahrung zur Reife gebracht oder eine Kletterhilfe geschaffen werden.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +1V1): Die Pflanze wächst bis zum Anderthalbfachen ihrer natürlichen Größe an.",
         "source": "GRW",
         "page": 250,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Wasser finden",
@@ -3207,7 +3835,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erfährt die Richtung der nächsten Quelle trinkbaren Wassers.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Der Zauberer erfährt zusätzlich die Entfernung der nächsten Trinkwasserquelle.",
         "source": "GRW",
         "page": 251,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Wasser reinigen",
@@ -3221,7 +3852,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauber reinigt bis zu 10 Liter verschmutzter Flüssigkeit. Betroffen sind nur natürliche Krankheitserreger, Giftstoffe oder Verunreinigungen, nicht aber alchemistische Stoffe. Auch Alkohol oder Salz gelten nicht als Verunreinigungen.\n\nErfolgsgrade:\n• Auslösezeit, Verstärken (s. u.) • 3 EG (Kosten +1V1): Es werden bis zu 100 Liter gereinigt.",
         "source": "GRW",
         "page": 251,
-        "damage": ""
+        "damage": "",
+        "difficulty": "15",
+        "difficultyType": "fest",
+        "difficultyValue": 15
     },
     {
         "name": "Ranken",
@@ -3235,7 +3869,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Aus dem Boden schießen Ranken hervor, die sich um die Beine aller Wesen im Wirkungsbereich schlingen. Wer sich darin aufhält oder sich hindurch bewegt, muss eine erfolgreiche Akrobatik- oder Athletik-Probe gegen 20 ablegen, sonst gilt er als ringend. Diese Probe muss alle 20 Ticks wiederholt werden, wenn der Wirkungsbereich nicht verlassen wird. Aus dem Zustand Ringend kann sich ganz normal durch ein Befreien aus der Umklammerung (S. 164) gelöst werden, die Schwierigkeit hierfür beträgt 24. Die Ranken können zwar abgeschlagen werden, wachsen jedoch sofort wieder nach.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 1 EG (Kosten +K2V2): Auch bei gelungener Akrobatik- oder Athletik-Probe zählt der Wirkungsbereich zusätzlich noch als Schwieriges Gelände.",
         "source": "GRW",
         "page": 240,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Schutz vor Gift",
@@ -3249,7 +3886,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erhält einen Bonus in Höhe von 3 Punkten auf seinen Körperlichen Widerstand gegen Vergiftungen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Der Bonus erhöht sich auf 4 Punkte,",
         "source": "GRW",
         "page": 244,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Spurlos in der Wildnis",
@@ -3263,7 +3903,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer und bis zu drei weitere beim Auslösen des Zaubers festgelegte Wesen seiner Wahl hinterlassen kaum eine Fährte. Jagdkunst-Proben zu ihrer Verfolgung erhalten einen Malus in Höhe von 6 Punkten. Dieser gilt nur für Spuren, die innerhalb des Wirkungsbereichs hinterlassen wurden.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 2 EG (Kosten +K2V2): Es können bis zu fünf Personen bestimmt werden.",
         "source": "GRW",
         "page": 245,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Tiere beherrschen",
@@ -3277,7 +3920,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Ein einzelnes Wesen des Typus Tier bis maximal Größenklasse 7 wird unter den Willen des Zauberers gezwungen. Es kann einfache Kommandos im Rahmen seiner natürlichen Fähigkeiten ausführen. Das Wesen bewegt sich nicht ohne explizite Anweisung aus der Wirkungsweite des kanalisierten Zaubers (Seite 195) hinaus.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K2V2): Ein zweites Wesen gleichen oder niedrigeren Geistigen Widerstands kann beherrscht werden.",
         "source": "GRW",
         "page": 247,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Geistiger Widerstand des Ziels",
+        "difficultyType": "GW"
     },
     {
         "name": "Chamäleon",
@@ -3291,7 +3936,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer passt sich dem natürlichen Hintergrund an und ist kaum noch zu erkennen. Proben zu seiner Entdeckung erhalten einen Malus in Höhe von 4 Punkten. Wenn er sich nicht bewegt, beträgt der Malus sogar 12 Punkte.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K3V3): Der Malus erhöht sich auf 6 Punkte bzw. 18 Punkte.",
         "source": "GRW",
         "page": 225,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Insektenschwarm",
@@ -3305,7 +3953,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Das Ziel des Zaubers wird von einem Schwarm Insekten umschwirrt, die seine Konzentration stören und ihn verlangsamen. Jede kontinuierliche Aktion wird um 2 Ticks verlängert.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus, Wirkungsdauer • 2 EG (Kosten +3V3): Jede kontinuierliche Aktion wird um 3 Ticks verlängert.",
         "source": "GRW",
         "page": 233,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Kleintierform",
@@ -3319,7 +3970,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer verwandelt sich in ein nicht flugfähiges Wesen des Typus Tier der Größenklasse 1, sowie bis maximal Monstergrad (als Einzelgegner) 1.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Das Tier ist ein besonders prachtvolles Exemplar. Alle Proben auf Fertigkeiten, die von der Tiergestalt übernommen wurden, erhalten einen Bonus in Höhe von 2 Punkten.",
         "source": "GRW",
         "page": 234,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Rankenpfeil",
@@ -3333,7 +3987,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Aus einem mit diesem Zauber belegten Geschoss schießen nach dem Aufprall Ranken hervor, die sich um den Getroffenen winden und ihm den Zustand Ringend verleihen. Aus diesem kann sich ganz normal durch ein Befreien aus der Umklammerung (S. 164) gelöst werden, die Schwierigkeit hierfür beträgt 24. Die Ranken können zwar abgeschlagen werden, wachsen jedoch sofort wieder nach, selbst wenn der Pfeil entfernt wurde. Eine mit einem Rankenpfeil beschossene Mauer überwuchert mit Ranken, die als Kletterhilfe dienen können. Der Zauber unterliegt nicht der Regel zur maximalen Wirkungsweite kanalisierter Zauber.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Die Schwierigkeit für das Befreien aus der Umklammerung beträgt 27.",
         "source": "GRW",
         "page": 240,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Weg durch die Natur",
@@ -3347,7 +4004,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer und bis zu drei weitere beim Auslösen des Zaubers festgelegte Wesen seiner Wahl bewegen sich mit Leichtigkeit durch die Natur. Jegliches Terrain zählt für sie maximal als Rand der Wildnis und sie erhalten einen Bonus in Höhe von 3 Punkten auf Überleben-Proben mit Bezug auf das Reisen. Die Boni gelten nur während des Aufenthalts im Wirkungsbereich.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 2 EG (Kosten +K3V3): Es können bis zu fünf Personen bestimmt werden.",
         "source": "GRW",
         "page": 251,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Tierform",
@@ -3361,7 +4021,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer verwandelt sich in ein nicht flugfähiges Wesen des Typus Tier der Größenklasse 1 bis 5 sowie bis maximal Monstergrad (als Einzelgegner) 2.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K3V3): Die Kreatur ist ein besonders prachtvolles Exemplar. Alle Proben auf Fertigkeiten, die von der Tiergestalt übernommen wurden, erhalten einen Bonus in Höhe von 2 Punkten.",
         "source": "GRW",
         "page": 247,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Tiersprache",
@@ -3375,7 +4038,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer ist in der Lage, mit einem bestimmten Wesen des Typus Tier begrenzt zu kommunizieren, solange es ihm gegenüber mindestens die Einstellung Neutral aufweist. Es handelt sich nicht um ein echtes Gespräch, vielmehr kann er dem Wesen Fragen stellen, die diese im Rahmen seiner Sinneswahrnehmung, Denkfähigkeit und Laune beantworten kann.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsdauer • 2 EG (Kosten +4V4): Der Zauber wirkt auch mit Wesen des Typus Monster.",
         "source": "GRW",
         "page": 247,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Verdorren",
@@ -3389,7 +4055,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Eine berührte Pflanze oder ein Wesen des Typus Pflanze verdorrt und stirbt. Anderen Wesen muss eine Zähigkeit-Probe gegen 25 gelingen, um nicht den Zustand Sterbend 3 (Fluch) zu erhalten.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +4V4): Die Schwierigkeit der Zähigkeit-Probe erhöht sich auf 30.",
         "source": "GRW",
         "page": 249,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Verteidigung des Ziels",
+        "difficultyType": "VTD"
     },
     {
         "name": "Vogelform",
@@ -3403,7 +4071,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer verwandelt sich in ein flugfähiges Wesen des Typus Tier der Größenklasse 1 bis maximal Monstergrad (als Einzelgegner) 2.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K3V3): Die Kreatur ist ein besonders prachtvolles Exemplar. Alle Proben auf Fertigkeiten, die von der Tiergestalt übernommen wurden, erhalten einen Bonus in Höhe von 2 Punkten.",
         "source": "GRW",
         "page": 250,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Bestienform",
@@ -3417,7 +4088,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer verwandelt sich in ein Wesen des Typus Monster oder Tier der Größenklasse 2-7. Es können nur Kreaturen bis Monstergrad (als Einzelgegner) 3 gewählt werden.\n\nErfolgsgrade:\n•Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus •1 EG (Kosten +K4V4): Die Kreatur ist ein besonders prachtvolles Exemplar. Alle Proben auf Fertigkeiten, die von der Tiergestalt übernommen wurden, erhalten einen Bonus in Höhe von 2 Punkten.",
         "source": "GRW",
         "page": 224,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Blitze rufen",
@@ -3431,7 +4105,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer ruft eine Wolke herbei, die über dem gesamten Wirkungsbereich schwebt. Aus dieser kann er Blitze gegen im Wirkungsbereich befindliche Ziele hervorschießen lassen. Dazu würfelt er als sofortige Aktion mit seiner für den Zauber verwendeten Magieschule einen Angriff gegen die Verteidigung des Ziels (Dauer: 5 Ticks) und richtet im Falle eines Erfolgs 2W6+5 Punkte Elektrizitätsschaden an. Während der Zauberer die Wolke kontrolliert, kann er keine anderen Aktionen vollführen. Er kann maximal so viele Blitze aus der Wolke hervorschießen lassen, wie er Fertigkeitspunkte in der verwendeten Magieschule besitzt. Ist diese Maximalzahl erreicht, endet der Zauber automatisch.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 1 EG (Kosten +K4V4): Die Ziele erhalten zusätzlich für 30 Ticks den Zustand Benommen 1.",
         "source": "GRW",
         "page": 224,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Wetterkontrolle",
@@ -3445,7 +4122,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer ist in der Lage, das Wetter um ihn herum beliebig zu verändern. Er kann Stürme erschaffen oder besänftigen, Schneefall rufen oder strahlenden Sonnenschein. Dabei können Kälte- und Hitzestufe maximal um 3 Stufen verändert werden. Nach Ende der Wirkungsdauer normalisiert sich das Wetter wieder.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich, Wirkungsdauer • 1 EG (Kosten +5V5): Kälte- und Hitzestufe können beliebig verändert werden.",
         "source": "GRW",
         "page": 252,
-        "damage": ""
+        "damage": "",
+        "difficulty": "30",
+        "difficultyType": "fest",
+        "difficultyValue": 30
     },
     {
         "name": "Schattenschleier",
@@ -3459,7 +4139,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Ein dünner Schleier aus Schatten bedeckt den Zauberer. Die Lichtverhältnisse sind für ihn um 1 Stufe verschlechtert. In starkem Sonnenschein ist darüber hinaus die Hitzestufe für ihn um 1 Stufe gesenkt.\n\nErfolgsgrade:\n• Auslösezeit, Verstärken (s. u.) • 1 EG (Kosten +K1V1): Die Hitzestufe ist für ihn um 2 Stufen gesenkt.",
         "source": "GRW",
         "page": 242,
-        "damage": ""
+        "damage": "",
+        "difficulty": "15",
+        "difficultyType": "fest",
+        "difficultyValue": 15
     },
     {
         "name": "Schattenspiel",
@@ -3473,7 +4156,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer kann die Bewegungen eines einzelnen Schattens mit einer Fläche von bis zu 10 m² kontrollieren. Der Schatten bleibt dabei aber stets auf einer Oberfläche.\n\nErfolgsgrade:\n• Auslösezeit, Reichweite, Verstärken (s. u.) • 1 EG (Kosten +K1V1): Die Fläche kann bis zu 20 m² betragen.",
         "source": "GRW",
         "page": 242,
-        "damage": ""
+        "damage": "",
+        "difficulty": "15",
+        "difficultyType": "fest",
+        "difficultyValue": 15
     },
     {
         "name": "Dunkelheit",
@@ -3487,7 +4173,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Rund um den Zauberer vertiefen sich die Schatten, Licht wird schwächer. Die Lichtverhältnisse verschlechtern sich dadurch um 1 Stufe.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 1 EG (Kosten +K1V1): Die Lichtverhältnisse sinken um insgesamt 2 Stufen.",
         "source": "GRW",
         "page": 225,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Katzenaugen",
@@ -3501,7 +4190,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Lichtverhältnisse verbessern sich für den Zauberer um 1 Stufe.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Die Lichtverhältnisse verbessern sich für den Zauberer um insgesamt 2 Stufen.",
         "source": "GRW",
         "page": 233,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Schattenmantel",
@@ -3515,7 +4207,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer hüllt sich in tiefe Schatten, die ihn bei Stillstand verbergen. Wahrnehmung-Proben, um ihn mit den Augen zu entdecken, erhalten einen Malus in Höhe von 4 Punkten, sofern er sich nicht bewegt.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Der Malus gilt auch bei Bewegung des Zauberers.",
         "source": "GRW",
         "page": 241,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Schattenwaffe",
@@ -3529,7 +4224,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Eine mit diesem Spruch verzauberte Waffe ist außerhalb eines Kampfes kaum zu erkennen. Es bedarf einer gelungenen Wahrnehmung-Probe gegen 20, um sie auszumachen. Die Waffe richtet 1 Punkt zusätzlichen Schattenschaden gegen Wesen des Typus Lichtwesen an.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Die Schwierigkeit der Wahrnehmung-Probe beträgt 25.",
         "source": "GRW",
         "page": 242,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Schattenpfeil",
@@ -3543,7 +4241,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer schleudert einen nadelspitzen Pfeil aus Dunkelheit auf das Ziel. Dieser verursacht 2W10 Punkte Schattenschaden und hat die Waffenmerkmale Scharf 3 und Durchdringung 2 (S. 186).\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Schaden, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +2V1): Das Ziel erhält zusätzlich für 30 Ticks den Zustand Blutend 1.",
         "source": "GRW",
         "page": 241,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Verteidigung des Ziels",
+        "difficultyType": "VTD"
     },
     {
         "name": "Schattenwand",
@@ -3557,7 +4257,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erschafft eine schnurgerade und unverrückbare Wand aus festen Schatten von 20 cm Dicke mit einer beliebig verteilbaren Fläche von bis zu 10 m². Sie ist vollkommen lichtundurchlässig und dämpft Geräusche, sodass mit dem Gehör im Zusammenhang stehende Wahrnehmung-Proben einen Malus in Höhe von 6 Punkten erhalten. Ihre Härte beträgt 4 Punkte, ihre Haltbarkeit 12 Punkte. Sie kann also zerstört werden, was den Zauber beendet. Die maximale Wirkungsweite kanalisierter Zauber (S. 195) gilt für diesen Zauber als verzehnfacht.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Der Malus erhöht sich auf 8 Punkte.",
         "source": "GRW",
         "page": 242,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Verhüllung",
@@ -3571,7 +4274,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer wird von fließenden Schatten umgeben, die ihn verbergen, seine Schritte dämpfen und seine Umrisse verfälschen. Er erhält einen Bonus in Höhe von 3 Punkten auf Heimlichkeit-Proben.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Der Bonus erhöht sich auf 5 Punkte.",
         "source": "GRW",
         "page": 249,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Lichtbann",
@@ -3585,7 +4291,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Ein einzelner Lichtzauber wird aufgehoben, solange er maximal Grad 3 aufweist. Handelt es sich um einen Zauber mit Wirkungsbereich, genügt es, wenn sich ein Teil von diesem innerhalb der Reichweite befindet.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +3V3): Es wird ein Zauber bis Grad 5 aufgehoben.",
         "source": "GRW",
         "page": 236,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Nachtsicht",
@@ -3599,7 +4308,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Lichtverhältnisse verbessern sich für den Zauberer um 3 Stufen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K3V3): Die Lichtverhältnisse verbessern sich um insgesamt 4 Stufen.",
         "source": "GRW",
         "page": 239,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Schatten beleben",
@@ -3613,7 +4325,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Aus dem Schatten des Zauberers löst sich eine schwarze Gestalt gleicher Statur und Größenklasse. Die übrigen Abgeleiteten Werte des Wesens entsprechen den um 3 Punkte verschlechterten abgeleiteten Werten des Zauberers. Auf seine Proben (mit den Werten des Zauberers) erhält es ebenfalls einen Malus in Höhe von 3 Punkten. Das Wesen besitzt das Merkmal Schwächlich (S. 265). Es führt die Befehle des Zauberers bedingungslos aus, vermag aber nicht zu zaubern oder zu sprechen. Wird es getötet, erleidet der Zauberer 2W6 Punkte Schaden.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K3V3): Die abgeleiteten Werte des Wesens entsprechen den um 2 Punkte gesenkten abgeleiteten Werten des Zauberers. Der Malus auf Proben beträgt nur noch 2 Punkte.",
         "source": "GRW",
         "page": 241,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Schattenleib",
@@ -3627,7 +4342,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Körper des Zauberers verwandelt sich in eine schwarze Schattengestalt, behält aber seine Statur bei. Er erhält einen Bonus in Höhe von 4 Punkten auf seine Schadensreduktion und 7 Punkten auf seine Heimlichkeit, sowie eine Verwundbarkeit gegen Lichtschaden. Kleidung und Ausrüstung sind nicht von der Verwandlung betroffen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K4V4): Gegenstände bis Last 4 werden mitverwandelt.",
         "source": "GRW",
         "page": 241,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Schattenrüstzeug",
@@ -3641,7 +4359,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer verfestigt Schatten und formt aus ihnen einen Ausrüstungsgegenstand der Qualität 0 mit einer maximalen Last von 4, sei es eine Waffe, ein Seil, ein Umhang oder ein Hammer.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K4V4): Die Qualität beträgt 2.",
         "source": "GRW",
         "page": 241,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Schattensprung",
@@ -3655,7 +4376,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer tritt in einen Schatten hinein und im selben Moment aus einem anderen Schatten heraus, der maximal 50 Meter entfernt sein darf. Er muss den zweiten Schatten sehen können.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +4V4): Der Zauberer kann ein Wesen bis maximal Größenklasse 6 mitnehmen, indem er es berührt.",
         "source": "GRW",
         "page": 242,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Aura der Schatten",
@@ -3669,7 +4393,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer und bis zu drei weitere bei Auslösung des Zaubers festgelegte Wesen seiner Wahl erhalten einen Bonus in Höhe von 7 Punkten auf alle Heimlichkeit-Proben, solange sie sich im Wirkungsbereich des Zaubers aufhalten.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 1 EG (Kosten +K5V5): Es können bis zu fünf Wesen festgelegt werden.",
         "source": "GRW",
         "page": 223,
-        "damage": ""
+        "damage": "",
+        "difficulty": "30",
+        "difficultyType": "fest",
+        "difficultyValue": 30
     },
     {
         "name": "Schwärze",
@@ -3683,7 +4410,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Lichtverhältnisse werden um 4 Stufen verschlechtert, zudem wird die Wirkung aller Lichtzauber unterdrückt, solange sie maximal Grad 3 aufweisen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 1 EG (Kosten +K5V5): Die Wirkung von Lichtzaubern bis Grad 5 wird unterdrückt.",
         "source": "GRW",
         "page": 244,
-        "damage": ""
+        "damage": "",
+        "difficulty": "30",
+        "difficultyType": "fest",
+        "difficultyValue": 30
     },
     {
         "name": "Glück",
@@ -3697,7 +4427,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erhält für seinen nächsten Wurf einen Bonus in Höhe von 1 Punkt.\n\nErfolgsgrade:\n• Auslösezeit, Verstärken (s. u.) • 1 EG (Kosten +1V1): Der Bonus erhöht sich auf 2 Punkte.",
         "source": "GRW",
         "page": 232,
-        "damage": ""
+        "damage": "",
+        "difficulty": "15",
+        "difficultyType": "fest",
+        "difficultyValue": 15
     },
     {
         "name": "Schützende Hand",
@@ -3711,7 +4444,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erhält beim ersten Angriff, der während der Wirkungsdauer gegen ihn gerichtet wird, einen Bonus in Höhe von 1 Punkt auf den passenden Widerstandswert.\n\nErfolgsgrade:\n• Auslösezeit, Verstärken (s. u.), Wirkungsdauer • 1 EG (Kosten +1V1): Der Bonus erhöht sich auf 2 Punkte.",
         "source": "GRW",
         "page": 243,
-        "damage": ""
+        "damage": "",
+        "difficulty": "15",
+        "difficultyType": "fest",
+        "difficultyValue": 15
     },
     {
         "name": "Ende des Weges",
@@ -3725,7 +4461,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Ein Leichnam wird dauerhaft vor unheiligen Schändungen geschützt. Ihn betreffende Zauber der Typen Geisterwesen oder Nekromantie erhalten einen Malus in Höhe von 4 Punkten.\n\nErfolgsgrade:\n• Auslösezeit, Verstärken (s. u.) • 1 EG (Kosten +1V1): Der Malus erhöht sich auf 6 Punkte.",
         "source": "GRW",
         "page": 226,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Pech",
@@ -3739,7 +4478,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Das Ziel erhält für seinen nächsten Wurf einen Malus in Höhe von 2 Punkten.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +1V1): Der Malus erhöht sich auf 3 Punkte.",
         "source": "GRW",
         "page": 240,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Sechster Sinn",
@@ -3753,7 +4495,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer verfügt über einen sechsten Sinn. Er erhält einen Bonus in Höhe von 3 Punkten auf Wahrnehmung-Proben, um eine Überraschung abzuwehren.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K1V1): Das Bonus erhöht sich auf 5 Punkte.",
         "source": "GRW",
         "page": 244,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Segnung",
@@ -3767,7 +4512,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Ziel erhält einen Bonus von 1 Punkt auf alle Fertigkeiten und Widerstandswerte.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsdauer • 2 EG (Kosten +1V1): Der Bonus erhöht sich auf 2 Punkte.",
         "source": "GRW",
         "page": 244,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Weihe",
@@ -3781,7 +4529,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer weiht einen Gegenstand seiner Gottheit oder den Kräften des Schicksals, wodurch er einen zusätzlichen Bonus in Höhe von 1 Punkt auf alle Fertigkeiten gewährt, für die er eingesetzt wird.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsdauer • 2 EG (Kosten +1V1): Der Bonus erhöht sich auf 2 Punkte.",
         "source": "GRW",
         "page": 252,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Fluch der Schmerzen",
@@ -3795,7 +4546,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer verflucht sein Ziel so, dass es den Zustand Verwundet 1 erhält.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +2V2): Das Ziel erhält den Zustand Verwundet 2.",
         "source": "GRW",
         "page": 230,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Körperlicher Widerstand des Ziels",
+        "difficultyType": "KW"
     },
     {
         "name": "Lebensband",
@@ -3809,7 +4562,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Sämtlicher Schaden, den ein vom Zauberer bestimmtes Wesen erleidet, wird auf ein anderes vom Zauberer bestimmtes Wesen übertragen. Zur Verzauberung müssen beide Ziele gleichzeitig berührt werden und beide müssen dem Zauber freiwillig zustimmen. Der Zauber endet automatisch mit dem Ableben des Schaden empfangenden Wesens.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K3V3): Auch die Auswirkung von Giften und Krankheiten werden übertragen.",
         "source": "GRW",
         "page": 235,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Leichtes Ziel",
@@ -3823,7 +4579,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Verteidigung des Ziels wird um 2 Punkte gesenkt.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Die Verteidigung wird um 3 Punkte gesenkt.",
         "source": "GRW",
         "page": 236,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Körperlicher Widerstand des Ziels",
+        "difficultyType": "KW"
     },
     {
         "name": "Eulengespür",
@@ -3837,7 +4595,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer ist von Weisheit und Voraussicht erfüllt. Dadurch erhält er einen Bonus in Höhe von 3 Punkten auf alle Proben, in die seine Intuition einfließt.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K4V4): Der Bonus erhöht sich auf 4 Punkte.",
         "source": "GRW",
         "page": 227,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Fluch brechen",
@@ -3851,7 +4612,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Alle momentan auf das Ziel wirkenden Zauber des Typus Fluch bzw. Zustände mit der Ursache Fluch werden aufgehoben, solange die verursachenden Zauber maximal Grad 3 aufweisen.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +2V2): Es werden Zauber und Ursachen bis Grad 5 aufgehoben.",
         "source": "GRW",
         "page": 229,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Hohe Segnung",
@@ -3865,7 +4629,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Das Ziel erhält einen Bonus in Höhe von 2 Punkten auf alle Fertigkeitsproben und Widerstandswerte.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsdauer • 2 EG (Kosten +3V3): Der Bonus erhöht sich auf 3 Punkte.",
         "source": "GRW",
         "page": 233,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Prophezeiung",
@@ -3879,7 +4646,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erhält eine undeutliche Weissagung über die nahe Zukunft oder das Schicksal einer Person, eines Gegenstands oder einer Unternehmung.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus • 3 EG (Kosten +3V3): Der Zauberer erhält eine deutlichere Weissagung.",
         "source": "GRW",
         "page": 240,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Verhängnis",
@@ -3893,7 +4663,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Alle Proben des Ziels zählen auch bei einem Würfelergebnis von insgesamt 4 als Patzer.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsdauer • 1 EG (Kosten +3V3): Auch ein Ergebnis von 5 zählt als Patzer.",
         "source": "GRW",
         "page": 249,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Schicksalsband",
@@ -3907,7 +4680,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer gibt dem Ziel eine einzelne Anweisung, jeder Verstoß dagegen verursacht 4W6 Punkte Schaden. Handelt es sich um einen längerfristigen Auftrag, wird der Schaden am Ende jeden Tages verursacht, an dem das Ziel sich nicht zumindest bemüht, auf dessen Erfolg hinzuwirken.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsdauer • 2 EG (Kosten +4V4): Der Zauberer kann zwei miteinander verknüpfte Anweisungen geben, wodurch es jedoch nicht zu einer Verdoppelung des Schadens kommt.",
         "source": "GRW",
         "page": 242,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Geistiger Widerstand des Ziels",
+        "difficultyType": "GW"
     },
     {
         "name": "Verdammung",
@@ -3921,7 +4696,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Geistiger Widerstand und Körperlicher Widerstand eines einzelnen Ziels werden um jeweils 5 Punkte gesenkt\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K4V4): Beide Werte werden um jeweils 7 Punkte gesenkt.",
         "source": "GRW",
         "page": 249,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Verjüngen",
@@ -3935,7 +4713,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer wird um 20 Jahre verjüngt, bleibt jedoch mindestens 1 Jahr alt.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K4V4): Der Zauberer wird um 30 Jahre verjüngt, das Mindestalter beträgt weiter 1 Jahr.",
         "source": "GRW",
         "page": 250,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Schutz vor Angriffen",
@@ -3949,7 +4730,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer strahlt ein überwältigendes Maß an Friedfertigkeit aus, sodass es einer gelungenen Entschlossenheit-Probe gegen 35 bedarf, um einen Angriff gegen ihn auszuführen. Attackiert er einen Gegner von sich aus, verfällt die Wirkung des Zaubers auf den Angegriffenen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K5V5): Die Schwierigkeit beträgt 40.",
         "source": "GRW",
         "page": 243,
-        "damage": ""
+        "damage": "",
+        "difficulty": "30",
+        "difficultyType": "fest",
+        "difficultyValue": 30
     },
     {
         "name": "Todesfluch",
@@ -3963,7 +4747,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Dieser Zauber zerreißt die Verbindung zwischen Körper und Lebenskraft des Opfers. Es erhält den Zustand Sterbend 1 (Fluch).\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 3 EG (Kosten +4V4): Das Opfer erhält den Zustand Sterbend 2 (Fluch).",
         "source": "GRW",
         "page": 248,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Körperlicher Widerstand des Ziels",
+        "difficultyType": "KW"
     },
     {
         "name": "Zufall bannen",
@@ -3977,7 +4763,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Eine beliebige einzelne Probe oder anderweitiger Würfelwurf wird nicht geworfen, stattdessen wird das Ergebnis bestimmt. Im Anschluss endet der Zauber. Die den Wurf ‚ausführende‘ Person muss sich innerhalb der Reichweite befinden.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K5V5): Die Bestimmung eines zweiten Würfelwurfs ist möglich.",
         "source": "GRW",
         "page": 253,
-        "damage": ""
+        "damage": "",
+        "difficulty": "30",
+        "difficultyType": "fest",
+        "difficultyValue": 30
     },
     {
         "name": "Härte",
@@ -3991,7 +4780,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Härte eines unbelebten Objekts erhöht sich um 1 Punkt.\n\nErfolgsgrade:\n• Auslösezeit, Verstärken (s. u.) • 1 EG (Kosten +K1V1): Die Härte erhöht sich um insgesamt 2 Punkte.",
         "source": "GRW",
         "page": 233,
-        "damage": ""
+        "damage": "",
+        "difficulty": "15",
+        "difficultyType": "fest",
+        "difficultyValue": 15
     },
     {
         "name": "Kleiner Magieschutz",
@@ -4005,7 +4797,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Gegen das Ziel gerichtete Zauber erhalten einen Malus in Höhe von 1 Punkt.\n\nErfolgsgrade:\n• Auslösezeit, Verstärken (s. u.) • 1 EG (Kosten +K1V1): Der Malus erhöht sich auf 2 Punkte.",
         "source": "GRW",
         "page": 234,
-        "damage": ""
+        "damage": "",
+        "difficulty": "15",
+        "difficultyType": "fest",
+        "difficultyValue": 15
     },
     {
         "name": "Alarm",
@@ -4019,7 +4814,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer wird alarmiert, wenn eines oder mehrere Wesen der Größenklasse 2 oder höher den Wirkungsbereich betritt. Er vermag dabei keinen genauen Ort zu bestimmen, sondern lediglich die pure Anwesenheit festzustellen, ebenso wenig kann er Angaben zur Anzahl machen. Es ist möglich, bis zu zehn bestimmte Wesen seiner Wahl von der Alarmierung auszunehmen.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich, Wirkungsdauer • 1 EG (Kosten +1V1): Der Zauberer weiß, in welcher Richtung sich die Wesen befinden, ohne jedoch die Entfernung zu kennen.",
         "source": "GRW",
         "page": 223,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Gedankenschutz",
@@ -4033,7 +4831,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Gegen Beherrschungszauber erhält das Ziel einen Bonus in Höhe von 3 Punkten auf seinen Geistigen Widerstand.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Der Bonus erhöht sich auf 4 Punkte.",
         "source": "GRW",
         "page": 230,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Magische Rüstung",
@@ -4047,7 +4848,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer umhüllt seinen Körper mit einer schimmernden Schicht aus purer Magie, die seine Verteidigung um 2 Punkte erhöht. Dieser Zauber ist nicht mit anderen Zaubern kombinierbar, die ebenfalls die Typen Rüstung und Schutzfeld besitzen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Die Erhöhung beträgt 3 Punkte.",
         "source": "GRW",
         "page": 237,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Magisches Schloss",
@@ -4061,7 +4865,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer verstärkt ein Schloss, dessen Stufe um 1 Stufe ansteigt und damit schwieriger zu öffnen ist.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsdauer • 1 EG (Kosten +1V1): Die Qualität erhöht sich um insgesamt 2 Stufen.",
         "source": "GRW",
         "page": 238,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Rindenhaut",
@@ -4075,7 +4882,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Haut des Zauberers wird borkig und hart. Er erhält einen Bonus in Höhe von jeweils 1 Punkt auf seine Verteidigung und seine Schadensreduktion. Dieser Zauber ist nicht mit anderen Zaubern kombinierbar, die ebenfalls den Typus Haut besitzen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K1V1): Der Bonus auf die Schadensreduktion erhöht sich auf 2 Punkte.",
         "source": "GRW",
         "page": 240,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Schutz vor Feuer",
@@ -4089,7 +4899,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Sämtlicher gegen den Zauberer gerichteter Feuerschaden wird um 4 Punkte gesenkt. Die Hitzestufe (S. 174) gilt für ihn als um 1 reduziert.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Entsprechender Schaden wird um 6 Punkte gesenkt.",
         "source": "GRW",
         "page": 244,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Schutz vor Kälte",
@@ -4103,7 +4916,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Sämtlicher gegen den Zauberer gerichteter Kälteschaden wird um 4 Punkte gesenkt. Die Kältestufe (S. 175) gilt für ihn als um 1 reduziert.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K1V1): Entsprechender Schaden wird um 6 Punkte gesenkt.",
         "source": "GRW",
         "page": 244,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Eiserne Aura",
@@ -4117,7 +4933,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer und bis zu drei weitere beim Auslösen des Zaubers festgelegte Wesen seiner Wahl erhalten jeweils einen Bonus in Höhe von 2 Punkten auf die Verteidigung. Die Boni gelten nur während des Aufenthalts im Wirkungsbereich.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 1 EG (Kosten +K2V2): Es können bis zu fünf Wesen bestimmt werden.",
         "source": "GRW",
         "page": 226,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Schutz vor Elektrizität",
@@ -4131,7 +4950,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Sämtlicher gegen den Zauberer gerichteter Elektrizitätsschaden wird um 6 Punkte gesenkt.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Entsprechender Schaden wird um 8 Punkte gesenkt.",
         "source": "GRW",
         "page": 243,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Steinhaut",
@@ -4145,7 +4967,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Haut des Zauberers wird hart wie Fels. Er erhält einen Bonus in Höhe von jeweils 2 Punkten auf seine Verteidigung und seine Schadensreduktion. Dieser Zauber ist nicht mit anderen Zaubern kombinierbar, die ebenfalls den Typus Haut besitzen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K2V2): Der Bonus auf die SR erhöht sich auf 3 Punkte.",
         "source": "GRW",
         "page": 246,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Windschild",
@@ -4159,7 +4984,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer umgibt sich mit einem Schild aus tobendem Wind, welcher Fernkampfangriffen gegen ihn einen Malus in Höhe von 6 Punkten verleiht.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K3V3): Der Malus erhöht sich auf 9 Punkte.",
         "source": "GRW",
         "page": 252,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Gleißende Barriere",
@@ -4173,7 +5001,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erschafft eine schnurgerade und unverrückbare Wand aus gleißendem Licht von 20 cm Dicke mit einer beliebig verteilbaren Fläche von bis zu 10 m². Ihre Härte beträgt 2 Punkte, ihre Haltbarkeit 6 Punkte. Die Barriere erhöht die Lichtverhältnisse im Umkreis von 5 Metern um 2 Stufen. Sie kann zerstört werden, was den Zauber beendet. Die maximale Wirkungsweite kanalisierter Zauber (S. 195) gilt für diesen Zauber als verzehnfacht.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Wird die Wand im Nahkampf attackiert, erhalten die Angreifer den Zustand Geblendet 1. Außerdem verbessert sie die Lichtverhältnisse im Umkreis von 5 Metern um insgesamt 3 Stufen.",
         "source": "GRW",
         "page": 232,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Gleißender Schild",
@@ -4187,7 +5018,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer umgibt sich mit einem Schild aus gleißendem Licht. Wird er im Nahkampf attackiert, erhalten die Angreifer den Zustand Geblendet 1 (max. 1 mal gleichzeitig). Zudem verbessern sich die Lichtverhältnisse im Umkreis von 10 Metern um 1 Stufe.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K2V2): Angreifer im Nahkampf erhalten den Zustand Geblendet 2, die Lichtverhältnisse verbessern sich um insgesamt 2 Stufen.",
         "source": "GRW",
         "page": 232,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Großer Magieschutz",
@@ -4201,7 +5035,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Alle gegen das Ziel gerichteten Zauber erhalten einen Malus in Höhe von 4 Punkten.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K3V3): Der Malus erhöht sich auf 6 Punkte.",
         "source": "GRW",
         "page": 232,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Kälteschild",
@@ -4215,7 +5052,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer umgibt sich mit einem Schild aus frostiger Kälte. Während er selbst nicht davon beeinträchtigt wird, erleidet jedes Wesen nach jeweils 15 vollen Ticks Aufenthalt in einem Abstand von maximal 2 m Kälteschaden in Höhe von 2W6 Punkten.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Betroffene Wesen erhalten zusätzlich den Zustand Benommen 1.",
         "source": "GRW",
         "page": 233,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Leben verhüllen",
@@ -4229,7 +5069,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Lebensaura des Zauberers wird unterdrückt. Untote und andere Wesen, die Lebenskraft spüren, nehmen ihn als totes Objekt wahr, solange ihr Geistiger Widerstand nicht mindestens 20 beträgt.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Der Zauberer wird nicht wahrgenommen, wenn der Geistige Widerstand nicht mindestens 25 beträgt.",
         "source": "GRW",
         "page": 235,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Magischer Panzer",
@@ -4243,7 +5086,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer umhüllt seinen Körper mit einer schimmernden, aber sehr widerstandsfähigen Schicht aus purer Magie, die seine Verteidigung um 4 Punkte erhöht. Dieser Zauber ist nicht mit anderen Zaubern kombinierbar, die ebenfalls die Typen Rüstung und Schutzfeld besitzen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K3V3): Die Erhöhung beträgt 5 Punkte.",
         "source": "GRW",
         "page": 237,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Schutz vor Gift",
@@ -4257,7 +5103,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erhält einen Bonus in Höhe von 3 Punkten auf seinen Körperlichen Widerstand gegen Vergiftungen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Der Bonus erhöht sich auf 4 Punkte,",
         "source": "GRW",
         "page": 244,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Schutz vor Untoten",
@@ -4271,7 +5120,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer schafft eine Zone, innerhalb derer Wesen des Typus Untoter einen Malus in Höhe von 2 Punkten für alle Proben erhalten.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 1 EG (Kosten +K2V2): Der Malus erhöht sich auf 4 Punkte.",
         "source": "GRW",
         "page": 244,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Flammenschild",
@@ -4285,7 +5137,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer umgibt sich mit einem Schild aus lodernden Flammen. Während er selbst nicht davon beeinträchtigt wird, erleidet jedes Wesen, das sich ihm für länger als 15 Ticks auf 2 Meter nähert, für 15 Ticks den Zustand Brennend 2.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K3V3): Die nötige Zeit der Nähe wird auf 5 Ticks reduziert.",
         "source": "GRW",
         "page": 229,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Schutz vor Elementen",
@@ -4299,7 +5154,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Sämtlicher gegen den Zauberer gerichteter Feuer-, Fels-, Elektrizitäts-, Wind-, Säure-, Wasser- und Kälteschaden wird um 10 Punkte gesenkt.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K4V4): Entsprechender Schaden wird um 12 Punkte gesenkt.",
         "source": "GRW",
         "page": 243,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Stahlhaut",
@@ -4313,7 +5171,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Haut des Zauberers wird hart wie Stahl und schimmert metallisch. Er erhält einen Bonus in Höhe von jeweils 4 Punkten auf seine Verteidigung und seine Schadensreduktion. Dieser Zauber ist nicht mit anderen Zaubern kombinierbar, die ebenfalls den Typus Haut besitzen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K4V4): Der Bonus auf die SR erhöht sich auf 5 Punkte.",
         "source": "GRW",
         "page": 245,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Widerstände erhöhen",
@@ -4327,7 +5188,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erhält einen Bonus in Höhe von jeweils 2 Punkten auf seine Widerstandswerte.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K3V3): Der Bonus erhöht sich auf 3 Punkte.",
         "source": "GRW",
         "page": 252,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Zone der Bannung",
@@ -4341,7 +5205,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Innerhalb des Wirkungsbereichs erhalten alle Zauberproben einen Malus in Höhe von 4 Punkten.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 2 EG (Kosten +K3V3): Der Malus erhöht sich auf 6 Punkte.",
         "source": "GRW",
         "page": 253,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Schutz vor Angriffen",
@@ -4355,7 +5222,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer strahlt ein überwältigendes Maß an Friedfertigkeit aus, sodass es einer gelungenen Entschlossenheit-Probe gegen 35 bedarf, um einen Angriff gegen ihn auszuführen. Attackiert er einen Gegner von sich aus, verfällt die Wirkung des Zaubers auf den Angegriffenen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K5V5): Die Schwierigkeit beträgt 40.",
         "source": "GRW",
         "page": 243,
-        "damage": ""
+        "damage": "",
+        "difficulty": "30",
+        "difficultyType": "fest",
+        "difficultyValue": 30
     },
     {
         "name": "Todesschutz",
@@ -4369,7 +5239,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauber schützt den Zauberer in begrenztem Maße vor dem Tod. Sollte er innerhalb der Wirkungsdauer eigentlich sterben (egal aus welchem Grund), erhält er stattdessen den Zustand Bewusstlos, eventuelle negative Lebenspunkte werden geheilt. Etwaige Zustände werden nicht geheilt, ebenso wie sonstige Quellen des Sterbens (wie etwa Ertrinken, wenn der Zauberer sich unter Wasser befindet) nicht ausgesetzt werden. Der Zauber endet, sobald er einmal seine Wirkung entfaltet hat.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K4V4): Bei Auslösung des Zaubers werden auch etwaige Sterbend-Zustände geheilt.",
         "source": "GRW",
         "page": 248,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Unzerstörbar",
@@ -4383,7 +5256,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Ein unbelebtes Objekt kann nicht mehr beschädigt oder zerstört werden. Es erhält seine übliche Verformbarkeit bei, ebenso wie sein Gewicht. Auf die Schutzwirkung von Rüstungen oder den Schaden von Waffen hat dieser Zauber keine Auswirkungen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 3 EG (Kosten +K4V4): Sollte es sich um eine Rüstung handeln, steigt außerdem deren Schadensreduktion um 1 Punkt.",
         "source": "GRW",
         "page": 249,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Ausdauer stärken",
@@ -4397,7 +5273,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Für die Bestimmung einer Überanstrengung gilt die Konstitution des Zauberers als um 2 Punkte erhöht. Zähigkeit-Proben zur Abwehr des Zustands Erschöpft erhalten einen Bonus in Höhe von 2 Punkten.\n\nErfolgsgrade:\n• Auslösezeit, Verstärken (s. u.) • 1 EG (Kosten +K1V1): Die Konstitution gilt für Überanstrengung als um 3 Punkte erhöht. Der Bonus auf Zähigkeit-Proben steigt auf 3 Punkte.",
         "source": "GRW",
         "page": 224,
-        "damage": ""
+        "damage": "",
+        "difficulty": "15",
+        "difficultyType": "fest",
+        "difficultyValue": 15
     },
     {
         "name": "Härte",
@@ -4411,7 +5290,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Härte eines unbelebten Objekts erhöht sich um 1 Punkt.\n\nErfolgsgrade:\n• Auslösezeit, Verstärken (s. u.) • 1 EG (Kosten +K1V1): Die Härte erhöht sich um insgesamt 2 Punkte.",
         "source": "GRW",
         "page": 233,
-        "damage": ""
+        "damage": "",
+        "difficulty": "15",
+        "difficultyType": "fest",
+        "difficultyValue": 15
     },
     {
         "name": "Aura der Entschlossenheit",
@@ -4425,7 +5307,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer und bis zu drei weitere beim Auslösen des Zaubers festgelegte Wesen seiner Wahl erhalten jeweils einen Bonus in Höhe von 1 Punkt auf den Geistigen Widerstand und von 2 Punkten auf die Entschlossenheit. Die Boni gelten nur während des Aufenthalts im Wirkungsbereich.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 2 EG (Kosten +K1V1): Es können bis zu fünf Personen bestimmt werden.",
         "source": "GRW",
         "page": 223,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Gehör verbessern",
@@ -4439,7 +5324,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erhält einen Bonus in Höhe von 3 Punkten auf jede Wahrnehmung-Probe, die sein Gehör betrifft.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Der Bonus erhöht sich auf 5 Punkte.",
         "source": "GRW",
         "page": 231,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Sicht verbessern",
@@ -4453,7 +5341,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erhält einen Bonus in Höhe von 3 Punkten auf jede Wahrnehmung-Probe, die seine Sicht betrifft.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Der Bonus erhöht sich auf 5 Punkte.",
         "source": "GRW",
         "page": 244,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Zunge des Diplomaten",
@@ -4467,7 +5358,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erhält einen Bonus in Höhe von jeweils 1 Punkt auf alle Proben in den Fertigkeiten Diplomatie und Redegewandtheit.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K1V1): Der Bonus erhöht sich auf 2 Punkte.",
         "source": "GRW",
         "page": 253,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Beschleunigen",
@@ -4481,7 +5375,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Geschwindigkeit des Zauberers erhöht sich um 2 Punkte.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Die Geschwindigkeit erhöht sich um insgesamt 4 Punkte.",
         "source": "GRW",
         "page": 224,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Eiserne Aura",
@@ -4495,7 +5392,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer und bis zu drei weitere beim Auslösen des Zaubers festgelegte Wesen seiner Wahl erhalten jeweils einen Bonus in Höhe von 2 Punkten auf die Verteidigung. Die Boni gelten nur während des Aufenthalts im Wirkungsbereich.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 1 EG (Kosten +K2V2): Es können bis zu fünf Wesen bestimmt werden.",
         "source": "GRW",
         "page": 226,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Heilung stärken",
@@ -4509,7 +5409,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Regeneration der Lebenspunkte in der nächsten Ruhephase wird um 5 Punkte erhöht.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +2V2): Es werden in der nächsten Ruhephase insgesamt 10 zusätzliche Lebenspunkte regeneriert.",
         "source": "GRW",
         "page": 233,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Lebenskraft stärken",
@@ -4523,7 +5426,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erhält 6 zusätzliche Lebenspunkte, die im Falle erlittener Schadenspunkte zuerst verbraucht werden. Es ist möglich, dadurch temporär über einen Vorrat an Lebenspunkten zu verfügen, der über das natürliche Maximum hinausgeht (ebenso gelten die Regeln zu maximalen Boni auf abgeleitete Werte für diesen Zauber nicht). Sollte der Zauberer bereits verwundet sein, gelten weiter seine aktuellen Wundabzüge. Der Zauber endet automatisch, wenn die 6 zusätzlichen Lebenspunkte aufgebraucht wurden. Dieser Zauber ist nicht mit anderen Zaubern kombinierbar, die ebenfalls die Typen Körper stärken und Leben besitzen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Der Zauberer erhält insgesamt 8 zusätzliche Lebenspunkte.",
         "source": "GRW",
         "page": 235,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Schmerzen widerstehen",
@@ -4537,7 +5443,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer wird unempfindlicher gegen Schmerzen. Eventuelle Wundabzüge sinken um 3 Punkte.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Die Wundabzüge sinken um 4 Punkte.",
         "source": "GRW",
         "page": 243,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Schwächeanfall",
@@ -4551,7 +5460,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Das Ziel erhält einen Malus in Höhe von 1 Punkt auf alle Proben, in die seine Stärke einfließt.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Der Malus erhöht sich auf 2 Punkte.",
         "source": "GRW",
         "page": 244,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Körperlicher Widerstand des Ziels",
+        "difficultyType": "KW"
     },
     {
         "name": "Gegenstand verbessern",
@@ -4565,7 +5476,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Gegenstandsqualität eines Objekts erhöht sich um 2 Punkte.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K3V3): Die Gegenstandsqualität erhöht sich um insgesamt 4 Punkte.",
         "source": "GRW",
         "page": 231,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Katzenreflexe",
@@ -4579,7 +5493,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erhält einen Bonus in Höhe von 2 Punkten auf alle Proben, in die seine Beweglichkeit einfließt.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Die Initiative des Zauberers ist außerdem um 2 Punkte gesenkt.",
         "source": "GRW",
         "page": 234,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Schwere Arme",
@@ -4593,7 +5510,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Das Ziel kann seine Arme nur schwer heben. Alle seine Proben für Nahkampfangriffe und Fernkampfangriffe erhalten einen Malus in Höhe von 2 Punkten.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Der Malus erhöht sich auf 3 Punkte.",
         "source": "GRW",
         "page": 244,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Körperlicher Widerstand des Ziels",
+        "difficultyType": "KW"
     },
     {
         "name": "Sinne verstärken",
@@ -4607,7 +5526,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erhält einen Bonus in Höhe von 5 Punkten auf jede Wahrnehmung-Probe.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K3V3): Der Bonus erhöht sich auf 7 Punkte.",
         "source": "GRW",
         "page": 245,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Widerstände erhöhen",
@@ -4621,7 +5543,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erhält einen Bonus in Höhe von jeweils 2 Punkten auf seine Widerstandswerte.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K3V3): Der Bonus erhöht sich auf 3 Punkte.",
         "source": "GRW",
         "page": 252,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Aura der Lebenskraft",
@@ -4635,7 +5560,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer und bis zu drei weitere beim Auslösen des Zaubers festgelegte Wesen seiner Wahl erhalten jeweils 10 zusätzliche Lebenspunkte, die im Falle erlittener Schadenspunkte zuerst verbraucht werden. Es ist möglich, dadurch temporär über einen Vorrat an Lebenspunkten zu verfügen, der über das natürliche Maximum hinausgeht (und auch die maximalen Boni auf abgeleitete Werte gelten hier nicht). Sollte ein Nutznießer bereits verwundet sein, gelten weiter seine aktuellen Wundabzüge. Die zusätzlichen Punkte stehen nur während des Aufenthalts im Wirkungsbereich zur Verfügung und verfallen bei Verlassen desselben. Dieser Zauber ist nicht mit anderen Zaubern kombinierbar, die ebenfalls die Typen Körper stärken und Leben besitzen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 2 EG (Kosten +K4V4): Es können bis zu fünf Personen bestimmt werden.",
         "source": "GRW",
         "page": 223,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Bärenstärke",
@@ -4649,7 +5577,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erhält einen Bonus in Höhe von 4 Punkten auf alle Proben, in die seine Stärke einfließt.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K4V4): Der Bonus erhöht sich auf 5 Punkte.",
         "source": "GRW",
         "page": 224,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Eulengespür",
@@ -4663,7 +5594,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer ist von Weisheit und Voraussicht erfüllt. Dadurch erhält er einen Bonus in Höhe von 3 Punkten auf alle Proben, in die seine Intuition einfließt.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K4V4): Der Bonus erhöht sich auf 4 Punkte.",
         "source": "GRW",
         "page": 227,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Aura des Anführers",
@@ -4677,7 +5611,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer und bis zu drei weitere beim Auslösen des Zaubers festgelegte Wesen seiner Wahl erhalten jeweils einen Bonus in Höhe von 2 Punkten auf den Geistigen Widerstand, den Körperlichen Widerstand, die Verteidigung sowie alle durchgeführten Angriffe. Zudem sind sie immun gegen die Zustände Angsterfüllt und Panisch. Die Boni gelten nur während des Aufenthalts im Wirkungsbereich.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 2 EG (Kosten +K5V5): Es können bis zu fünf Personen bestimmt werden.",
         "source": "GRW",
         "page": 224,
-        "damage": ""
+        "damage": "",
+        "difficulty": "30",
+        "difficultyType": "fest",
+        "difficultyValue": 30
     },
     {
         "name": "Schmerzen ignorieren",
@@ -4691,7 +5628,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer wird beinahe unempfindlich gegen Schmerzen. Eventuelle Wundabzüge sinken um 6 Punkte.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K4V4): Die Wundabzüge sinken um 8 Punkte.",
         "source": "GRW",
         "page": 243,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Geisterblick",
@@ -4705,7 +5645,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer kann seinen parallelen Standort in der Geisterwelt sehen, hören und riechen, als wäre er dort. Eine Interaktion ist jedoch nicht möglich. Während der Wirkungsdauer ist der Zauberer nicht dazu in der Lage, sein Umfeld wahrzunehmen.\n\nErfolgsgrade:\n• Auslösezeit, Verstärken (s. u.) • 1 EG (Kosten +K1V1): Der Zauberer ist dazu in der Lage, während der Wirkungsdauer sein Umfeld wahrzunehmen.",
         "source": "GRW",
         "page": 231,
-        "damage": ""
+        "damage": "",
+        "difficulty": "15",
+        "difficultyType": "fest",
+        "difficultyValue": 15
     },
     {
         "name": "Hauch der Geister",
@@ -4719,7 +5662,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer verspürt ein leichtes Frösteln, wenn sich ein Wesen des Typus Geisterwesen im Wirkungsbereich aufhält.\n\nErfolgsgrade:\n• Auslösezeit, Verstärken (s. u.), Wirkungsbereich • 1 EG (Kosten +K1V1): Der Zauberer weiß, in welcher Richtung sich die Geister befinden, ohne jedoch die Entfernung zu kennen.",
         "source": "GRW",
         "page": 233,
-        "damage": ""
+        "damage": "",
+        "difficulty": "15",
+        "difficultyType": "fest",
+        "difficultyValue": 15
     },
     {
         "name": "Ende des Weges",
@@ -4733,7 +5679,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Ein Leichnam wird dauerhaft vor unheiligen Schändungen geschützt. Ihn betreffende Zauber der Typen Geisterwesen oder Nekromantie erhalten einen Malus in Höhe von 4 Punkten.\n\nErfolgsgrade:\n• Auslösezeit, Verstärken (s. u.) • 1 EG (Kosten +1V1): Der Malus erhöht sich auf 6 Punkte.",
         "source": "GRW",
         "page": 226,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Geister rufen I",
@@ -4747,7 +5696,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer beschwört ein Wesen der Typen Geisterwesen und Magisches Wesen I, das all seinen Anweisungen folgt.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K1V1): Es wird ein zweites Wesen derselben Art beschworen.",
         "source": "GRW",
         "page": 231,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Geistersprache",
@@ -4761,7 +5713,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer kann mit Wesen des Typus Geisterwesen kommunizieren. Diese sind ihm gegenüber nicht notwendigerweise freundlich gesonnen, aber in der Regel zumindest interessiert.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Die Einstellung von Wesen des Typus Geisterwesen gegenüber dem Zauberer verbessert sich um 1 Stufe.",
         "source": "GRW",
         "page": 231,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Schwächeanfall",
@@ -4775,7 +5730,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Das Ziel erhält einen Malus in Höhe von 1 Punkt auf alle Proben, in die seine Stärke einfließt.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Der Malus erhöht sich auf 2 Punkte.",
         "source": "GRW",
         "page": 244,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Körperlicher Widerstand des Ziels",
+        "difficultyType": "KW"
     },
     {
         "name": "Fluch der Schmerzen",
@@ -4789,7 +5746,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer verflucht sein Ziel so, dass es den Zustand Verwundet 1 erhält.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +2V2): Das Ziel erhält den Zustand Verwundet 2.",
         "source": "GRW",
         "page": 230,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Körperlicher Widerstand des Ziels",
+        "difficultyType": "KW"
     },
     {
         "name": "Geh noch nicht",
@@ -4803,7 +5762,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauber hält die Lebenskraft eines Sterbenden in dessen Körper. Die Wirkung der Zustände Sterbend 1 und Sterbend 2 wird ausgesetzt, während die Wirkungsdauer einer etwaigen Zustandsursache weiterläuft.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K2V2): Auch die Wirkung des Zustands Sterbend 3 wird ausgesetzt.",
         "source": "GRW",
         "page": 231,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Leben verhüllen",
@@ -4817,7 +5779,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Lebensaura des Zauberers wird unterdrückt. Untote und andere Wesen, die Lebenskraft spüren, nehmen ihn als totes Objekt wahr, solange ihr Geistiger Widerstand nicht mindestens 20 beträgt.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Der Zauberer wird nicht wahrgenommen, wenn der Geistige Widerstand nicht mindestens 25 beträgt.",
         "source": "GRW",
         "page": 235,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Schutz vor Untoten",
@@ -4831,7 +5796,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer schafft eine Zone, innerhalb derer Wesen des Typus Untoter einen Malus in Höhe von 2 Punkten für alle Proben erhalten.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 1 EG (Kosten +K2V2): Der Malus erhöht sich auf 4 Punkte.",
         "source": "GRW",
         "page": 244,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Untote schwächen",
@@ -4845,7 +5813,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Ein Wesen des Typus Untoter erhält einen Malus in Höhe von 4 Punkten auf alle Proben.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K1V1): Der Malus erhöht sich auf 6 Punkte.",
         "source": "GRW",
         "page": 249,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Körperlicher Widerstand des Ziels",
+        "difficultyType": "KW"
     },
     {
         "name": "Lebensraub",
@@ -4859,7 +5829,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer entzieht einem Opfer 3W6+5 Lebenspunkte und überträgt sie auf ein Wesen seiner Wahl. Beide Ziele müssen gleichzeitig berührt werden. Die Lebenspunkte können auf diesem Wege nicht über das natürliche Maximum hinaus angehoben werden.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +3V3): Die Anzahl der entzogenen Lebenspunkte erhöht sich auf 4W6+5.",
         "source": "GRW",
         "page": 235,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Körperlicher Widerstand des Ziels",
+        "difficultyType": "KW"
     },
     {
         "name": "Untote bannen",
@@ -4873,7 +5845,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Ein Wesen des Typus Untoter wird vernichtet, wenn ihm eine Zähigkeit-Probe gegen 15 misslingt. Gelingt die Probe, erleidet das Wesen 3W6 Schaden.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +2V2): Ein zweites Wesen mit gleichem oder geringerem Körperlichen Widerstand wird betroffen.",
         "source": "GRW",
         "page": 249,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Körperlicher Widerstand des Ziels",
+        "difficultyType": "KW"
     },
     {
         "name": "Untote erheben",
@@ -4887,7 +5861,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Ein totes Wesen wird zu einem Geschöpf des Typus Untoter. Aus frischen Leichnamen werden Wandelnde Leichname (siehe S. 282), während aus skelettierten Toten Skelette werden (siehe S. 279). Die erhobenen Untoten gehorchen den Befehlen des Zauberers.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsdauer • 1 EG (Kosten +3V3): Das Wesen erhält 15 Erfahrungspunkte, die nach Willen des Zauberers nach den Regeln zum Steigern von Abenteurern verteilt werden.",
         "source": "GRW",
         "page": 249,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Todesfluch",
@@ -4901,7 +5878,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Dieser Zauber zerreißt die Verbindung zwischen Körper und Lebenskraft des Opfers. Es erhält den Zustand Sterbend 1 (Fluch).\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 3 EG (Kosten +4V4): Das Opfer erhält den Zustand Sterbend 2 (Fluch).",
         "source": "GRW",
         "page": 248,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Körperlicher Widerstand des Ziels",
+        "difficultyType": "KW"
     },
     {
         "name": "Todesschutz",
@@ -4915,7 +5894,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauber schützt den Zauberer in begrenztem Maße vor dem Tod. Sollte er innerhalb der Wirkungsdauer eigentlich sterben (egal aus welchem Grund), erhält er stattdessen den Zustand Bewusstlos, eventuelle negative Lebenspunkte werden geheilt. Etwaige Zustände werden nicht geheilt, ebenso wie sonstige Quellen des Sterbens (wie etwa Ertrinken, wenn der Zauberer sich unter Wasser befindet) nicht ausgesetzt werden. Der Zauber endet, sobald er einmal seine Wirkung entfaltet hat.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K4V4): Bei Auslösung des Zaubers werden auch etwaige Sterbend-Zustände geheilt.",
         "source": "GRW",
         "page": 248,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Totenschlaf",
@@ -4929,7 +5911,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Das Ziel fällt in einen todesähnlichen Schlaf und erhält den Zustand Schlafend. In diesem Zustand benötigt es weder Luft noch Wasser oder Nahrung, auch altert es nicht. Die Wirkungen von Giften und Krankheiten werden unterbrochen, ebenso wie die Zustände Blutend und Sterbend. Die Person kann durch Gewalteinwirkung geweckt werden, wacht aber anders als üblich nicht durch Lärm oder ähnliches auf.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsdauer • 2 EG (Kosten +4V4): Der Zauberer kann eine Bedingung benennen, bei deren Eintreten der Zauber sofort endet.",
         "source": "GRW",
         "page": 248,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Geistiger Widerstand des Ziels",
+        "difficultyType": "GW"
     },
     {
         "name": "Geistreise",
@@ -4943,7 +5927,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Geist des Zauberers löst sich von seinem Körper, sodass er die Geisterwelt betreten und mit ihren Bewohnern interagieren kann. Sein Leib fällt währenddessen in eine Trance. Endet der Zauber, kehrt der Geist auf der Stelle zurück.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K5V5): Der Zauberer verfügt in der Geisterwelt über eine Schadensreduktion in Höhe von 5 Punkten.",
         "source": "GRW",
         "page": 231,
-        "damage": ""
+        "damage": "",
+        "difficulty": "30",
+        "difficultyType": "fest",
+        "difficultyValue": 30
     },
     {
         "name": "Verdorren",
@@ -4957,7 +5944,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Eine berührte Pflanze oder ein Wesen des Typus Pflanze verdorrt und stirbt. Anderen Wesen muss eine Zähigkeit-Probe gegen 25 gelingen, um nicht den Zustand Sterbend 3 (Fluch) zu erhalten.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +4V4): Die Schwierigkeit der Zähigkeit-Probe erhöht sich auf 30.",
         "source": "GRW",
         "page": 249,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Verteidigung des Ziels",
+        "difficultyType": "VTD"
     },
     {
         "name": "Haarfarbe",
@@ -4971,7 +5960,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Das Haupthaar oder -fell des Zauberers nimmt die von ihm gewünschten Farben an.\n\nErfolgsgrade:\n• Auslösezeit, Verstärken (s. u.) • 1 EG (Kosten +K1V1): Auch die restliche Körperbehaarung kann verändert werden.",
         "source": "GRW",
         "page": 232,
-        "damage": ""
+        "damage": "",
+        "difficulty": "15",
+        "difficultyType": "fest",
+        "difficultyValue": 15
     },
     {
         "name": "Krallen",
@@ -4985,7 +5977,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Aus den Händen des Zauberers wachsen scharfe Krallen. Seine waffenlosen Nahkampfangriffe verursachen dadurch echten Schaden statt Betäubungsschaden.\n\nErfolgsgrade:\n• Auslösezeit, Verstärken (s. u.) • 1 EG (Kosten +K1V1): Der Schaden erhöht sich zusätzlich um 1 Punkt.",
         "source": "GRW",
         "page": 234,
-        "damage": ""
+        "damage": "",
+        "difficulty": "15",
+        "difficultyType": "fest",
+        "difficultyValue": 15
     },
     {
         "name": "Gesicht ändern",
@@ -4999,7 +5994,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Gesichtszüge des Zauberers verändern sich leicht, sodass es einer gelungenen Wahrnehmung-Probe gegen 18 bedarf, um ihn wiederzuerkennen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K1V1): Der Schwierigkeit der Wahrnehmung-Probe beträgt 21.",
         "source": "GRW",
         "page": 232,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Rindenhaut",
@@ -5013,7 +6011,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Haut des Zauberers wird borkig und hart. Er erhält einen Bonus in Höhe von jeweils 1 Punkt auf seine Verteidigung und seine Schadensreduktion. Dieser Zauber ist nicht mit anderen Zaubern kombinierbar, die ebenfalls den Typus Haut besitzen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K1V1): Der Bonus auf die Schadensreduktion erhöht sich auf 2 Punkte.",
         "source": "GRW",
         "page": 240,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Sprungbeine",
@@ -5027,7 +6028,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die normale Grund-Sprungweite des Abenteurers wird um 50% erhöht.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Die Grund-Sprungweite wird verdoppelt.",
         "source": "GRW",
         "page": 245,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Steinfaust",
@@ -5041,7 +6045,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Eine Hand des Zauberers verwandelt sich in Stein. Seine waffenlosen Nahkampfangriffe verursachen dadurch echten Schaden statt Betäubungsschaden, außerdem erhält er im Handgemenge das Waffenmerkmal Defensiv 1 (S. 186). Dieser Zauber ist nicht mit anderen Zaubern des Typus Hand kombinierbar.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Zusätzlich richtet der Zauberer im unbewaffneten Nahkampf 2 Punkte echten Felsschaden an.",
         "source": "GRW",
         "page": 246,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Gehör verbessern",
@@ -5055,7 +6062,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erhält einen Bonus in Höhe von 3 Punkten auf jede Wahrnehmung-Probe, die sein Gehör betrifft.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Der Bonus erhöht sich auf 5 Punkte.",
         "source": "GRW",
         "page": 231,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Katzenaugen",
@@ -5069,7 +6079,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Lichtverhältnisse verbessern sich für den Zauberer um 1 Stufe.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Die Lichtverhältnisse verbessern sich für den Zauberer um insgesamt 2 Stufen.",
         "source": "GRW",
         "page": 233,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Kleintierform",
@@ -5083,7 +6096,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer verwandelt sich in ein nicht flugfähiges Wesen des Typus Tier der Größenklasse 1, sowie bis maximal Monstergrad (als Einzelgegner) 1.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Das Tier ist ein besonders prachtvolles Exemplar. Alle Proben auf Fertigkeiten, die von der Tiergestalt übernommen wurden, erhalten einen Bonus in Höhe von 2 Punkten.",
         "source": "GRW",
         "page": 234,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Reparatur",
@@ -5097,7 +6113,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Einem demolierten oder angeschlagenen Objekt mit einer maximalen Last von 6 wird seine ursprüngliche Form zurückgegeben.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +2V2): Die maximale Last beträgt 8.",
         "source": "GRW",
         "page": 240,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Rüstung schwächen",
@@ -5111,7 +6130,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Schadensreduktion des Ziels wird um 2 Punkte gesenkt (Minimum 0). Hiervon ist nur Schadensreduktion von getragenen Rüstungen betroffen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Auch sämtliche anderen Arten von Schadensreduktion werden betroffen, wie etwa aus natürlicher Rüstung oder aus Magie.",
         "source": "GRW",
         "page": 240,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Körperlicher Widerstand des Ziels",
+        "difficultyType": "KW"
     },
     {
         "name": "Sicht verbessern",
@@ -5125,7 +6146,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erhält einen Bonus in Höhe von 3 Punkten auf jede Wahrnehmung-Probe, die seine Sicht betrifft.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Der Bonus erhöht sich auf 5 Punkte.",
         "source": "GRW",
         "page": 244,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Steinhaut",
@@ -5139,7 +6163,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Haut des Zauberers wird hart wie Fels. Er erhält einen Bonus in Höhe von jeweils 2 Punkten auf seine Verteidigung und seine Schadensreduktion. Dieser Zauber ist nicht mit anderen Zaubern kombinierbar, die ebenfalls den Typus Haut besitzen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K2V2): Der Bonus auf die SR erhöht sich auf 3 Punkte.",
         "source": "GRW",
         "page": 246,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Erde zu Schlamm",
@@ -5153,7 +6180,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Im Wirkungsbereich befindliche Erde verwandelt sich in Schlamm und wird zu Schwierigem Gelände. Der Boden trocknet nach Wirken des Zaubers auf natürliche Weise.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 1 EG (Kosten +2V2): Erde im Wirkungsbereich wird zu Sehr Schwierigem Gelände.",
         "source": "GRW",
         "page": 226,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Stimme kopieren",
@@ -5167,7 +6197,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer nimmt die Stimme einer anderen Person an. Soll es sich um jene einer bestimmten Person handeln, können nur solche Eigenheiten übernommen werden, die dem Zauberer bekannt sind. Die Täuschung kann von Bekannten der Person mit einer vergleichenden Probe auf Empathie gegen die Redegewandtheit des Zauberers bemerkt werden.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K3V3): Eine etwaige Redegewandtheit-Probe des Zauberers, um die Sprechweise überzeugend zu imitieren, erhält einen Bonus in Höhe von 3 Punkten.",
         "source": "GRW",
         "page": 246,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Tierform",
@@ -5181,7 +6214,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer verwandelt sich in ein nicht flugfähiges Wesen des Typus Tier der Größenklasse 1 bis 5 sowie bis maximal Monstergrad (als Einzelgegner) 2.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K3V3): Die Kreatur ist ein besonders prachtvolles Exemplar. Alle Proben auf Fertigkeiten, die von der Tiergestalt übernommen wurden, erhalten einen Bonus in Höhe von 2 Punkten.",
         "source": "GRW",
         "page": 247,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Verwandlung beenden",
@@ -5195,7 +6231,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Alle momentan auf das Ziel wirkenden Verwandlungszauber werden aufgehoben, solange sie maximal Grad 3 aufweisen.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +3V3): Es werden Zauber bis Grad 5 aufgehoben.",
         "source": "GRW",
         "page": 250,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Vogelform",
@@ -5209,7 +6248,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer verwandelt sich in ein flugfähiges Wesen des Typus Tier der Größenklasse 1 bis maximal Monstergrad (als Einzelgegner) 2.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K3V3): Die Kreatur ist ein besonders prachtvolles Exemplar. Alle Proben auf Fertigkeiten, die von der Tiergestalt übernommen wurden, erhalten einen Bonus in Höhe von 2 Punkten.",
         "source": "GRW",
         "page": 250,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Wasseratmung",
@@ -5223,7 +6265,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer kann unter Wasser atmen, solange er nicht tiefer als 10 Meter taucht. Seine Atmung an Land wird nicht beeinträchtigt.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K3V3): Der Zauberer kann beliebig tief tauchen, ohne seine Atemfähigkeit zu verlieren.",
         "source": "GRW",
         "page": 251,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Bestienform",
@@ -5237,7 +6282,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer verwandelt sich in ein Wesen des Typus Monster oder Tier der Größenklasse 2-7. Es können nur Kreaturen bis Monstergrad (als Einzelgegner) 3 gewählt werden.\n\nErfolgsgrade:\n•Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus •1 EG (Kosten +K4V4): Die Kreatur ist ein besonders prachtvolles Exemplar. Alle Proben auf Fertigkeiten, die von der Tiergestalt übernommen wurden, erhalten einen Bonus in Höhe von 2 Punkten.",
         "source": "GRW",
         "page": 224,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Bärenstärke",
@@ -5251,7 +6299,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erhält einen Bonus in Höhe von 4 Punkten auf alle Proben, in die seine Stärke einfließt.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K4V4): Der Bonus erhöht sich auf 5 Punkte.",
         "source": "GRW",
         "page": 224,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Verjüngen",
@@ -5265,7 +6316,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer wird um 20 Jahre verjüngt, bleibt jedoch mindestens 1 Jahr alt.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K4V4): Der Zauberer wird um 30 Jahre verjüngt, das Mindestalter beträgt weiter 1 Jahr.",
         "source": "GRW",
         "page": 250,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Eins mit dem Feuer",
@@ -5279,7 +6333,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Körper des Zauberers verwandelt sich in eine lodernde Gestalt aus Feuer, behält aber seine Statur bei. Er erhält einen Bonus in Höhe von 5 Punkten auf seine Schadensreduktion und seine Berührungen richten bei ausreichender Dauer Brandschaden 3 an, während er selbst immun gegen Hitze- und Feuerschaden ist. Kleidung und Ausrüstung sind nicht von der Verwandlung betroffen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K5V5): Gegenstände bis Last 4 werden mitverwandelt.",
         "source": "GRW",
         "page": 225,
-        "damage": ""
+        "damage": "",
+        "difficulty": "30",
+        "difficultyType": "fest",
+        "difficultyValue": 30
     },
     {
         "name": "Fremde Gestalt",
@@ -5293,7 +6350,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer nimmt das Aussehen einer anderen Person an, einschließlich seiner Größe, Statur und Stimme. Soll die Erscheinung einer bestimmten Person erworben werden, können nur solche Eigenheiten übernommen werden, die dem Zauberer bekannt sind. Ist die Person einem Gegenüber gut bekannt, vermag dieser die Täuschung zu erkennen, wenn er sich mindestens 5 Minuten lang mit dem Zauberer auseinandersetzt und ihm eine Probe auf Wahrnehmung gegen 33 oder eine vergleichende Empathie-Probe gegen die Redegewandtheit des Zauberers gelingt.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K5V5): Der Schwierigkeit einer etwaigen Wahrnehmung-Probe beträgt 40. Eine etwaige Empathie-Probe erhält einen Malus in Höhe von 3 Punkten.",
         "source": "GRW",
         "page": 230,
-        "damage": ""
+        "damage": "",
+        "difficulty": "30",
+        "difficultyType": "fest",
+        "difficultyValue": 30
     },
     {
         "name": "Leib aus Licht",
@@ -5307,7 +6367,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Körper des Zauberers verwandelt sich in eine strahlende Gestalt aus Licht, behält aber seine Statur bei. Er erhält einen Bonus in Höhe von 4 Punkten auf seine Schadensreduktion und ist immun gegen den Zustand Geblendet, während alle Wesen, die ihn im Nahkampf attackieren, den Zustand Geblendet 1 erhalten. Zudem verbessern sich die Lichtverhältnisse im Umkreis von 10 Metern um 1 Stufe. Kleidung und Ausrüstung sind nicht von der Verwandlung betroffen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K4V4): Gegenstände bis Last 4 werden mitverwandelt.",
         "source": "GRW",
         "page": 235,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Nebelgestalt",
@@ -5321,7 +6384,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer verwandelt sich in eine Gestalt aus Nebel und vermag sich selbst durch kleinste Ritzen zu zwängen. Er erhält die Merkmale Körperlos und Verwundbarkeit gegen Feuerschaden (siehe S. 265). Seine Geschwindigkeit in dieser Form entspricht seiner Mystik. Kleidung und Ausrüstung sind nicht von der Verwandlung betroffen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K4V4): Gegenstände bis Last 4 werden mitverwandelt.",
         "source": "GRW",
         "page": 239,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Schattenleib",
@@ -5335,7 +6401,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Körper des Zauberers verwandelt sich in eine schwarze Schattengestalt, behält aber seine Statur bei. Er erhält einen Bonus in Höhe von 4 Punkten auf seine Schadensreduktion und 7 Punkten auf seine Heimlichkeit, sowie eine Verwundbarkeit gegen Lichtschaden. Kleidung und Ausrüstung sind nicht von der Verwandlung betroffen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K4V4): Gegenstände bis Last 4 werden mitverwandelt.",
         "source": "GRW",
         "page": 241,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Versteinern",
@@ -5349,7 +6418,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Das Ziel des Zaubers wird in unnatürlich harten Stein (Härte 8, Haltbarkeit 16) verwandelt. Es kann seine Umwelt noch wahrnehmen, sich aber nicht mehr bewegen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K4V4): Die Härte steigt auf 10, die Haltbarkeit auf 20.",
         "source": "GRW",
         "page": 250,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Körperlicher Widerstand des Ziels",
+        "difficultyType": "KW"
     },
     {
         "name": "Katzenwäsche",
@@ -5363,7 +6434,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Ein Gegenstand oder ein Körperteil des Abenteurers wird augenblicklich von Dreck und Schmutz gereinigt, als ob er gründlich in Seifenwasser gewaschen worden wäre.\n\nErfolgsgrade:\n• Auslösezeit, Verstärken (s. u.) • 1 EG (Kosten +1V1): Es kann der gesamte Körper des Zauberers oder ein kompletter Satz Kleidung als Ziel gewählt werden.",
         "source": "GRW",
         "page": 234,
-        "damage": ""
+        "damage": "",
+        "difficulty": "15",
+        "difficultyType": "fest",
+        "difficultyValue": 15
     },
     {
         "name": "Wasser reinigen",
@@ -5377,7 +6451,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauber reinigt bis zu 10 Liter verschmutzter Flüssigkeit. Betroffen sind nur natürliche Krankheitserreger, Giftstoffe oder Verunreinigungen, nicht aber alchemistische Stoffe. Auch Alkohol oder Salz gelten nicht als Verunreinigungen.\n\nErfolgsgrade:\n• Auslösezeit, Verstärken (s. u.) • 3 EG (Kosten +1V1): Es werden bis zu 100 Liter gereinigt.",
         "source": "GRW",
         "page": 251,
-        "damage": ""
+        "damage": "",
+        "difficulty": "15",
+        "difficultyType": "fest",
+        "difficultyValue": 15
     },
     {
         "name": "Einfrieren",
@@ -5391,7 +6468,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Das Ziel erleidet 1W6+3 Punkte Kälteschaden und erhält für 30 Ticks den Zustand Lahm.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Schaden, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +1V1): Das Ziel erhält zusätzlich für 30 Ticks den Zustand Benommen 1.",
         "source": "GRW",
         "page": 225,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Körperlicher Widerstand des Ziels",
+        "difficultyType": "KW"
     },
     {
         "name": "Nebelsicht",
@@ -5405,7 +6484,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Aus Nebel, Dampf und Wolken resultierende Abzüge auf die Sicht können ignoriert werden.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Der Zaubernde erhält sogar einen Bonus in Höhe von 2 Punkten auf Wahrnehmung-Proben in nebliger Umgebung.",
         "source": "GRW",
         "page": 239,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Schutz vor Kälte",
@@ -5419,7 +6501,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Sämtlicher gegen den Zauberer gerichteter Kälteschaden wird um 4 Punkte gesenkt. Die Kältestufe (S. 175) gilt für ihn als um 1 reduziert.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K1V1): Entsprechender Schaden wird um 6 Punkte gesenkt.",
         "source": "GRW",
         "page": 244,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Wasser finden",
@@ -5433,7 +6518,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erfährt die Richtung der nächsten Quelle trinkbaren Wassers.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Der Zauberer erfährt zusätzlich die Entfernung der nächsten Trinkwasserquelle.",
         "source": "GRW",
         "page": 251,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Eisglätte",
@@ -5447,7 +6535,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Boden wird im Wirkungsbereich mit einer spiegelglatten Eisschicht überzogen, wodurch zur Überquerung die Regeln zum Balancieren (S. 102) zum Tragen kommen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 1 EG (Kosten +K2V2): Die Schwierigkeit der zum Balancieren nötigen Akrobatik-Proben erhöht sich um 5 Punkte.",
         "source": "GRW",
         "page": 226,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Eislanze",
@@ -5461,7 +6552,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer wirft eine Lanze aus scharfkantigen Eiskristallen auf das Ziel. Der Getroffene erleidet 2W10 Punkte Kälteschaden und den Zustand Lahm für 30 Ticks.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Schaden, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +2V1): Der Zauberer wirft zeitgleich eine weitere Eislanze auf ein zweites Ziel, das maximal so viel Punkte Verteidigung wie das Hauptziel besitzt.",
         "source": "GRW",
         "page": 226,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Verteidigung des Ziels",
+        "difficultyType": "VTD"
     },
     {
         "name": "Kälteschild",
@@ -5475,7 +6568,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer umgibt sich mit einem Schild aus frostiger Kälte. Während er selbst nicht davon beeinträchtigt wird, erleidet jedes Wesen nach jeweils 15 vollen Ticks Aufenthalt in einem Abstand von maximal 2 m Kälteschaden in Höhe von 2W6 Punkten.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Betroffene Wesen erhalten zusätzlich den Zustand Benommen 1.",
         "source": "GRW",
         "page": 233,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Erde zu Schlamm",
@@ -5489,7 +6585,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Im Wirkungsbereich befindliche Erde verwandelt sich in Schlamm und wird zu Schwierigem Gelände. Der Boden trocknet nach Wirken des Zaubers auf natürliche Weise.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 1 EG (Kosten +2V2): Erde im Wirkungsbereich wird zu Sehr Schwierigem Gelände.",
         "source": "GRW",
         "page": 226,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Nebel rufen",
@@ -5503,7 +6602,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauber erschafft eine dichte Nebelwolke, in der die Sichtweite auf 5 Meter begrenzt ist und die Lichtverhältnisse um 1 Stufe verschlechtert sind.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 1 EG (Kosten +K3V3): Die Sichtweite sinkt auf 2 Meter, die Lichtverhältnisse verschlechtern sich um insgesamt 2 Stufen.",
         "source": "GRW",
         "page": 239,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Wasseratmung",
@@ -5517,7 +6619,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer kann unter Wasser atmen, solange er nicht tiefer als 10 Meter taucht. Seine Atmung an Land wird nicht beeinträchtigt.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K3V3): Der Zauberer kann beliebig tief tauchen, ohne seine Atemfähigkeit zu verlieren.",
         "source": "GRW",
         "page": 251,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Über Wasser gehen",
@@ -5531,7 +6636,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer kann über Wasserflächen gehen, als handelte es sich um festes Gestein, auch vermag er nicht unter Wasser gezogen zu werden. Handelt es sich um ein fließendes Gewässer, wird er zusammen mit der obersten Wasserschicht abgetrieben, während bei starkem Wellengang Akrobatik-Proben verlangt werden können, um Stürze zu vermeiden.\n\nErfolgsgrade:\n– • Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K3V3): Die Geschwindigkeit des Zauberers erhöht sich um 2 Punkte, wenn er sich auf dem Wasser fortbewegt.",
         "source": "GRW",
         "page": 248,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Eisiges Gefängnis",
@@ -5545,7 +6653,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erschafft um das Ziel eine trübe und unbewegliche Kuppel aus Eis mit einem Radius von bis zu 3 Metern. Sie weist eine Härte von 5 und eine Haltbarkeit von 24 auf, kann also zerstört werden.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus, Wirkungsdauer • 1 EG (Kosten +4V4): Die Kältestufe erhöht sich innerhalb der Kuppel um 2 Stufen.",
         "source": "GRW",
         "page": 226,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Säurestrahl",
@@ -5559,7 +6670,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer schießt einen Säurestrahl auf das Ziel ab, der 3W6+3 Punkte Säureschaden verursacht. Der Schaden des Zaubers hat die Waffenmerkmale Scharf 3 und Durchdringung 3 (S. 186).\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Schaden, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +2V2): Das Ziel erhält zusätzlich für 30 Ticks den Zustand Verwundet 1.",
         "source": "GRW",
         "page": 241,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Verteidigung des Ziels",
+        "difficultyType": "VTD"
     },
     {
         "name": "Wasserschwall",
@@ -5573,7 +6686,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Ein 2 Meter breiter Wasserschwall richtet bei allen Wesen, die sich zwischen dem Zauberer und dem Zielpunkt befinden, 2W6 Punkte Wasser-Betäubungsschaden an. Die getroffenen müssen eine Akrobatik- oder Athletik-Probe gegen 15 (erhöht um die Fertigkeitspunkte des Zauberers) ablegen, um nicht vom Aufprall umgeworfen zu werden und als liegend zu gelten.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Schaden, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +3V3): Getroffene Wesen erhalten zusätzlich für 30 Ticks den Zustand Benommen 1.",
         "source": "GRW",
         "page": 251,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Nebelgestalt",
@@ -5587,7 +6703,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer verwandelt sich in eine Gestalt aus Nebel und vermag sich selbst durch kleinste Ritzen zu zwängen. Er erhält die Merkmale Körperlos und Verwundbarkeit gegen Feuerschaden (siehe S. 265). Seine Geschwindigkeit in dieser Form entspricht seiner Mystik. Kleidung und Ausrüstung sind nicht von der Verwandlung betroffen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K4V4): Gegenstände bis Last 4 werden mitverwandelt.",
         "source": "GRW",
         "page": 239,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Wasserherrschaft",
@@ -5601,7 +6720,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer kann das im Wirkungsbereich befindliche Wasser beliebig dirigieren, solange es sich nicht innerhalb eines Wesens befindet.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 2 EG (Kosten +K5V5): Der Zauberer kann das Wasser beliebig in Eis oder Dampf verwandeln.",
         "source": "GRW",
         "page": 251,
-        "damage": ""
+        "damage": "",
+        "difficulty": "30",
+        "difficultyType": "fest",
+        "difficultyValue": 30
     },
     {
         "name": "Sanfter Fall",
@@ -5615,7 +6737,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Erleidet der Zauberer Fallschaden, wird dieser um eine Stufe gesenkt. Die Begrenzung für die Abfederung eines Sturzes (siehe S. 174) zählt hierbei nicht.\n\nErfolgsgrade:\n• Auslösezeit, Verstärken (s. u.) • 2 EG (Kosten +K1V1): Fallschaden wird um 2 Stufen gesenkt.",
         "source": "GRW",
         "page": 240,
-        "damage": ""
+        "damage": "",
+        "difficulty": "15",
+        "difficultyType": "fest",
+        "difficultyValue": 15
     },
     {
         "name": "Stoß",
@@ -5629,7 +6754,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Das Ziel wird 1 Meter zurückgestoßen und verliert 1 Tick.\n\nErfolgsgrade:\n• Auslösezeit, Reichweite, Verstärken (s. u.) • 1 EG (Kosten +1V1): Dem Ziel muss zusätzlich eine Akrobatik-Probe gegen 15 gelingen, um nicht zu stürzen und den Zustand liegend zu erhalten.",
         "source": "GRW",
         "page": 246,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Körperlicher Widerstand des Ziels",
+        "difficultyType": "KW"
     },
     {
         "name": "Geruch",
@@ -5643,7 +6770,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erschafft einen beliebigen Geruch. Dieser Zauber benötigt keine Formel.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 2 EG (Kosten +K1V1): Wesen im Wirkungsbereich erhalten den Zustand Benommen 1.",
         "source": "GRW",
         "page": 232,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Leichtigkeit",
@@ -5657,7 +6787,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Last eines Objekts wird um 2 Stufen gesenkt.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Die Last wird um insgesamt 3 Stufen gesenkt.",
         "source": "GRW",
         "page": 236,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Nebelsicht",
@@ -5671,7 +6804,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Aus Nebel, Dampf und Wolken resultierende Abzüge auf die Sicht können ignoriert werden.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K1V1): Der Zaubernde erhält sogar einen Bonus in Höhe von 2 Punkten auf Wahrnehmung-Proben in nebliger Umgebung.",
         "source": "GRW",
         "page": 239,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Schockgriff",
@@ -5685,7 +6821,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Hand des Zauberers wird von zuckenden Blitzen überzogen. Im unbewaffneten Nahkampf richten seine Angriffe echten Elektrizitätsschaden an und besitzen das Waffenmerkmal Durchdringung 1 (S. 186). Dieser Zauber ist nicht mit anderen Zaubern des Typus Hand kombinierbar.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K1V1): Zusätzlich richtet der Zauberer im unbewaffneten Nahkampf 2 Punkte echten Elektritzitätsschaden an.",
         "source": "GRW",
         "page": 243,
-        "damage": ""
+        "damage": "",
+        "difficulty": "18",
+        "difficultyType": "fest",
+        "difficultyValue": 18
     },
     {
         "name": "Beflügelte Waffe",
@@ -5699,7 +6838,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Die Waffe wird durch die Kraft des Windes beflügelt, was Angriffe mit ihr leichter macht. Der Benutzer der Waffe erhält einen Bonus in Höhe von 2 Punkten auf seine Proben für Angriffe mit dieser Waffe.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K1V1): Der Bonus erhöht sich auf 3 Punkte.",
         "source": "GRW",
         "page": 224,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Blitzschlag",
@@ -5713,7 +6855,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer wirft seinem Ziel einen Blitz entgegen. Der Getroffene erleidet 2W10+2 Punkte Elektrizitätsschaden mit dem Waffenmerkmal Scharf 2 (S. 186).\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Schaden, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +2V2): Das Ziel erhält zusätzlich für 30 Ticks den Zustand Benommen 1.",
         "source": "GRW",
         "page": 225,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Verteidigung des Ziels",
+        "difficultyType": "VTD"
     },
     {
         "name": "Schutz vor Elektrizität",
@@ -5727,7 +6871,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Sämtlicher gegen den Zauberer gerichteter Elektrizitätsschaden wird um 6 Punkte gesenkt.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K2V2): Entsprechender Schaden wird um 8 Punkte gesenkt.",
         "source": "GRW",
         "page": 243,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Wolkenpfad",
@@ -5741,7 +6888,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer verfestigt die vor ihm befindliche Luft zu einer schnurgeraden, waagerechten und unsichtbaren Brücke mit einer beliebig verteilbaren Fläche von bis zu 10 m². Ihre Härte beträgt 4 Punkte, ihre Haltbarkeit 12 Punkte. Sie kann also zerstört werden, was den Zauber beendet. Sie zerbirst außerdem, wenn sie mit mehr als drei Personen oder entsprechend schweren Gegenständen belastet wird.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K2V2): Die Brücke kann mit bis zu 15 Personen (oder entsprechend schweren Gegenständen) belastet werden.",
         "source": "GRW",
         "page": 252,
-        "damage": ""
+        "damage": "",
+        "difficulty": "21",
+        "difficultyType": "fest",
+        "difficultyValue": 21
     },
     {
         "name": "Kettenblitz",
@@ -5755,7 +6905,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Bis zu drei Ziele werden nacheinander von einem Blitzschlag getroffen. Das erste Ziel muss sich in der Reichweite des Zaubers befinden, die jeweils folgenden Ziele dürfen maximal 5 Meter vom vorhergehenden Ziel entfernt stehen. Das erste Ziel erhält 3W6+6 Punkte Elektrizitätsschaden, jedes weitere dann die Hälfte des Schadens des vorhergehenden Ziels.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Reichweite, Schaden, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +2V2): Die Ziele erhalten zusätzlich für 30 Ticks den Zustand Benommen 2.",
         "source": "GRW",
         "page": 234,
-        "damage": ""
+        "damage": "",
+        "difficulty": "Höchste Verteidigung der Ziele",
+        "difficultyType": "VTD"
     },
     {
         "name": "Levitieren",
@@ -5769,7 +6921,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer beginnt zu schweben und kann sich mit einer Geschwindigkeit von 1 fortbewegen. Es ist ihm dabei nicht möglich, höher als 10 Meter aufzusteigen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K3V3): Die Geschwindigkeit erhöht sich auf 2, die Maximalhöhe auf 15 Meter.",
         "source": "GRW",
         "page": 236,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Nebel rufen",
@@ -5783,7 +6938,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauber erschafft eine dichte Nebelwolke, in der die Sichtweite auf 5 Meter begrenzt ist und die Lichtverhältnisse um 1 Stufe verschlechtert sind.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 1 EG (Kosten +K3V3): Die Sichtweite sinkt auf 2 Meter, die Lichtverhältnisse verschlechtern sich um insgesamt 2 Stufen.",
         "source": "GRW",
         "page": 239,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Windschild",
@@ -5797,7 +6955,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer umgibt sich mit einem Schild aus tobendem Wind, welcher Fernkampfangriffen gegen ihn einen Malus in Höhe von 6 Punkten verleiht.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K3V3): Der Malus erhöht sich auf 9 Punkte.",
         "source": "GRW",
         "page": 252,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Windstoß",
@@ -5811,7 +6972,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer beschwört einen konstanten und etwa 10 m weit reichenden Windstoß, der von ihm selbst ausgeht und stark genug ist, ein kleines Segelboot langsam anzutreiben. Wird er gegen ein Wesen gerichtet, muss diesem alle 10 Ticks eine Akrobatik-Probe gegen 20 gelingen, um nicht umgestoßen zu werden und als liegend zu gelten.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K3V3): Der Zauberer kann die Richtung des Stoßes während der Wirkungsdauer beliebig verändern.",
         "source": "GRW",
         "page": 252,
-        "damage": ""
+        "damage": "",
+        "difficulty": "24",
+        "difficultyType": "fest",
+        "difficultyValue": 24
     },
     {
         "name": "Blitze rufen",
@@ -5825,7 +6989,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer ruft eine Wolke herbei, die über dem gesamten Wirkungsbereich schwebt. Aus dieser kann er Blitze gegen im Wirkungsbereich befindliche Ziele hervorschießen lassen. Dazu würfelt er als sofortige Aktion mit seiner für den Zauber verwendeten Magieschule einen Angriff gegen die Verteidigung des Ziels (Dauer: 5 Ticks) und richtet im Falle eines Erfolgs 2W6+5 Punkte Elektrizitätsschaden an. Während der Zauberer die Wolke kontrolliert, kann er keine anderen Aktionen vollführen. Er kann maximal so viele Blitze aus der Wolke hervorschießen lassen, wie er Fertigkeitspunkte in der verwendeten Magieschule besitzt. Ist diese Maximalzahl erreicht, endet der Zauber automatisch.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 1 EG (Kosten +K4V4): Die Ziele erhalten zusätzlich für 30 Ticks den Zustand Benommen 1.",
         "source": "GRW",
         "page": 224,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Nebelgestalt",
@@ -5839,7 +7006,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer verwandelt sich in eine Gestalt aus Nebel und vermag sich selbst durch kleinste Ritzen zu zwängen. Er erhält die Merkmale Körperlos und Verwundbarkeit gegen Feuerschaden (siehe S. 265). Seine Geschwindigkeit in dieser Form entspricht seiner Mystik. Kleidung und Ausrüstung sind nicht von der Verwandlung betroffen.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 1 EG (Kosten +K4V4): Gegenstände bis Last 4 werden mitverwandelt.",
         "source": "GRW",
         "page": 239,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Stürmischer Wind",
@@ -5853,7 +7023,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erschafft einen Wirbelsturm. Fernkampfangriffe im oder durch den Wirkungsbereich verfehlen automatisch ihr Ziel. Darin befindlichen Wesen muss alle 10 Ticks eine Akrobatik-Probe gegen 25 gelingen, um nicht zu Boden zu stürzen und als liegend zu gelten. Außerdem erhalten sie im gleichen Abstand 1W6 Punkte Schaden durch herumfliegende Objekte, sofern solche vorhanden sind. Zudem wird ihre Geschwindigkeit halbiert.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Reichweite, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich • 1 EG (Kosten +K4V4): Der Zauberer kann den Wirkungsbereich innerhalb der Reichweite mit einer Geschwindigkeit von 3 verschieben.",
         "source": "GRW",
         "page": 246,
-        "damage": ""
+        "damage": "",
+        "difficulty": "27",
+        "difficultyType": "fest",
+        "difficultyValue": 27
     },
     {
         "name": "Fliegen",
@@ -5867,7 +7040,10 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer erhebt sich in die Lüfte und kann sich mit einer Geschwindigkeit fortbewegen, die seiner doppelten Mystik entspricht.\n\nErfolgsgrade:\n• Auslösezeit, Kanalisierter Fokus, Verstärken (s. u.), Verzehrter Fokus • 2 EG (Kosten +K5V5): Die Geschwindigkeit entspricht seiner vierfachen Mystik.",
         "source": "GRW",
         "page": 229,
-        "damage": ""
+        "damage": "",
+        "difficulty": "30",
+        "difficultyType": "fest",
+        "difficultyValue": 30
     },
     {
         "name": "Wetterkontrolle",
@@ -5881,6 +7057,9 @@ export const SPELLS_DB: Spell[] = [
         "description": "Der Zauberer ist in der Lage, das Wetter um ihn herum beliebig zu verändern. Er kann Stürme erschaffen oder besänftigen, Schneefall rufen oder strahlenden Sonnenschein. Dabei können Kälte- und Hitzestufe maximal um 3 Stufen verändert werden. Nach Ende der Wirkungsdauer normalisiert sich das Wetter wieder.\n\nErfolgsgrade:\n• Auslösezeit, Erschöpfter Fokus, Verstärken (s. u.), Verzehrter Fokus, Wirkungsbereich, Wirkungsdauer • 1 EG (Kosten +5V5): Kälte- und Hitzestufe können beliebig verändert werden.",
         "source": "GRW",
         "page": 252,
-        "damage": ""
+        "damage": "",
+        "difficulty": "30",
+        "difficultyType": "fest",
+        "difficultyValue": 30
     }
 ];

@@ -5,15 +5,17 @@
  */
 import React, { useContext, useMemo, useState } from 'react';
 import { toast } from 'react-hot-toast';
-import { Heart, Sparkles, RotateCcw, Coffee } from 'lucide-react';
+import { Heart, Sparkles, RotateCcw, Coffee, HeartCrack, HeartPulse } from 'lucide-react';
 import { CharacterContext, useCharacter } from '../../context/CharacterContext';
 import { usePlaySessionOptional } from '../../context/PlaySessionContext';
 import { RollModal } from '../play/RollModal';
 import { AttackModal, type AttackTargetConfig } from '../play/AttackModal';
 import { CastSpellModal } from '../play/CastSpellModal';
+import { TakeDamageModal } from '../play/TakeDamageModal';
+import { HealModal } from '../play/HealModal';
 import type { RollEntry } from '../play/DiceLog';
 import { aktiverKatalog } from '../../regelwerk/bruecke';
-import { betaeubungsimmun, fokusFrei, gesundheitsstufen, lebenslage, type BegleiterZustand } from '../../regelwerk/vitals';
+import { betaeubungsimmun, fokusFrei, gesundheitsfelder, gesundheitsstufen, lebenslage, schadenEintragen, type BegleiterZustand } from '../../regelwerk/vitals';
 import type { Begleiter, Spell } from '../../types';
 import type { Wertekasten } from '../../regelwerk/begleiter';
 import { generateId } from '../../utils/id';
@@ -33,7 +35,11 @@ const zeit = () => new Date().toLocaleTimeString([], { hour: '2-digit', minute: 
 /** Charakter-Kontext ohne Wirkungen: so zeigen die Modale keine Boni des Abenteurers */
 const OhneCharakterBoni: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const ctx = useContext(CharacterContext);
-  const wert = useMemo(() => (ctx ? { ...ctx, calc: { ...ctx.calc, wirkungen: undefined } } : null), [ctx]);
+  // ohne Wirkungen des Abenteurers; Höchstbonus aus Zauberei nicht nach seinem Heldengrad (Begleiter: Heldengrad 1)
+  const wert = useMemo(() => (ctx ? {
+    ...ctx,
+    calc: { ...ctx.calc, wirkungen: undefined, heldengrad: undefined, regelwerk: ctx.calc?.regelwerk ? { ...ctx.calc.regelwerk, hoechstbonus: undefined } : ctx.calc?.regelwerk },
+  } : null), [ctx]);
   return wert ? <CharacterContext.Provider value={wert as typeof ctx & object}>{children}</CharacterContext.Provider> : <>{children}</>;
 };
 
@@ -48,7 +54,7 @@ export function wirfFormel(formel: string): { wuerfel: number[]; mod: number; su
 }
 
 export interface BegleiterSpielDaten {
-  name: string; lp: number; fo: number; merkmale: string[];
+  name: string; lp: number; fo: number; merkmale: string[]; sr?: string | number;
 }
 
 /** Würfeln und Vitalwerte eines Begleiters. Liefert die Aktionen und die Modale (im Eintrag rendern). */
@@ -62,6 +68,7 @@ export function useBegleiterSpiel(b: Begleiter, index: number, daten: BegleiterS
   const [probe, setProbe] = useState<{ name: string; wert: number } | null>(null);
   const [angriff, setAngriff] = useState<AttackTargetConfig | null>(null);
   const [zauber, setZauber] = useState<{ spell: Spell; wert: number } | null>(null);
+  const [lpModal, setLpModal] = useState<'schaden' | 'heilen' | null>(null);
 
   const setze = (zustand: BegleiterZustand) => {
     const a = { type: 'BEGLEITER_AENDERN' as const, payload: { index, aenderung: { zustand } } };
@@ -86,6 +93,7 @@ export function useBegleiterSpiel(b: Begleiter, index: number, daten: BegleiterS
     },
     zaubern: (spell, wert) => setZauber({ spell, wert }),
   };
+  const zahlSR = zahl(daten.sr);
 
   const fokus = z.fokus ?? {};
   const modale = (
@@ -125,22 +133,45 @@ export function useBegleiterSpiel(b: Begleiter, index: number, daten: BegleiterS
             setZauber(null);
           }} />
       )}
+      {lpModal === 'schaden' && (
+        <TakeDamageModal begleiter={daten.name} stufen={stufen} maxLP={daten.lp} derivedSR={zahlSR} armorSR={0} currentSplitterPoints={0} activeTempHP={0}
+          currentHealthSlots={gesundheitsfelder(lage.gesamt, z)} onClose={() => setLpModal(null)}
+          onApplyDamage={({ kind, amount, note }) => {
+            if (amount <= 0) return;
+            if (kind === 'exhausted' && betaeubungsimmun(k, daten.merkmale)) {
+              log('damage', `immun gegen Betäubungsschaden (${amount} ignoriert)`, note, { text: 'immun', variant: 'neutral' });
+              return;
+            }
+            const art = kind;
+            setze(schadenEintragen(lage.gesamt, z, art, amount));
+            const text = art === 'consumed' ? 'Schaden' : art === 'exhausted' ? 'Betäubungsschaden' : 'kanalisierter Schaden';
+            log('damage', `${amount} ${text} erlitten`, note, { text: `−${amount} LP`, variant: 'danger' });
+          }} />
+      )}
+      {lpModal === 'heilen' && (
+        <HealModal begleiter={daten.name} stufen={stufen} maxLP={daten.lp} currentHealthSlots={gesundheitsfelder(lage.gesamt, z)} activeConditions={[]}
+          onClose={() => setLpModal(null)}
+          onApplyHeal={({ consumedHealed, exhaustedHealed, channeledHealed, note, healMethod }) => {
+            const summe = consumedHealed + exhaustedHealed + channeledHealed;
+            if (summe <= 0) return;
+            setze({ ...z, schaden: Math.max(0, (z.schaden ?? 0) - consumedHealed), betaeubung: Math.max(0, (z.betaeubung ?? 0) - exhaustedHealed), kanalisiert: Math.max(0, (z.kanalisiert ?? 0) - channeledHealed) });
+            log('heal', `${summe} LP geheilt${healMethod && healMethod !== 'manual' ? ` (${healMethod.replace('_', ' ')})` : ''}`, note, { text: `+${summe} LP`, variant: 'success' });
+          }} />
+      )}
     </OhneCharakterBoni>
   );
 
-  return { aktionen, modale, lage, stufenQuelle: quelle, setze, log, zustand: z };
+  return { aktionen, modale, lage, stufenQuelle: quelle, setze, log, zustand: z, schadenModal: () => setLpModal('schaden'), heilenModal: () => setLpModal('heilen') };
 }
 
 /** Lebenspunkte (je Gesundheitsstufe) und Fokus eines Begleiters */
 export const BegleiterVitals: React.FC<{ spiel: ReturnType<typeof useBegleiterSpiel>; daten: BegleiterSpielDaten }> = ({ spiel, daten }) => {
   const { lage, zustand: z, setze, log, stufenQuelle } = spiel;
-  const [menge, setMenge] = useState(1);
   const [foMenge, setFoMenge] = useState(1);
   const k = aktiverKatalog();
   const immun = betaeubungsimmun(k, daten.merkmale);
   const f = z.fokus ?? {};
   const frei = fokusFrei(daten.fo, z);
-  const n = Math.max(1, menge);
   const aendern = (neu: BegleiterZustand, titel: string, art: 'damage' | 'heal' | 'focus', badge: string) => {
     setze(neu); log(art, titel, undefined, { text: badge, variant: art === 'damage' ? 'danger' : art === 'heal' ? 'success' : 'info' });
   };
@@ -176,15 +207,10 @@ export const BegleiterVitals: React.FC<{ spiel: ReturnType<typeof useBegleiterSp
             ))}
           </div>
           <div className="flex flex-wrap gap-1 items-center mt-1">
-            <input type="number" min={1} value={menge} onChange={e => setMenge(Number(e.target.value) || 1)} className={`${auswahl} w-14`} aria-label="Menge Lebenspunkte" />
-            <button type="button" className="px-2 py-0.5 rounded bg-red-700 text-white font-bold cursor-pointer"
-              onClick={() => aendern({ ...z, schaden: Math.min(lage.gesamt, (z.schaden ?? 0) + n) }, `${n} Schaden erlitten`, 'damage', `−${n} LP`)}>Schaden</button>
-            {!immun && (
-              <button type="button" className="px-2 py-0.5 rounded bg-amber-500 text-white font-bold cursor-pointer"
-                onClick={() => aendern({ ...z, betaeubung: (z.betaeubung ?? 0) + n }, `${n} Betäubungsschaden`, 'damage', `−${n} LP`)}>Betäubung</button>
-            )}
-            <button type="button" className="px-2 py-0.5 rounded bg-green-700 text-white font-bold cursor-pointer" disabled={!(z.schaden ?? 0)}
-              onClick={() => aendern({ ...z, schaden: Math.max(0, (z.schaden ?? 0) - n) }, `${n} LP geheilt`, 'heal', `+${n} LP`)}>Heilen</button>
+            <button type="button" className="px-2 py-0.5 rounded bg-red-700 text-white font-bold cursor-pointer flex items-center gap-1"
+              onClick={spiel.schadenModal}><HeartCrack size={11} />Schaden erleiden</button>
+            <button type="button" className="px-2 py-0.5 rounded bg-green-700 text-white font-bold cursor-pointer flex items-center gap-1 disabled:opacity-40" disabled={!lage.verloren}
+              onClick={spiel.heilenModal}><HeartPulse size={11} />Heilen</button>
             {immun && <span className="text-gray-500">immun gegen Betäubungsschaden</span>}
           </div>
         </div>
@@ -226,7 +252,7 @@ export const BegleiterVitals: React.FC<{ spiel: ReturnType<typeof useBegleiterSp
 /** Spieldaten aus einem Wertekasten (LP und FO je Stufe, Merkmale) */
 export function spielDaten(b: Begleiter, w: Wertekasten | null | undefined): BegleiterSpielDaten {
   const merkmale = String(w?.felder?.merkmale ?? '').split(/,(?![^(]*\))/).map(x => x.trim()).filter(Boolean);
-  return { name: b.rufname || b.name, lp: zahl(w?.abgeleitete_werte?.LP), fo: zahl(w?.abgeleitete_werte?.FO), merkmale };
+  return { name: b.rufname || b.name, lp: zahl(w?.abgeleitete_werte?.LP), fo: zahl(w?.abgeleitete_werte?.FO), sr: w?.abgeleitete_werte?.SR, merkmale };
 }
 
 /** Kurzanzeige im Kopf eines Begleiters: LP und Fokus */

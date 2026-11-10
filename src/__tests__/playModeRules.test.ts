@@ -275,6 +275,56 @@ describe('Play Mode Rules & Health/Focus Engine (Splittermond GRW)', () => {
     expect(result.current.state.playState.healthSlots.filter((s) => s.type === 'consumed')).toHaveLength(1);
   });
 
+  it('GRW S. 244: Lebenskraft stärken ends automatically and releases channeled focus when all tempHP are depleted', () => {
+    const { result } = renderHook(() => useCharacterState());
+    act(() => {
+      result.current.dispatch({
+        type: 'PLAY_RESET',
+        payload: { maxLP: 8, maxFocus: 16, maxSplitter: 3 },
+      });
+      // Cast Lebenskraft stärken: binds 6 channeled focus, grants 6 temp HP
+      result.current.dispatch({
+        type: 'PLAY_CAST_SPELL',
+        payload: {
+          exhaustedFocus: 0,
+          channeledFocus: 6,
+          consumedFocus: 2,
+          channeledSpell: {
+            id: 'cs-temp',
+            name: 'Lebenskraft stärken',
+            channeledFocus: 6,
+          },
+        },
+      });
+      result.current.dispatch({
+        type: 'PLAY_ADD_TEMP_HP',
+        payload: { amount: 6 },
+      });
+    });
+
+    expect(result.current.state.playState.tempHP).toBe(6);
+    expect(result.current.state.playState.focus.channeled).toBe(6);
+    expect(result.current.state.playState.channeledSpells).toHaveLength(1);
+
+    // Take 4 damage: absorbed by tempHP, spell remains active
+    act(() => {
+      result.current.dispatch({ type: 'PLAY_TAKE_DAMAGE', payload: { kind: 'consumed', maxLP: 8, amount: 4 } });
+    });
+    expect(result.current.state.playState.tempHPUsed).toBe(4);
+    expect(result.current.state.playState.channeledSpells).toHaveLength(1);
+    expect(result.current.state.playState.focus.channeled).toBe(6);
+
+    // Take another 3 damage: 2 absorbed, 1 penetrates to healthSlots, tempHP fully consumed, spell auto-ends!
+    act(() => {
+      result.current.dispatch({ type: 'PLAY_TAKE_DAMAGE', payload: { kind: 'consumed', maxLP: 8, amount: 3 } });
+    });
+    expect(result.current.state.playState.tempHP).toBe(0);
+    expect(result.current.state.playState.channeledSpells).toHaveLength(0); // auto-ended!
+    expect(result.current.state.playState.focus.channeled).toBe(0); // released!
+    expect(result.current.state.playState.focus.exhausted).toBe(6); // converted to exhausted focus!
+    expect(result.current.state.playState.healthSlots.filter((s) => s.type === 'consumed')).toHaveLength(1);
+  });
+
   it('slides up damage (Schaden rutscht auf) according to Splittermond rules when damage is removed', () => {
     const { result } = renderHook(() => useCharacterState());
     act(() => {
