@@ -111,7 +111,7 @@ export interface GefolgeFertigkeit {
   id: string; name: string; punkte: number;
   /** Punkte + Attribute; null bei Kampffertigkeiten (Attribute je Waffe) */
   wert: number | null; schwelle: number; angehoben: boolean; zuHoch: boolean }
-export interface GefolgeZauber { id: string; name: string; schule?: string; grad?: number; ok: boolean }
+export interface GefolgeZauber { id: string; name: string; schule?: string; schuleId?: string; grad?: number; ok: boolean }
 export interface GefolgeMeisterschaft { id: string; name: string; fertigkeit?: string; schwelle: number; ok: boolean }
 
 export interface GefolgeWerte {
@@ -124,6 +124,8 @@ export interface GefolgeWerte {
   zauber: GefolgeZauber[];
   freieMeisterschaften: number;
   freieZauber: number;
+  /** Waffen mit Angriffswert (Punkte der Waffenfertigkeit + Attribute der Waffe) */
+  waffen: { id: string; name: string; wert: number; schaden: string; wgs: string; ini: string; merkmale: string; fertigkeit: string }[];
   /** Gefolge-Punkte für diesen Gefolgsmann: 1 + Schwellen + Meisterschaften/Zauber über den freien */
   punkte: number;
   hinweise: string[];
@@ -183,7 +185,7 @@ export function gefolgeWerte(k: Katalog, b: Begleiter, maxFertigkeit: number): G
     const schulen: { id: string; schule: string; grad: number }[] = e?.daten.schulen ?? [];
     const passend = schulen.filter(s => s.grad <= hoechsterZaubergrad(pkt(s.id))).sort((x, y) => x.grad - y.grad)[0];
     const s = passend ?? schulen.find(x => pkt(x.id) > 0) ?? schulen[0];
-    return { id, name: e?.name ?? id, schule: s?.schule, grad: s?.grad, ok: !!passend };
+    return { id, name: e?.name ?? id, schule: s?.schule, schuleId: s?.id, grad: s?.grad, ok: !!passend };
   });
   for (const z of zauber) if (!z.ok) hinweise.push(`Zauber ${z.name}: Magieschule fehlt oder zu wenige Punkte für Grad ${z.grad ?? '?'}`);
 
@@ -192,16 +194,24 @@ export function gefolgeWerte(k: Katalog, b: Begleiter, maxFertigkeit: number): G
   const freieMeisterschaften = angehoben.size;
   const gesamtPunkte = 1 + angehoben.size + Math.max(0, meisterschaften.length - freieMeisterschaften) + Math.max(0, zauber.length - freieZauber);
 
+  const kurzName: Record<string, string> = Object.fromEntries(ATTRIBUTE);
+  const waffen = (b.waffen ?? []).map(id => k.get(id)).filter((e): e is NonNullable<typeof e> => e?.typ === 'waffe').map(e => {
+    const d = e.daten; const f: string = d.fertigkeit ?? '';
+    const wert = pkt(f) + (d.attribute ?? []).reduce((s: number, a: string) => s + (A[kurzName[a] ?? a] ?? 0), 0);
+    return { id: e.id, name: e.name, wert, schaden: String(d.schaden ?? ''), wgs: String(d.wgs ?? ''), ini: '', merkmale: String(d.merkmale_text ?? '–'), fertigkeit: k.get(f)?.name ?? f };
+  });
+
   let werte: Wertekasten = { attribute: Object.fromEntries(ATTRIBUTE.map(([kurz, n]) => [kurz, String(A[n])])) };
   if (rasse) {
     const w = abgeleiteteWerte(k, A, rasse, staerken, 1).werte;
     werte = {
       ...werte,
       abgeleitete_werte: { ...Object.fromEntries(['GK', 'GSW', 'INI', 'LP', 'FO', 'VTD', 'GW', 'KW'].map(x => [x, String(w[x] ?? '–')])), SR: '0' },
+      waffen: waffen.map(x => ({ name: x.name, wert: String(x.wert), schaden: x.schaden, wgs: x.wgs, ini: x.ini, merkmale: x.merkmale })),
     };
   }
   return {
-    attribute: A, werte, fertigkeiten, staerken, kulturMeisterschaft: kw.meisterschaft, meisterschaften, zauber,
+    attribute: A, werte, fertigkeiten, staerken, kulturMeisterschaft: kw.meisterschaft, meisterschaften, zauber, waffen,
     freieMeisterschaften, freieZauber, punkte: gesamtPunkte, hinweise,
   };
 }
@@ -225,4 +235,12 @@ export function zauberAngebot(k: Katalog, fertigkeiten: GefolgeFertigkeit[]) {
       .sort((x: { grad: number }, y: { grad: number }) => x.grad - y.grad)[0];
     return s ? [{ id: e.id, name: e.name, schule: s.schule as string, grad: s.grad as number }] : [];
   }).sort((a, b) => a.schule.localeCompare(b.schule, 'de') || a.grad - b.grad || a.name.localeCompare(b.name, 'de'));
+}
+
+/** Waffen für einen Gefolgsmann: Waffen der Kampffertigkeiten, die er besitzt */
+export function waffenAngebot(k: Katalog, fertigkeiten: GefolgeFertigkeit[]) {
+  const f = new Set(fertigkeiten.map(x => x.id));
+  return Object.values(k.eintraege).filter(e => e.typ === 'waffe' && f.has(e.daten.fertigkeit))
+    .map(e => ({ id: e.id, name: e.name, fertigkeit: k.get(e.daten.fertigkeit)?.name ?? '', modus: String(e.daten.modus ?? ''), schaden: String(e.daten.schaden ?? '') }))
+    .sort((a, b) => a.fertigkeit.localeCompare(b.fertigkeit, 'de') || a.name.localeCompare(b.name, 'de'));
 }

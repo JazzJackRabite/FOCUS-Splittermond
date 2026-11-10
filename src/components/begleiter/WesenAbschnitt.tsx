@@ -4,6 +4,8 @@ import { useCharacter } from '../../context/CharacterContext';
 import { beschwoerbareWesen, diensteFuer, wertekasten } from '../../regelwerk/begleiter';
 import type { Katalog } from '../../regelwerk/katalog';
 import { Werte, auswahl, karte, knopf } from './Wertekasten';
+import { BegleiterVitals, VitalKurz, spielDaten, useBegleiterSpiel } from './BegleiterSpiel';
+import type { Begleiter } from '../../types';
 
 const Dienste: React.FC<{ k: Katalog; wesen: string }> = ({ k, wesen }) => {
   const { state } = useCharacter();
@@ -17,11 +19,42 @@ const Dienste: React.FC<{ k: Katalog; wesen: string }> = ({ k, wesen }) => {
   );
 };
 
+const WesenEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number }> = ({ k, b, index }) => {
+  const { dispatch } = useCharacter();
+  const [offen, setOffen] = useState(false);
+  const e = k.get(b.id); const w = e ? wertekasten(e) : null;
+  const daten = spielDaten(b, w);
+  const spiel = useBegleiterSpiel(b, index, daten);
+  return (
+    <li className="border border-[#d1c4b0] rounded-lg p-2 bg-white">
+      {spiel.modale}
+      <div className="flex items-center justify-between gap-2">
+        <button type="button" className="flex items-center gap-1 text-sm font-bold text-[#1B365D] cursor-pointer" onClick={() => setOffen(o => !o)} aria-expanded={offen}>
+          {offen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}{b.name}
+        </button>
+        <span className="flex items-center gap-2 text-xs text-gray-500">
+          <VitalKurz spiel={spiel} daten={daten} />
+          Stufe {e?.daten.beschwoerbares_wesen_stufe ?? '?'}
+          {!e && <span className="text-amber-700">nicht im Katalog (Buch nicht geladen?)</span>}
+          <button type="button" aria-label={`${b.name} entfernen`} onClick={() => dispatch({ type: 'BEGLEITER_ENTFERNEN', payload: { index } })}
+            className="p-1 rounded hover:bg-black/5 hover:text-red-700 cursor-pointer"><Trash2 size={14} /></button>
+        </span>
+      </div>
+      {offen && e && (
+        <div className="mt-2 space-y-2 text-xs">
+          <BegleiterVitals spiel={spiel} daten={daten} />
+          {w ? <Werte w={w} aktionen={spiel.aktionen} /> : <p className="text-xs text-gray-600">Keine Werte im Katalog ({e.daten.quelle_text ?? 'anderes Werk'}).</p>}
+          <div><strong className="text-xs">Dienste:</strong><Dienste k={k} wesen={b.id} /></div>
+        </div>
+      )}
+    </li>
+  );
+};
+
 /** Beschworene Wesen (Die Magie S. 186–191) mit ihren Diensten */
 export const WesenAbschnitt: React.FC<{ k: Katalog }> = ({ k }) => {
   const { state, dispatch } = useCharacter();
   const [wahl, setWahl] = useState('');
-  const [offen, setOffen] = useState<Record<number, boolean>>({});
   const wesen = useMemo(() => beschwoerbareWesen(k), [k]);
   const liste = (state.begleiter ?? []).map((b, i) => ({ b, i })).filter(x => x.b.art === 'wesen');
 
@@ -36,30 +69,7 @@ export const WesenAbschnitt: React.FC<{ k: Katalog }> = ({ k }) => {
       )}
       {liste.length > 0 && (
         <ul className="space-y-2 mb-3">
-          {liste.map(({ b, i }) => {
-            const e = k.get(b.id); const w = e ? wertekasten(e) : null;
-            return (
-              <li key={`${b.id}-${i}`} className="border border-[#d1c4b0] rounded-lg p-2 bg-white">
-                <div className="flex items-center justify-between gap-2">
-                  <button type="button" className="flex items-center gap-1 text-sm font-bold text-[#1B365D] cursor-pointer" onClick={() => setOffen(o => ({ ...o, [i]: !o[i] }))} aria-expanded={!!offen[i]}>
-                    {offen[i] ? <ChevronDown size={14} /> : <ChevronRight size={14} />}{b.name}
-                  </button>
-                  <span className="flex items-center gap-2 text-xs text-gray-500">
-                    Stufe {e?.daten.beschwoerbares_wesen_stufe ?? '?'}
-                    {!e && <span className="text-amber-700">nicht im Katalog (Buch nicht geladen?)</span>}
-                    <button type="button" aria-label={`${b.name} entfernen`} onClick={() => dispatch({ type: 'BEGLEITER_ENTFERNEN', payload: { index: i } })}
-                      className="p-1 rounded hover:bg-black/5 hover:text-red-700 cursor-pointer"><Trash2 size={14} /></button>
-                  </span>
-                </div>
-                {offen[i] && e && (
-                  <div className="mt-2 space-y-2">
-                    {w ? <Werte w={w} /> : <p className="text-xs text-gray-600">Keine Werte im Katalog ({e.daten.quelle_text ?? 'anderes Werk'}).</p>}
-                    <div><strong className="text-xs">Dienste:</strong><Dienste k={k} wesen={b.id} /></div>
-                  </div>
-                )}
-              </li>
-            );
-          })}
+          {liste.map(({ b, i }) => <WesenEintrag key={`${b.id}-${i}`} k={k} b={b} index={i} />)}
         </ul>
       )}
       {wesen.length > 0 && (

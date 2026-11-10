@@ -2,11 +2,13 @@ import React, { useMemo, useState } from 'react';
 import { Users, Plus, Trash2, ChevronDown, ChevronRight, X, AlertTriangle } from 'lucide-react';
 import { useCharacter } from '../../context/CharacterContext';
 import {
-  ATTRIBUTE, ersteSchwelle, freieAttribute, gefolgeWerte, gruppenOptionen, kulturen, meisterschaftsAngebot, rassen, zauberAngebot,
+  ATTRIBUTE, ersteSchwelle, freieAttribute, gefolgeWerte, gruppenOptionen, waffenAngebot, kulturen, meisterschaftsAngebot, rassen, zauberAngebot,
 } from '../../regelwerk/gefolge';
 import type { Katalog } from '../../regelwerk/katalog';
 import type { Begleiter } from '../../types';
-import { Werte, auswahl, karte, knopf } from './Wertekasten';
+import { Werte, auswahl, karte, knopf, wuerfelKnopf } from './Wertekasten';
+import { BegleiterVitals, VitalKurz, spielDaten, useBegleiterSpiel } from './BegleiterSpiel';
+import type { Spell } from '../../types';
 
 /** Gefolge-Punkte des Abenteurers (Summe der Ressource Gefolge) */
 function useGefolgePunkte(): number {
@@ -20,6 +22,7 @@ const GefolgeEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; maxFer
   const [msWahl, setMsWahl] = useState('');
   const [zWahl, setZWahl] = useState('');
   const [fWahl, setFWahl] = useState('');
+  const [wWahl, setWWahl] = useState('');
   const aendern = (aenderung: Partial<Begleiter>) => dispatch({ type: 'BEGLEITER_AENDERN', payload: { index, aenderung } });
   const g = gefolgeWerte(k, b, maxFertigkeit);
   const kultur = k.get(b.id);
@@ -35,14 +38,27 @@ const GefolgeEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; maxFer
   const schwellen = b.schwellen ?? [];
   const ms = b.meisterschaften ?? [];
   const zs = b.zauber ?? [];
+  const ws = b.waffen ?? [];
+  const daten = spielDaten(b, g.werte);
+  const spiel = useBegleiterSpiel(b, index, daten);
+  const wAngebot = useMemo(() => waffenAngebot(k, g.fertigkeiten), [k, g.fertigkeiten]);
+  /** Katalog-Zauber → Zauber des Editors für das Zauber-Modal */
+  const alsSpell = (id: string, schuleId?: string): Spell | null => {
+    const e = k.get(id); if (!e) return null; const d = e.daten;
+    const sch = (d.schulen ?? []).find((x: { id: string }) => x.id === schuleId) ?? d.schulen?.[0];
+    return { name: e.name, school: k.get(sch?.id)?.name ?? '', grade: Number(sch?.grad) || 0, cost: String(d.kosten ?? ''), castTime: d.zauberdauer,
+      range: d.reichweite, duration: d.wirkungsdauer, description: d.wirkung, source: k.pakete[e.quelle.paket]?.kuerzel ?? e.quelle.paket, page: e.quelle.buch_seiten?.[0] };
+  };
 
   return (
     <li className="border border-[#d1c4b0] rounded-lg p-2 bg-white">
+      {spiel.modale}
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <button type="button" className="flex items-center gap-1 text-sm font-bold text-[#1B365D] cursor-pointer" onClick={() => setOffen(o => !o)} aria-expanded={offen}>
           {offen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}{titel}
         </button>
         <span className="flex items-center gap-2 text-xs text-gray-500 flex-wrap">
+          <VitalKurz spiel={spiel} daten={daten} />
           {b.rasse && <span>{k.get(b.rasse)?.name}</span>}
           <span>{g.punkte} {g.punkte === 1 ? 'Punkt' : 'Punkte'}</span>
           {g.hinweise.length > 0 && <span className="text-amber-700 flex items-center gap-0.5" title={g.hinweise.join('\n')}><AlertTriangle size={12} />{g.hinweise.length}</span>}
@@ -118,7 +134,21 @@ const GefolgeEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; maxFer
             </div>
           )}
 
-          <Werte w={g.werte} />
+          {b.rasse && <BegleiterVitals spiel={spiel} daten={daten} />}
+          <Werte w={g.werte} aktionen={spiel.aktionen} />
+          <div className="flex flex-wrap gap-2 items-center">
+            {ws.length > 0 && <span className="flex flex-wrap gap-1">{g.waffen.map((x, i) => (
+              <span key={`${x.id}-${i}`} className="inline-flex items-center gap-0.5 border border-[#d1c4b0] rounded px-1">{x.name} <span className="text-gray-500">({x.fertigkeit})</span>
+                <button type="button" aria-label={`Waffe ${x.name} entfernen`} onClick={() => aendern({ waffen: ws.filter((_, j) => j !== i) })} className="p-0.5 hover:text-red-700 cursor-pointer"><X size={10} /></button>
+              </span>))}</span>}
+            <select value={wWahl} onChange={ev => setWWahl(ev.target.value)} aria-label="Waffe für Gefolgsmann wählen" className={auswahl}>
+              <option value="">{wAngebot.length ? 'Waffe wählen …' : 'Waffen: erst eine Kampffertigkeit'}</option>
+              {[...new Set(wAngebot.map(x => x.fertigkeit))].map(f => (
+                <optgroup key={f} label={f}>{wAngebot.filter(x => x.fertigkeit === f).map(x => <option key={x.id} value={x.id}>{x.name} ({x.schaden}{x.modus && x.modus !== 'Nahkampf' ? `, ${x.modus}` : ''})</option>)}</optgroup>
+              ))}
+            </select>
+            <button type="button" disabled={!wWahl} className={knopf} onClick={() => { aendern({ waffen: [...ws, wWahl] }); setWWahl(''); }}><Plus size={12} />Waffe</button>
+          </div>
 
           <div>
             <h4 className="font-bold text-[#1B365D] mb-1">Fertigkeiten</h4>
@@ -128,7 +158,9 @@ const GefolgeEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; maxFer
                 <tbody>
                   {g.fertigkeiten.map(f => (
                     <tr key={f.id} className={f.zuHoch ? 'text-red-700' : ''}>
-                      <td>{f.name}</td><td>{f.punkte}</td>
+                      <td>{f.wert !== null ? (
+                        <button type="button" className={wuerfelKnopf} onClick={() => spiel.aktionen.probe(f.name, f.wert!)} aria-label={`Probe ${f.name} würfeln`}>🎲 {f.name}</button>
+                      ) : f.name}</td><td>{f.punkte}</td>
                       <td className="font-bold">{f.wert ?? <span className="font-normal text-gray-500" title="Kampffertigkeit: Punkte + Attribute der Waffe">+ Waffe</span>}</td>
                       <td className="text-right">
                         {f.angehoben ? (
@@ -193,7 +225,12 @@ const GefolgeEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; maxFer
                 {g.zauber.map((z, i) => (
                   <li key={`${z.id}-${i}`} className="flex items-center gap-1">
                     {!z.ok && <AlertTriangle size={12} className="text-amber-700" aria-label="Voraussetzung nicht erfüllt" />}
-                    {z.name} <span className="text-gray-500">({z.schule} {z.grad}{i < g.freieZauber ? ', frei' : ', 1 P.'})</span>
+                    {(() => {
+                      const sp = alsSpell(z.id, z.schuleId); const sw = g.fertigkeiten.find(f => f.id === z.schuleId)?.wert;
+                      return sp && sw !== null && sw !== undefined
+                        ? <button type="button" className={wuerfelKnopf} onClick={() => spiel.aktionen.zaubern?.(sp, sw)} aria-label={`Zauber ${z.name} wirken`}>✨ {z.name}</button>
+                        : <>{z.name}</>;
+                    })()} <span className="text-gray-500">({z.schule} {z.grad}{i < g.freieZauber ? ', frei' : ', 1 P.'})</span>
                     <button type="button" aria-label={`Zauber ${z.name} entfernen`} onClick={() => aendern({ zauber: zs.filter((_, j) => j !== i) })}
                       className="p-0.5 rounded hover:bg-black/5 hover:text-red-700 cursor-pointer"><X size={11} /></button>
                   </li>

@@ -238,6 +238,8 @@ export interface Begleiter {
   meisterschaften?: string[];
   /** Zauber (IDs) */
   zauber?: string[];
+  /** Waffen des Gefolgsmanns (Katalog-IDs) */
+  waffen?: string[];
   // ---- Golem (Die Magie S. 197–207); id = Korpus
   /** Golemmaterial (Katalog-ID) */
   material?: string;
@@ -256,6 +258,11 @@ export interface Begleiter {
   abnormitaet?: string;
   /** mit Erfahrungspunkten gesteigert: Attribute (Kürzel) und Fertigkeiten (IDs), jeweils Anzahl der Punkte */
   steigerung?: { attribute?: Record<string, number>; fertigkeiten?: Record<string, number> };
+  // ---- Spielwerte aller Begleiter: verlorene Lebenspunkte und verbrauchter Fokus
+  zustand?: {
+    schaden?: number; betaeubung?: number; kanalisiert?: number;
+    fokus?: { erschoepft?: number; kanalisiert?: number; verzehrt?: number };
+  };
 }
 
 /** Gewählter Baustein eines Relikts (Regel-ID aus den Paketen) */

@@ -72,6 +72,8 @@ export interface PlaySessionContextType {
     }
   ) => void;
   handleRecordRoll: (entry: RollEntry) => void;
+  /** Protokolleintrag ohne Charakter-Aktion (z. B. Begleiter) */
+  logEintrag: (logEntryData: { category: ActionLogEntry['category']; title: string; description?: string; badge?: ActionLogEntry['badge'] }) => void;
   handleQuickRoll: (sides: number, diceCount: number, label: string, modifier?: number) => void;
   handleRollDiceFormula: (formula: string, label: string) => void;
 
@@ -205,6 +207,17 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
       };
       setProtocolHistory((prev) => [newEntry, ...prev]);
     }
+  };
+
+  const logEintrag: PlaySessionContextType['logEintrag'] = (logEntryData) => {
+    pushPlayHistory();
+    const newEntry: ActionLogEntry = {
+      type: 'action',
+      id: generateId(),
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+      ...logEntryData,
+    };
+    setProtocolHistory((prev) => [newEntry, ...prev]);
   };
 
   const handleRecordRoll = (entry: RollEntry) => {
@@ -646,7 +659,7 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
   };
 
   const focusAvailable = maxFO - focus.exhausted - focus.channeled - focus.consumed;
-  const isPlayOrCombat = mode === 'play' || mode === 'combat';
+  const isPlayOrCombat = mode === 'play' || mode === 'combat' || mode === 'begleiter';
 
   return (
     <PlaySessionContext.Provider
@@ -659,6 +672,7 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
         dispatchWithHistory,
         logAndDispatch,
         handleRecordRoll,
+        logEintrag,
         handleQuickRoll,
         handleRollDiceFormula,
         rollConfig,
@@ -825,6 +839,11 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
     </PlaySessionContext.Provider>
   );
 };
+
+/** Wie usePlaySession, aber null außerhalb des Providers (z. B. in Tests einzelner Ansichten) */
+export function usePlaySessionOptional(): PlaySessionContextType | null {
+  return useContext(PlaySessionContext);
+}
 
 export function usePlaySession(): PlaySessionContextType {
   const context = useContext(PlaySessionContext);

@@ -92,7 +92,7 @@ export interface RollModalProps {
   behinderung?: number;
   /** Current available splinter points */
   splitterPoints?: number;
-  /** Callback when 1 SP is spent during or for this roll */
+  /** Callback when 1 SP is spent during or for this roll (ohne: kein Splitterpunkte-Bereich, z. B. bei Begleitern) */
   onSpendSplitterPoint?: (reason: string) => void;
   onClose: () => void;
   /** Optional callback after a successful roll (e.g. deduct focus costs) */
@@ -550,6 +550,7 @@ export const RollModal: React.FC<RollModalProps> = ({
             <div className="text-5xl font-black font-mono text-[#1B365D] dark:text-[#F2EFE6] tracking-tight py-1">{total}</div>
 
             {/* Splitterpunkt einsetzen (GRW Splittermond) */}
+            {onSpendSplitterPoint && (
             <div className="mt-3 pt-3 border-t border-[#e3d4b9] bg-[#faf6ee] -mx-4 -mb-2 p-3 rounded-b-xl border-b border-[#d1c4b0]">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-bold uppercase tracking-wider text-[#1B365D] fantasy-font flex items-center gap-1">
@@ -606,6 +607,7 @@ export const RollModal: React.FC<RollModalProps> = ({
                 </button>
               </div>
             </div>
+            )}
 
             {/* EG block – only when Schwierigkeit was provided */}
             {egResult && (

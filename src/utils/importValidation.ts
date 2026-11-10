@@ -525,6 +525,10 @@ export function validateCharacterImport(data: unknown): Partial<CharacterState> 
     ...(zahlen(w.attribute) ? { attribute: zahlen(w.attribute) } : {}),
     ...(zahlen(w.fertigkeiten) ? { fertigkeiten: zahlen(w.fertigkeiten) } : {}),
   });
+  const zustand = (z: Record<string, unknown>): NonNullable<Begleiter['zustand']> => ({
+    ...(zahlen({ schaden: z.schaden, betaeubung: z.betaeubung, kanalisiert: z.kanalisiert }) ?? {}),
+    ...(zahlen(z.fokus) && Object.keys(zahlen(z.fokus)!).length ? { fokus: zahlen(z.fokus) } : {}),
+  });
   if (Array.isArray(data.begleiter)) {
     const b = (data.begleiter as unknown[]).filter((x): x is Record<string, unknown> => !!x && typeof x === 'object' && typeof (x as Record<string, unknown>).id === 'string'
       && ['tier', 'wesen', 'gefolge', 'golem', 'untoter'].includes(String((x as Record<string, unknown>).art)))
@@ -542,6 +546,7 @@ export function validateCharacterImport(data: unknown): Partial<CharacterState> 
         ...(Array.isArray(x.schwellen) ? { schwellen: texte(x.schwellen) } : {}),
         ...(Array.isArray(x.meisterschaften) ? { meisterschaften: texte(x.meisterschaften) } : {}),
         ...(Array.isArray(x.zauber) ? { zauber: texte(x.zauber) } : {}),
+        ...(Array.isArray(x.waffen) ? { waffen: texte(x.waffen) } : {}),
         ...(typeof x.material === 'string' ? { material: x.material } : {}),
         ...(Array.isArray(x.bausteine) ? { bausteine: texte(x.bausteine) } : {}),
         ...(Array.isArray(x.sonderausstattung) ? { sonderausstattung: texte(x.sonderausstattung) } : {}),
@@ -550,6 +555,7 @@ export function validateCharacterImport(data: unknown): Partial<CharacterState> 
         ...(typeof x.verstaerkungen === 'number' && x.verstaerkungen >= 0 ? { verstaerkungen: Math.floor(x.verstaerkungen) } : {}),
         ...(typeof x.abnormitaet === 'string' ? { abnormitaet: x.abnormitaet } : {}),
         ...(x.steigerung && typeof x.steigerung === 'object' && !Array.isArray(x.steigerung) ? { steigerung: steigerung(x.steigerung as Record<string, unknown>) } : {}),
+        ...(x.zustand && typeof x.zustand === 'object' && !Array.isArray(x.zustand) ? { zustand: zustand(x.zustand as Record<string, unknown>) } : {}),
         ...(x.kulturWahl && typeof x.kulturWahl === 'object' && !Array.isArray(x.kulturWahl) ? { kulturWahl: kulturWahl(x.kulturWahl as Record<string, unknown>) } : {}),
       }));
     if (b.length) result.begleiter = b;

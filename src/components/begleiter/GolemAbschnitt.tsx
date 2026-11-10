@@ -8,6 +8,7 @@ import { alsWertekasten } from '../../regelwerk/modifikationen';
 import type { Katalog } from '../../regelwerk/katalog';
 import type { Begleiter } from '../../types';
 import { Werte, auswahl, karte, knopf } from './Wertekasten';
+import { BegleiterVitals, VitalKurz, spielDaten, useBegleiterSpiel } from './BegleiterSpiel';
 
 const ART_TEXT: Record<string, string> = {
   'Zusätzliche Fähigkeit': 'Zusätzliche Fähigkeiten (Schritt 3)', Rolle: 'Rollen (Schritt 4)', Applikation: 'Applikationen',
@@ -71,15 +72,20 @@ const GolemEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; besitzer
   const titel = b.rufname ? `${b.rufname} (Golem, ${b.name})` : `Golem (${b.name})`;
   const kennt = g.animierung ? besitzer.zauber.includes(g.animierung.name) : false;
   const hinweise = [...g.hinweise];
+  const wk = g.werte ? alsWertekasten(g.werte) : null;
+  const daten = spielDaten(b, wk);
+  const spiel = useBegleiterSpiel(b, index, daten);
   if (b.golemRessource && !besitzer.golemPunkte.some(p => p >= g.stufe)) hinweise.push(`Ressource Golem ${g.stufe} nötig (1 Punkt je Stufe)`);
 
   return (
     <li className="border border-[#d1c4b0] rounded-lg p-2 bg-white">
+      {spiel.modale}
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <button type="button" className="flex items-center gap-1 text-sm font-bold text-[#1B365D] cursor-pointer" onClick={() => setOffen(o => !o)} aria-expanded={offen}>
           {offen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}{titel}
         </button>
         <span className="flex items-center gap-2 text-xs text-gray-500 flex-wrap">
+          <VitalKurz spiel={spiel} daten={daten} />
           <span className="px-1.5 rounded bg-[#ebdcc3] text-[#1B365D] font-bold">Golem {g.stufe}</span>
           {b.material && <span>{k.get(b.material)?.name}</span>}
           <span>{b.golemRessource ? 'Ressource Golem' : `${g.preis} L`}</span>
@@ -117,7 +123,8 @@ const GolemEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; besitzer
             {g.materialSchwachpunkt && <> Schwachpunkt des Materials: {g.materialSchwachpunkt}.</>}
           </p>
 
-          {g.werte && <Werte w={alsWertekasten(g.werte)} />}
+          {wk && <BegleiterVitals spiel={spiel} daten={daten} />}
+          {wk && <Werte w={wk} aktionen={spiel.aktionen} />}
 
           <BausteinGruppe k={k} art="Zusätzliche Fähigkeit" b={b} aendern={aendern} />
           <BausteinGruppe k={k} art="Rolle" b={b} aendern={aendern} info="Mehrfach wählbar und kombinierbar; Kämpfer setzt Aggressiv voraus." />

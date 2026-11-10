@@ -12,6 +12,7 @@ import type { Ergebnis } from '../../regelwerk/typen';
 import type { Begleiter } from '../../types';
 import { HELDENGRADE } from '../../data/rules';
 import { Werte, auswahl, karte, knopf } from './Wertekasten';
+import { BegleiterVitals, VitalKurz, spielDaten, useBegleiterSpiel } from './BegleiterSpiel';
 
 interface Fuehrer {
   char: BedingungsCharakter; msIds: string[]; heldengrad: number;
@@ -60,6 +61,8 @@ const TierEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; f: Fuehre
   const verbraucht = potenzialVerbraucht(liste, gewaehlt);
   const info = new Map(liste.map(a => [a.id, a]));
   const reittier = istReittier(k, b);
+  const daten = spielDaten(b, w);
+  const spiel = useBegleiterSpiel(b, index, daten);
 
   // Prüfung je gewählter Abrichtung: mit den Abrichtungen davor, als n-te Wahl derselben Abrichtung
   const pruefung = gewaehlt.map((id, i) => {
@@ -76,11 +79,13 @@ const TierEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; f: Fuehre
 
   return (
     <li className="border border-[#d1c4b0] rounded-lg p-2 bg-white">
+      {spiel.modale}
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <button type="button" className="flex items-center gap-1 text-sm font-bold text-[#1B365D] cursor-pointer" onClick={() => setOffen(o => !o)} aria-expanded={offen}>
           {offen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}{b.rufname ? `${b.rufname} (${b.name})` : b.name}
         </button>
         <span className="flex items-center gap-2 text-xs text-gray-500 flex-wrap">
+          <VitalKurz spiel={spiel} daten={daten} />
           {reittier && <span className="px-1.5 rounded bg-[#ebdcc3] text-[#1B365D] font-bold">Reittier</span>}
           {b.vertrauter && <span className="px-1.5 rounded bg-[#ebdcc3] text-[#1B365D] font-bold">Vertrauter</span>}
           {b.kreatur ? `Kreatur ${b.kreatur}` : 'ohne Ressource'}
@@ -115,7 +120,8 @@ const TierEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; f: Fuehre
             </label>
           </div>
 
-          {e ? (w ? <Werte w={w} /> : <p className="text-xs text-gray-600">Keine Werte im Katalog.</p>) : null}
+          {w && <BegleiterVitals spiel={spiel} daten={daten} />}
+          {e ? (w ? <Werte w={w} aktionen={spiel.aktionen} /> : <p className="text-xs text-gray-600">Keine Werte im Katalog.</p>) : null}
 
           <div>
             <h4 className="text-xs font-bold text-[#1B365D] mb-1">Abrichtungen</h4>
