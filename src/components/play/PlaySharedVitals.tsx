@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   AlertTriangle,
   Check,
   Sparkles,
   Shield,
+  Flame,
+  Plus,
+  Heart,
 } from 'lucide-react';
 import { useCharacter } from '../../context/CharacterContext';
 import { usePlaySession } from '../../context/PlaySessionContext';
@@ -17,6 +20,9 @@ import { getConditionDescription } from '../../utils/conditionModifiers';
 import { toast } from 'react-hot-toast';
 import { generateId } from '../../utils/id';
 import type { StatusCondition, HealthSlot, ChanneledSpell } from '../../types';
+import { TakeDamageModal } from './TakeDamageModal';
+import { HealModal } from './HealModal';
+import { getActiveSpellModifiers } from '../../utils/magicRules';
 
 // ============================================================================
 // Compound Stepper Button Component (matches user's screenshot)
@@ -161,10 +167,9 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
   const activeTempHP = Math.max(0, tempHP - tempHPUsed);
   const lpModifier = playState.lpModifier ?? 0;
 
-  // Stepper amounts state
-  const [stunDamageAmount, setStunDamageAmount] = useState<number>(1);
-  const [consumedDamageAmount, setConsumedDamageAmount] = useState<number>(1);
-  const [channeledDamageAmount, setChanneledDamageAmount] = useState<number>(1);
+  // Damage & Heal modals & Stepper amounts state
+  const [showTakeDamageModal, setShowTakeDamageModal] = useState<boolean>(false);
+  const [showHealModal, setShowHealModal] = useState<boolean>(false);
   const [tempHPAmount, setTempHPAmount] = useState<number>(1);
 
   const [exhaustedFocusAmount, setExhaustedFocusAmount] = useState<number>(1);
@@ -189,15 +194,26 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
   const totalDamage = consumedLP + exhaustedLP + channeledLP;
 
   const focusAvailable = maxFO - focus.exhausted - focus.channeled - focus.consumed;
-  const woundPenaltyDisplay = currentWoundPenalty;
+  const activeSpellMods = useMemo(() => getActiveSpellModifiers(channeledSpells), [channeledSpells]);
+  const effectiveWoundPenalty = Math.min(0, currentWoundPenalty + activeSpellMods.woundPenaltyReduction);
+  const woundPenaltyDisplay = effectiveWoundPenalty;
 
   const isLahm = conditions.some((c) => c.key === 'Lahm');
   const isRingend = conditions.some((c) => c.key === 'Ringend');
   const isBewusstlos = conditions.some((c) => c.key === 'Bewusstlos');
   const isLiegend = conditions.some((c) => c.key === 'Liegend');
 
-  const effectiveGSW = isRingend ? 0 : isLahm ? Math.floor(derived.GSW / 2) : derived.GSW;
-  const effectiveVTD = isBewusstlos ? 0 : isRingend ? Math.max(0, derived.VTD - 3) : isLiegend ? Math.max(0, derived.VTD - 2) : derived.VTD;
+  const effectiveGSW = isRingend ? 0 : isLahm ? Math.floor((derived.GSW + activeSpellMods.gswBonus) / 2) : (derived.GSW + activeSpellMods.gswBonus);
+  const effectiveVTD = isBewusstlos
+    ? 0
+    : isRingend
+      ? Math.max(0, derived.VTD + activeSpellMods.vtdBonus - 3)
+      : isLiegend
+        ? Math.max(0, derived.VTD + activeSpellMods.vtdBonus - 2)
+        : (derived.VTD + activeSpellMods.vtdBonus);
+  const effectiveSR = (derived.SR || 0) + activeSpellMods.srBonus;
+  const effectiveGW = (derived.GW || 0) + activeSpellMods.gwBonus;
+  const effectiveKW = (derived.KW || 0) + activeSpellMods.kwBonus;
 
   const formatConditionLabel = (c: StatusCondition) => {
     let lbl = c.key;
@@ -411,10 +427,26 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
 
             <div>
               {woundPenaltyDisplay !== 0 ? (
-                <span className="border border-[#8C443C] bg-[#2d1c1a] text-[#F9DEDC] text-xs font-semibold px-2 py-0.5 rounded-md flex items-center gap-1.5 shadow-xs">
+                <span
+                  className="border border-[#8C443C] bg-[#2d1c1a] text-[#F9DEDC] text-xs font-semibold px-2 py-0.5 rounded-md flex items-center gap-1.5 shadow-xs"
+                  title={activeSpellMods.woundPenaltyReduction > 0 ? `Wundabzug durch Zauber um ${activeSpellMods.woundPenaltyReduction} reduziert (Basis: ${currentWoundPenalty})` : undefined}
+                >
                   <AlertTriangle size={12} className="text-[#F9DEDC] shrink-0" />
                   <span>{currentHealthLevelName || 'Verletzt'}</span>
                   <span className="font-mono font-black">{woundPenaltyDisplay}</span>
+                  {activeSpellMods.woundPenaltyReduction > 0 && (
+                    <span className="text-emerald-400 text-[10px] font-bold">+{activeSpellMods.woundPenaltyReduction} ✨</span>
+                  )}
+                </span>
+              ) : currentWoundPenalty < 0 && activeSpellMods.woundPenaltyReduction > 0 ? (
+                <span
+                  className="border border-emerald-700 bg-emerald-950/70 text-emerald-200 text-xs font-semibold px-2 py-0.5 rounded-md flex items-center gap-1 shadow-xs"
+                  title={`Wundabzug durch Zauber ignoriert (Basis: ${currentWoundPenalty})`}
+                >
+                  <Sparkles size={12} className="text-emerald-300 shrink-0" />
+                  <span>{currentHealthLevelName || 'Verletzt'}</span>
+                  <span className="font-mono font-black">0</span>
+                  <span className="text-[10px] text-emerald-300 font-bold">(Schmerz ignoriert)</span>
                 </span>
               ) : dyingLevel > 0 ? (
                 <span className="border border-red-700 bg-red-950 text-red-200 text-xs font-semibold px-2 py-0.5 rounded-md flex items-center gap-1 shadow-xs animate-pulse">
@@ -755,102 +787,29 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                 })}
               </div>
 
-              {/* ── Action Stepper Buttons Row 1: Betäubung, Echter Schaden, Kanalisiert ── */}
-              <div className="grid grid-cols-3 gap-1.5 sm:gap-2 pt-1 border-t border-[#2B374D]/60">
-                <CompoundStepper
-                  label="Betäubung"
-                  variant="amber"
-                  amount={stunDamageAmount}
-                  onAmountChange={setStunDamageAmount}
-                  onPlus={() => {
-                    session.logAndDispatch(
-                      { type: 'PLAY_TAKE_DAMAGE', payload: { kind: 'exhausted', amount: stunDamageAmount, maxLP } },
-                      {
-                        category: 'damage',
-                        title: `${stunDamageAmount} Betäubungsschaden`,
-                        description: `${stunDamageAmount} Betäubung erlitten`,
-                        badge: { text: `-${stunDamageAmount} LP (Bet.)`, variant: 'warning' },
-                      }
-                    );
-                    toast.success(`${stunDamageAmount} Betäubungsschaden erlitten`);
-                  }}
-                  onMinus={() => {
-                    session.logAndDispatch(
-                      { type: 'PLAY_UNDO_DAMAGE', payload: { kind: 'exhausted', amount: stunDamageAmount, maxLP } },
-                      {
-                        category: 'heal',
-                        title: `${stunDamageAmount} Betäubung geheilt`,
-                        badge: { text: `+${stunDamageAmount} LP (Bet.)`, variant: 'success' },
-                      }
-                    );
-                    toast.success(`${stunDamageAmount} Betäubung geheilt`);
-                  }}
-                  minusTitle="Betäubungsschaden heilen"
-                  plusTitle="Betäubungsschaden nehmen"
-                />
+              {/* ── Action Buttons Row: + Schaden & + Heilung (Design von "verzehrt" bzw. grün, ohne Mouse-Over-Animation) ── */}
+              <div className="pt-1.5 border-t border-[#2B374D]/60 grid grid-cols-2 gap-1.5 sm:gap-2">
+                {/* + Schaden Button (Design von "verzehrt") */}
+                <button
+                  type="button"
+                  onClick={() => setShowTakeDamageModal(true)}
+                  className="py-1.5 px-2.5 rounded-lg font-bold text-xs bg-[#291715] hover:bg-[#341b18] text-[#F9DEDC] border border-[#8c3d35]/70 hover:border-[#b06258] shadow-xs flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
+                  title="Schaden erleiden (Modal öffnen)"
+                >
+                  <Flame size={14} className="text-[#cc6b60]" />
+                  <span>+ Schaden</span>
+                </button>
 
-                <CompoundStepper
-                  label="Echter Schaden"
-                  variant="red"
-                  amount={consumedDamageAmount}
-                  onAmountChange={setConsumedDamageAmount}
-                  onPlus={() => {
-                    session.logAndDispatch(
-                      { type: 'PLAY_TAKE_DAMAGE', payload: { kind: 'consumed', amount: consumedDamageAmount, maxLP } },
-                      {
-                        category: 'damage',
-                        title: `${consumedDamageAmount} echter Schaden`,
-                        description: `${consumedDamageAmount} echte LP als Schaden erlitten`,
-                        badge: { text: `-${consumedDamageAmount} LP`, variant: 'danger' },
-                      }
-                    );
-                    toast.success(`${consumedDamageAmount} echter Schaden erlitten`);
-                  }}
-                  onMinus={() => {
-                    session.logAndDispatch(
-                      { type: 'PLAY_REST_HEAL', payload: { konAmount: consumedDamageAmount, wilAmount: 0 } },
-                      {
-                        category: 'heal',
-                        title: `${consumedDamageAmount} Wunde(n) geheilt`,
-                        badge: { text: `+${consumedDamageAmount} LP`, variant: 'success' },
-                      }
-                    );
-                    toast.success(`${consumedDamageAmount} Wunde(n) geheilt`);
-                  }}
-                  minusTitle="Echten Schaden heilen"
-                  plusTitle="Echten Schaden nehmen"
-                />
-
-                <CompoundStepper
-                  label="Kanalisiert"
-                  variant="blue"
-                  amount={channeledDamageAmount}
-                  onAmountChange={setChanneledDamageAmount}
-                  onPlus={() => {
-                    session.logAndDispatch(
-                      { type: 'PLAY_TAKE_DAMAGE', payload: { kind: 'channeled', amount: channeledDamageAmount, maxLP } },
-                      {
-                        category: 'damage',
-                        title: `${channeledDamageAmount} Schaden kanalisiert`,
-                        badge: { text: `-${channeledDamageAmount} LP (Kan.)`, variant: 'info' },
-                      }
-                    );
-                    toast.success(`${channeledDamageAmount} Schaden kanalisiert`);
-                  }}
-                  onMinus={() => {
-                    session.logAndDispatch(
-                      { type: 'PLAY_UNDO_DAMAGE', payload: { kind: 'channeled', amount: channeledDamageAmount, maxLP } },
-                      {
-                        category: 'heal',
-                        title: `${channeledDamageAmount} kanalisierter Schaden entfernt`,
-                        badge: { text: `+${channeledDamageAmount} LP`, variant: 'info' },
-                      }
-                    );
-                    toast.success(`${channeledDamageAmount} kanalisierter Schaden entfernt`);
-                  }}
-                  minusTitle="Kanalisierten Schaden entfernen"
-                  plusTitle="Schaden kanalisieren"
-                />
+                {/* + Heilung Button (In grün) */}
+                <button
+                  type="button"
+                  onClick={() => setShowHealModal(true)}
+                  className="py-1.5 px-2.5 rounded-lg font-bold text-xs bg-[#13271d] hover:bg-[#1a3527] text-[#d1fae5] border border-[#2e6347]/70 hover:border-[#3c825d] shadow-xs flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
+                  title="Heilung anwenden (Modal öffnen)"
+                >
+                  <Heart size={14} className="text-emerald-400" />
+                  <span>+ Heilung</span>
+                </button>
               </div>
 
               {/* ── Action Stepper Row 2: Temp LP & LP-Modifikator ── */}
@@ -1111,29 +1070,37 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                 </div>
                 {channeledSpells.length > 0 ? (
                   <div className="flex flex-wrap gap-1.5">
-                    {channeledSpells.map((s) => (
-                      <span
-                        key={s.id}
-                        title={`${s.name}: Bindet ${s.channeledFocus} kanalisierten Fokus. Klick auf '×' hebt Zauber auf.`}
-                        className="inline-flex items-center gap-1.5 bg-[#141c28] hover:bg-[#192433] text-[#F2EFE6] border border-[#5C7189]/50 hover:border-[#748BA6] rounded-full px-2 py-0.5 text-xs font-medium shadow-2xs transition-colors"
-                      >
-                        <span className="font-semibold text-[#F2EFE6]">{s.name}</span>
+                    {channeledSpells.map((s) => {
+                      const buff = activeSpellMods.breakdown.find((b) => b.spellName.toLowerCase() === (s.name || '').toLowerCase());
+                      return (
                         <span
-                          className="text-[#86D4C4] font-mono font-bold text-[11px] bg-[#122320] px-1.5 py-0.2 rounded border border-[#35665D]"
-                          title={`Bindet ${s.channeledFocus} K-Fokus`}
+                          key={s.id}
+                          title={`${s.name}: Bindet ${s.channeledFocus} kanalisierten Fokus.${buff ? ` Aktiver Effekt: ${buff.description}.` : ''} Klick auf '×' hebt Zauber auf.`}
+                          className="inline-flex items-center gap-1.5 bg-[#141c28] hover:bg-[#192433] text-[#F2EFE6] border border-[#5C7189]/50 hover:border-[#748BA6] rounded-full px-2 py-0.5 text-xs font-medium shadow-2xs transition-colors"
                         >
-                          K{s.channeledFocus}
+                          <span className="font-semibold text-[#F2EFE6]">{s.name}</span>
+                          {buff && (
+                            <span className="text-[10px] text-[#86D4C4] font-bold bg-[#132722] px-1.5 py-0.2 rounded border border-[#23584c]">
+                              {buff.description}
+                            </span>
+                          )}
+                          <span
+                            className="text-[#86D4C4] font-mono font-bold text-[11px] bg-[#122320] px-1.5 py-0.2 rounded border border-[#35665D]"
+                            title={`Bindet ${s.channeledFocus} K-Fokus`}
+                          >
+                            K{s.channeledFocus}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => session.handleCancelChanneledSpell(s)}
+                            className="ml-0.5 text-stone-400 hover:text-[#ff8ba7] transition-colors cursor-pointer text-xs leading-none font-bold"
+                            title={`'${s.name}' aufheben (${s.channeledFocus} K-Fokus wird zu erschöpftem Fokus)`}
+                          >
+                            ×
+                          </button>
                         </span>
-                        <button
-                          type="button"
-                          onClick={() => session.handleCancelChanneledSpell(s)}
-                          className="ml-0.5 text-stone-400 hover:text-[#ff8ba7] transition-colors cursor-pointer text-xs leading-none font-bold"
-                          title={`'${s.name}' aufheben (${s.channeledFocus} K-Fokus wird zu erschöpftem Fokus)`}
-                        >
-                          ×
-                        </button>
-                      </span>
-                    ))}
+                      );
+                    })}
                   </div>
                 ) : (
                   <div className="text-[11px] text-stone-500 italic">Keine kanalisierten Zauber aktiv</div>
@@ -1252,30 +1219,38 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                 {/* Active channeled spells chips if any */}
                 {channeledSpells.length > 0 ? (
                   <div className="flex flex-wrap gap-1.5 pt-0.5">
-                    {channeledSpells.map((s) => (
-                      <span
-                        key={s.id}
-                        title={`${s.name}: Bindet ${s.channeledFocus} kanalisierten Fokus. Klick auf 'Aufheben' wandelt diesen Fokus in erschöpften Fokus um.`}
-                        className="inline-flex items-center gap-1.5 bg-[#141c28] hover:bg-[#192433] text-[#F2EFE6] border border-[#5C7189]/50 hover:border-[#748BA6] rounded-full px-2.5 py-0.5 text-xs font-medium shadow-2xs transition-colors"
-                      >
-                        <span className="font-semibold text-[#F2EFE6]">{s.name}</span>
+                    {channeledSpells.map((s) => {
+                      const buff = activeSpellMods.breakdown.find((b) => b.spellName.toLowerCase() === (s.name || '').toLowerCase());
+                      return (
                         <span
-                          className="text-[#86D4C4] font-mono font-bold text-[11px] bg-[#122320] px-1.5 py-0.2 rounded border border-[#35665D]"
-                          title={`Bindet ${s.channeledFocus} kanalisierte(n) Fokuspunkt(e)`}
+                          key={s.id}
+                          title={`${s.name}: Bindet ${s.channeledFocus} kanalisierten Fokus.${buff ? ` Aktiver Effekt: ${buff.description}.` : ''} Klick auf 'Aufheben' wandelt diesen Fokus in erschöpften Fokus um.`}
+                          className="inline-flex items-center gap-1.5 bg-[#141c28] hover:bg-[#192433] text-[#F2EFE6] border border-[#5C7189]/50 hover:border-[#748BA6] rounded-full px-2.5 py-0.5 text-xs font-medium shadow-2xs transition-colors"
                         >
-                          K{s.channeledFocus}
+                          <span className="font-semibold text-[#F2EFE6]">{s.name}</span>
+                          {buff && (
+                            <span className="text-[10px] text-[#86D4C4] font-bold bg-[#132722] px-1.5 py-0.2 rounded border border-[#23584c]">
+                              {buff.description}
+                            </span>
+                          )}
+                          <span
+                            className="text-[#86D4C4] font-mono font-bold text-[11px] bg-[#122320] px-1.5 py-0.2 rounded border border-[#35665D]"
+                            title={`Bindet ${s.channeledFocus} kanalisierte(n) Fokuspunkt(e)`}
+                          >
+                            K{s.channeledFocus}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => session.handleCancelChanneledSpell(s)}
+                            className="ml-1 text-[11px] font-bold text-[#8fa7c7] hover:text-[#ff8ba7] bg-[#1c2738] hover:bg-[#2b1f26] px-1.5 py-0.5 rounded transition-all cursor-pointer flex items-center gap-0.5"
+                            title={`'${s.name}' aufheben (${s.channeledFocus} K-Fokus wird zu erschöpftem Fokus)`}
+                          >
+                            <span>×</span>
+                            <span>Aufheben</span>
+                          </button>
                         </span>
-                        <button
-                          type="button"
-                          onClick={() => session.handleCancelChanneledSpell(s)}
-                          className="ml-1 text-[11px] font-bold text-[#8fa7c7] hover:text-[#ff8ba7] bg-[#1c2738] hover:bg-[#2b1f26] px-1.5 py-0.5 rounded transition-all cursor-pointer flex items-center gap-0.5"
-                          title={`'${s.name}' aufheben (${s.channeledFocus} K-Fokus wird zu erschöpftem Fokus)`}
-                        >
-                          <span>×</span>
-                          <span>Aufheben</span>
-                        </button>
-                      </span>
-                    ))}
+                      );
+                    })}
                   </div>
                 ) : (
                   <div className="text-[11px] text-stone-500 italic py-0.5">
@@ -1341,8 +1316,8 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                       ? `Verteidigung: ${effectiveVTD} (−3 durch Zustand Ringend)`
                       : isLiegend
                         ? `Verteidigung: ${effectiveVTD} (−2 Nahkampf-VTD durch Zustand Liegend)`
-                        : gearVtdBonus > 0
-                          ? `VTD: Basis ${derived.VTD - gearVtdBonus} + Ausrüstung +${gearVtdBonus}`
+                        : gearVtdBonus > 0 || activeSpellMods.vtdBonus > 0
+                          ? `VTD: Basis ${derived.VTD - gearVtdBonus} + Ausrüstung +${gearVtdBonus}${activeSpellMods.vtdBonus > 0 ? ` + Zauber +${activeSpellMods.vtdBonus} (${activeSpellMods.breakdown.filter((b) => b.vtd).map((b) => b.spellName).join(', ')})` : ''}`
                           : 'Verteidigung'
                 }
               >
@@ -1355,28 +1330,60 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                     <span className="text-[10px] text-[#ff8ba7] font-bold ml-1">(-3)</span>
                   ) : isLiegend ? (
                     <span className="text-[10px] text-[#ff8ba7] font-bold ml-1">(-2)</span>
-                  ) : gearVtdBonus > 0 ? (
-                    <span className="text-[10px] text-emerald-400 font-bold ml-0.5">+{gearVtdBonus}</span>
-                  ) : null}
+                  ) : (
+                    <>
+                      {gearVtdBonus > 0 && <span className="text-[10px] text-emerald-400 font-bold ml-0.5">+{gearVtdBonus}</span>}
+                      {activeSpellMods.vtdBonus > 0 && (
+                        <span
+                          className="text-[10px] text-[#86D4C4] font-bold ml-0.5 bg-[#122b24] px-1 py-0.2 rounded border border-[#255e4e]"
+                          title={`+${activeSpellMods.vtdBonus} VTD durch aktive Zauber (${activeSpellMods.breakdown.filter((b) => b.vtd).map((b) => b.spellName).join(', ')})`}
+                        >
+                          +{activeSpellMods.vtdBonus}
+                        </span>
+                      )}
+                    </>
+                  )}
                 </span>
               </div>
               <div
                 className="bg-[#141b27] rounded-lg p-2 border border-[#2B374D] shadow-2xs"
-                title={`Schadensreduktion: ${armorSR} Rüstung + ${derived.SR - armorSR} natürlich`}
+                title={`Schadensreduktion: ${armorSR} Rüstung + ${derived.SR - armorSR} natürlich${activeSpellMods.srBonus > 0 ? ` + ${activeSpellMods.srBonus} Zauber (${activeSpellMods.breakdown.filter((b) => b.sr).map((b) => b.spellName).join(', ')})` : ''}`}
               >
                 <span className="text-[10px] uppercase font-bold text-stone-400 block">SR</span>
                 <span className="text-xl font-bold text-[#F2EFE6] font-mono">
-                  {derived.SR}
+                  {effectiveSR}
                   {armorSR > 0 && <span className="text-[10px] text-amber-400 font-bold ml-0.5">({armorSR})</span>}
+                  {activeSpellMods.srBonus > 0 && (
+                    <span
+                      className="text-[10px] text-[#86D4C4] font-bold ml-0.5 bg-[#122b24] px-1 py-0.2 rounded border border-[#255e4e]"
+                      title={`+${activeSpellMods.srBonus} SR durch aktive Zauber (${activeSpellMods.breakdown.filter((b) => b.sr).map((b) => b.spellName).join(', ')})`}
+                    >
+                      +{activeSpellMods.srBonus}
+                    </span>
+                  )}
                 </span>
               </div>
-              <div className="bg-[#141b27] rounded-lg p-2 border border-[#2B374D] shadow-2xs">
+              <div className="bg-[#141b27] rounded-lg p-2 border border-[#2B374D] shadow-2xs" title={activeSpellMods.gwBonus > 0 ? `Geistiger Widerstand (+${activeSpellMods.gwBonus} Zauber)` : 'Geistiger Widerstand'}>
                 <span className="text-[10px] uppercase font-bold text-stone-400 block">GW</span>
-                <span className="text-xl font-bold text-[#F2EFE6] font-mono">{derived.GW}</span>
+                <span className="text-xl font-bold text-[#F2EFE6] font-mono">
+                  {effectiveGW}
+                  {activeSpellMods.gwBonus > 0 && (
+                    <span className="text-[10px] text-[#86D4C4] font-bold ml-0.5 bg-[#122b24] px-1 py-0.2 rounded border border-[#255e4e]">
+                      +{activeSpellMods.gwBonus}
+                    </span>
+                  )}
+                </span>
               </div>
-              <div className="bg-[#141b27] rounded-lg p-2 border border-[#2B374D] shadow-2xs">
+              <div className="bg-[#141b27] rounded-lg p-2 border border-[#2B374D] shadow-2xs" title={activeSpellMods.kwBonus > 0 ? `Körperlicher Widerstand (+${activeSpellMods.kwBonus} Zauber)` : 'Körperlicher Widerstand'}>
                 <span className="text-[10px] uppercase font-bold text-stone-400 block">KW</span>
-                <span className="text-xl font-bold text-[#F2EFE6] font-mono">{derived.KW}</span>
+                <span className="text-xl font-bold text-[#F2EFE6] font-mono">
+                  {effectiveKW}
+                  {activeSpellMods.kwBonus > 0 && (
+                    <span className="text-[10px] text-[#86D4C4] font-bold ml-0.5 bg-[#122b24] px-1 py-0.2 rounded border border-[#255e4e]">
+                      +{activeSpellMods.kwBonus}
+                    </span>
+                  )}
+                </span>
               </div>
             </div>
           </div>
@@ -1477,6 +1484,143 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
           </div>
         </div>
       </div>
+
+      {/* ── Take Damage Modal ── */}
+      {showTakeDamageModal && (
+        <TakeDamageModal
+          onClose={() => setShowTakeDamageModal(false)}
+          maxLP={maxLP}
+          derivedSR={effectiveSR}
+          armorSR={armorSR || 0}
+          currentSplitterPoints={splitterPoints}
+          activeTempHP={activeTempHP}
+          currentHealthSlots={healthSlots}
+          onApplyDamage={({ kind, amount, spendSplitter, selectedConditions, note }) => {
+            if (spendSplitter && splitterPoints > 0) {
+              const newSP = splitterPoints - 1;
+              session.logAndDispatch(
+                { type: 'PLAY_SET_SPLITTER', payload: newSP },
+                {
+                  category: 'splitter',
+                  title: '1 Splitterpunkt eingesetzt (Schaden um 5 reduziert)',
+                  description: `Splitterpunkte auf ${newSP} SP gesetzt (GRW S. 81)`,
+                  badge: { text: '-1 SP', variant: 'warning' },
+                }
+              );
+            }
+
+            if (amount > 0) {
+              const kindLabel =
+                kind === 'consumed'
+                  ? 'echter Schaden'
+                  : kind === 'exhausted'
+                  ? 'Betäubungsschaden'
+                  : 'kanalisierter Schaden';
+
+              session.logAndDispatch(
+                { type: 'PLAY_TAKE_DAMAGE', payload: { kind, amount, maxLP } },
+                {
+                  category: 'damage',
+                  title: `${amount} ${kindLabel}`,
+                  description: note ? `${amount} ${kindLabel} erlitten (${note})` : `${amount} ${kindLabel} erlitten`,
+                  badge: { text: `-${amount} LP`, variant: kind === 'consumed' ? 'danger' : 'warning' },
+                }
+              );
+              toast.success(`${amount} ${kindLabel} erlitten`);
+            } else {
+              toast.success('Kein Schaden erlitten (vollständig abgewehrt)');
+            }
+
+            if (selectedConditions && selectedConditions.length > 0) {
+              selectedConditions.forEach((c) => {
+                const newCondition: StatusCondition = {
+                  id: generateId(),
+                  key: c.key,
+                  level: c.level,
+                };
+                session.logAndDispatch(
+                  { type: 'PLAY_ADD_CONDITION', payload: newCondition },
+                  {
+                    category: 'condition',
+                    title: `Zustand erhalten: ${c.key}${c.level ? ` ${c.level}` : ''}`,
+                    description: `${c.key} hinzugefügt`,
+                    badge: { text: `${c.key}${c.level ? ` ${c.level}` : ''}`, variant: 'warning' },
+                  }
+                );
+              });
+              toast.success(`${selectedConditions.length} Zustand/Zustände hinzugefügt`);
+            }
+          }}
+        />
+      )}
+
+      {/* ── Heal Modal (GRW S. 165–167) ── */}
+      {showHealModal && (
+        <HealModal
+          onClose={() => setShowHealModal(false)}
+          maxLP={maxLP}
+          currentHealthSlots={healthSlots}
+          activeConditions={conditions}
+          onApplyHeal={({ consumedHealed, exhaustedHealed, channeledHealed, conditionsToRemove, note, healMethod }) => {
+            const totalHealed = consumedHealed + exhaustedHealed + channeledHealed;
+
+            if (consumedHealed > 0) {
+              dispatch({
+                type: 'PLAY_UNDO_DAMAGE',
+                payload: { kind: 'consumed', amount: consumedHealed, maxLP },
+              });
+            }
+            if (exhaustedHealed > 0) {
+              dispatch({
+                type: 'PLAY_UNDO_DAMAGE',
+                payload: { kind: 'exhausted', amount: exhaustedHealed, maxLP },
+              });
+            }
+            if (channeledHealed > 0) {
+              dispatch({
+                type: 'PLAY_UNDO_DAMAGE',
+                payload: { kind: 'channeled', amount: channeledHealed, maxLP },
+              });
+            }
+
+            if (conditionsToRemove && conditionsToRemove.length > 0) {
+              conditionsToRemove.forEach((cId) => {
+                const cond = conditions.find((c) => c.id === cId);
+                session.logAndDispatch(
+                  { type: 'PLAY_REMOVE_CONDITION', payload: { id: cId } },
+                  {
+                    category: 'condition',
+                    title: 'Zustand beendet durch Heilung',
+                    description: cond ? `${cond.key} aufgehoben` : 'Zustand aufgehoben',
+                    badge: { text: cond ? `${cond.key} weg` : 'Zustand weg', variant: 'success' },
+                  }
+                );
+              });
+            }
+
+            if (totalHealed > 0 || (conditionsToRemove && conditionsToRemove.length > 0)) {
+              const details: string[] = [];
+              if (consumedHealed > 0) details.push(`${consumedHealed} echter Schaden`);
+              if (exhaustedHealed > 0) details.push(`${exhaustedHealed} Betäubung`);
+              if (channeledHealed > 0) details.push(`${channeledHealed} kanalisiert`);
+              if (conditionsToRemove && conditionsToRemove.length > 0) {
+                details.push(`${conditionsToRemove.length} Zustand/Zustände beendet`);
+              }
+
+              session.logAndDispatch(
+                { type: 'PLAY_UNDO_DAMAGE', payload: { kind: 'consumed', amount: 0, maxLP } },
+                {
+                  category: 'heal',
+                  title: totalHealed > 0 ? `+${totalHealed} LP geheilt` : 'Zustände geheilt',
+                  description: `${healMethod ?? 'Heilung'}: ${details.join(', ')}${note ? ` (${note})` : ''}`,
+                  badge: { text: totalHealed > 0 ? `+${totalHealed} LP` : 'Geheilt', variant: 'success' },
+                }
+              );
+              toast.success(totalHealed > 0 ? `+${totalHealed} LP geheilt` : 'Zustand beendet');
+            }
+          }}
+        />
+      )}
     </div>
   );
 };

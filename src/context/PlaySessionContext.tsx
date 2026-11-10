@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useMemo, ReactNode } from 'react';
 import { toast } from 'react-hot-toast';
 import type {
   CharacterAction,
@@ -12,7 +12,11 @@ import { grossmeisterAb } from '../regelwerk/bruecke';
 import { generateId } from '../utils/id';
 import { SKILL_CATEGORIES, SKILL_DATA, ALL_CONDITIONS } from '../data/rules';
 import { isSkillAffectedByBehinderung } from '../utils/conditionModifiers';
-import { executeSpellDamageRoll, type ParsedSpellDamage } from '../utils/magicRules';
+import {
+  executeSpellDamageRoll,
+  getActiveSpellModifiers,
+  type ParsedSpellDamage,
+} from '../utils/magicRules';
 import {
   DiceLog,
   type LogEntry,
@@ -238,15 +242,26 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
 
   const handleRollDiceFormula = (formula: string, label: string) => {
     pushPlayHistory();
-    const cleanFormula = formula.trim().toUpperCase();
-    const match = cleanFormula.match(/^(\d*)W(\d+)([+-]\d+)?$/i);
+    const cleanFormula = formula.trim().replace(/\s+/g, '').toUpperCase();
+    // Unterstützt z. B. 1W6, 2W10+5, 1W6-2 sowie kombinierte Zusätze wie 1W6+1+2
+    const match = cleanFormula.match(/^(\d*)W(\d+)((?:[+-]\d+)*)$/i);
     if (!match) {
       toast.error(`Ungültige Würfelformel: ${formula}`);
       return;
     }
     const count = parseInt(match[1] || '1', 10);
     const sides = parseInt(match[2], 10);
-    const mod = match[3] ? parseInt(match[3], 10) : 0;
+    const modString = match[3] || '';
+
+    let mod = 0;
+    if (modString) {
+      const parts = modString.match(/([+-]\d+)/g);
+      if (parts) {
+        for (const p of parts) {
+          mod += parseInt(p, 10);
+        }
+      }
+    }
 
     const dice: number[] = [];
     for (let i = 0; i < count; i++) {
@@ -257,11 +272,13 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
     const isTriumph = count === 2 && sides === 10 && dice[0] === 10 && dice[1] === 10;
     const isPatzer = count === 2 && sides === 10 && dice[0] === 1 && dice[1] === 1;
 
+    const normalizedFormula = `${count}W${sides}${mod !== 0 ? (mod > 0 ? `+${mod}` : `${mod}`) : ''}`;
+
     const entry: RollEntry = {
       id: generateId(),
       type: 'roll',
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-      label: `${label} (${cleanFormula})`,
+      label: `${label} (${normalizedFormula})`,
       d10s: dice,
       baseVal: 0,
       modifier: mod,
@@ -271,7 +288,7 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
       isPatzer,
     };
     setProtocolHistory((prev) => [entry, ...prev]);
-    toast.success(`🎲 ${label}: ${total} (${cleanFormula} [${dice.join(', ')}])`);
+    toast.success(`🎲 ${label}: ${total} (${normalizedFormula} [${dice.join(', ')}])`);
   };
 
   // Roll helpers
@@ -408,6 +425,77 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
     );
 
     const spellName = castResult.spell.name;
+    const spellNameClean = spellName.trim().toLowerCase();
+
+    // Splittermond GRW: Automatische Gutschrift temporärer Lebenspunkte bei Lebenskraft stärken & Aura der Lebenskraft
+    if (spellNameClean === 'lebenskraft stärken') {
+      const hasExtra = (castResult.modificationsSummary || []).some(
+        (m) => m.toLowerCase().includes('8 zusätzliche') || m.toLowerCase().includes('+k2v2') || m.toLowerCase().includes('8')
+      );
+      const tempAmount = hasExtra ? 8 : 6;
+      dispatch({ type: 'PLAY_ADD_TEMP_HP', payload: { amount: tempAmount } });
+      toast.success(`💚 +${tempAmount} temporäre LP erhalten (GRW S. 244)!`);
+    } else if (spellNameClean === 'aura der lebenskraft') {
+      dispatch({ type: 'PLAY_ADD_TEMP_HP', payload: { amount: 10 } });
+      toast.success(`💚 +10 temporäre LP erhalten (GRW S. 241)!`);
+    }
+
+    // Direkte Selbstheilung oder Zustandsbehebung
+    if (castResult.healSelf) {
+      if (castResult.healSelf.restoreAll) {
+        const consumedCount = healthSlots.filter((s) => s.type === 'consumed').length;
+        const exhaustedCount = healthSlots.filter((s) => s.type === 'exhausted' || s.type === 'channeled').length;
+        if (consumedCount > 0) {
+          dispatch({ type: 'PLAY_UNDO_DAMAGE', payload: { kind: 'consumed', amount: consumedCount, maxLP } });
+        }
+        if (exhaustedCount > 0) {
+          dispatch({ type: 'PLAY_UNDO_DAMAGE', payload: { kind: 'exhausted', amount: exhaustedCount, maxLP } });
+        }
+        const badConditions = ['Erschöpft', 'Blutend', 'Brennend', 'Vergiftet', 'Benommen', 'Verwirrt', 'Geblendet', 'Siechtum', 'Lahm'];
+        if (castResult.healSelf.curesPoisonDisease) {
+          badConditions.push('Krankheit');
+        }
+        const cleanConditions = conditions.filter((c) => !badConditions.includes(c.key));
+        dispatch({ type: 'PLAY_SET_STATE', payload: { ...playState, conditions: cleanConditions } });
+        toast.success(
+          castResult.healSelf.curesPoisonDisease
+            ? '💚 Wiederherstellung (EG-verstärkt): Alle LP geheilt, Zustände entfernt & Gifte/Krankheiten aufgehoben!'
+            : '💚 Wiederherstellung: Alle LP geheilt & schwere Zustände aufgehoben!'
+        );
+      } else if (castResult.healSelf.hp && castResult.healSelf.hp > 0) {
+        const healAmount = castResult.healSelf.hp;
+        const consumedCount = healthSlots.filter((s) => s.type === 'consumed').length;
+        const consumedToHeal = Math.min(healAmount, consumedCount);
+        const remainingHeal = healAmount - consumedToHeal;
+        if (consumedToHeal > 0) {
+          dispatch({ type: 'PLAY_UNDO_DAMAGE', payload: { kind: 'consumed', amount: consumedToHeal, maxLP } });
+        }
+        if (remainingHeal > 0) {
+          const exhaustedCount = healthSlots.filter((s) => s.type === 'exhausted' || s.type === 'channeled').length;
+          const exhaustedToHeal = Math.min(remainingHeal, exhaustedCount);
+          if (exhaustedToHeal > 0) {
+            dispatch({ type: 'PLAY_UNDO_DAMAGE', payload: { kind: 'exhausted', amount: exhaustedToHeal, maxLP } });
+          }
+        }
+        toast.success(`💚 +${healAmount} LP geheilt (${spellName})!`);
+      } else if (castResult.healSelf.removeCondition) {
+        const condKey = castResult.healSelf.removeCondition;
+        const existing = conditions.find((c) => c.key.toLowerCase() === condKey.toLowerCase());
+        if (existing) {
+          if (existing.level && existing.level > 1) {
+            const updated = conditions.map((c) => (c.id === existing.id ? { ...c, level: (c.level ?? 2) - 1 } : c));
+            dispatch({ type: 'PLAY_SET_STATE', payload: { ...playState, conditions: updated } });
+            toast.success(`✨ Zustand '${condKey}' um 1 Stufe verringert (jetzt Stufe ${existing.level - 1})`);
+          } else {
+            dispatch({ type: 'PLAY_REMOVE_CONDITION', payload: { id: existing.id } });
+            toast.success(`✨ Zustand '${condKey}' vollständig aufgehoben!`);
+          }
+        } else {
+          toast(`Info: Kein aktiver Zustand '${condKey}' auf dem Helden.`);
+        }
+      }
+    }
+
     setCastSpellTarget(null);
     const damageToast = castResult.damageRoll
       ? ` · 💥 ${castResult.damageRoll.total} ${castResult.damageRoll.damageType} angerichtet!`
@@ -450,6 +538,14 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
         badge: { text: `${spell.channeledFocus} FO`, variant: 'warning' },
       }
     );
+
+    // Wenn Lebenskraft stärken oder Aura der Lebenskraft abgebrochen wird, verfallen verbleibende Temp-LP
+    const sName = (spell.name || '').trim().toLowerCase();
+    if (sName === 'lebenskraft stärken' || sName === 'aura der lebenskraft') {
+      dispatch({ type: 'PLAY_REMOVE_TEMP_HP', payload: { amount: 999 } });
+      toast(`Temporäre Lebenspunkte aus '${spell.name}' sind verfallen.`);
+    }
+
     toast.success(`🔮 Kanalisierung von '${spell.name}' gelöst: ${spell.channeledFocus} FO ist nun erschöpft.`);
   };
 
@@ -647,6 +743,8 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
 
   const focusAvailable = maxFO - focus.exhausted - focus.channeled - focus.consumed;
   const isPlayOrCombat = mode === 'play' || mode === 'combat';
+  const activeSpellMods = useMemo(() => getActiveSpellModifiers(playState.channeledSpells), [playState.channeledSpells]);
+  const effectiveWoundPenalty = Math.min(0, currentWoundPenalty + activeSpellMods.woundPenaltyReduction);
 
   return (
     <PlaySessionContext.Provider
@@ -703,9 +801,10 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
         <RollModal
           skillName={rollConfig.skillName}
           baseValue={rollConfig.baseValue}
-          woundPenalty={currentWoundPenalty}
+          woundPenalty={effectiveWoundPenalty}
           healthLevelName={currentHealthLevelName}
           conditions={conditions}
+          channeledSpells={playState.channeledSpells}
           behinderung={rollConfig.behinderung}
           splitterPoints={splitterPoints}
           onSpendSplitterPoint={(reason) => {
@@ -744,8 +843,9 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
           maxFO={maxFO}
           focusState={focus}
           conditions={conditions}
-          woundPenalty={currentWoundPenalty}
+          woundPenalty={effectiveWoundPenalty}
           splitterpunkte={splitterPoints}
+          inventory={state.inventory || []}
           onClose={() => setCastSpellTarget(null)}
           onCastSuccess={handleCastSpellSuccess}
           onCastFailure={handleCastSpellFailure}
@@ -777,7 +877,8 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
             )
           }
           conditions={conditions}
-          woundPenalty={currentWoundPenalty}
+          channeledSpells={playState.channeledSpells}
+          woundPenalty={effectiveWoundPenalty}
           splitterpunkte={splitterPoints}
           onClose={() => setAttackTarget(null)}
           onSpendSplitterpunkt={() => {

@@ -52,6 +52,9 @@ export interface Spell {
   isFree?: boolean;
   source?: string;
   sourceMode?: AppMode;
+  difficulty?: string;
+  difficultyType?: 'fest' | 'VTD' | 'GW' | 'KW';
+  difficultyValue?: number;
 }
 
 export interface ItemEntry {
@@ -91,7 +94,10 @@ export interface ChanneledSpell {
   duration?: string;
   range?: string;
   target?: string;
+  targetItemId?: string;      // ID of enchanted equipment item (e.g. Katar)
+  targetItemName?: string;    // Name of enchanted equipment item
   enhancements?: string[];
+  selectedEnhancementIds?: string[];
   notes?: string;
   activeRounds?: number;
   activeTicks?: number;

@@ -3,12 +3,13 @@ import { X, Sparkles, RotateCw, Zap, Check } from 'lucide-react';
 import DiceIcon from '../ui/DiceIcon';
 import type { RollEntry } from './DiceLog';
 import { generateId } from '../../utils/id';
-import type { StatusCondition } from '../../types';
+import type { StatusCondition, ChanneledSpell } from '../../types';
 import {
   getActiveRollModifiers,
   isSkillAffectedByBehinderung,
   type ActiveRollModifier,
 } from '../../utils/conditionModifiers';
+import { getActiveSpellRollBonuses, type ActiveSpellRollBonus } from '../../utils/magicRules';
 import { SituativeBoni, useSituativeBoni } from './SituativeBoni';
 
 // ---------------------------------------------------------------
@@ -87,6 +88,7 @@ export interface RollModalProps {
   woundPenalty?: number;
   healthLevelName?: string;
   conditions?: StatusCondition[];
+  channeledSpells?: ChanneledSpell[];
   activeModifiers?: ActiveRollModifier[];
   /** Behinderung (Armor / Shield / Overweight Handicap) */
   behinderung?: number;
@@ -142,6 +144,7 @@ export const RollModal: React.FC<RollModalProps> = ({
   woundPenalty = 0,
   healthLevelName = 'Unverletzt',
   conditions = [],
+  channeledSpells = [],
   activeModifiers,
   behinderung = 0,
   splitterPoints = 0,
@@ -171,6 +174,35 @@ export const RollModal: React.FC<RollModalProps> = ({
 
   const [modifiersList, setModifiersList] = useState<ActiveRollModifier[]>(initialModifiers);
   const situativ = useSituativeBoni('probe', skillName);
+
+  // Splittermond GRW: Aktive kanalisierte Zauber-Boni (automatisch aktiv)
+  const spellBonuses = useMemo(() => {
+    return getActiveSpellRollBonuses(channeledSpells, skillName, false);
+  }, [channeledSpells, skillName]);
+
+  const [activeSpellBonusIds, setActiveSpellBonusIds] = useState<Set<string>>(() => {
+    return new Set(spellBonuses.map((b) => b.id));
+  });
+
+  useEffect(() => {
+    setActiveSpellBonusIds(new Set(spellBonuses.map((b) => b.id)));
+  }, [spellBonuses]);
+
+  const toggleSpellBonus = (id: string) => {
+    setActiveSpellBonusIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const spellBonusTotal = useMemo(() => {
+    return spellBonuses
+      .filter((b) => activeSpellBonusIds.has(b.id))
+      .reduce((sum, b) => sum + b.bonus, 0);
+  }, [spellBonuses, activeSpellBonusIds]);
+
   const [extraModifier, setExtraModifier] = useState(0);
   const [extraModifierStr, setExtraModifierStr] = useState('0');
   const [schwierigkeit, setSchwierigkeit] = useState<number | null>(initialSchwierigkeit ?? null);
@@ -195,7 +227,7 @@ export const RollModal: React.FC<RollModalProps> = ({
     .reduce((sum, m) => sum + m.malus, 0);
 
   const splinterModifier = splinterBonusSpent ? 3 : 0;
-  const effectiveModifier = conditionMalusTotal + situativ.summe + extraModifier + splinterModifier;
+  const effectiveModifier = conditionMalusTotal + situativ.summe + extraModifier + splinterModifier + spellBonusTotal;
   const diceCount = (rollType === 'risk' ? 4 : 2) + (grossmeister ? 1 : 0);
 
   const toggleModifier = (id: string) => {
@@ -219,7 +251,7 @@ export const RollModal: React.FC<RollModalProps> = ({
       setIsRolling(false);
       setResult(r);
 
-      const currentEffMod = conditionMalusTotal + situativ.summe + extraModifier + (bonusApplied ? 3 : 0);
+      const currentEffMod = conditionMalusTotal + situativ.summe + extraModifier + (bonusApplied ? 3 : 0) + spellBonusTotal;
       const computedTotal = baseValue + r.result + currentEffMod;
       const computedEg =
         schwierigkeit !== null
@@ -230,6 +262,11 @@ export const RollModal: React.FC<RollModalProps> = ({
         .filter((m) => m.active)
         .map((m) => `${m.label} (${m.malus >= 0 ? `+${m.malus}` : m.malus})`);
       activeConditionLabels.push(...situativ.labels);
+
+      const activeSpellBonusLabels = spellBonuses
+        .filter((b) => activeSpellBonusIds.has(b.id))
+        .map((b) => `${b.source} (+${b.bonus})`);
+      activeConditionLabels.push(...activeSpellBonusLabels);
 
       if (bonusApplied) {
         activeConditionLabels.push('Splitterpunkt +3');
@@ -274,7 +311,7 @@ export const RollModal: React.FC<RollModalProps> = ({
     setSplinterBonusSpent(true);
 
     if (result && onRecordRoll) {
-      const newEffMod = conditionMalusTotal + situativ.summe + extraModifier + 3;
+      const newEffMod = conditionMalusTotal + situativ.summe + extraModifier + 3 + spellBonusTotal;
       const newComputedTotal = baseValue + result.result + newEffMod;
       const newComputedEg =
         schwierigkeit !== null
@@ -285,6 +322,11 @@ export const RollModal: React.FC<RollModalProps> = ({
         .filter((m) => m.active)
         .map((m) => `${m.label} (${m.malus >= 0 ? `+${m.malus}` : m.malus})`);
       activeConditionLabels.push(...situativ.labels);
+
+      const activeSpellBonusLabels = spellBonuses
+        .filter((b) => activeSpellBonusIds.has(b.id))
+        .map((b) => `${b.source} (+${b.bonus})`);
+      activeConditionLabels.push(...activeSpellBonusLabels);
       activeConditionLabels.push('Splitterpunkt +3');
 
       onRecordRoll({
@@ -354,6 +396,55 @@ export const RollModal: React.FC<RollModalProps> = ({
             </div>
           )}
         </div>
+
+        {/* Aktive Zauber-Wirkungen (GRW: Bärenstärke, Katzenreflexe, Sinne verstärken, etc.) */}
+        {spellBonuses.length > 0 && (
+          <div className="bg-[#e4ede6] rounded-xl p-3 mb-3 border border-[#b8d9bf]">
+            <div className="flex justify-between items-center mb-1.5">
+              <span className="text-xs font-bold uppercase tracking-wider text-emerald-900 fantasy-font flex items-center gap-1.5">
+                <Sparkles size={14} className="text-emerald-700" /> Aktive Zauber-Wirkungen
+              </span>
+              <span className="text-xs font-bold font-mono px-2 py-0.5 rounded-md border bg-emerald-800 text-white border-emerald-900">
+                Bonus: +{spellBonusTotal}
+              </span>
+            </div>
+            <p className="text-xs text-emerald-950/80 mb-2 leading-relaxed">
+              Automatisch aus aktiven Zaubern aktiviert. Zum Abwählen anklicken:
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {spellBonuses.map((b) => {
+                const isActive = activeSpellBonusIds.has(b.id);
+                return (
+                  <button
+                    key={b.id}
+                    type="button"
+                    onClick={() => toggleSpellBonus(b.id)}
+                    title={`${b.description} (Klicken zum ${isActive ? 'Abwählen' : 'Aktivieren'})`}
+                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all border shadow-2xs cursor-pointer ${
+                      isActive
+                        ? 'bg-emerald-800 text-white border-emerald-900 shadow-xs hover:bg-emerald-700 active:scale-98'
+                        : 'bg-white/90 text-stone-600 border-[#d1c4b0] line-through hover:opacity-100'
+                    }`}
+                  >
+                    {isActive ? (
+                      <Check size={12} strokeWidth={3} className="shrink-0 text-emerald-300" />
+                    ) : (
+                      <X size={12} strokeWidth={3} className="shrink-0 text-stone-500" />
+                    )}
+                    <span>{b.source}</span>
+                    <span
+                      className={`px-1.5 py-0.5 rounded text-[11px] font-mono font-bold ${
+                        isActive ? 'bg-black/25 text-white' : 'bg-[#d1c4b0]/50 text-stone-600'
+                      }`}
+                    >
+                      +{b.bonus}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Zustands- & Wundabzüge (D&D Beyond Style: automatisch eingerechnet und einzeln abwählbar) */}
         <SituativeBoni boni={situativ.boni} gewaehlt={situativ.gewaehlt} onToggle={situativ.umschalten} />

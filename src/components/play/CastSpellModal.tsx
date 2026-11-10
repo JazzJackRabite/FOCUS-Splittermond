@@ -1,4 +1,4 @@
-import React, { useState, useId, useMemo } from 'react';
+import React, { useState, useEffect, useId, useMemo } from 'react';
 import {
   X,
   Sparkles,
@@ -17,9 +17,11 @@ import {
   BookOpen,
   ChevronDown,
   ChevronUp,
+  Heart,
+  Sword,
 } from 'lucide-react';
 import DiceIcon from '../ui/DiceIcon';
-import type { Spell, FocusState, ChanneledSpell, StatusCondition } from '../../types';
+import type { Spell, FocusState, ChanneledSpell, StatusCondition, InventoryItem } from '../../types';
 import {
   parseFocusCost,
   getFullSpellInfo,
@@ -29,13 +31,19 @@ import {
   INITIAL_EG_ALLOCATIONS,
   parseSpellDamage,
   executeSpellDamageRoll,
+  getEnhancedSpellDamage,
+  getSelectedSpecificEnhancementEffects,
   parseSpellPermissibleModifications,
+  getSpellHealingInfo,
+  calculateSpellHealing,
+  type CalculatedSpellHealing,
   type SpecificSpellEnhancement,
   type PermissibleSpellModifications,
   type SpellDamageRollResult,
   type ParsedSpellDamage,
   type SpellEGAllocations,
   type SpellCastEGCalculation,
+  isEquipmentTargetingSpell,
 } from '../../utils/magicRules';
 import { generateId } from '../../utils/id';
 import type { RollEntry } from './DiceLog';
@@ -57,6 +65,13 @@ export interface CastSpellSuccessResult {
   modificationsSummary: string[];
   notes: string;
   damageRoll?: SpellDamageRollResult;
+  healSelf?: {
+    hp?: number;
+    restoreAll?: boolean;
+    curesPoisonDisease?: boolean;
+    removeCondition?: string;
+    label: string;
+  };
   rollDetails: {
     dice: number[];
     total: number;
@@ -95,6 +110,7 @@ interface CastSpellModalProps {
   conditions?: StatusCondition[];
   woundPenalty?: number;
   splitterpunkte: number;
+  inventory?: InventoryItem[];
   onClose: () => void;
   onCastSuccess: (result: CastSpellSuccessResult) => void;
   onCastFailure: (result: CastSpellFailureResult) => void;
@@ -121,6 +137,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
   conditions = [],
   woundPenalty = 0,
   splitterpunkte,
+  inventory = [],
   onClose,
   onCastSuccess,
   onCastFailure,
@@ -129,16 +146,70 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
 }) => {
   const modalHeadingId = useId();
   const spell = useMemo(() => getFullSpellInfo(rawSpell), [rawSpell]);
+
+  // Check if this spell enchants an equipment piece (e.g. Flammende Waffe -> Waffe; Rüstung schwächen -> Rüstung)
+  const equipmentTargetCheck = useMemo(() => isEquipmentTargetingSpell(spell), [spell]);
+
+  const candidateEquipment = useMemo(() => {
+    if (!equipmentTargetCheck.isEquipmentSpell) return [];
+    if (equipmentTargetCheck.equipmentType === 'weapon') {
+      return (inventory || []).filter(
+        (item) => item.type === 'weapon' || item.category === 'weapon' || Boolean(item.damage)
+      );
+    }
+    if (equipmentTargetCheck.equipmentType === 'armor') {
+      return (inventory || []).filter((item) => item.type === 'armor' || item.type === 'shield');
+    }
+    return (inventory || []).filter((item) => item.type !== 'other');
+  }, [equipmentTargetCheck, inventory]);
+
+  const [selectedEquipmentId, setSelectedEquipmentId] = useState<string>(() => {
+    if (!equipmentTargetCheck.isEquipmentSpell) return '';
+    const equipped = candidateEquipment.find((item) => item.equipped);
+    if (equipped) return equipped.id;
+    if (candidateEquipment.length > 0) return candidateEquipment[0].id;
+    return 'other';
+  });
+
+  const selectedEquipmentItem = useMemo(() => {
+    if (!selectedEquipmentId || selectedEquipmentId === 'other') return null;
+    return candidateEquipment.find((item) => item.id === selectedEquipmentId) || null;
+  }, [candidateEquipment, selectedEquipmentId]);
   const grundkosten = useMemo(() => parseFocusCost(spell.cost), [spell.cost]);
   // Kosten- und Zauberdauer-Änderungen aus Meisterschaften (nur mit Regelpaketen)
   const zauberWirk = useZauberAnpassungen(schoolSkillName, grundkosten.isChanneled);
   const baseCost = useMemo(() => kostenAnwenden(grundkosten, zauberWirk.kosten), [grundkosten, zauberWirk.kosten]);
   const kostenGeaendert = baseCost !== grundkosten;
   const zauberdauer = useMemo(() => zauberdauerAnpassen(spell.castTime, zauberWirk.dauer), [spell.castTime, zauberWirk.dauer]);
+  const spellHealingInfo = useMemo(() => getSpellHealingInfo(spell.name, spell.description), [spell.name, spell.description]);
 
   // Step 1: Difficulty & Roll Modifiers
-  const [difficulty, setDifficulty] = useState<number>(15);
-  const [selectedPreset, setSelectedPreset] = useState<string>('15');
+  const isFixedDifficulty = useMemo(() => {
+    if (spell.difficultyType === 'fest') return true;
+    if (spell.difficultyValue !== undefined && spell.difficultyType !== 'VTD' && spell.difficultyType !== 'GW' && spell.difficultyType !== 'KW') return true;
+    if (spell.difficulty && !isNaN(Number(spell.difficulty))) return true;
+    if (!spell.difficultyType && !spell.difficulty) return true;
+    return false;
+  }, [spell.difficultyType, spell.difficultyValue, spell.difficulty]);
+
+  const fixedDiffValue = useMemo(() => {
+    if (spell.difficultyValue !== undefined) return spell.difficultyValue;
+    if (spell.difficulty && !isNaN(Number(spell.difficulty))) return Number(spell.difficulty);
+    return 12 + 3 * (spell.grade ?? 0);
+  }, [spell.difficultyValue, spell.difficulty, spell.grade]);
+
+  const initialDifficulty = useMemo(() => {
+    if (isFixedDifficulty) return fixedDiffValue;
+    if (spell.difficultyType === 'VTD') return 16;
+    if (spell.difficultyType === 'GW') return 15;
+    if (spell.difficultyType === 'KW') return 17;
+    return 15;
+  }, [isFixedDifficulty, fixedDiffValue, spell.difficultyType]);
+
+  const [difficulty, setDifficulty] = useState<number>(initialDifficulty);
+  const effectiveDifficulty = isFixedDifficulty ? fixedDiffValue : difficulty;
+
+  const [selectedPreset, setSelectedPreset] = useState<string>(() => (isFixedDifficulty ? String(fixedDiffValue) : '15'));
   const [situationalMod, setSituationalMod] = useState<number>(0);
   const [spellTargetNote, setSpellTargetNote] = useState<string>('');
   const [showSpellDetails, setShowSpellDetails] = useState<boolean>(false);
@@ -171,8 +242,8 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
   // Step 3: Evaluation (EG / Negative EG)
   const egCalculation: SpellCastEGCalculation | null = useMemo(() => {
     if (!hasRolled) return null;
-    return calculateSpellEG(totalRollResult, difficulty, isFumble, isCrit);
-  }, [hasRolled, totalRollResult, difficulty, isFumble, isCrit]);
+    return calculateSpellEG(totalRollResult, effectiveDifficulty, isFumble, isCrit);
+  }, [hasRolled, totalRollResult, effectiveDifficulty, isFumble, isCrit]);
 
   // Manual failure adjustment (if player/GM wants to tweak negative EG focus cost)
   const [customFailureFocus, setCustomFailureFocus] = useState<number | null>(null);
@@ -201,6 +272,10 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
     return zauberWirk.labels.length ? { ...f, modificationsSummary: [...zauberWirk.labels, ...f.modificationsSummary] } : f;
   }, [baseCost, allocations, permissibleMods.specificEnhancements, zauberWirk.labels]);
 
+  const currentHealingInfo = useMemo(() => {
+    return calculateSpellHealing(spell.name, allocations, permissibleMods.specificEnhancements);
+  }, [spell.name, allocations, permissibleMods.specificEnhancements]);
+
   const handleToggleEnhancement = (enh: SpecificSpellEnhancement) => {
     setAllocations((prev) => {
       const isSelected = prev.selectedEnhancementIds.includes(enh.id);
@@ -224,14 +299,28 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
 
   // Step 4.5: Damage Roller State
   const detectedDamage = useMemo(
-    () => parseSpellDamage(spell.description, spell.name),
-    [spell.description, spell.name]
+    () => getEnhancedSpellDamage(spell.name, spell.description, allocations, permissibleMods.specificEnhancements),
+    [spell.name, spell.description, allocations, permissibleMods.specificEnhancements]
   );
+  const activeEnhancementEffects = useMemo(() => {
+    return getSelectedSpecificEnhancementEffects(spell.name, allocations, permissibleMods.specificEnhancements);
+  }, [spell.name, allocations, permissibleMods.specificEnhancements]);
+
   const [enableDamageRoll, setEnableDamageRoll] = useState<boolean>(!!detectedDamage);
   const [customDiceCount, setCustomDiceCount] = useState<number>(detectedDamage?.diceCount ?? 1);
   const [customDiceSides, setCustomDiceSides] = useState<number>(detectedDamage?.diceSides ?? 6);
   const [customBaseBonus, setCustomBaseBonus] = useState<number>(detectedDamage?.baseBonus ?? 0);
   const [customDamageType, setCustomDamageType] = useState<string>(detectedDamage?.damageType ?? 'Schaden');
+
+  useEffect(() => {
+    if (detectedDamage) {
+      setCustomDiceCount(detectedDamage.diceCount);
+      setCustomDiceSides(detectedDamage.diceSides);
+      setCustomBaseBonus(detectedDamage.baseBonus);
+      setCustomDamageType(detectedDamage.damageType);
+    }
+  }, [detectedDamage]);
+
   const [showDamageConfig, setShowDamageConfig] = useState<boolean>(false);
   const [damageResult, setDamageResult] = useState<SpellDamageRollResult | null>(null);
   const [manualDamageInputOpen, setManualDamageInputOpen] = useState<boolean>(false);
@@ -328,7 +417,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
           baseVal: schoolSkillTotal,
           modifier: totalRollModifier - schoolSkillTotal,
           total: sum + totalRollModifier,
-          target: difficulty,
+          target: effectiveDifficulty,
           isTriumph: crit,
           isPatzer: fumble,
         };
@@ -391,11 +480,23 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
   };
 
   // Finish: Success
-  const handleCompleteCast = () => {
+  const handleCompleteCast = (healSelfOption?: {
+    hp?: number;
+    restoreAll?: boolean;
+    curesPoisonDisease?: boolean;
+    removeCondition?: string;
+    label: string;
+  }) => {
     if (!egCalculation?.isSuccess) return;
 
     let channeledSpell: ChanneledSpell | undefined = undefined;
     if (finalCosts.effectiveChanneled > 0) {
+      const targetItemName = selectedEquipmentItem
+        ? selectedEquipmentItem.name
+        : selectedEquipmentId === 'other'
+        ? 'Fremde Waffe / Verbündeter'
+        : undefined;
+
       channeledSpell = {
         id: generateId(),
         name: spell.name,
@@ -405,15 +506,20 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
         castTime: zauberdauer,
         duration: spell.duration,
         range: spell.range,
+        target: spell.target,
+        targetItemId: selectedEquipmentItem ? selectedEquipmentItem.id : undefined,
+        targetItemName,
         startedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         activeRounds: 1,
         activeTicks: 0,
+        selectedEnhancementIds: [...allocations.selectedEnhancementIds],
         enhancements: finalCosts.modificationsSummary,
         notes: [
           `Auslösezeit: ${finalCosts.effectiveCastTicks} Ticks`,
           `EG: ${totalEarnedEG}`,
+          targetItemName ? `Ziel: ${targetItemName}` : '',
           ...finalCosts.modificationsSummary,
-          spellTargetNote ? `Ziel: ${spellTargetNote}` : '',
+          spellTargetNote ? `Notiz: ${spellTargetNote}` : '',
         ].filter(Boolean).join(' · '),
       };
     }
@@ -431,10 +537,11 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
       modificationsSummary: finalCosts.modificationsSummary,
       notes: spellTargetNote,
       damageRoll: currentDamageResult ?? undefined,
+      healSelf: healSelfOption,
       rollDetails: {
         dice: rollDice,
         total: totalRollResult,
-        difficulty,
+        difficulty: effectiveDifficulty,
         eg: totalEarnedEG,
         isCrit,
         isFumble,
@@ -452,14 +559,14 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
       spell,
       exhaustedFocusLost: lostFO,
       negativeEG: egCalculation.negativeEG,
-      difficulty,
+      difficulty: effectiveDifficulty,
       totalRoll: totalRollResult,
       isFumble,
       notes: spellTargetNote,
       rollDetails: {
         dice: rollDice,
         total: totalRollResult,
-        difficulty,
+        difficulty: effectiveDifficulty,
         isFumble,
       },
     });
@@ -592,76 +699,234 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
             </div>
           )}
 
-          {/* STEP 1: Difficulty & Target Selection */}
-          <div className="bg-white rounded-xl border border-[#d1c4b0] p-4 space-y-3">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <div>
-                <label htmlFor="spell-diff-input" className="font-bold text-sm text-[#1B365D] flex items-center gap-1.5">
-                  <Target className="w-4 h-4 text-[#8B263E]" /> Schwierigkeit des Zaubers
-                </label>
+          {/* Ausrüstungs-Zielauswahl für Zauber, die Ausrüstung verzaubern (Flammende Waffe etc.) */}
+          {equipmentTargetCheck.isEquipmentSpell && (
+            <div className="bg-white rounded-xl border border-[#d1c4b0] p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="p-1.5 bg-[#f3e5cf] text-[#1B365D] rounded-lg border border-[#C5A059]/40">
+                    <Sword className="w-4 h-4 text-[#1B365D]" />
+                  </span>
+                  <div>
+                    <h4 className="font-bold text-sm text-[#1B365D] flex items-center gap-1.5">
+                      <span>Ziel-{equipmentTargetCheck.targetCategory} im Inventar auswählen</span>
+                      <span className="text-[10px] bg-[#f3e5cf] text-[#1B365D] font-semibold px-2 py-0.5 rounded border border-[#C5A059]/40">
+                        Ziel: {spell.target || equipmentTargetCheck.targetCategory}
+                      </span>
+                    </h4>
+                    <p className="text-xs text-stone-500">
+                      {equipmentTargetCheck.constraintNote}
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center gap-1.5">
+
+              {candidateEquipment.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                  {candidateEquipment.map((item) => {
+                    const isSelected = selectedEquipmentId === item.id;
+                    return (
+                      <div
+                        key={item.id}
+                        onClick={() => setSelectedEquipmentId(item.id)}
+                        className={`p-2.5 rounded-xl border text-xs cursor-pointer transition-all flex items-center justify-between gap-2 ${
+                          isSelected
+                            ? 'bg-[#1B365D] text-white border-[#1B365D] shadow-sm ring-1 ring-[#C5A059]'
+                            : 'bg-[#faf6ee] text-stone-800 border-[#d1c4b0] hover:border-[#C5A059]'
+                        }`}
+                      >
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="font-bold text-sm truncate">{item.name}</span>
+                            {item.equipped ? (
+                              <span
+                                className={`text-[9px] px-1.5 py-0.5 rounded font-bold ${
+                                  isSelected
+                                    ? 'bg-emerald-800 text-white'
+                                    : 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                                }`}
+                              >
+                                Ausgerüstet
+                              </span>
+                            ) : (
+                              <span
+                                className={`text-[9px] px-1.5 py-0.5 rounded font-medium ${
+                                  isSelected ? 'bg-stone-700 text-stone-200' : 'bg-stone-100 text-stone-600'
+                                }`}
+                              >
+                                Im Rucksack
+                              </span>
+                            )}
+                          </div>
+                          <div
+                            className={`text-[11px] mt-0.5 flex items-center gap-2 ${
+                              isSelected ? 'text-stone-300' : 'text-stone-500'
+                            }`}
+                          >
+                            {item.weaponSkill && <span>{item.weaponSkill}</span>}
+                            {item.damage && <span className="font-mono font-bold">{item.damage}</span>}
+                            {item.wgs && <span>WGS {item.wgs}</span>}
+                          </div>
+                        </div>
+                        <div
+                          className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
+                            isSelected ? 'border-[#C5A059] bg-[#C5A059]' : 'border-stone-400 bg-white'
+                          }`}
+                        >
+                          {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-[#1B365D]" />}
+                        </div>
+                      </div>
+                    );
+                  })}
+
+                  {/* Option: Fremdes Ziel / Verbündeter */}
+                  <div
+                    onClick={() => setSelectedEquipmentId('other')}
+                    className={`p-2.5 rounded-xl border text-xs cursor-pointer transition-all flex items-center justify-between gap-2 ${
+                      selectedEquipmentId === 'other'
+                        ? 'bg-[#1B365D] text-white border-[#1B365D] shadow-sm ring-1 ring-[#C5A059]'
+                        : 'bg-[#faf6ee] text-stone-800 border-[#d1c4b0] hover:border-[#C5A059]'
+                    }`}
+                  >
+                    <div className="min-w-0 flex-1">
+                      <span className="font-bold text-sm block">Waffe eines Verbündeten / Fremde Waffe</span>
+                      <span
+                        className={`text-[11px] block ${
+                          selectedEquipmentId === 'other' ? 'text-stone-300' : 'text-stone-500'
+                        }`}
+                      >
+                        Wirkung auf Ausrüstung eines anderen Charakters
+                      </span>
+                    </div>
+                    <div
+                      className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
+                        selectedEquipmentId === 'other' ? 'border-[#C5A059] bg-[#C5A059]' : 'border-stone-400 bg-white'
+                      }`}
+                    >
+                      {selectedEquipmentId === 'other' && <div className="w-1.5 h-1.5 rounded-full bg-[#1B365D]" />}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-900 space-y-1">
+                  <p className="font-bold flex items-center gap-1.5">
+                    <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+                    Keine passende Ausrüstung im Inventar
+                  </p>
+                  <p>{equipmentTargetCheck.constraintNote}</p>
+                  <p className="text-[11px] text-amber-700 italic">
+                    Der Zauber wird als Wirkung auf eine fremde Ausrüstung / Verbündeten eingetragen.
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* STEP 1: Difficulty & Target Selection */}
+          {isFixedDifficulty ? (
+            <div className="bg-white rounded-xl border border-[#d1c4b0] p-4 space-y-2.5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="font-bold text-sm text-[#1B365D] flex items-center gap-1.5">
+                    <Target className="w-4 h-4 text-[#8B263E]" /> Schwierigkeit des Zaubers
+                  </span>
+                  <span className="text-xs text-stone-500">
+                    Fester Wert laut Datenbank ({spell.difficulty ?? fixedDiffValue})
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-stone-600 font-medium">Feste Schwierigkeit:</span>
+                  <div className="px-4 py-1.5 rounded-lg bg-[#1B365D] text-white font-mono font-bold text-lg shadow-xs">
+                    {fixedDiffValue}
+                  </div>
+                </div>
+              </div>
+
+              {/* Optional Target Note */}
+              <div className="pt-2 border-t border-[#f0e8db]">
                 <input
-                  id="spell-diff-input"
-                  type="number"
-                  min={1}
-                  max={45}
-                  value={difficulty}
-                  onFocus={(e) => e.target.select()}
-                  onChange={(e) => {
-                    const val = parseInt(e.target.value, 10) || 15;
-                    setDifficulty(val);
-                    setSelectedPreset('custom');
-                  }}
-                  className="w-16 text-center font-bold text-base py-1 px-2 border border-[#c5b59e] rounded-lg bg-[#fcfaf7] focus:outline-none focus:ring-2 focus:ring-[#1B365D]"
+                  type="text"
+                  value={spellTargetNote}
+                  onChange={(e) => setSpellTargetNote(e.target.value)}
+                  placeholder="Ziel oder Anmerkung (z. B. 'Verbündeter', 'Reisegruppe', 'Lichtkugel')..."
+                  className="w-full text-xs px-3 py-1.5 border border-[#d1c4b0] rounded-lg bg-[#fcfaf7] focus:outline-none focus:ring-2 focus:ring-[#1B365D] text-gray-800 placeholder-gray-400"
                 />
               </div>
             </div>
-
-            {/* Presets Chips */}
-            <div className="flex flex-wrap gap-1.5 text-xs">
-              {[
-                { label: '12 (Leicht)', val: 12 },
-                { label: '15 (Standard)', val: 15 },
-                { label: '18 (Herausfordernd)', val: 18 },
-                { label: '21 (Schwer)', val: 21 },
-                { label: '24 (Sehr schwer)', val: 24 },
-                { label: 'VTD Ziel', val: 16 },
-                { label: 'GW Ziel', val: 15 },
-                { label: 'KW Ziel', val: 17 },
-              ].map((p) => {
-                const isActive = difficulty === p.val && selectedPreset === p.label;
-                return (
-                  <button
-                    key={p.label}
-                    type="button"
-                    onClick={() => {
-                      setDifficulty(p.val);
-                      setSelectedPreset(p.label);
+          ) : (
+            <div className="bg-white rounded-xl border border-[#d1c4b0] p-4 space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                  <label htmlFor="spell-diff-input" className="font-bold text-sm text-[#1B365D] flex items-center gap-1.5">
+                    <Target className="w-4 h-4 text-[#8B263E]" /> Schwierigkeit des Zaubers
+                  </label>
+                  <span className="text-xs text-[#8B263E] font-medium">
+                    Variabel laut Datenbank: {spell.difficulty || `Gegen ${spell.difficultyType ?? 'Widerstand'} des Ziels`}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <input
+                    id="spell-diff-input"
+                    type="number"
+                    min={1}
+                    max={45}
+                    value={difficulty}
+                    onFocus={(e) => e.target.select()}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value, 10) || 15;
+                      setDifficulty(val);
+                      setSelectedPreset('custom');
                     }}
-                    className={`px-2.5 py-1 rounded-lg border text-xs font-medium transition-all ${
-                      isActive
-                        ? 'bg-[#1B365D] text-white border-[#1B365D]'
-                        : 'bg-white text-gray-700 border-[#d1c4b0] hover:bg-[#f4ede2]'
-                    }`}
-                  >
-                    {p.label}
-                  </button>
-                );
-              })}
-            </div>
+                    className="w-16 text-center font-bold text-base py-1 px-2 border border-[#c5b59e] rounded-lg bg-[#fcfaf7] focus:outline-none focus:ring-2 focus:ring-[#1B365D]"
+                  />
+                </div>
+              </div>
 
-            {/* Optional Target Note */}
-            <div>
-              <input
-                type="text"
-                value={spellTargetNote}
-                onChange={(e) => setSpellTargetNote(e.target.value)}
-                placeholder="Ziel oder Anmerkung (z. B. 'Ork-Krieger', 'Reisegruppe', 'Lichtkugel')..."
-                className="w-full text-xs px-3 py-1.5 border border-[#d1c4b0] rounded-lg bg-[#fcfaf7] placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-[#1B365D]"
-              />
+              {/* Presets Chips */}
+              <div className="flex flex-wrap gap-1.5 text-xs">
+                {[
+                  { label: 'VTD Ziel (16)', val: 16 },
+                  { label: 'GW Ziel (15)', val: 15 },
+                  { label: 'KW Ziel (17)', val: 17 },
+                  { label: '12 (Leicht)', val: 12 },
+                  { label: '15 (Standard)', val: 15 },
+                  { label: '18 (Herausfordernd)', val: 18 },
+                  { label: '21 (Schwer)', val: 21 },
+                  { label: '24 (Sehr schwer)', val: 24 },
+                ].map((p) => {
+                  const isActive = difficulty === p.val && selectedPreset === p.label;
+                  return (
+                    <button
+                      key={p.label}
+                      type="button"
+                      onClick={() => {
+                        setDifficulty(p.val);
+                        setSelectedPreset(p.label);
+                      }}
+                      className={`px-2.5 py-1 rounded-lg border text-xs font-medium transition-all ${
+                        isActive
+                          ? 'bg-[#1B365D] text-white border-[#1B365D]'
+                          : 'bg-white text-gray-700 border-[#d1c4b0] hover:bg-[#f4ede2]'
+                      }`}
+                    >
+                      {p.label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Optional Target Note */}
+              <div>
+                <input
+                  type="text"
+                  value={spellTargetNote}
+                  onChange={(e) => setSpellTargetNote(e.target.value)}
+                  placeholder="Ziel oder Anmerkung (z. B. 'Ork-Krieger', 'Reisegruppe', 'Gegnerischer Zauberer')..."
+                  className="w-full text-xs px-3 py-1.5 border border-[#d1c4b0] rounded-lg bg-[#fcfaf7] focus:outline-none focus:ring-2 focus:ring-[#1B365D] text-gray-800 placeholder-gray-400"
+                />
+              </div>
             </div>
-          </div>
+          )}
 
           {/* STEP 2: Probe Calculation & Rolling */}
           <div className="bg-white rounded-xl border border-[#d1c4b0] p-4 space-y-3">
@@ -1373,6 +1638,11 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                                     Kosten {enh.focusCostRaw}
                                   </span>
                                 )}
+                                {isSelected && (
+                                  <span className="text-[10px] bg-emerald-800 text-emerald-100 font-bold px-2 py-0.5 rounded-full inline-flex items-center gap-1 shadow-2xs">
+                                    ✓ Aktiviert
+                                  </span>
+                                )}
                               </div>
                               <p className="text-xs text-stone-700 font-medium leading-relaxed">
                                 {enh.description}
@@ -1772,11 +2042,76 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
           </button>
 
           {hasRolled && egCalculation?.isSuccess && (
-            spellCausesDamage && !currentDamageResult ? (
+            currentHealingInfo?.isHealingSpell ? (
+              <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
+                <button
+                  type="button"
+                  onClick={() => handleCompleteCast()}
+                  disabled={!canAffordFocus}
+                  className="px-3 py-2 text-xs font-semibold text-stone-600 hover:text-stone-900 underline decoration-dotted transition-colors cursor-pointer"
+                  title="Zauber auf Ziel oder Verbündeten anwenden (ohne Selbstheilung)"
+                >
+                  Auf Verbündeten wirken (-{finalCosts.totalFocus} FO)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleCompleteCast({
+                      hp: currentHealingInfo.totalLP,
+                      restoreAll: currentHealingInfo.isRestoreAll,
+                      curesPoisonDisease: currentHealingInfo.curesPoisonDisease,
+                      label: currentHealingInfo.label,
+                    });
+                  }}
+                  disabled={!canAffordFocus}
+                  className="py-2.5 px-5 bg-emerald-700 hover:bg-emerald-600 text-white border border-emerald-800 rounded-xl font-bold text-sm shadow-sm transition-transform active:scale-95 disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto"
+                >
+                  <Heart className="w-4 h-4 fill-white shrink-0" />
+                  <span>
+                    {currentHealingInfo.isRestoreAll
+                      ? (currentHealingInfo.curesPoisonDisease
+                          ? 'Selbst heilen (Alle LP, Zustände & Gifte/Krankheiten)'
+                          : 'Selbst heilen (Alle LP & Zustände)')
+                      : `Selbst heilen (+${currentHealingInfo.totalLP} LP)`}
+                  </span>
+                  {currentHealingInfo.hasEnhancementSelected && !currentHealingInfo.isRestoreAll && (
+                    <span className="text-[10px] bg-emerald-900 text-emerald-200 px-1.5 py-0.5 rounded font-mono font-semibold">
+                      (EG-verstärkt)
+                    </span>
+                  )}
+                </button>
+              </div>
+            ) : currentHealingInfo?.conditionToRemove ? (
+              <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
+                <button
+                  type="button"
+                  onClick={() => handleCompleteCast()}
+                  disabled={!canAffordFocus}
+                  className="px-3 py-2 text-xs font-semibold text-stone-600 hover:text-stone-900 underline decoration-dotted transition-colors cursor-pointer"
+                  title="Zauber auf Ziel oder Verbündeten anwenden"
+                >
+                  Auf Verbündeten wirken (-{finalCosts.totalFocus} FO)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleCompleteCast({
+                      removeCondition: currentHealingInfo.conditionToRemove,
+                      label: currentHealingInfo.label,
+                    });
+                  }}
+                  disabled={!canAffordFocus}
+                  className="py-2.5 px-5 bg-emerald-700 hover:bg-emerald-600 text-white border border-emerald-800 rounded-xl font-bold text-sm shadow-sm transition-transform active:scale-95 disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto"
+                >
+                  <Sparkles className="w-4 h-4 text-emerald-200 shrink-0" />
+                  <span>Zustand aufheben ({currentHealingInfo.conditionToRemove})</span>
+                </button>
+              </div>
+            ) : spellCausesDamage && !currentDamageResult ? (
               <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
                 <button
                   type="button"
-                  onClick={handleCompleteCast}
+                  onClick={() => handleCompleteCast()}
                   disabled={!canAffordFocus}
                   className="px-3 py-2 text-xs font-semibold text-stone-600 hover:text-stone-900 underline decoration-dotted transition-colors cursor-pointer"
                   title="Zauber abschließen ohne Schaden auszuwürfeln"
@@ -1800,14 +2135,15 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
             ) : (
               <button
                 type="button"
-                onClick={handleCompleteCast}
+                onClick={() => handleCompleteCast()}
                 disabled={!canAffordFocus}
                 className="py-2.5 px-6 bg-[#C5A059] hover:bg-[#b38d48] text-[#1B365D] border border-[#a37e38] rounded-xl font-bold text-sm shadow-sm transition-transform active:scale-95 disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto"
               >
                 <Sparkles className="w-4 h-4 text-[#1B365D]" />
                 <span>
                   Zauber vollenden (-{finalCosts.totalFocus} FO
-                  {currentDamageResult ? ` · ${currentDamageResult.total} Schaden` : ''})
+                  {currentDamageResult ? ` · ${currentDamageResult.total} Schaden` : ''}
+                  {activeEnhancementEffects.length > 0 ? ` · ${activeEnhancementEffects.length} Verstärkung(en)` : ''})
                 </span>
               </button>
             )

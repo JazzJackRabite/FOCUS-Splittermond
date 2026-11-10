@@ -9,6 +9,17 @@ import {
   calculateFinalSpellCosts,
   INITIAL_EG_ALLOCATIONS,
   parseSpellPermissibleModifications,
+  getActiveSpellModifiers,
+  getActiveSpellRollBonuses,
+  getSpellWeaponDamageBonus,
+  getSpellHealingInfo,
+  calculateSpellHealing,
+  getEnhancedSpellDamage,
+  getSelectedSpecificEnhancementEffects,
+  parseEnhancementFocusDelta,
+  isEquipmentTargetingSpell,
+  getWeaponEnchantments,
+  combineDamageFormula,
 } from '../utils/magicRules';
 import { baseCharacterReducer, DEFAULT_STATE } from '../hooks/useCharacterState';
 import type { CharacterState, ChanneledSpell, Spell } from '../types';
@@ -315,5 +326,560 @@ describe('useCharacterState - spell actions', () => {
 
     expect(nextState.playState.channeledSpells[0].activeRounds).toBe(2);
     expect(nextState.playState.channeledSpells[0].activeTicks).toBe(10);
+  });
+
+  describe('getActiveSpellModifiers (Buff Spells like Steinhaut)', () => {
+    it('correctly calculates +2 VTD and +2 SR for standard Steinhaut', () => {
+      const mods = getActiveSpellModifiers([
+        {
+          id: 'cs-1',
+          name: 'Steinhaut',
+          channeledFocus: 6,
+        },
+      ]);
+
+      expect(mods.vtdBonus).toBe(2);
+      expect(mods.srBonus).toBe(2);
+      expect(mods.breakdown).toHaveLength(1);
+      expect(mods.breakdown[0].description).toBe('+2 VTD, +2 SR');
+    });
+
+    it('correctly calculates +2 VTD and +3 SR for enhanced Steinhaut (SR auf 3 Punkte)', () => {
+      const mods = getActiveSpellModifiers([
+        {
+          id: 'cs-1',
+          name: 'Steinhaut',
+          channeledFocus: 8,
+          enhancements: ['Der Bonus auf die SR erhöht sich auf 3 Punkte. (+K2V2)'],
+        },
+      ]);
+
+      expect(mods.vtdBonus).toBe(2);
+      expect(mods.srBonus).toBe(3);
+    });
+
+    it('returns 0 bonuses when no buff spells are channeled', () => {
+      const mods = getActiveSpellModifiers([
+        {
+          id: 'cs-2',
+          name: 'Lichtstrahl',
+          channeledFocus: 4,
+        },
+      ]);
+
+      expect(mods.vtdBonus).toBe(0);
+      expect(mods.srBonus).toBe(0);
+      expect(mods.breakdown).toHaveLength(0);
+    });
+
+    it('correctly calculates wound penalty reductions (Schmerzen widerstehen & Aura der Schmerzlosigkeit)', () => {
+      const mods1 = getActiveSpellModifiers([
+        { id: 'cs-sw', name: 'Schmerzen widerstehen', channeledFocus: 4 },
+      ]);
+      expect(mods1.woundPenaltyReduction).toBe(3);
+
+      const mods2 = getActiveSpellModifiers([
+        { id: 'cs-si', name: 'Schmerzen ignorieren', channeledFocus: 6 },
+      ]);
+      expect(mods2.woundPenaltyReduction).toBe(6);
+
+      const mods3 = getActiveSpellModifiers([
+        { id: 'cs-as', name: 'Aura der Schmerzlosigkeit', channeledFocus: 8 },
+      ]);
+      expect(mods3.woundPenaltyReduction).toBe(999);
+    });
+  });
+
+  describe('getActiveSpellRollBonuses & Weapon Buffs', () => {
+    it('applies attribute roll bonuses based on SKILL_DATA (Katzenreflexe, Bärenstärke)', () => {
+      const channeled = [
+        { id: 'cs-kr', name: 'Katzenreflexe', channeledFocus: 4 },
+        { id: 'cs-bs', name: 'Bärenstärke', channeledFocus: 4 },
+      ];
+
+      // Akrobatik uses [BEW, STA] -> should get both Katzenreflexe (+2) and Bärenstärke (+4)
+      const akrobatikBonuses = getActiveSpellRollBonuses(channeled, 'Akrobatik', false);
+      expect(akrobatikBonuses).toHaveLength(2);
+      expect(akrobatikBonuses.find((b) => b.source === 'Katzenreflexe')?.bonus).toBe(2);
+      expect(akrobatikBonuses.find((b) => b.source === 'Bärenstärke')?.bonus).toBe(4);
+
+      // Heimlichkeit uses [BEW, INT] -> gets Katzenreflexe (+2) but NOT Bärenstärke
+      const heimlichkeitBonuses = getActiveSpellRollBonuses(channeled, 'Heimlichkeit', false);
+      expect(heimlichkeitBonuses).toHaveLength(1);
+      expect(heimlichkeitBonuses[0].source).toBe('Katzenreflexe');
+    });
+
+    it('applies specific skill bonuses (Sinne verstärken, Aura der Schatten, Segnung)', () => {
+      const channeled = [
+        { id: 'cs-sinne', name: 'Sinne verstärken', channeledFocus: 4 },
+        { id: 'cs-schatten', name: 'Aura der Schatten', channeledFocus: 6 },
+        { id: 'cs-segnung', name: 'Segnung', channeledFocus: 2 },
+      ];
+
+      const wahrnehmungBonuses = getActiveSpellRollBonuses(channeled, 'Wahrnehmung', false);
+      // Sinne verstärken (+5) and Segnung (+1)
+      expect(wahrnehmungBonuses.find((b) => b.source === 'Sinne verstärken')?.bonus).toBe(5);
+      expect(wahrnehmungBonuses.find((b) => b.source === 'Segnung')?.bonus).toBe(1);
+
+      const heimlichkeitBonuses = getActiveSpellRollBonuses(channeled, 'Heimlichkeit', false);
+      // Aura der Schatten (+7) and Segnung (+1)
+      expect(heimlichkeitBonuses.find((b) => b.source === 'Aura der Schatten')?.bonus).toBe(7);
+      expect(heimlichkeitBonuses.find((b) => b.source === 'Segnung')?.bonus).toBe(1);
+    });
+
+    it('applies combat attack roll and weapon damage bonuses', () => {
+      const channeled = [
+        { id: 'cs-anfuehrer', name: 'Aura des Anführers', channeledFocus: 6 },
+        { id: 'cs-flamme', name: 'Flammende Waffe', channeledFocus: 4 },
+        { id: 'cs-licht', name: 'Waffe des Lichtes', channeledFocus: 4 },
+      ];
+
+      const atkBonuses = getActiveSpellRollBonuses(channeled, 'Klingenwaffen', true);
+      expect(atkBonuses.find((b) => b.source === 'Aura des Anführers')?.bonus).toBe(2);
+
+      const weaponDmg = getSpellWeaponDamageBonus(channeled);
+      expect(weaponDmg.fireDamage).toBe(1);
+      expect(weaponDmg.lightDamage).toBe(1);
+      expect(weaponDmg.bonusText).toContain('Flammende Waffe');
+      expect(weaponDmg.bonusText).toContain('Waffe des Lichtes');
+    });
+  });
+
+  describe('calculateSpellHealing & EG modifications', () => {
+    it('returns correct healing details for self-healing and restoration', () => {
+      expect(getSpellHealingInfo('Selbstheilung')?.baseLP).toBe(3);
+      expect(getSpellHealingInfo('Leichte Heilung')?.baseLP).toBe(6);
+      expect(getSpellHealingInfo('Heilung')?.baseLP).toBe(16);
+      expect(getSpellHealingInfo('Wiederherstellung')?.isRestoreAll).toBe(true);
+    });
+
+    it('calculates Selbstheilung with base and with 2 EG enhancement (6 LP)', () => {
+      const specificEnhancements = [
+        {
+          id: 'enh-1',
+          egCost: 2,
+          focusCostRaw: '+1V1',
+          focusDelta: { raw: '+1V1', isChanneled: false, exhausted: 0, channeled: 0, consumed: 1, total: 1 },
+          description: 'Es werden insgesamt 6 Lebenspunkte regeneriert.',
+          raw: '2 EG (Kosten +1V1): Es werden insgesamt 6 Lebenspunkte regeneriert.',
+        },
+      ];
+
+      // Base
+      const unenhanced = calculateSpellHealing('Selbstheilung', INITIAL_EG_ALLOCATIONS, specificEnhancements);
+      expect(unenhanced?.totalLP).toBe(3);
+
+      // With specific 2 EG enhancement
+      const enhanced = calculateSpellHealing(
+        'Selbstheilung',
+        { ...INITIAL_EG_ALLOCATIONS, selectedEnhancementIds: ['enh-1'] },
+        specificEnhancements
+      );
+      expect(enhanced?.totalLP).toBe(6);
+      expect(enhanced?.hasEnhancementSelected).toBe(true);
+    });
+
+    it('calculates Leichte Heilung with base (6 LP) and 2 EG enhancement (10 LP)', () => {
+      const specificEnhancements = [
+        {
+          id: 'enh-lh',
+          egCost: 2,
+          focusCostRaw: '+2V2',
+          focusDelta: { raw: '+2V2', isChanneled: false, exhausted: 0, channeled: 0, consumed: 2, total: 2 },
+          description: 'Es werden insgesamt 10 Lebenspunkte regeneriert.',
+          raw: '2 EG (Kosten +2V2): Es werden insgesamt 10 Lebenspunkte regeneriert.',
+        },
+      ];
+
+      const unenhanced = calculateSpellHealing('Leichte Heilung', INITIAL_EG_ALLOCATIONS, specificEnhancements);
+      expect(unenhanced?.totalLP).toBe(6);
+
+      const enhanced = calculateSpellHealing(
+        'Leichte Heilung',
+        { ...INITIAL_EG_ALLOCATIONS, selectedEnhancementIds: ['enh-lh'] },
+        specificEnhancements
+      );
+      expect(enhanced?.totalLP).toBe(10);
+      expect(enhanced?.hasEnhancementSelected).toBe(true);
+    });
+
+    it('calculates Heilung with base (16 LP) and 1 EG enhancement (24 LP)', () => {
+      const specificEnhancements = [
+        {
+          id: 'enh-h',
+          egCost: 1,
+          focusCostRaw: '+3V3',
+          focusDelta: { raw: '+3V3', isChanneled: false, exhausted: 0, channeled: 0, consumed: 3, total: 3 },
+          description: 'Es werden insgesamt 24 Lebenspunkte regeneriert.',
+          raw: '1 EG (Kosten +3V3): Es werden insgesamt 24 Lebenspunkte regeneriert.',
+        },
+      ];
+
+      const unenhanced = calculateSpellHealing('Heilung', INITIAL_EG_ALLOCATIONS, specificEnhancements);
+      expect(unenhanced?.totalLP).toBe(16);
+
+      const enhanced = calculateSpellHealing(
+        'Heilung',
+        { ...INITIAL_EG_ALLOCATIONS, selectedEnhancementIds: ['enh-h'] },
+        specificEnhancements
+      );
+      expect(enhanced?.totalLP).toBe(24);
+      expect(enhanced?.hasEnhancementSelected).toBe(true);
+    });
+
+    it('calculates Wiederherstellung with 1 EG enhancement curing poisons & diseases', () => {
+      const specificEnhancements = [
+        {
+          id: 'enh-wh',
+          egCost: 1,
+          focusCostRaw: '+4V4',
+          focusDelta: { raw: '+4V4', isChanneled: false, exhausted: 0, channeled: 0, consumed: 4, total: 4 },
+          description: 'Zusätzlich werden alle Gifte und Krankheiten aufgehoben, sofern sie maximal den Zustand Siechtum 2 verleihen.',
+          raw: '1 EG (Kosten +4V4): Zusätzlich werden alle Gifte und Krankheiten aufgehoben...',
+        },
+      ];
+
+      const unenhanced = calculateSpellHealing('Wiederherstellung', INITIAL_EG_ALLOCATIONS, specificEnhancements);
+      expect(unenhanced?.isRestoreAll).toBe(true);
+      expect(unenhanced?.curesPoisonDisease).toBe(false);
+
+      const enhanced = calculateSpellHealing(
+        'Wiederherstellung',
+        { ...INITIAL_EG_ALLOCATIONS, selectedEnhancementIds: ['enh-wh'] },
+        specificEnhancements
+      );
+      expect(enhanced?.isRestoreAll).toBe(true);
+      expect(enhanced?.curesPoisonDisease).toBe(true);
+    });
+
+    it('returns correct condition removal details for Erfrischung and Giftbann', () => {
+      expect(getSpellHealingInfo('Erfrischung')?.conditionToRemove).toBe('Erschöpft');
+      expect(getSpellHealingInfo('Giftbann')?.conditionToRemove).toBe('Vergiftet');
+      expect(getSpellHealingInfo('Feuerstrahl')).toBeNull();
+    });
+  });
+
+  describe('Audit of specific enhancements on other spells', () => {
+    it('applies Magische Rüstung enhancement (+3 VTD instead of +2 VTD)', () => {
+      const unenhanced: ChanneledSpell = { id: 'cs1', name: 'Magische Rüstung', channeledFocus: 4 };
+      expect(getActiveSpellModifiers([unenhanced]).vtdBonus).toBe(2);
+
+      const enhanced: ChanneledSpell = {
+        id: 'cs2',
+        name: 'Magische Rüstung',
+        channeledFocus: 4,
+        selectedEnhancementIds: ['enh-1'],
+        enhancements: ['Verstärkung: Die Erhöhung beträgt 3 Punkte. [Kosten +K1V1] (1 EG)'],
+      };
+      expect(getActiveSpellModifiers([enhanced]).vtdBonus).toBe(3);
+    });
+
+    it('applies Magischer Panzer enhancement (+5 VTD instead of +4 VTD)', () => {
+      const unenhanced: ChanneledSpell = { id: 'cs1', name: 'Magischer Panzer', channeledFocus: 12 };
+      expect(getActiveSpellModifiers([unenhanced]).vtdBonus).toBe(4);
+
+      const enhanced: ChanneledSpell = {
+        id: 'cs2',
+        name: 'Magischer Panzer',
+        channeledFocus: 12,
+        selectedEnhancementIds: ['enh-1'],
+        enhancements: ['Verstärkung: Die Erhöhung beträgt 5 Punkte. [Kosten +K3V3] (1 EG)'],
+      };
+      expect(getActiveSpellModifiers([enhanced]).vtdBonus).toBe(5);
+    });
+
+    it('applies Widerstände erhöhen enhancement (+3 GW/KW instead of +2)', () => {
+      const unenhanced: ChanneledSpell = { id: 'cs1', name: 'Widerstände erhöhen', channeledFocus: 12 };
+      const baseMods = getActiveSpellModifiers([unenhanced]);
+      expect(baseMods.gwBonus).toBe(2);
+      expect(baseMods.kwBonus).toBe(2);
+
+      const enhanced: ChanneledSpell = {
+        id: 'cs2',
+        name: 'Widerstände erhöhen',
+        channeledFocus: 12,
+        selectedEnhancementIds: ['enh-1'],
+        enhancements: ['Verstärkung: Der Bonus erhöht sich auf 3 Punkte. [Kosten +K3V3] (2 EG)'],
+      };
+      const enhMods = getActiveSpellModifiers([enhanced]);
+      expect(enhMods.gwBonus).toBe(3);
+      expect(enhMods.kwBonus).toBe(3);
+    });
+
+    it('applies Beflügelte Waffe enhancement (+3 attack instead of +2)', () => {
+      const unenhanced: ChanneledSpell = { id: 'cs1', name: 'Beflügelte Waffe', channeledFocus: 8 };
+      expect(getActiveSpellRollBonuses([unenhanced], 'Klingenwaffen')[0]?.bonus).toBe(2);
+
+      const enhanced: ChanneledSpell = {
+        id: 'cs2',
+        name: 'Beflügelte Waffe',
+        channeledFocus: 8,
+        selectedEnhancementIds: ['enh-1'],
+        enhancements: ['Verstärkung: Der Bonus erhöht sich auf 3 Punkte. [Kosten +K1V1] (2 EG)'],
+      };
+      expect(getActiveSpellRollBonuses([enhanced], 'Klingenwaffen')[0]?.bonus).toBe(3);
+    });
+
+    it('applies Bärenstärke enhancement (+5 Stärke instead of +4)', () => {
+      const unenhanced: ChanneledSpell = { id: 'cs1', name: 'Bärenstärke', channeledFocus: 12 };
+      expect(getActiveSpellRollBonuses([unenhanced], 'STA')[0]?.bonus).toBe(4);
+
+      const enhanced: ChanneledSpell = {
+        id: 'cs2',
+        name: 'Bärenstärke',
+        channeledFocus: 12,
+        selectedEnhancementIds: ['enh-1'],
+        enhancements: ['Verstärkung: Der Bonus erhöht sich auf 5 Punkte. [Kosten +K4V4] (2 EG)'],
+      };
+      expect(getActiveSpellRollBonuses([enhanced], 'STA')[0]?.bonus).toBe(5);
+    });
+
+    it('increases Lebensraub damage from 2W6+5 to 4W6+5 with 1 EG enhancement', () => {
+      const specificEnhancements = [
+        {
+          id: 'enh-1',
+          egCost: 1,
+          focusCostRaw: '+3V3',
+          focusDelta: { raw: '+3V3', isChanneled: false, exhausted: 0, channeled: 0, consumed: 3, total: 3 },
+          description: 'Die Anzahl der entzogenen Lebenspunkte erhöht sich auf 4W6+5.',
+          raw: '1 EG (Kosten +3V3): Die Anzahl der entzogenen Lebenspunkte erhöht sich auf 4W6+5.',
+        },
+      ];
+      const unenhanced = getEnhancedSpellDamage('Lebensraub', 'Der Zauberer entzieht 2W6+5 LP...', INITIAL_EG_ALLOCATIONS, specificEnhancements);
+      expect(unenhanced?.formula).toBe('2W6+5');
+
+      const enhanced = getEnhancedSpellDamage(
+        'Lebensraub',
+        'Der Zauberer entzieht 2W6+5 LP...',
+        { ...INITIAL_EG_ALLOCATIONS, selectedEnhancementIds: ['enh-1'] },
+        specificEnhancements
+      );
+      expect(enhanced?.formula).toBe('4W6+5');
+      expect(enhanced?.diceCount).toBe(4);
+    });
+
+    it('detects added conditions from specific enhancements (e.g. Benommen 1 on Blitzschlag)', () => {
+      const specificEnhancements = [
+        {
+          id: 'enh-1',
+          egCost: 1,
+          focusCostRaw: '+2V2',
+          focusDelta: { raw: '+2V2', isChanneled: false, exhausted: 0, channeled: 0, consumed: 2, total: 2 },
+          description: 'Das Ziel erhält zusätzlich für 30 Ticks den Zustand Benommen 1.',
+          raw: '1 EG (Kosten +2V2): Das Ziel erhält zusätzlich für 30 Ticks den Zustand Benommen 1.',
+        },
+      ];
+      const effects = getSelectedSpecificEnhancementEffects(
+        'Blitzschlag',
+        { ...INITIAL_EG_ALLOCATIONS, selectedEnhancementIds: ['enh-1'] },
+        specificEnhancements
+      );
+      expect(effects).toHaveLength(1);
+      expect(effects[0].addedCondition).toBe('Benommen 1');
+    });
+
+    it('applies Krallen & Schockgriff enhanced weapon damage', () => {
+      const enhancedKrallen: ChanneledSpell = {
+        id: 'cs1',
+        name: 'Krallen',
+        channeledFocus: 1,
+        selectedEnhancementIds: ['enh-1'],
+        enhancements: ['Verstärkung: Der Schaden erhöht sich zusätzlich um 1 Punkt. [Kosten +K1V1] (1 EG)'],
+      };
+      const dmg = getSpellWeaponDamageBonus([enhancedKrallen]);
+      expect(dmg.bonusText).toContain('Krallen verstärkt');
+    });
+
+    it('correctly parses enhancement focus deltas with parseEnhancementFocusDelta', () => {
+      const dK1V1 = parseEnhancementFocusDelta('+K1V1');
+      expect(dK1V1.channeled).toBe(1);
+      expect(dK1V1.consumed).toBe(1);
+      expect(dK1V1.total).toBe(2);
+
+      const dK2V2 = parseEnhancementFocusDelta('+K2V2');
+      expect(dK2V2.channeled).toBe(2);
+      expect(dK2V2.consumed).toBe(2);
+      expect(dK2V2.total).toBe(4);
+
+      const d1V1 = parseEnhancementFocusDelta('+1V1');
+      expect(d1V1.exhausted).toBe(1);
+      expect(d1V1.consumed).toBe(1);
+      expect(d1V1.total).toBe(2);
+
+      const d2V1 = parseEnhancementFocusDelta('+2V1');
+      expect(d2V1.exhausted).toBe(2);
+      expect(d2V1.consumed).toBe(1);
+      expect(d2V1.total).toBe(3);
+    });
+
+    it('correctly calculates final costs for Flammende Waffe with +K1V1 enhancement', () => {
+      const baseCost = parseFocusCost('K4V1'); // 3 channeled, 1 consumed
+      const specificEnhancements = [
+        {
+          id: 'enh-1',
+          egCost: 2,
+          focusCostRaw: '+K1V1',
+          focusDelta: parseEnhancementFocusDelta('+K1V1'),
+          description: 'Die Klinge richtet 2 Punkte Feuerschaden an.',
+          raw: '2 EG (Kosten +K1V1): Die Klinge richtet 2 Punkte Feuerschaden an.',
+        },
+      ];
+      const finalCosts = calculateFinalSpellCosts(
+        baseCost,
+        { ...INITIAL_EG_ALLOCATIONS, selectedEnhancementIds: ['enh-1'] },
+        specificEnhancements
+      );
+      expect(finalCosts.effectiveChanneled).toBe(4);
+      expect(finalCosts.effectiveConsumed).toBe(2);
+      expect(finalCosts.totalFocus).toBe(6);
+    });
+
+    it('applies Flammende Waffe and Waffe des Lichtes enhanced damage (+2)', () => {
+      const enhancedFlamme: ChanneledSpell = {
+        id: 'cs-flamme-enh',
+        name: 'Flammende Waffe',
+        channeledFocus: 4,
+        selectedEnhancementIds: ['enh-1'],
+        notes: 'Verstärkung: Die Klinge richtet 2 Punkte Feuerschaden an. [Kosten +K1V1]',
+      };
+      const dmgFlamme = getSpellWeaponDamageBonus([enhancedFlamme]);
+      expect(dmgFlamme.fireDamage).toBe(2);
+      expect(dmgFlamme.bonusText).toContain('+2 Feuerschaden');
+
+      const enhancedLicht: ChanneledSpell = {
+        id: 'cs-licht-enh',
+        name: 'Waffe des Lichtes',
+        channeledFocus: 8,
+        selectedEnhancementIds: ['enh-1'],
+        notes: 'Verstärkung: Der Zusatzschaden erhöht sich auf 2 Punkte Lichtschaden. [Kosten +K2V2]',
+      };
+      const dmgLicht = getSpellWeaponDamageBonus([enhancedLicht]);
+      expect(dmgLicht.lightDamage).toBe(2);
+      expect(dmgLicht.bonusText).toContain('+2 Lichtschaden');
+    });
+  });
+
+  describe('equipment targeting & constraints (GRW compliance)', () => {
+    it('identifies weapon targeting spells correctly and sets allowsUnarmed to false', () => {
+      const flamme = isEquipmentTargetingSpell('Flammende Waffe');
+      expect(flamme.targetsEquipment).toBe(true);
+      expect(flamme.equipmentType).toBe('weapon');
+      expect(flamme.allowsUnarmed).toBe(false);
+
+      const befluegelt = isEquipmentTargetingSpell('Beflügelte Waffe');
+      expect(befluegelt.targetsEquipment).toBe(true);
+      expect(befluegelt.equipmentType).toBe('weapon');
+      expect(befluegelt.allowsUnarmed).toBe(false);
+
+      const ruestung = isEquipmentTargetingSpell('Magische Rüstung');
+      expect(ruestung.targetsEquipment).toBe(true);
+      expect(ruestung.equipmentType).toBe('armor');
+
+      const feuerstrahl = isEquipmentTargetingSpell('Feuerstrahl');
+      expect(feuerstrahl.targetsEquipment).toBe(false);
+    });
+
+    it('isolates weapon enchantments to specific weapon via targetItemId and forbids waffenlos', () => {
+      const katar = {
+        id: 'w-katar',
+        name: 'Katar',
+        damage: '1W6+1',
+        speed: 6,
+        category: 'melee',
+        skill: 'Handgemenge',
+        attack: 4,
+      };
+
+      const langschwert = {
+        id: 'w-sword',
+        name: 'Langschwert',
+        damage: '1W6+4',
+        speed: 7,
+        category: 'melee',
+        skill: 'Klingenwaffen',
+        attack: 6,
+      };
+
+      const waffenlos = {
+        id: 'waffenlos',
+        name: 'Waffenlos (Faustschlag)',
+        damage: '1W6',
+        speed: 5,
+        category: 'melee',
+        skill: 'Handgemenge',
+        attack: 4,
+      };
+
+      const channeledFlammeKatar: ChanneledSpell = {
+        id: 'cs-flamme-katar',
+        name: 'Flammende Waffe',
+        channeledFocus: 5,
+        targetItemId: 'w-katar',
+        targetItemName: 'Katar',
+        selectedEnhancementIds: ['enh-1'],
+        notes: 'Verstärkung: Die Klinge richtet 2 Punkte Feuerschaden an. [Kosten +K1V1]',
+      };
+
+      // 1. Katar gets the +2 Feuer damage
+      const katarEnchantments = getWeaponEnchantments(katar, [channeledFlammeKatar]);
+      expect(katarEnchantments.fireDamage).toBe(2);
+      expect(katarEnchantments.extraDamageText).toBe('+2 Feuer');
+      expect(katarEnchantments.damageFormulaDisplay).toBe('1W6+1 (+2 Feuer)');
+      expect(katarEnchantments.damageRollFormula).toBe('1W6+3');
+      expect(katarEnchantments.buttonDamageLabel).toContain('1W6+1 (+2 Feuer) Schaden');
+
+      // 2. Langschwert does NOT receive the bonus because targetItemId does not match
+      const swordEnchantments = getWeaponEnchantments(langschwert, [channeledFlammeKatar]);
+      expect(swordEnchantments.fireDamage).toBe(0);
+      expect(swordEnchantments.extraDamageText).toBe('');
+      expect(swordEnchantments.damageRollFormula).toBe('1W6+4');
+
+      // 3. Waffenlos NEVER receives weapon enchantments (Splittermond rule constraint)
+      const waffenlosEnchantments = getWeaponEnchantments(waffenlos, [channeledFlammeKatar]);
+      expect(waffenlosEnchantments.fireDamage).toBe(0);
+      expect(waffenlosEnchantments.damageRollFormula).toBe('1W6');
+
+      // 4. AttackModal getSpellWeaponDamageBonus checks
+      const dmgKatar = getSpellWeaponDamageBonus([channeledFlammeKatar], 'w-katar');
+      expect(dmgKatar.fireDamage).toBe(2);
+
+      const dmgSword = getSpellWeaponDamageBonus([channeledFlammeKatar], 'w-sword');
+      expect(dmgSword.fireDamage).toBe(0);
+
+      const dmgWaffenlos = getSpellWeaponDamageBonus([channeledFlammeKatar], 'waffenlos');
+      expect(dmgWaffenlos.fireDamage).toBe(0);
+    });
+
+    it('isolates attack bonuses (Beflügelte Waffe) to the targeted weapon', () => {
+      const channeledBefluegelt: ChanneledSpell = {
+        id: 'cs-befluegelt',
+        name: 'Beflügelte Waffe',
+        channeledFocus: 4,
+        targetItemId: 'w-spear',
+        targetItemName: 'Jagdspeer',
+        notes: 'Verstärkung: Der Angriffsbonus erhöht sich auf 3 Punkte. [Kosten +K1V1]',
+        selectedEnhancementIds: ['enh-1'],
+      };
+
+      // Spear gets +3 on attack rolls
+      const spearBonuses = getActiveSpellRollBonuses([channeledBefluegelt], 'Stangenwaffen', true, 'w-spear');
+      expect(spearBonuses.some((b) => b.source === 'Beflügelte Waffe' && b.bonus === 3)).toBe(true);
+
+      // Sword does not get the +3 attack bonus
+      const swordBonuses = getActiveSpellRollBonuses([channeledBefluegelt], 'Klingenwaffen', true, 'w-sword');
+      expect(swordBonuses.some((b) => b.source === 'Beflügelte Waffe')).toBe(false);
+
+      // Waffenlos does not get the +3 attack bonus
+      const unarmedBonuses = getActiveSpellRollBonuses([channeledBefluegelt], 'Handgemenge', true, 'waffenlos');
+      expect(unarmedBonuses.some((b) => b.source === 'Beflügelte Waffe')).toBe(false);
+    });
+
+    it('combines damage formulas correctly (e.g. 1W6+1 + 2 -> 1W6+3, avoiding invalid 1W6+1+2)', () => {
+      expect(combineDamageFormula('1W6+1', 2)).toBe('1W6+3');
+      expect(combineDamageFormula('1W6', 2)).toBe('1W6+2');
+      expect(combineDamageFormula('2W6-1', 2)).toBe('2W6+1');
+      expect(combineDamageFormula('1W6+2', 0)).toBe('1W6+2');
+      expect(combineDamageFormula('1W6+4', 1)).toBe('1W6+5');
+    });
   });
 });

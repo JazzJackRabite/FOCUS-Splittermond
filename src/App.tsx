@@ -6,14 +6,12 @@ import { useCharacterState } from './hooks/useCharacterState';
 import { useCalculations } from './hooks/useCalculations';
 import { useNamensAbgleich } from './regelwerk/useNamensAbgleich';
 import { CharacterContext, useCharacter } from './context/CharacterContext';
-import { XpAddModal } from './components/modals/XpAddModal';
 import { ProfileModal } from './components/modals/ProfileModal';
 import { SettingsModal } from './components/common/SettingsModal';
 import { useTheme } from './hooks/useTheme';
 import { loadFromLocalStorage } from './hooks/useLocalStorage';
 import { ConfirmDialog } from './components/ui/ConfirmDialog';
 import { CreationView } from './features/creation/CreationView';
-import { AdvancementView } from './features/advancement/AdvancementView';
 import { PlayView } from './features/play/PlayView';
 import { CombatMagicTab } from './components/combat/CombatMagicTab';
 import { InventoryView } from './features/inventory/InventoryView';
@@ -76,14 +74,9 @@ const App: React.FC = () => {
   useNamensAbgleich(state, dispatch);
   const { currentThemeId, setTheme } = useTheme();
 
-  const { mode, xpTotal } = state;
-  const { xpAvailable, heldengrad, isCreationComplete } = calc;
+  const { mode } = state;
+  const { xpAvailable, isCreationComplete } = calc;
 
-  const hgMatch = heldengrad.name.match(/^(.*?)\s*(\(.*\))$/);
-  const hgTitle = hgMatch ? hgMatch[1] : heldengrad.name;
-  const hgRank = hgMatch ? hgMatch[2] : '';
-
-  const [showXpModal, setShowXpModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showThemeModal, setShowThemeModal] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogState | null>(null);
@@ -212,9 +205,9 @@ const App: React.FC = () => {
 
           {/* HEADER */}
           <div className="bg-[#1B365D] text-[#f3e5cf] p-3 sm:p-4 border-b-6 sm:border-b-8 border-[#C5A059] shadow-lg relative z-10 no-print w-full">
-            <div className="flex flex-wrap items-center justify-between gap-3 lg:gap-4">
+            <div className="flex items-center justify-between gap-3 lg:gap-4">
               {/* 1. Branding */}
-              <div className="order-1 shrink-0">
+              <div className="shrink-0">
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-widest text-[#f3e5cf] drop-shadow-lg leading-none">
                   FOCUS
                 </h1>
@@ -224,50 +217,8 @@ const App: React.FC = () => {
                 </p>
               </div>
 
-              {/* 2. Character Status Widget (Heldengrad & Gesamt-EP) */}
-              <div className="order-3 sm:order-2 w-full sm:w-auto flex justify-center">
-                <div className="bg-[#0f2340]/90 border border-[#C5A059]/60 rounded-lg px-3.5 sm:px-4 py-1.5 shadow-inner flex items-center gap-3 sm:gap-4">
-                  <div className="text-center sm:text-right flex flex-col justify-center">
-                    <div className="text-xs sm:text-sm font-bold text-[#C5A059] fantasy-font whitespace-nowrap leading-tight">
-                      {hgTitle}
-                    </div>
-                    {hgRank && (
-                      <div className="text-[10px] sm:text-xs text-[#f3e5cf]/85 font-medium whitespace-nowrap leading-tight mt-0.5">
-                        {hgRank}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="h-8 w-px bg-[#C5A059]/40 self-center" />
-
-                  <div className="flex items-center gap-2">
-                    <div className="flex flex-col items-start">
-                      <span className="text-[9px] sm:text-[10px] uppercase text-gray-400 tracking-wider font-semibold leading-none">
-                        Gesamt-EP
-                      </span>
-                      {isAdvancementUnlocked && (
-                        <button
-                          type="button"
-                          onClick={() => setShowXpModal(true)}
-                          className="text-[10px] text-[#C5A059] hover:text-white hover:underline transition-colors mt-0.5 cursor-pointer font-medium leading-none whitespace-nowrap"
-                          title="Erfahrungspunkte hinzufügen"
-                        >
-                          +EP
-                        </button>
-                      )}
-                    </div>
-                    <div
-                      className="min-w-[3.6rem] bg-[#faf4e6] text-center font-bold text-[#1B365D] text-sm sm:text-base border border-[#C5A059] rounded py-0.5 px-2 select-none shadow-xs"
-                      title="Gesamt-Erfahrungspunkte (können unten im Protokoll korrigiert werden)"
-                    >
-                      {xpTotal}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* 3. Action Controls */}
-              <div className="order-2 sm:order-3 flex items-center gap-1.5 sm:gap-2 shrink-0">
+              {/* 2. Action Controls */}
+              <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                 <button
                   onClick={() => setShowProfileModal(true)}
                   className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded transition bg-[#0f2340] border border-[#C5A059] text-[#f3e5cf] hover:bg-[#C5A059] hover:text-[#1B365D] flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-bold shadow-sm cursor-pointer"
@@ -292,16 +243,6 @@ const App: React.FC = () => {
               </div>
             </div>
           </div>
-
-          {/* XP Modal */}
-          {showXpModal && (
-            <XpAddModal
-              onClose={() => setShowXpModal(false)}
-              onAdd={(val, note) => {
-                dispatch({ type: 'ADD_XP_WITH_NOTE', payload: { amount: val, note } });
-              }}
-            />
-          )}
 
           {/* Profile Modal */}
           {showProfileModal && (
@@ -329,27 +270,21 @@ const App: React.FC = () => {
           {/* TABS */}
           <div className="sticky top-0 z-30 flex bg-[#e3d4b9] border-b border-[#d1c4b0] no-print shadow-md w-full backdrop-blur-xs overflow-x-auto">
             <button
-              onClick={() => handleTabClick('creation')}
+              onClick={() => {
+                if (mode === 'creation' || mode === 'xp') return;
+                if (state.creationFinalized) {
+                  dispatch({ type: 'SET_MODE', payload: 'xp' });
+                } else {
+                  dispatch({ type: 'SET_MODE', payload: 'creation' });
+                }
+              }}
               className={`flex-1 min-w-[85px] min-h-[40px] py-2 sm:py-2.5 md:py-3 px-1.5 sm:px-3 text-center font-bold uppercase tracking-normal sm:tracking-wider md:tracking-widest text-[11px] sm:text-xs md:text-sm transition-all flex items-center justify-center select-none ${
-                mode === 'creation'
+                mode === 'creation' || mode === 'xp'
                   ? 'bg-[#faf4e6] text-[#1B365D] border-b-2 sm:border-b-0 sm:border-t-4 border-[#1B365D] shadow-xs'
                   : 'text-gray-700 hover:bg-[#ebdcc3]'
               }`}
             >
-              <span>Erschaffung</span>
-            </button>
-
-            <button
-              onClick={() => handleTabClick('xp')}
-              disabled={!isAdvancementUnlocked}
-              className={`flex-1 min-w-[85px] min-h-[40px] py-2 sm:py-2.5 md:py-3 px-1.5 sm:px-3 text-center font-bold uppercase tracking-normal sm:tracking-wider md:tracking-widest text-[11px] sm:text-xs md:text-sm transition-all flex items-center justify-center select-none ${
-                mode === 'xp'
-                  ? 'bg-[#faf4e6] text-[#1B365D] border-b-2 sm:border-b-0 sm:border-t-4 border-[#1B365D] shadow-xs'
-                  : 'text-gray-700 hover:bg-[#ebdcc3]'
-              } ${!isAdvancementUnlocked ? 'opacity-50 cursor-not-allowed' : ''}`}
-              title={!isAdvancementUnlocked ? 'Erst verfügbar wenn Erschaffung abgeschlossen' : ''}
-            >
-              <span>Steigerung</span>
+              <span>Charakter</span>
             </button>
 
             <button
@@ -406,8 +341,7 @@ const App: React.FC = () => {
           </div>
 
           {/* MAIN CONTENT */}
-          {mode === 'creation' && <CreationView />}
-          {mode === 'xp' && <AdvancementView />}
+          {(mode === 'creation' || mode === 'xp') && <CreationView />}
           {mode === 'play' && <PlayView />}
           {mode === 'combat' && <CombatMagicTab />}
           {mode === 'inventory' && <InventoryView />}

@@ -256,6 +256,30 @@ anwenden) oder Werte der Begleiter im Kampf.
 - Offen: Vertraute aus „Die Magie“, Baukasten für beschwörbare Wesen (Magie S. 193–196) und für Bestien (Bestienmeister),
   Begleiter im Kampf-Tab, Boni aus Abrichtungen im Wertekasten, fehlende Bestiarium-Werte auf der Datenseite.
 
+## Stand 6 (08.11.2026): Regelkonforme Zaubermodifikationen, Ausrüstungsverzauberung & Würfellogik
+
+- **Spezifische Zauber-Verstärkungen & Fokuskosten (`utils/magicRules.ts`):**
+  - Parse-Logik für komplexe Fokuskosten-Deltas (`+K1V1`, `+K2V2`, `+1V1`, `+3V3`) aus Spruchbeschreibungen (`parseEnhancementFocusDelta`).
+  - Korrekte Verteilung auf die drei Fokus-Pools (erschöpft, kanalisiert, verzehrt) bei aktivierten Verstärkungen (`calculateFinalSpellCosts`).
+  - Direkte LP-Heilzauber (*Selbstheilung*, *Leichte Heilung*, *Heilung*, *Wiederherstellung*): Übernahme der spezifischen EG-Verstärkungswerte laut Spruchdaten statt nicht-regelkonformem freiem Verstärken.
+  - Wundabzüge: Automatische Verringerung bei kanalisierten Zaubern (*Schmerzen widerstehen*, *Aura der Schmerzlosigkeit*).
+  - Bereinigung der Benutzeroberfläche im Zauberdialog (`components/play/CastSpellModal.tsx`): Entfernung redundanter Textbereiche.
+- **Ausrüstungsverzauberung & Zielbindung (`components/play/CastSpellModal.tsx`, `components/combat/CombatMagicTab.tsx`, `components/play/AttackModal.tsx`):**
+  - Erkennung von Ausrüstungszaubern (*Flammende Waffe*, *Waffe des Lichtes*, *Beflügelte Waffe*, *Magische Rüstung*, *Gegenstand verbessern* etc.) via `isEquipmentTargetingSpell`.
+  - **Regel-Constraint nach GRW S. 229:** Waffenloser Kampf kann **nicht** verzaubert werden. Auswahlliste zeigt nur hergestellte Waffen aus dem Inventar sowie „Fremde Waffe / Verbündeter“.
+  - Speicherung von `targetItemId` und `targetItemName` auf `ChanneledSpell`.
+  - **Schnellansicht & Aktions-Buttons:**
+    - Header der Waffe zeigt aktive Verzauberungs-Badges (z. B. `🔥 Flammende Waffe (+2 Feuer)`).
+    - SCHADEN-Feld weist den Bonus direkt aus (z. B. `1W6+1 (+2 Feuer)`).
+    - AT-Feld und Angriffs-Button berücksichtigen Boni (z. B. `Angriff (Handgemenge) +3` durch *Beflügelte Waffe*).
+    - Schadens-Button zeigt `1W6+1 (+2 Feuer) Schaden` und rollt den korrekten Gesamtwert.
+  - **Angriffsdialog (`AttackModal`):** Filtert Zauberboni strikt auf die geführte Waffe (`weapon.id`); andere Waffen und waffenlose Angriffe bleiben unbeeinflusst.
+  - **Tracker (`ChanneledSpellsTracker`):** Zeigt für kanalisierte Zauber das Badge `Ziel: [Name]`.
+- **Würfelformel-Kombinierung (`combineDamageFormula` & `context/PlaySessionContext.tsx`):**
+  - Zusammenführung von Grundschaden und statischen Boni zu validen Standard-Würfelformeln (`1W6+1` + `2` $\rightarrow$ `1W6+3`, statt `1W6+1+2`).
+  - Robuster Dice-Parser in `handleRollDiceFormula`, der auch mehrteilige Modifikatoren problemlos auflöst.
+- **Tests:** 43 Unit-Tests in `src/__tests__/magicRules.test.ts` sichern Fokuskosten, Verstärkungen, Ausrüstungsbindung und Formelkombinierung ab.
+
 ## Google AI Studio
 
 Unverändert eine Vite-/React-App mit `metadata.json` im Wurzelordner; Import über „Import from GitHub“, Hosting über Cloud Run.
