@@ -3,3 +3,7 @@ dist
 # Arbeitsdateien und Bildschirmfotos aus Google AI Studio gehören nicht ins Repository (und nicht in die gehostete App)
 .aistudio/
 public/assets/aistudio/
+
+# Zwischenablage von Google AI Studio (Bildschirmfotos aus dem Chat) – nicht ins Repository
+.aistudio/
+public/assets/aistudio/
