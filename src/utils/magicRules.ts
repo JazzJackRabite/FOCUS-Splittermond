@@ -1067,7 +1067,6 @@ export function calculateSpellHealing(
   _specificEnhancements: SpecificSpellEnhancement[] = [],
   katalog: Katalog | null = aktiverKatalog()
 ): CalculatedSpellHealing | null {
-  const name = (spellName || '').trim().toLowerCase();
   const verstaerkt = (allocations?.selectedEnhancementIds || []).length > 0;
   const heil = lpWirkung(katalog, spellName || '', 'heilung_lp', verstaerkt);
   if (heil) {
@@ -1088,21 +1087,8 @@ export function calculateSpellHealing(
     };
   }
 
-  // Zustände aufheben: noch nach Zaubername (steht nicht in den Spielwerten der Pakete)
-  if (name === 'erfrischung' || name === 'giftbann') {
-    return {
-      isHealingSpell: false,
-      baseLP: 0,
-      enhancedLP: 0,
-      totalLP: 0,
-      isRestoreAll: false,
-      curesPoisonDisease: false,
-      hasEnhancementSelected: false,
-      conditionToRemove: name === 'erfrischung' ? 'Erschöpft' : 'Vergiftet',
-      label: name === 'erfrischung' ? 'Erschöpfung abbauen' : 'Vergiftung aufheben',
-    };
-  }
-
+  // Zauber, die Stufen eines Zustands unterdrücken (z. B. Erfrischung), wirken über wirksameZustaende(), solange sie aktiv
+  // sind – hier gibt es nichts abzuziehen. Giftbann hebt Gifte nach Grad auf; einen Zustand „Vergiftet“ kennt das GRW nicht.
   return null;
 }
 

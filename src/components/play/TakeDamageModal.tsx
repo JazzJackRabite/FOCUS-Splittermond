@@ -30,7 +30,7 @@ const COMMON_DAMAGE_CONDITIONS: Array<{ key: string; hasLevel: boolean; maxLevel
   { key: 'Benommen', hasLevel: true, maxLevel: 2, label: 'Benommen (Wucht/Schock)' },
   { key: 'Liegend', hasLevel: false, label: 'Liegend (zu Boden geworfen)' },
   { key: 'Erschöpft', hasLevel: true, maxLevel: 3, label: 'Erschöpft (Kälte/Ausdauer)' },
-  { key: 'Vergiftet', hasLevel: false, label: 'Vergiftet (Giftangriff)' },
+  { key: 'Vergiftet', hasLevel: false, label: 'Vergiftet (nur Markierung, kein GRW-Zustand)' },
 ];
 
 const GRW_STUFEN = [

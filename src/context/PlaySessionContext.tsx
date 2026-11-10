@@ -9,7 +9,7 @@ import type {
 } from '../types';
 import { useCharacter } from './CharacterContext';
 import { aktiverKatalog } from '../regelwerk/bruecke';
-import { lpWirkung } from '../regelwerk/zauberwerte';
+import { lpWirkung, wirksameZustaende } from '../regelwerk/zauberwerte';
 import { grossmeisterAb } from '../regelwerk/bruecke';
 import { generateId } from '../utils/id';
 import { SKILL_CATEGORIES, SKILL_DATA, ALL_CONDITIONS } from '../data/rules';
@@ -753,6 +753,11 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
   const focusAvailable = maxFO - focus.exhausted - focus.channeled - focus.consumed;
   const isPlayOrCombat = mode === 'play' || mode === 'combat' || mode === 'begleiter';
   const activeSpellMods = useMemo(() => getActiveSpellModifiers(playState.channeledSpells), [playState.channeledSpells]);
+  // Zustände, von denen ein aktiver Zauber Stufen unterdrückt (z. B. Erfrischung), wirken beim Würfeln nur mit der Reststufe
+  const wirksameZustaendeListe = useMemo(
+    () => wirksameZustaende(aktiverKatalog(), conditions, playState.channeledSpells ?? []).wirksam,
+    [conditions, playState.channeledSpells]
+  );
   const effectiveWoundPenalty = Math.min(0, currentWoundPenalty + activeSpellMods.woundPenaltyReduction);
 
   return (
@@ -813,7 +818,7 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
           baseValue={rollConfig.baseValue}
           woundPenalty={effectiveWoundPenalty}
           healthLevelName={currentHealthLevelName}
-          conditions={conditions}
+          conditions={wirksameZustaendeListe}
           channeledSpells={playState.channeledSpells}
           behinderung={rollConfig.behinderung}
           splitterPoints={splitterPoints}
@@ -852,7 +857,7 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
           availableFocus={focusAvailable}
           maxFO={maxFO}
           focusState={focus}
-          conditions={conditions}
+          conditions={wirksameZustaendeListe}
           woundPenalty={effectiveWoundPenalty}
           splitterpunkte={splitterPoints}
           inventory={state.inventory || []}
@@ -886,7 +891,7 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
               (list || []).map((m: any) => ({ ...m, skill: m.skill || skill }))
             )
           }
-          conditions={conditions}
+          conditions={wirksameZustaendeListe}
           channeledSpells={playState.channeledSpells}
           woundPenalty={effectiveWoundPenalty}
           splitterpunkte={splitterPoints}

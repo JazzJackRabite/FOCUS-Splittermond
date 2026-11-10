@@ -17,7 +17,7 @@ import { ATTRIBUT_NAME, idNachName, norm } from './bruecke';
 import { wirkungKurz, type Wirkung } from './wirkungen';
 
 export type SpielwertBezug = 'VTD' | 'SR' | 'GW' | 'KW' | 'GSW' | 'INI' | 'wundabzug' | 'angriff' | 'fertigkeit' | 'attribut'
-  | 'alle_fertigkeiten' | 'zusatzschaden' | 'zusatz_lp' | 'heilung_lp';
+  | 'alle_fertigkeiten' | 'zusatzschaden' | 'zusatz_lp' | 'heilung_lp' | 'zustand_unterdrueckt';
 
 export interface Spielwert {
   bezug: SpielwertBezug;
@@ -28,6 +28,8 @@ export interface Spielwert {
   lage?: boolean;
   ziel?: 'selbst' | 'waffe' | 'waffenlos';
   schadensart?: string;
+  /** zustand_unterdrueckt: ID des Zustands, von dem der Zauber so viele Stufen unterdrückt, solange er wirkt */
+  zustand?: string;
   /** zusatz_lp: der Zauber endet, sobald die zusätzlichen Lebenspunkte aufgebraucht sind */
   endet_wenn_verbraucht?: boolean;
 }
@@ -127,6 +129,7 @@ export function spielwertText(k: Katalog | null, x: Spielwert, v: number | 'alle
     case 'zusatzschaden': return `${vz(zahl(v))} ${x.schadensart ?? 'Schaden'}${x.ziel === 'waffenlos' ? ' (waffenlos)' : ''}${lage}`;
     case 'zusatz_lp': return `${vz(zahl(v))} zusätzliche Lebenspunkte`;
     case 'heilung_lp': return v === 'alle' ? 'heilt alle Lebenspunkte' : `heilt ${v} Lebenspunkte`;
+    case 'zustand_unterdrueckt': return `unterdrückt ${v === 'alle' ? 'alle' : v} ${v === 1 ? 'Stufe' : 'Stufen'} ${k?.get(x.zustand ?? '')?.name ?? 'eines Zustands'}`;
     default: return `${vz(zahl(v))} ${x.bezug}${lage}`;
   }
 }
@@ -255,4 +258,30 @@ export function lpWirkung(k: Katalog | null, name: string, bezug: 'heilung_lp' |
   const x = spielwerteDesZaubers(k, name)?.werte.find(w => w.bezug === bezug);
   if (!x) return null;
   return { lp: geltenderWert(x, verstaerkt), grund: x.wert, verstaerkt: verstaerkt && x.verstaerkt !== undefined };
+}
+
+/**
+ * Zustände, wie sie gerade wirken: Aktive Zauber können Stufen eines Zustands unterdrücken, solange sie wirken (z. B.
+ * Erfrischung: 1 Stufe Erschöpft, verstärkt 3 – GRW S. 227). Der gespeicherte Zustand bleibt unverändert; endet der Zauber,
+ * gilt wieder die volle Stufe. Zustände ohne Stufen zählen als Stufe 1.
+ */
+export function wirksameZustaende<T extends { key: string; level?: number }>(k: Katalog | null, zustaende: T[], zauber: AktiverZauber[]): { wirksam: T[]; unterdrueckt: { key: string; stufen: number; durch: string }[] } {
+  const unterdrueckt: { key: string; stufen: number; durch: string }[] = [];
+  for (const a of aktiveZauber(k, zauber).gilt) {
+    for (const x of a.sw.werte) {
+      if (x.bezug !== 'zustand_unterdrueckt' || !x.zustand) continue;
+      const v = geltenderWert(x, a.verstaerkt);
+      const name = k?.get(x.zustand)?.name;
+      if (name && v !== 0) unterdrueckt.push({ key: name, stufen: zahl(v), durch: a.cs.name });
+    }
+  }
+  if (!unterdrueckt.length) return { wirksam: zustaende, unterdrueckt };
+  const wirksam: T[] = [];
+  for (const z of zustaende) {
+    const weg = unterdrueckt.filter(u => norm(u.key) === norm(z.key)).reduce((s, u) => s + u.stufen, 0);
+    const stufe = (z.level ?? 1) - weg;
+    if (weg === 0) wirksam.push(z);
+    else if (stufe > 0) wirksam.push({ ...z, level: stufe });
+  }
+  return { wirksam, unterdrueckt: unterdrueckt.filter(u => zustaende.some(z => norm(z.key) === norm(u.key))) };
 }

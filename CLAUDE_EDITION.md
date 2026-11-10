@@ -361,11 +361,23 @@ Dateien aus AI Studio im Repository: `public/assets/aistudio/*.png`, `.aistudio/
   89 Zauber mit Spielwerten (57 GRW, 32 aus Büchern). Die Prüfsuite prüft jede Zahl gegen den Zaubertext.
   Neues GRW-Paket in `public/regelpakete`; Buchpakete neu hochladen.
 - Ohne geladenes Regelpaket haben Zauber keine automatische Wirkung (kein Rückfall auf eine Tabelle im Code).
-- Noch nach Zaubername im Code: Erfrischung und Giftbann heben einen Zustand auf (`calculateSpellHealing`).
+- Erfrischung und Giftbann standen noch nach Zaubername im Code – behoben in Stand 18.
 - Die Zauber aus den Büchern sind nur automatisch abgeleitet, nicht einzeln gesichtet; Werte, die nur in einer Lage gelten,
   rechnet der Editor nicht fest ein.
 - Tests: `zauberwirkungenGrw.test.tsx` (u. a. ein erfundener Buchzauber wirkt wie ein GRW-Zauber). 323 Tests grün ohne
   Bücher (zusammen mit Begleiter Teil 4), 114 im Ordner `regelwerk` mit allen Büchern vor dem Zusammenführen; Build läuft.
+
+## Stand 18 (10.11.2026): Erfrischung und Giftbann nach Regelwerk
+
+- **Erfrischung** (GRW S. 227) unterdrückt 1 Stufe Erschöpft, verstärkt 3, solange der Zauber wirkt. Vorher senkte der
+  Editor den Zustand beim Wirken dauerhaft um 1 Stufe, ohne Verstärkung und ohne Rückkehr beim Ende des Zaubers. Jetzt steht
+  der Wert im Regelpaket (`spielwerte`, Bezug `zustand_unterdrueckt` mit Zustands-ID); der gespeicherte Zustand bleibt, beim
+  Würfeln gilt die Reststufe (`wirksameZustaende` in `regelwerk/zauberwerte.ts`, genutzt im PlaySessionContext für Proben-,
+  Angriffs- und Zauberdialog). Der aktive Zauber zeigt „unterdrückt n Stufen Erschöpft“.
+- **Giftbann** hebt keine erfundene Markierung mehr auf: Das GRW kennt keinen Zustand „Vergiftet“, der Zauber hebt Gifte
+  nach Grad auf (steht in seiner Beschreibung). „Vergiftet“ bleibt im Schadensdialog als reine Markierung ohne Regelwirkung.
+- Damit steht kein Zauber mehr mit Namen in `utils/magicRules.ts`.
+- 326 Tests grün ohne Bücher; neues GRW-Paket in `public/regelpakete`.
 
 ## Google AI Studio
 

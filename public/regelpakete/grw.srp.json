@@ -35060,7 +35060,18 @@
      ]
     },
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "spielwerte": {
+     "werte": [
+      {
+       "bezug": "zustand_unterdrueckt",
+       "wert": 1,
+       "verstaerkt": 3,
+       "zustand": "grw:zustand:erschoepft"
+      }
+     ],
+     "quelle": "tabelle"
+    }
    }
   },
   {

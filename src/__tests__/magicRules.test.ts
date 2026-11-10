@@ -559,9 +559,11 @@ describe('useCharacterState - spell actions', () => {
       expect(enhanced?.curesPoisonDisease).toBe(true);
     });
 
-    it('returns correct condition removal details for Erfrischung and Giftbann', () => {
-      expect(getSpellHealingInfo('Erfrischung')?.conditionToRemove).toBe('Erschöpft');
-      expect(getSpellHealingInfo('Giftbann')?.conditionToRemove).toBe('Vergiftet');
+    it('Erfrischung und Giftbann heben beim Wirken keinen Zustand auf', () => {
+      // Erfrischung unterdrückt Stufen von Erschöpft, solange sie wirkt (wirksameZustaende, GRW S. 227); Giftbann hebt
+      // Gifte nach Grad auf – einen Zustand „Vergiftet“ gibt es im GRW nicht.
+      expect(getSpellHealingInfo('Erfrischung')).toBeNull();
+      expect(getSpellHealingInfo('Giftbann')).toBeNull();
       expect(getSpellHealingInfo('Feuerstrahl')).toBeNull();
     });
   });

@@ -9,12 +9,13 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { Katalog } from '../regelwerk/katalog';
 import { setzeAktivenKatalog } from '../regelwerk/bruecke';
 import { basisAusDateien } from '../regelwerk/__tests__/hilfen';
-import { spielwerteDesZaubers } from '../regelwerk/zauberwerte';
+import { spielwerteDesZaubers, wirksameZustaende } from '../regelwerk/zauberwerte';
 import { render } from '@testing-library/react';
 import {
   INITIAL_EG_ALLOCATIONS,
   begrenzeZauberbonus,
   calculateFinalSpellCosts,
+  calculateSpellHealing,
   calculateTotalEGSpent,
   getActiveSpellModifiers,
   getActiveSpellRollBonuses,
@@ -112,6 +113,24 @@ describe('Zauberwerte nach GRW', () => {
     expect(getSpellWeaponDamageBonus([flamme], undefined, 'Waffenlos').totalDamage).toBe(0);
     expect(getSpellWeaponDamageBonus([zauber('Flammende Waffe')], 'waffen|Nahkampf|Handgemenge|Waffenlos').totalDamage).toBe(0);
     expect(getSpellWeaponDamageBonus([zauber('Flammenhand', true)], 'waffenlos').fireDamage).toBe(2);
+  });
+});
+
+describe('Zustände unterdrücken (Erfrischung, GRW S. 227)', () => {
+  const erschoepft = [{ id: 'z1', key: 'Erschöpft', level: 2 }, { id: 'z2', key: 'Liegend' }];
+  it('1 Stufe Erschöpft ist unterdrückt, solange der Zauber wirkt; verstärkt 3 Stufen', () => {
+    const einfach = wirksameZustaende(K, erschoepft, [zauber('Erfrischung')]);
+    expect(einfach.wirksam).toEqual([{ id: 'z1', key: 'Erschöpft', level: 1 }, { id: 'z2', key: 'Liegend' }]);
+    expect(einfach.unterdrueckt).toEqual([{ key: 'Erschöpft', stufen: 1, durch: 'Erfrischung' }]);
+    expect(wirksameZustaende(K, erschoepft, [zauber('Erfrischung', true)]).wirksam).toEqual([{ id: 'z2', key: 'Liegend' }]);
+  });
+  it('der gespeicherte Zustand bleibt – ohne den Zauber gilt wieder die volle Stufe', () => {
+    expect(wirksameZustaende(K, erschoepft, []).wirksam).toBe(erschoepft);
+    expect(erschoepft[0].level).toBe(2);
+  });
+  it('Zauber heben keinen Zustand mehr beim Wirken auf (Erfrischung, Giftbann)', () => {
+    expect(calculateSpellHealing('Erfrischung', INITIAL_EG_ALLOCATIONS)).toBeNull();
+    expect(calculateSpellHealing('Giftbann', INITIAL_EG_ALLOCATIONS)).toBeNull();
   });
 });
 
