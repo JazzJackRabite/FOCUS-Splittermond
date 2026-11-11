@@ -1,15 +1,17 @@
 import { aenderungGesperrt } from '../../fundament/hausregeln';
 import React, { useMemo, useState } from 'react';
-import { Bot, Plus, Trash2, ChevronDown, ChevronRight, X, AlertTriangle } from 'lucide-react';
+import { Bot, Plus, X, Minus } from 'lucide-react';
 import { useCharacter } from '../../context/CharacterContext';
 import {
-  IMMER_INSTRUKTIONEN, bausteine, golemWerte, hoechstens, korpusStufe, korpusse, materialien, sonderausstattungen, voraussetzung,
+  IMMER_INSTRUKTIONEN, allgemeineFertigkeiten, bausteinInfo, bausteine, golemMeisterschaften, golemWerte, hoechstens, korpusGK, korpusStufe,
+  korpusse, materialInfo, materialien, sonderausstattungen, voraussetzung, type GolemWahl,
 } from '../../regelwerk/golem';
 import { alsWertekasten } from '../../regelwerk/modifikationen';
 import type { Katalog } from '../../regelwerk/katalog';
 import type { Begleiter } from '../../types';
-import { Werte, auswahl, karte, knopf } from './Wertekasten';
+import { Werte, Eintrag, Hinweise, Notiz } from './Wertekasten';
 import { BegleiterVitals, VitalKurz, spielDaten, useBegleiterSpiel } from './BegleiterSpiel';
+import { Abschnittstitel, Auswahl, Eingabe, Karte, Knopf, Marke } from '../../fundament';
 
 const ART_TEXT: Record<string, string> = {
   'Zusätzliche Fähigkeit': 'Zusätzliche Fähigkeiten (Schritt 3)', Rolle: 'Rollen (Schritt 4)', Applikation: 'Applikationen',
@@ -18,48 +20,112 @@ const ART_TEXT: Record<string, string> = {
 
 interface Besitzer { golemPunkte: number[]; konstrukteur: boolean; zauber: string[] }
 
+const Titel3: React.FC<{ children: React.ReactNode }> = ({ children }) => <Abschnittstitel als="h3" className="text-[15px]">{children}</Abschnittstitel>;
+
 const BausteinGruppe: React.FC<{ k: Katalog; art: string; b: Begleiter; aendern: (a: Partial<Begleiter>) => void; info?: React.ReactNode }> = ({ k, art, b, aendern, info }) => {
   const [wahl, setWahl] = useState('');
   const [offen, setOffen] = useState<Record<number, boolean>>({});
   const liste = useMemo(() => bausteine(k, art), [k, art]);
   const alle = b.bausteine ?? [];
-  const meine = alle.map((id, i) => ({ id, i })).filter(x => k.get(x.id)?.daten.baustein === art);
+  const meine = alle.map((id, i) => ({ id, i })).filter(x => bausteinInfo(k.get(x.id)).art === art);
   const namen = new Set(alle.map(i => k.get(i)?.name));
   return (
-    <div>
-      <h4 className="font-bold text-gold-hell mb-1">{ART_TEXT[art] ?? art}</h4>
-      {info && <p className="text-leise mb-1">{info}</p>}
-      {art === 'Instruktion' && <p className="text-leise mb-1">Immer: {IMMER_INSTRUKTIONEN.join(', ')}.</p>}
+    <div className="space-y-2">
+      <Titel3>{ART_TEXT[art] ?? art}</Titel3>
+      {info && <p className="text-leise">{info}</p>}
+      {art === 'Instruktion' && <p className="text-leise">Immer: {IMMER_INSTRUKTIONEN.join(', ')}.</p>}
       {meine.length > 0 && (
-        <ul className="space-y-0.5 mb-1">
+        <ul className="space-y-1">
           {meine.map(({ id, i }) => {
-            const e = k.get(id)!;
+            const e = k.get(id)!; const bi = bausteinInfo(e);
             return (
-              <li key={`${id}-${i}`} className="border-l-2 border-gold pl-2">
-                <div className="flex items-center gap-1">
-                  <button type="button" className="font-bold text-left cursor-pointer" onClick={() => setOffen(o => ({ ...o, [i]: !o[i] }))}>{e.name}</button>
-                  {e.daten.stufe_merkmal_golem && <span className="text-leise">Golem {e.daten.stufe_merkmal_golem}</span>}
-                  <button type="button" aria-label={`${e.name} entfernen`} onClick={() => aendern({ bausteine: alle.filter((_, j) => j !== i) })}
-                    className="ml-auto p-0.5 rounded-knopf hover:bg-black/5 hover:text-schaden cursor-pointer"><X size={11} /></button>
+              <li key={`${id}-${i}`} className="border-l-2 border-rahmen pl-3">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Knopf className="border-transparent! bg-transparent! hover:bg-erhoeht! px-1 font-bold" aria-expanded={!!offen[i]} onClick={() => setOffen(o => ({ ...o, [i]: !o[i] }))}>{e.name}</Knopf>
+                  {bi.zuschlag && <Marke klein>Golem {bi.zuschlag}</Marke>}
+                  <Knopf nurSymbol className="ml-auto" aria-label={`${e.name} entfernen`} onClick={() => aendern({ bausteine: alle.filter((_, j) => j !== i) })}><X size={16} aria-hidden /></Knopf>
                 </div>
-                {offen[i] && <p className="text-schrift">{e.daten.beschreibung}</p>}
+                {offen[i] && <p className="mt-1">{bi.beschreibung}</p>}
               </li>
             );
           })}
         </ul>
       )}
-      <div className="flex flex-wrap gap-2 items-center">
-        <select value={wahl} onChange={ev => setWahl(ev.target.value)} aria-label={`${art} wählen`} className={auswahl}>
+      <div className="flex flex-wrap gap-2 items-end">
+        <Auswahl beschriftung={`${art} wählen`} beschriftungVerborgen value={wahl} onChange={ev => setWahl(ev.target.value)}>
           <option value="">{art} wählen …</option>
           {liste.filter(e => !(art === 'Instruktion' && IMMER_INSTRUKTIONEN.includes(e.name))).map(e => {
             const n = alle.filter(x => x === e.id).length; const voll = n >= hoechstens(e);
-            const v = voraussetzung(e); const fehlt = v && !namen.has(v);
-            return <option key={e.id} value={e.id} disabled={voll}>{fehlt ? '✗ ' : ''}{e.name}{e.daten.stufe_merkmal_golem ? ` (Golem ${e.daten.stufe_merkmal_golem})` : ''}{voll ? ' – bereits gewählt' : ''}</option>;
+            const v = voraussetzung(e); const fehlt = v && !namen.has(v); const z = bausteinInfo(e).zuschlag;
+            return <option key={e.id} value={e.id} disabled={voll}>{e.name}{z ? ` (Golem ${z})` : ''}{voll ? ' – bereits gewählt' : fehlt ? ` – setzt ${v} voraus` : ''}</option>;
           })}
-        </select>
-        <button type="button" disabled={!wahl} className={knopf} onClick={() => { aendern({ bausteine: [...alle, wahl] }); setWahl(''); }}><Plus size={12} />Hinzufügen</button>
+        </Auswahl>
+        <Knopf disabled={!wahl} onClick={() => { aendern({ bausteine: [...alle, wahl] }); setWahl(''); }}><Plus size={14} aria-hidden />Hinzufügen</Knopf>
       </div>
-      {wahl && <p className="text-schrift mt-1">{k.get(wahl)?.daten.beschreibung}</p>}
+      {wahl && <p>{bausteinInfo(k.get(wahl)).beschreibung}</p>}
+    </div>
+  );
+};
+
+/** Bedienbare Wahlen des Feinschliffs (Attribut, Meisterschaft, Fertigkeit, Punkte verteilen) */
+const Feinschliff: React.FC<{ k: Katalog; b: Begleiter; wahlen: GolemWahl[]; fertigkeiten: { id?: string; name: string; wert: number }[]; aendern: (a: Partial<Begleiter>) => void }> = ({ k, b, wahlen, fertigkeiten, aendern }) => {
+  const fs = b.feinschliff ?? {};
+  const setze = (schluessel: string, v: string | Record<string, number> | undefined) => {
+    const neu = { ...fs }; if (v === undefined || v === '') delete neu[schluessel]; else neu[schluessel] = v;
+    aendern({ feinschliff: Object.keys(neu).length ? neu : undefined });
+  };
+  const allgemein = useMemo(() => allgemeineFertigkeiten(k), [k]);
+  return (
+    <div className="space-y-3">
+      {wahlen.map(w => {
+        const v = fs[w.schluessel];
+        const label = `${w.quelle}: ${w.text}`;
+        if (w.art === 'attribut') return (
+          <Auswahl key={w.schluessel} beschriftung={label} value={typeof v === 'string' ? v : ''} onChange={ev => setze(w.schluessel, ev.target.value)}>
+            <option value="">Attribut wählen …</option>
+            {w.optionen.map(a => <option key={a} value={a}>{a} +{w.bonus}</option>)}
+          </Auswahl>
+        );
+        if (w.art === 'meisterschaft') {
+          const angebot = golemMeisterschaften(k, fertigkeiten, w.schwelle);
+          return (
+            <Auswahl key={w.schluessel} beschriftung={`${w.quelle}: freie Meisterschaft bis Schwelle ${w.schwelle}`} value={typeof v === 'string' ? v : ''} onChange={ev => setze(w.schluessel, ev.target.value)}>
+              <option value="">Meisterschaft wählen …</option>
+              {[...new Set(angebot.map(m => m.fertigkeit))].map(f => (
+                <optgroup key={f} label={f}>{angebot.filter(m => m.fertigkeit === f).map(m => <option key={m.id} value={m.id}>{m.name} (S{m.schwelle})</option>)}</optgroup>
+              ))}
+            </Auswahl>
+          );
+        }
+        if (w.art === 'fertigkeit') return (
+          <Auswahl key={w.schluessel} beschriftung={label} value={typeof v === 'string' ? v : ''} onChange={ev => setze(w.schluessel, ev.target.value)}>
+            <option value="">Fertigkeit wählen …</option>
+            {allgemein.map(e => { const hat = fertigkeiten.some(f => f.id === e.id); return <option key={e.id} value={e.id}>{e.name} ({hat ? `+${w.plus}` : `auf ${w.neu}`})</option>; })}
+          </Auswahl>
+        );
+        // Punkte verteilen
+        const verteilt = typeof v === 'object' ? v : {};
+        const summe = Object.values(verteilt).reduce((s, x) => s + x, 0);
+        return (
+          <div key={w.schluessel} className="space-y-2">
+            <p><span className="text-leise">{w.quelle}:</span> {w.text} – verteilt <Marke klein ton={summe > w.anzahl ? 'schaden' : summe === w.anzahl ? 'unverletzt' : 'neutral'}>{summe}/{w.anzahl}</Marke></p>
+            <div className="grid sm:grid-cols-2 gap-2">
+              {fertigkeiten.filter(f => f.id).map(f => {
+                const n = verteilt[f.id!] ?? 0;
+                const neu = (x: number) => { const o = { ...verteilt, [f.id!]: Math.max(0, x) }; if (!o[f.id!]) delete o[f.id!]; setze(w.schluessel, Object.keys(o).length ? o : undefined); };
+                return (
+                  <div key={f.id} className="flex items-center gap-2">
+                    <span className="min-w-[8rem]">{f.name}</span>
+                    <Knopf nurSymbol aria-label={`${f.name} weniger Punkte`} disabled={n <= 0} onClick={() => neu(n - 1)}><Minus size={16} aria-hidden /></Knopf>
+                    <span className="w-8 text-center font-titel">+{n}</span>
+                    <Knopf nurSymbol aria-label={`${f.name} mehr Punkte`} disabled={n >= w.max || summe >= w.anzahl} onClick={() => neu(n + 1)}><Plus size={16} aria-hidden /></Knopf>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 };
@@ -82,98 +148,83 @@ const GolemEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; besitzer
   if (b.golemRessource && !besitzer.golemPunkte.some(p => p >= g.stufe)) hinweise.push(`Ressource Golem ${g.stufe} nötig (1 Punkt je Stufe)`);
 
   return (
-    <li className="border border-rahmen rounded-knopf p-2 bg-flaeche">
-      {spiel.modale}
-      <div className="flex items-center justify-between gap-2 flex-wrap">
-        <button type="button" className="flex items-center gap-1 text-sm font-bold text-schrift cursor-pointer" onClick={() => setOffen(o => !o)} aria-expanded={offen}>
-          {offen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}{titel}
-        </button>
-        <span className="flex items-center gap-2 text-xs text-leise flex-wrap">
-          <VitalKurz spiel={spiel} daten={daten} />
-          <span className="px-1.5 rounded-knopf bg-erhoeht text-schrift font-bold">Golem {g.stufe}</span>
-          {b.material && <span>{k.get(b.material)?.name}</span>}
-          <span>{b.golemRessource ? 'Ressource Golem' : `${g.preis} L`}</span>
-          {hinweise.length > 0 && <span className="text-erschoepft flex items-center gap-0.5" title={hinweise.join('\n')}><AlertTriangle size={12} />{hinweise.length}</span>}
-          {!g.korpus && <span className="text-erschoepft">nicht im Katalog („Die Magie“ geladen?)</span>}
-          <button type="button" aria-label={`${titel} entfernen`} onClick={() => dispatch({ type: 'BEGLEITER_ENTFERNEN', payload: { index } })}
-            className="p-1 rounded-knopf hover:bg-black/5 hover:text-schaden cursor-pointer"><Trash2 size={14} /></button>
-        </span>
-      </div>
-
-      {offen && g.korpus && (
-        <div className="mt-2 space-y-3 text-xs">
-          <div className="flex flex-wrap gap-3 items-end">
-            <label className="flex flex-col gap-0.5">Rufname
-              <input value={b.rufname ?? ''} onChange={ev => aendern({ rufname: ev.target.value || undefined })} className={auswahl} placeholder="Name" />
-            </label>
-            <label className="flex flex-col gap-0.5">Material (Schritt 2)
-              <select value={b.material ?? ''} onChange={ev => aendern({ material: ev.target.value || undefined })} className={auswahl} aria-label="Golemmaterial">
-                <option value="">Material wählen …</option>
-                {materialien(k).map(m => <option key={m.id} value={m.id}>{m.name} ({m.daten.felder?.modifikationen}; Schwachpunkt {m.daten.felder?.schwachpunkt})</option>)}
-              </select>
-            </label>
-            <label className="flex items-center gap-1" title="Großer Ritus: dauerhaft animiert, eine Applikation je Stufe (Die Magie S. 203)">
-              <input type="checkbox" checked={!!b.golemRessource} onChange={ev => aendern({ golemRessource: ev.target.checked || undefined })} />
-              über Ressource Golem (Großer Ritus)
-            </label>
-          </div>
-
-          <p className="text-schrift">
-            <strong>Stufe Golem {g.stufe}</strong> = {g.stufePosten.map(p => `${p.text} ${p.wert}`).join(' + ')}.{' '}
-            {g.animierung ? <>Kleiner Ritus: <strong>{g.animierung.name}</strong>{kennt ? ' (bekannt)' : ''}. </> : 'Kein Animierungszauber für diese Stufe. '}
-            Konstruktion: Handwerk/Edelhandwerk gegen {g.konstruktion.schwierigkeit}, {g.konstruktion.fortschritt} Fortschrittspunkte
-            {besitzer.konstrukteur ? '' : ' (Meisterschaft Konstrukteur nötig)'}; Unterweisung (Arkane Kunde) ebenso.{' '}
-            {!b.golemRessource && <>Kaufpreis {g.preis} L.</>}
-            {g.materialSchwachpunkt && <> Schwachpunkt des Materials: {g.materialSchwachpunkt}.</>}
-          </p>
-
-          {wk && <BegleiterVitals spiel={spiel} daten={daten} />}
-          {wk && <Werte w={wk} aktionen={spiel.aktionen} />}
-
-          <BausteinGruppe k={k} art="Zusätzliche Fähigkeit" b={b} aendern={aendern} />
-          <BausteinGruppe k={k} art="Rolle" b={b} aendern={aendern} info="Mehrfach wählbar und kombinierbar; Kämpfer setzt Aggressiv voraus." />
-          <BausteinGruppe k={k} art="Applikation" b={b} aendern={aendern}
-            info={<>Gewählt {g.gewaehlt.Applikation.length}, frei {g.applikationenFrei}{b.golemRessource ? ' (eine je Stufe)' : ' (zwei automatisch)'}; jede weitere: +1 Schwierigkeit, +3 Fortschrittspunkte und ein weiterer Schwachpunkt.</>} />
-          <BausteinGruppe k={k} art="Schwachpunkt" b={b} aendern={aendern} info={<>Nötig: {g.schwachpunkteNoetig} zusätzlich zum Material.</>} />
-          <BausteinGruppe k={k} art="Instruktion" b={b} aendern={aendern} info={<>Implementierbar: {g.instruktionenErlaubt} (eine, weitere über „Zusätzliche Instruktion“).</>} />
-          <BausteinGruppe k={k} art="Verfügung" b={b} aendern={aendern}
-            info={g.verfuegungenAktiv !== null ? <>Aktiv höchstens {g.verfuegungenAktiv} (Stufe des Merkmals Golem, mind. 1).</> : 'Beim Kleinen Ritus über die Verstärkung des Animierungszaubers.'} />
-
-          {g.sonderausstattungPlaetze > 0 && (
-            <div>
-              <h4 className="font-bold text-gold-hell mb-1">Sonderausstattung (eine je zwei Stufen)</h4>
-              <div className="flex flex-wrap gap-2">
-                {Array.from({ length: g.sonderausstattungPlaetze }, (_, i) => (
-                  <select key={i} value={b.sonderausstattung?.[i] ?? ''} aria-label={`Sonderausstattung ${i + 1}`} className={auswahl}
-                    onChange={ev => { const l = [...(b.sonderausstattung ?? [])]; l[i] = ev.target.value; aendern({ sonderausstattung: l }); }}>
-                    <option value="">wählen …</option>
-                    {sa.map(z => (
-                      <optgroup key={z.material} label={z.material}>
-                        {z.optionen.map(o => <option key={o} value={o}>{o}</option>)}
-                      </optgroup>
-                    ))}
-                  </select>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {g.feinschliff.length > 0 && (
-            <div>
-              <h4 className="font-bold text-gold-hell mb-1">Feinschliff (Schritt 5, Spielleitung)</h4>
-              <ul className="list-disc pl-4 text-schrift">{g.feinschliff.map((t, i) => <li key={i}>{t}</li>)}</ul>
-              <p className="text-leise">Freie Fertigkeitspunkte nur auf allgemeine Fertigkeiten, die der Golem besitzt; freie Meisterschaften bis Schwelle {g.meisterschaftSchwelle}.</p>
-            </div>
-          )}
-
-          {hinweise.length > 0 && <ul className="text-erschoepft list-disc pl-4">{hinweise.map((h, i) => <li key={i}>{h}</li>)}</ul>}
-
-          <label className="flex flex-col gap-0.5">Notiz
-            <textarea value={b.notiz ?? ''} onChange={ev => aendern({ notiz: ev.target.value || undefined })} rows={2} className={`${auswahl} w-full`} />
+    <Eintrag titel={titel} offen={offen} umschalten={() => setOffen(o => !o)} vor={spiel.modale}
+      onEntfernen={() => dispatch({ type: 'BEGLEITER_ENTFERNEN', payload: { index } })}
+      marken={<>
+        <VitalKurz spiel={spiel} daten={daten} />
+        <Marke klein>Golem {g.stufe}</Marke>
+        {b.material && <span>{k.get(b.material)?.name}</span>}
+        <span>{b.golemRessource ? 'Ressource Golem' : `${g.preis} L`}</span>
+        {hinweise.length > 0 && <Marke klein ton="erschoepft" title={hinweise.join('\n')}>{hinweise.length} Hinweis{hinweise.length > 1 ? 'e' : ''}</Marke>}
+        {!g.korpus && <Marke klein ton="erschoepft">nicht im Katalog („Die Magie“ geladen?)</Marke>}
+      </>}>
+      {g.korpus && <>
+        <div className="flex flex-wrap gap-3 items-end">
+          <Eingabe beschriftung="Rufname" value={b.rufname ?? ''} onChange={ev => aendern({ rufname: ev.target.value || undefined })} placeholder="Name" />
+          <Auswahl beschriftung="Golemmaterial (Schritt 2)" value={b.material ?? ''} onChange={ev => aendern({ material: ev.target.value || undefined })}>
+            <option value="">Material wählen …</option>
+            {materialien(k).map(m => <option key={m.id} value={m.id}>{m.name} ({materialInfo(m)})</option>)}
+          </Auswahl>
+          <label className="flex items-center gap-2 min-h-11" title="Großer Ritus: dauerhaft animiert, eine Applikation je Stufe (Die Magie S. 203)">
+            <input type="checkbox" className="w-5 h-5 accent-gold" checked={!!b.golemRessource} onChange={ev => aendern({ golemRessource: ev.target.checked || undefined })} />
+            über Ressource Golem (Großer Ritus)
           </label>
         </div>
-      )}
-    </li>
+
+        <p>
+          <strong>Stufe Golem {g.stufe}</strong> = {g.stufePosten.map(p => `${p.text} ${p.wert}`).join(' + ')}.{' '}
+          {g.animierung ? <>Kleiner Ritus: <strong>{g.animierung.name}</strong>{kennt ? ' (bekannt)' : ''}. </> : 'Kein Animierungszauber für diese Stufe. '}
+          Konstruktion: Handwerk/Edelhandwerk gegen {g.konstruktion.schwierigkeit}, {g.konstruktion.fortschritt} Fortschrittspunkte
+          {besitzer.konstrukteur ? '' : ' (Meisterschaft Konstrukteur nötig)'}; Unterweisung (Arkane Kunde) ebenso.{' '}
+          {!b.golemRessource && <>Kaufpreis {g.preis} L.</>}
+          {g.materialSchwachpunkt && <> Schwachpunkt des Materials: {g.materialSchwachpunkt}.</>}
+        </p>
+
+        {wk && <BegleiterVitals spiel={spiel} daten={daten} />}
+        {wk && <Werte w={wk} aktionen={spiel.aktionen} />}
+
+        <BausteinGruppe k={k} art="Zusätzliche Fähigkeit" b={b} aendern={aendern} />
+        <BausteinGruppe k={k} art="Rolle" b={b} aendern={aendern} info="Mehrfach wählbar und kombinierbar; Kämpfer setzt Aggressiv voraus." />
+        <BausteinGruppe k={k} art="Applikation" b={b} aendern={aendern}
+          info={<>Gewählt {g.gewaehlt.Applikation.length}, frei {g.applikationenFrei}{b.golemRessource ? ' (eine je Stufe)' : ' (zwei automatisch)'}; jede weitere: +1 Schwierigkeit, +3 Fortschrittspunkte und ein weiterer Schwachpunkt.</>} />
+        <BausteinGruppe k={k} art="Schwachpunkt" b={b} aendern={aendern} info={<>Nötig: {g.schwachpunkteNoetig} zusätzlich zum Material.</>} />
+        <BausteinGruppe k={k} art="Instruktion" b={b} aendern={aendern} info={<>Implementierbar: {g.instruktionenErlaubt} (eine, weitere über „Zusätzliche Instruktion“).</>} />
+        <BausteinGruppe k={k} art="Verfügung" b={b} aendern={aendern}
+          info={g.verfuegungenAktiv !== null ? <>Aktiv höchstens {g.verfuegungenAktiv} (Stufe des Merkmals Golem, mind. 1).</> : 'Beim Kleinen Ritus über die Verstärkung des Animierungszaubers.'} />
+
+        {g.sonderausstattungPlaetze > 0 && (
+          <div className="space-y-2">
+            <Titel3>Sonderausstattung (eine je zwei Stufen)</Titel3>
+            <div className="flex flex-wrap gap-3">
+              {Array.from({ length: g.sonderausstattungPlaetze }, (_, i) => (
+                <Auswahl key={i} beschriftung={`Sonderausstattung ${i + 1}`} value={b.sonderausstattung?.[i] ?? ''}
+                  onChange={ev => { const l = [...(b.sonderausstattung ?? [])]; l[i] = ev.target.value; aendern({ sonderausstattung: l }); }}>
+                  <option value="">wählen …</option>
+                  {sa.map(z => (
+                    <optgroup key={z.material} label={z.material}>
+                      {z.optionen.map(o => <option key={o} value={o}>{o}</option>)}
+                    </optgroup>
+                  ))}
+                </Auswahl>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {(g.wahlen.length > 0 || g.feinschliff.length > 0) && (
+          <div className="space-y-2">
+            <Titel3>Feinschliff (Schritt 5)</Titel3>
+            {g.wahlen.length > 0 && <Feinschliff k={k} b={b} wahlen={g.wahlen} fertigkeiten={g.werte?.fertigkeiten ?? []} aendern={aendern} />}
+            {g.feinschliff.length > 0 && (
+              <div><span className="text-leise">Für die Spielleitung:</span><ul className="list-disc pl-6">{g.feinschliff.map((t, i) => <li key={i}>{t}</li>)}</ul></div>
+            )}
+          </div>
+        )}
+
+        <Hinweise liste={hinweise} />
+        <Notiz b={b} aendern={aendern} />
+      </>}
+    </Eintrag>
   );
 };
 
@@ -190,34 +241,33 @@ export const GolemAbschnitt: React.FC<{ k: Katalog }> = ({ k }) => {
   const eigene = (state.begleiter ?? []).map((b, i) => ({ b, i })).filter(x => x.b.art === 'golem');
 
   return (
-    <section className={karte} data-testid="begleiter-golems">
-      <div className="flex items-center gap-2 mb-2">
-        <Bot size={18} className="text-schrift" />
-        <h3 className="font-bold text-base text-gold-hell">Golems</h3>
+    <Karte data-testid="begleiter-golems" className="space-y-3">
+      <div className="flex items-center gap-2">
+        <Bot size={18} aria-hidden />
+        <Abschnittstitel>Golems</Abschnittstitel>
       </div>
       {liste.length === 0 ? (
-        <p className="text-xs text-leise">Der Golem-Baukasten steht im Buchpaket „Die Magie“ (Einstellungen → Regelpakete).</p>
+        <p className="text-sm text-leise">Der Golem-Baukasten steht im Buchpaket „Die Magie“ (Einstellungen → Regelpakete).</p>
       ) : (
         <>
-          <p className="text-xs text-leise mb-3">
+          <p className="text-sm text-leise">
             Baukasten nach Die Magie S. 205–207: Korpus, Material, Zusätzliche Fähigkeiten, Rollen, Feinschliff. Gekauft oder selbst gebaut
             (Kleiner Ritus mit Animierungszauber) oder dauerhaft über die Ressource Golem (1 Punkt je Stufe).
             {besitzer.golemPunkte.length > 0 && <> Ressource Golem: {besitzer.golemPunkte.join(', ')}.</>}
           </p>
-          {eigene.length > 0 && <ul className="space-y-2 mb-3">{eigene.map(({ b, i }) => <GolemEintrag key={`${b.id}-${i}`} k={k} b={b} index={i} besitzer={besitzer} />)}</ul>}
-          <div className="flex flex-wrap gap-2 items-center">
-            <select value={wahl} onChange={e => setWahl(e.target.value)} aria-label="Korpus wählen" className={auswahl}>
+          {eigene.length > 0 && <ul className="space-y-3">{eigene.map(({ b, i }) => <GolemEintrag key={`${b.id}-${i}`} k={k} b={b} index={i} besitzer={besitzer} />)}</ul>}
+          <div className="flex flex-wrap gap-2 items-end">
+            <Auswahl beschriftung="Korpus wählen" beschriftungVerborgen value={wahl} onChange={e => setWahl(e.target.value)}>
               <option value="">Korpus wählen …</option>
-              {liste.map(e => <option key={e.id} value={e.id}>{e.name} (Golem {korpusStufe(e)}, GK {e.daten.werte?.abgeleitete_werte?.GK})</option>)}
-            </select>
-            <button type="button" disabled={!wahl} className={knopf}
+              {liste.map(e => <option key={e.id} value={e.id}>{e.name} (Golem {korpusStufe(e)}, GK {korpusGK(e)})</option>)}
+            </Auswahl>
+            <Knopf art="sekundaer" disabled={!wahl}
               onClick={() => { dispatch({ type: 'BEGLEITER_HINZU', payload: { id: wahl, art: 'golem', name: k.get(wahl)!.name } }); setWahl(''); }}>
-              <Plus size={12} />Golem hinzufügen
-            </button>
+              <Plus size={14} aria-hidden />Golem hinzufügen
+            </Knopf>
           </div>
         </>
       )}
-    </section>
+    </Karte>
   );
 };
-

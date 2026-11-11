@@ -71,8 +71,12 @@ export interface UntotWerte {
   epGesamt: number; epVerbraucht: number;
   posten: { text: string; ep: number }[];
   grenze: number;
-  freieMeisterschaften: { fertigkeit: string; schwelle: number }[];
+  /** ein Platz je erreichter Schwelle einer gesteigerten Fertigkeit */
+  freieMeisterschaften: { fertigkeitId: string; fertigkeit: string; schwelle: number }[];
+  /** gewählte freie Meisterschaften (b.meisterschaften) mit Platzprüfung */
+  meisterschaften: { id: string; name: string; fertigkeit: string; schwelle: number; ok: boolean }[];
   abnormitaet: Eintrag | null;
+  abnormitaetText: string;
   hinweise: string[];
   /** Hinweise, die ein Regelverstoß sind */
   verstoesse: Verstoss[];
@@ -93,15 +97,26 @@ export function untotWerte(k: Katalog, b: Begleiter, opt: { nekromant: boolean; 
   const st = b.steigerung ?? {};
   const posten: { text: string; ep: number }[] = [];
   for (const [a, n] of Object.entries(st.attribute ?? {})) if (n > 0) posten.push({ text: `${a} +${n}`, ep: attributKosten(n) });
-  const freieMeisterschaften: { fertigkeit: string; schwelle: number }[] = [];
+  const freieMeisterschaften: UntotWerte['freieMeisterschaften'] = [];
   for (const [f, n] of Object.entries(st.fertigkeiten ?? {})) {
     if (n <= 0) continue;
     const name = f === ANGRIFF ? 'Angriff' : k.get(f)?.name ?? f;
     posten.push({ text: `${name} +${n}`, ep: fertigkeitKosten(n) });
     if (n > grenze) verstoss(`${name}: höchstens ${grenze} neue Punkte (Zaubergrad ${grad})`, `grenze:${f}`, n - grenze);
     if (f !== ANGRIFF && (INTELLEKTUELL.includes(f) || k.get(f)?.daten.kategorie === 'Magieschule')) verstoss(`${name} kann ein erhobener Untoter nicht steigern`, `nicht:${f}`, n);
-    const s = freieSchwelle(n); if (s) freieMeisterschaften.push({ fertigkeit: name, schwelle: s });
+    if (f !== ANGRIFF) for (let j = 1; j <= freieSchwelle(n); j++) freieMeisterschaften.push({ fertigkeitId: f, fertigkeit: name, schwelle: j });
   }
+  // gewählte freie Meisterschaften: je Platz eine, Schwelle höchstens die des Platzes
+  const frei = [...freieMeisterschaften];
+  const meisterschaften = (b.meisterschaften ?? []).map(id => {
+    const m = k.get(id); const f: string = m?.daten.fertigkeit ?? ''; const sw = Number(m?.daten.schwelle) || 1;
+    const i = frei.filter(p => p.fertigkeitId === f && p.schwelle >= sw).sort((x, y) => x.schwelle - y.schwelle)[0];
+    if (i) frei.splice(frei.indexOf(i), 1);
+    return { id, name: m?.name ?? id, fertigkeit: k.get(f)?.name ?? f, schwelle: sw, ok: !!i };
+  });
+  const ohnePlatz = meisterschaften.filter(m => !m.ok).length;
+  if (ohnePlatz) verstoss(`${ohnePlatz} Meisterschaft(en) ohne freien Platz (Fertigkeit nicht genug gesteigert)`, 'meisterschaften', ohnePlatz);
+
   const abnormitaet = b.abnormitaet ? k.get(b.abnormitaet) ?? null : null;
   if (abnormitaet) {
     posten.push({ text: `Abnormität ${abnormitaet.name}`, ep: Number(abnormitaet.daten.kosten_ep) || 5 });
@@ -133,7 +148,8 @@ export function untotWerte(k: Katalog, b: Begleiter, opt: { nekromant: boolean; 
     fertigkeiten.sort((x, y) => x.name.localeCompare(y.name, 'de'));
     const angriff = (st.fertigkeiten?.[ANGRIFF] ?? 0) + gek('BEW') + gek('STÄ');
     const waffen = w.waffen.map(x => ({ ...x, wert: x.wert + angriff }));
-    werte = { ...w, attribute, abgeleitet, fertigkeiten, waffen };
+    const gewaehlt = meisterschaften.filter(m => m.ok).map(m => `${m.fertigkeit} (${m.name})`);
+    werte = { ...w, attribute, abgeleitet, fertigkeiten, waffen, meisterschaften: [w.meisterschaften, ...gewaehlt].filter(Boolean).join(', ') || undefined };
     if (abnormitaet) {
       const m = leseModifikationen(k, abnormitaet.daten.modifikationen);
       werte = anwenden(k, werte, m);
@@ -141,7 +157,19 @@ export function untotWerte(k: Katalog, b: Begleiter, opt: { nekromant: boolean; 
   } else if (wertesatz) {
     hinweise.push(`Wertesatz ${wertesatz.name} steht nicht in den Regelpaketen – Werte aus ${wertesatz.quelle}`);
   }
-  return { erhebung, wertesatz, werte, epGesamt, epVerbraucht, posten, grenze, freieMeisterschaften, abnormitaet, hinweise, verstoesse };
+  return { erhebung, wertesatz, werte, epGesamt, epVerbraucht, posten, grenze, freieMeisterschaften, meisterschaften, abnormitaet, abnormitaetText: String(abnormitaet?.daten.beschreibung ?? ''), hinweise, verstoesse };
 }
 
 export const abnormitaeten = (k: Katalog) => Object.values(k.eintraege).filter(e => e.typ === 'abnormitaet').sort((a, b) => a.name.localeCompare(b.name, 'de'));
+
+/** Meisterschaften einer Fertigkeit bis zu einer Schwelle (für die freien Plätze) */
+export function meisterschaftenBis(k: Katalog, fertigkeit: string, schwelle: number) {
+  return Object.values(k.eintraege).filter(e => e.typ === 'meisterschaft' && e.daten.fertigkeit === fertigkeit && (Number(e.daten.schwelle) || 1) <= schwelle)
+    .map(e => ({ id: e.id, name: e.name, schwelle: Number(e.daten.schwelle) || 1 })).sort((a, b) => a.schwelle - b.schwelle || a.name.localeCompare(b.name, 'de'));
+}
+
+/** Fertigkeiten, die ein erhobener Untoter steigern darf (ohne Magieschulen und „intellektuelle“ Fertigkeiten) */
+export function steigerbareFertigkeiten(k: Katalog) {
+  return Object.values(k.eintraege).filter(e => e.typ === 'fertigkeit' && !e.daten.gruppierte_fertigkeit
+    && e.daten.kategorie !== 'Magieschule' && !INTELLEKTUELL.includes(e.id)).sort((x, y) => x.name.localeCompare(y.name, 'de'));
+}

@@ -1,6 +1,6 @@
 import { regelverstoss } from '../../fundament/hausregeln';
 import React, { useMemo, useState } from 'react';
-import { PawPrint, Plus, Trash2, ChevronDown, ChevronRight, X, Check, AlertTriangle, HelpCircle } from 'lucide-react';
+import { PawPrint, Plus, X } from 'lucide-react';
 import { useCharacter } from '../../context/CharacterContext';
 import {
   abrichtungen as alleAbrichtungen, alleTiere, istReittier, kreaturStufe, potenzial, potenzialVerbraucht, pruefeAbrichtung,
@@ -12,7 +12,8 @@ import type { Katalog } from '../../regelwerk/katalog';
 import type { Ergebnis } from '../../regelwerk/typen';
 import type { Begleiter } from '../../types';
 import { HELDENGRADE } from '../../data/rules';
-import { Werte, auswahl, karte, knopf } from './Wertekasten';
+import { Werte, Eintrag, Hinweise, Notiz } from './Wertekasten';
+import { Abschnittstitel, Auswahl, Eingabe, Karte, Knopf, Marke } from '../../fundament';
 import { BegleiterVitals, VitalKurz, spielDaten, useBegleiterSpiel } from './BegleiterSpiel';
 
 interface Fuehrer {
@@ -44,11 +45,13 @@ export function kreaturZuordnung(ressourcen: number[], tiere: number[]): boolean
   return t.length <= r.length && t.every((x, i) => x <= r[i]);
 }
 
+/** Ergebnis einer Voraussetzung als Marke: Wort und Rahmen, nicht nur Farbe */
 const Status: React.FC<{ e: Ergebnis; text?: string }> = ({ e, text }) => (
-  e === true ? <Check size={13} className="text-unverletzt shrink-0" aria-label="Voraussetzung erfüllt" />
-    : e === false ? <span title={text ? `Voraussetzung: ${text}` : undefined}><AlertTriangle size={13} className="text-erschoepft shrink-0" aria-label="Voraussetzung nicht erfüllt" /></span>
-      : <span title={text ? `Spielleitung: ${text}` : undefined}><HelpCircle size={13} className="text-leise shrink-0" aria-label="Entscheidung der Spielleitung" /></span>
+  e === true ? <Marke ton="unverletzt" klein>erfüllt</Marke>
+    : e === false ? <Marke ton="erschoepft" klein title={text ? `Voraussetzung: ${text}` : undefined}>nicht erfüllt</Marke>
+      : <Marke klein title={text ? `Spielleitung: ${text}` : undefined}>Spielleitung</Marke>
 );
+const ergebnisWort = (e: Ergebnis) => (e === true ? '' : e === false ? ' – Voraussetzung fehlt' : ' – Spielleitung');
 
 const TierEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; f: Fuehrer; liste: AbrichtungsInfo[] }> = ({ k, b, index, f, liste }) => {
   const { dispatch } = useCharacter();
@@ -77,123 +80,103 @@ const TierEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; f: Fuehre
     return { a, voll: n >= grenze, ergebnis: pruefeAbrichtung(k, a, f.char, tierTraeger(k, b), n) };
   });
   const gruppen = [...new Set(liste.map(a => a.gruppe))];
+  const titel = b.rufname ? `${b.rufname} (${b.name})` : b.name;
 
   return (
-    <li className="border border-rahmen rounded-knopf p-2 bg-flaeche">
-      {spiel.modale}
-      <div className="flex items-center justify-between gap-2 flex-wrap">
-        <button type="button" className="flex items-center gap-1 text-sm font-bold text-schrift cursor-pointer" onClick={() => setOffen(o => !o)} aria-expanded={offen}>
-          {offen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}{b.rufname ? `${b.rufname} (${b.name})` : b.name}
-        </button>
-        <span className="flex items-center gap-2 text-xs text-leise flex-wrap">
-          <VitalKurz spiel={spiel} daten={daten} />
-          {reittier && <span className="px-1.5 rounded-knopf bg-erhoeht text-schrift font-bold">Reittier</span>}
-          {b.vertrauter && <span className="px-1.5 rounded-knopf bg-erhoeht text-schrift font-bold">Vertrauter</span>}
-          {b.kreatur ? `Kreatur ${b.kreatur}` : 'ohne Ressource'}
-          {liste.length > 0 && <span className={verbraucht > pot.gesamt ? 'text-schaden font-bold' : ''}>Potenzial {verbraucht}/{pot.gesamt}</span>}
-          {!e && <span className="text-erschoepft">nicht im Katalog (Buch nicht geladen?)</span>}
-          {b.kreatur !== undefined && b.kreatur > 0 && st !== null && st > b.kreatur && <span className="text-erschoepft">braucht Kreatur {st}</span>}
-          <button type="button" aria-label={`${b.name} entfernen`} onClick={() => dispatch({ type: 'BEGLEITER_ENTFERNEN', payload: { index } })}
-            className="p-1 rounded-knopf hover:bg-black/5 hover:text-schaden cursor-pointer"><Trash2 size={14} /></button>
-        </span>
+    <Eintrag titel={titel} offen={offen} umschalten={() => setOffen(o => !o)} vor={spiel.modale}
+      onEntfernen={() => dispatch({ type: 'BEGLEITER_ENTFERNEN', payload: { index } })}
+      marken={<>
+        <VitalKurz spiel={spiel} daten={daten} />
+        {reittier && <Marke klein>Reittier</Marke>}
+        {b.vertrauter && <Marke klein>Vertrauter</Marke>}
+        <span>{b.kreatur ? `Kreatur ${b.kreatur}` : 'ohne Ressource'}</span>
+        {liste.length > 0 && <Marke klein ton={verbraucht > pot.gesamt ? 'schaden' : 'neutral'}>Potenzial {verbraucht}/{pot.gesamt}</Marke>}
+        {!e && <Marke klein ton="erschoepft">nicht im Katalog (Buch nicht geladen?)</Marke>}
+        {b.kreatur !== undefined && b.kreatur > 0 && st !== null && st > b.kreatur && <Marke klein ton="erschoepft">braucht Kreatur {st}</Marke>}
+      </>}>
+      <div className="flex flex-wrap gap-3 items-end">
+        <Eingabe beschriftung="Rufname" value={b.rufname ?? ''} onChange={ev => aendern({ rufname: ev.target.value || undefined })} placeholder={b.name} />
+        <Auswahl beschriftung="Ressource Kreatur" value={b.kreatur ?? 0} onChange={ev => aendern({ kreatur: Number(ev.target.value) || undefined })}>
+          <option value={0}>keine (gekauft, gezähmt …)</option>
+          {[...new Set([...f.kreatur, b.kreatur ?? 0])].filter(x => x > 0).sort((x, y) => x - y).map(x => <option key={x} value={x}>Kreatur {x}</option>)}
+        </Auswahl>
+        <Auswahl beschriftung="Qualität" value={b.qualitaet ?? 1} onChange={ev => aendern({ qualitaet: Number(ev.target.value) > 1 ? Number(ev.target.value) : undefined })}>
+          {TIER_QUALITAET.map(q => <option key={q.potenzial} value={q.potenzial}>{q.name} (Potenzial {q.potenzial})</option>)}
+        </Auswahl>
+        <label className={`flex items-center gap-2 min-h-11 ${f.tiervertrauter || b.vertrauter ? '' : 'text-leise'}`} title={f.tiervertrauter ? undefined : 'Erfordert die Stärke Tiervertrauter'}>
+          <input type="checkbox" className="w-5 h-5 accent-gold" checked={!!b.vertrauter} disabled={!f.tiervertrauter && !b.vertrauter} onChange={ev => aendern({ vertrauter: ev.target.checked || undefined })} />
+          Vertrauter (Stärke Tiervertrauter)
+        </label>
       </div>
 
-      {offen && (
-        <div className="mt-2 space-y-3">
-          <div className="flex flex-wrap gap-3 items-end text-xs">
-            <label className="flex flex-col gap-0.5">Rufname
-              <input value={b.rufname ?? ''} onChange={ev => aendern({ rufname: ev.target.value || undefined })} className={auswahl} placeholder={b.name} />
-            </label>
-            <label className="flex flex-col gap-0.5">Ressource Kreatur
-              <select value={b.kreatur ?? 0} onChange={ev => aendern({ kreatur: Number(ev.target.value) || undefined })} className={auswahl}>
-                <option value={0}>keine (gekauft, gezähmt …)</option>
-                {[...new Set([...f.kreatur, b.kreatur ?? 0])].filter(x => x > 0).sort((x, y) => x - y).map(x => <option key={x} value={x}>Kreatur {x}</option>)}
-              </select>
-            </label>
-            <label className="flex flex-col gap-0.5">Qualität
-              <select value={b.qualitaet ?? 1} onChange={ev => aendern({ qualitaet: Number(ev.target.value) > 1 ? Number(ev.target.value) : undefined })} className={auswahl}>
-                {TIER_QUALITAET.map(q => <option key={q.potenzial} value={q.potenzial}>{q.name} (Potenzial {q.potenzial})</option>)}
-              </select>
-            </label>
-            <label className={`flex items-center gap-1 ${f.tiervertrauter || b.vertrauter ? '' : 'opacity-50'}`} title={f.tiervertrauter ? undefined : 'Erfordert die Stärke Tiervertrauter'}>
-              <input type="checkbox" checked={!!b.vertrauter} disabled={!f.tiervertrauter && !b.vertrauter} onChange={ev => aendern({ vertrauter: ev.target.checked || undefined })} />
-              Vertrauter (Stärke Tiervertrauter)
-            </label>
-          </div>
+      {w && <BegleiterVitals spiel={spiel} daten={daten} />}
+      {e ? (w ? <Werte w={w} aktionen={spiel.aktionen} /> : <p className="text-leise">Keine Werte im Katalog.</p>) : null}
 
-          {w && <BegleiterVitals spiel={spiel} daten={daten} />}
-          {e ? (w ? <Werte w={w} aktionen={spiel.aktionen} /> : <p className="text-xs text-leise">Keine Werte im Katalog.</p>) : null}
-
-          <div>
-            <h4 className="text-xs font-bold text-gold-hell mb-1">Abrichtungen</h4>
-            {liste.length === 0 ? (
-              <p className="text-xs text-leise">Abrichtungen und Potenzial stehen im Buchpaket „Bestienmeister“ (Einstellungen → Regelpakete).</p>
-            ) : (
-              <>
-                <p className="text-xs text-leise mb-1">
-                  Potenzial {pot.gesamt} = {pot.posten.map(p => `${p.text} ${p.wert}`).join(' + ')}; verbraucht {verbraucht} (Bestienmeister S. 15).
-                  {verbraucht > pot.gesamt && <strong className="block text-schaden">Mehr Abrichtungen, als das Potenzial erlaubt.</strong>}
-                </p>
-                {gewaehlt.length > 0 && (
-                  <ul className="text-xs space-y-1 mb-2">
-                    {gewaehlt.map((id, i) => {
-                      const a = info.get(id);
-                      return (
-                        <li key={`${id}-${i}`} className="border-l-2 border-gold pl-2">
-                          <div className="flex items-center gap-1">
-                            <Status e={pruefung[i]} text={a?.voraussetzung?.text} />
-                            <button type="button" className="font-bold text-schrift cursor-pointer text-left" onClick={() => setText(t => ({ ...t, [i]: !t[i] }))}>
-                              {a?.name ?? k.get(id)?.name ?? id}
-                            </button>
-                            <span className="text-leise">{a ? `${a.grundausbildung ? 'Grundausbildung, ' : ''}${a.kosten} P.` : 'nicht im Katalog'}</span>
-                            <button type="button" aria-label={`Abrichtung ${a?.name ?? id} entfernen`} onClick={() => aendern({ abrichtungen: gewaehlt.filter((_, j) => j !== i) })}
-                              className="ml-auto p-0.5 rounded-knopf hover:bg-black/5 hover:text-schaden cursor-pointer"><X size={12} /></button>
-                          </div>
-                          {text[i] && a && <p className="text-schrift mt-0.5">{a.beschreibung}{a.voraussetzung ? <span className="block text-leise">Voraussetzung: {a.voraussetzung.text}</span> : null}</p>}
-                        </li>
-                      );
-                    })}
-                  </ul>
-                )}
-                <div className="flex flex-wrap gap-2 items-center">
-                  <select value={wahl} onChange={ev => setWahl(ev.target.value)} aria-label="Abrichtung wählen" className={auswahl}>
-                    <option value="">Abrichtung wählen …</option>
-                    {gruppen.map(g => (
-                      <optgroup key={g} label={g}>
-                        {angebot.filter(x => x.a.gruppe === g).map(({ a, voll, ergebnis }) => (
-                          <option key={a.id} value={a.id} disabled={voll}>
-                            {ergebnis === true ? '✓ ' : ergebnis === false ? '✗ ' : '? '}{a.name} ({a.kosten} P.{a.quelle !== 'Bestienmeister' ? `, ${a.quelle}` : ''}){voll ? ' – bereits gewählt' : ''}
-                          </option>
-                        ))}
-                      </optgroup>
-                    ))}
-                  </select>
-                  <button type="button" disabled={!wahl} className={knopf} onClick={() => { if (angebot.find(x => x.a.id === wahl)?.ergebnis === false && regelverstoss('Die Voraussetzung dieser Abrichtung ist nicht erfüllt.')) return; aendern({ abrichtungen: [...gewaehlt, wahl] }); setWahl(''); }}>
-                    <Plus size={12} />Abrichtung hinzufügen
-                  </button>
-                </div>
-                {wahl && (() => {
-                  const x = angebot.find(y => y.a.id === wahl); if (!x) return null;
+      <div className="space-y-2">
+        <Abschnittstitel als="h3" className="text-[15px]">Abrichtungen</Abschnittstitel>
+        {liste.length === 0 ? (
+          <p className="text-leise">Abrichtungen und Potenzial stehen im Buchpaket „Bestienmeister“ (Einstellungen → Regelpakete).</p>
+        ) : (
+          <>
+            <p className="text-leise">
+              Potenzial {pot.gesamt} = {pot.posten.map(p => `${p.text} ${p.wert}`).join(' + ')}; verbraucht {verbraucht} (Bestienmeister S. 15).
+            </p>
+            {verbraucht > pot.gesamt && <Hinweise liste={['Mehr Abrichtungen, als das Potenzial erlaubt.']} />}
+            {gewaehlt.length > 0 && (
+              <ul className="space-y-2">
+                {gewaehlt.map((id, i) => {
+                  const a = info.get(id);
                   return (
-                    <p className="text-xs text-schrift mt-1">
-                      {x.a.beschreibung}
-                      {x.a.voraussetzung && <span className={`block ${x.ergebnis === false ? 'text-erschoepft' : 'text-leise'}`}>
-                        Voraussetzung: {x.a.voraussetzung.text}{x.ergebnis === false ? ' – nicht erfüllt' : x.ergebnis === 'offen' ? ' – Entscheidung der Spielleitung' : ''}
-                      </span>}
-                    </p>
+                    <li key={`${id}-${i}`} className="border-l-2 border-rahmen pl-3">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <Knopf className="border-transparent! bg-transparent! hover:bg-erhoeht! px-1 font-bold" aria-expanded={!!text[i]} onClick={() => setText(t => ({ ...t, [i]: !t[i] }))}>
+                          {a?.name ?? k.get(id)?.name ?? id}
+                        </Knopf>
+                        <Status e={pruefung[i]} text={a?.voraussetzung?.text} />
+                        <span className="text-leise">{a ? `${a.grundausbildung ? 'Grundausbildung, ' : ''}${a.kosten} P.` : 'nicht im Katalog'}</span>
+                        <Knopf nurSymbol className="ml-auto" aria-label={`Abrichtung ${a?.name ?? id} entfernen`} onClick={() => aendern({ abrichtungen: gewaehlt.filter((_, j) => j !== i) })}><X size={16} aria-hidden /></Knopf>
+                      </div>
+                      {text[i] && a && <p className="mt-1">{a.beschreibung}{a.voraussetzung ? <span className="block text-leise">Voraussetzung: {a.voraussetzung.text}</span> : null}</p>}
+                    </li>
                   );
-                })()}
-                <p className="text-[11px] text-leise mt-1">Boni aus Abrichtungen sind im Wertekasten noch nicht eingerechnet.</p>
-              </>
+                })}
+              </ul>
             )}
-          </div>
+            <div className="flex flex-wrap gap-2 items-end">
+              <Auswahl beschriftung="Abrichtung wählen" beschriftungVerborgen value={wahl} onChange={ev => setWahl(ev.target.value)}>
+                <option value="">Abrichtung wählen …</option>
+                {gruppen.map(g => (
+                  <optgroup key={g} label={g}>
+                    {angebot.filter(x => x.a.gruppe === g).map(({ a, voll, ergebnis }) => (
+                      <option key={a.id} value={a.id} disabled={voll}>
+                        {a.name} ({a.kosten} P.{a.quelle !== 'Bestienmeister' ? `, ${a.quelle}` : ''}){voll ? ' – bereits gewählt' : ergebnisWort(ergebnis)}
+                      </option>
+                    ))}
+                  </optgroup>
+                ))}
+              </Auswahl>
+              <Knopf art="sekundaer" disabled={!wahl} onClick={() => { if (angebot.find(x => x.a.id === wahl)?.ergebnis === false && regelverstoss('Die Voraussetzung dieser Abrichtung ist nicht erfüllt.')) return; aendern({ abrichtungen: [...gewaehlt, wahl] }); setWahl(''); }}>
+                <Plus size={14} aria-hidden />Abrichtung hinzufügen
+              </Knopf>
+            </div>
+            {wahl && (() => {
+              const x = angebot.find(y => y.a.id === wahl); if (!x) return null;
+              return (
+                <p>
+                  {x.a.beschreibung}
+                  {x.a.voraussetzung && <span className="block text-leise">
+                    Voraussetzung: {x.a.voraussetzung.text}{x.ergebnis === false ? ' – nicht erfüllt' : x.ergebnis === 'offen' ? ' – Entscheidung der Spielleitung' : ''}
+                  </span>}
+                </p>
+              );
+            })()}
+            <p className="text-xs text-leise">Boni aus Abrichtungen sind im Wertekasten nicht eingerechnet: Die Einträge im Paket haben dafür noch keine Zahlenwerte.</p>
+          </>
+        )}
+      </div>
 
-          <label className="flex flex-col gap-0.5 text-xs">Notiz
-            <textarea value={b.notiz ?? ''} onChange={ev => aendern({ notiz: ev.target.value || undefined })} rows={2} className={`${auswahl} w-full`} />
-          </label>
-        </div>
-      )}
-    </li>
+      <Notiz b={b} aendern={aendern} />
+    </Eintrag>
   );
 };
 
@@ -217,38 +200,41 @@ export const TierAbschnitt: React.FC<{ k: Katalog }> = ({ k }) => {
     const frei = st !== null ? belegt.filter(x => x >= st).sort((a, b) => a - b)[0] : undefined;
     dispatch({ type: 'BEGLEITER_HINZU', payload: { id: e.id, art: 'tier', name: e.name, ...(frei ? { kreatur: frei } : {}) } });
   };
+  const hinweise = [
+    ...(!zuordnungOk ? ['Die Tiere nutzen mehr oder höhere Ressourcen Kreatur, als der Charakter hat.'] : []),
+    ...(vertraute > 1 ? ['Mehr als ein Vertrauter.'] : []),
+    ...(vertraute > 0 && !f.tiervertrauter ? ['Vertrauter ohne die Stärke Tiervertrauter.'] : []),
+  ];
 
   return (
-    <section className={karte} data-testid="begleiter-tiere">
-      <div className="flex items-center gap-2 mb-2">
-        <PawPrint size={18} className="text-schrift" />
-        <h3 className="font-bold text-base text-gold-hell">Tiere</h3>
+    <Karte data-testid="begleiter-tiere" className="space-y-3">
+      <div className="flex items-center gap-2">
+        <PawPrint size={18} aria-hidden />
+        <Abschnittstitel>Tiere</Abschnittstitel>
       </div>
-      <p className="text-xs text-leise mb-3">
+      <p className="text-sm text-leise">
         Ressource Kreatur: {f.kreatur.length ? f.kreatur.join(', ') : 'keine'} – ein Tiergefährte je Ressource, höchstens mit „Kreatur N“ (GRW S. 78).
         Reittiere und gekaufte Tiere brauchen keine Ressource.
-        {!zuordnungOk && <strong className="block text-erschoepft">Die Tiere nutzen mehr oder höhere Ressourcen Kreatur, als der Charakter hat.</strong>}
-        {vertraute > 1 && <strong className="block text-erschoepft">Mehr als ein Vertrauter.</strong>}
-        {vertraute > 0 && !f.tiervertrauter && <strong className="block text-erschoepft">Vertrauter ohne die Stärke Tiervertrauter.</strong>}
       </p>
+      <Hinweise liste={hinweise} />
 
       {eigene.length > 0 && (
-        <ul className="space-y-2 mb-3">
+        <ul className="space-y-3">
           {eigene.map(({ b, i }) => <TierEintrag key={`${b.id}-${i}`} k={k} b={b} index={i} f={f} liste={liste} />)}
         </ul>
       )}
 
-      <div className="flex flex-wrap gap-2 items-center">
-        <select value={wahl} onChange={e => setWahl(e.target.value)} aria-label="Tier wählen" className={auswahl}>
+      <div className="flex flex-wrap gap-2 items-end">
+        <Auswahl beschriftung="Tier wählen" beschriftungVerborgen value={wahl} onChange={e => setWahl(e.target.value)}>
           <option value="">Tier wählen …</option>
           {tiere.map(t => (
             <option key={t.id} value={t.id}>
               {t.name} ({[t.stufe ? `Kreatur ${t.stufe}` : null, t.typus.includes('Reittier') ? 'Reittier' : null, t.quelle !== 'GRW' ? t.quelle : null].filter(Boolean).join(', ') || 'Tier'})
             </option>
           ))}
-        </select>
-        <button type="button" disabled={!wahl} className={knopf} onClick={() => { hinzu(wahl); setWahl(''); }}><Plus size={12} />Tier hinzufügen</button>
+        </Auswahl>
+        <Knopf art="sekundaer" disabled={!wahl} onClick={() => { hinzu(wahl); setWahl(''); }}><Plus size={14} aria-hidden />Tier hinzufügen</Knopf>
       </div>
-    </section>
+    </Karte>
   );
 };

@@ -15,6 +15,8 @@ export interface Gesundheitsstufe { name: string; wundabzug: number }
 export interface BegleiterZustand {
   schaden?: number; betaeubung?: number; kanalisiert?: number;
   fokus?: { erschoepft?: number; kanalisiert?: number; verzehrt?: number };
+  /** Zustände (gleiches Format wie beim Abenteurer) */
+  zustaende?: { id: string; key: string; level?: number; note?: string }[];
 }
 
 const STANDARD: Gesundheitsstufe[] = [

@@ -195,12 +195,12 @@ describe.skipIf(!BESTIEN || !fs.existsSync(BESTIEN))('Abrichtungen mit „Bestie
     fireEvent.click(screen.getByRole('button', { name: /^Pferd$/ }));
     const sel = screen.getByLabelText('Abrichtung wählen') as HTMLSelectElement;
     const r1 = [...sel.options].find(o => o.text.includes('Reittier I ('))!;
-    expect(r1.text.startsWith('✓')).toBe(true);
+    expect(r1.text).not.toMatch(/Voraussetzung fehlt|Spielleitung/); // erfüllt: kein Zusatz (keine Symbole, FUNDAMENT)
     fireEvent.change(sel, { target: { value: r1.value } });
     fireEvent.click(screen.getByRole('button', { name: /Abrichtung hinzufügen/ }));
     expect(screen.getByText('Potenzial 1/7')).toBeTruthy();
     expect([...sel.options].find(o => o.value === r1.value)!.disabled).toBe(true);
-    expect(screen.getByLabelText('Voraussetzung erfüllt')).toBeTruthy();
+    expect(screen.getByText('erfüllt')).toBeTruthy();
     fireEvent.click(screen.getByLabelText('Abrichtung Reittier I entfernen'));
     expect(screen.getByText('Potenzial 0/7')).toBeTruthy();
     kat.aktuell = K;

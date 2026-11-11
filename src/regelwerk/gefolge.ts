@@ -126,7 +126,7 @@ export interface GefolgeWerte {
   freieMeisterschaften: number;
   freieZauber: number;
   /** Waffen mit Angriffswert (Punkte der Waffenfertigkeit + Attribute der Waffe) */
-  waffen: { id: string; name: string; wert: number; schaden: string; wgs: string; ini: string; merkmale: string; fertigkeit: string }[];
+  waffen: { id: string; name: string; wert: number; schaden: string; wgs: string; ini: string; merkmale: string; fertigkeit: string; angeboren: boolean }[];
   /** Gefolge-Punkte für diesen Gefolgsmann: 1 + Schwellen + Meisterschaften/Zauber über den freien */
   punkte: number;
   hinweise: string[];
@@ -200,10 +200,11 @@ export function gefolgeWerte(k: Katalog, b: Begleiter, maxFertigkeit: number): G
   const gesamtPunkte = 1 + angehoben.size + Math.max(0, meisterschaften.length - freieMeisterschaften) + Math.max(0, zauber.length - freieZauber);
 
   const kurzName: Record<string, string> = Object.fromEntries(ATTRIBUTE);
-  const waffen = (b.waffen ?? []).map(id => k.get(id)).filter((e): e is NonNullable<typeof e> => e?.typ === 'waffe').map(e => {
+  const angeboren = new Set(angeboreneWaffen(k).map(e => e.id));
+  const waffen = [...angeboren, ...(b.waffen ?? []).filter(id => !angeboren.has(id))].map(id => k.get(id)).filter((e): e is NonNullable<typeof e> => e?.typ === 'waffe').map(e => {
     const d = e.daten; const f: string = d.fertigkeit ?? '';
     const wert = pkt(f) + (d.attribute ?? []).reduce((s: number, a: string) => s + (A[kurzName[a] ?? a] ?? 0), 0);
-    return { id: e.id, name: e.name, wert, schaden: String(d.schaden ?? ''), wgs: String(d.wgs ?? ''), ini: '', merkmale: String(d.merkmale_text ?? '–'), fertigkeit: k.get(f)?.name ?? f };
+    return { id: e.id, name: e.name, wert, schaden: String(d.schaden ?? ''), wgs: String(d.wgs ?? ''), ini: '', merkmale: String(d.merkmale_text ?? '–'), fertigkeit: k.get(f)?.name ?? f, angeboren: angeboren.has(e.id) };
   });
 
   let werte: Wertekasten = { attribute: Object.fromEntries(ATTRIBUTE.map(([kurz, n]) => [kurz, String(A[n])])) };
@@ -245,7 +246,33 @@ export function zauberAngebot(k: Katalog, fertigkeiten: GefolgeFertigkeit[]) {
 /** Waffen für einen Gefolgsmann: Waffen der Kampffertigkeiten, die er besitzt */
 export function waffenAngebot(k: Katalog, fertigkeiten: GefolgeFertigkeit[]) {
   const f = new Set(fertigkeiten.map(x => x.id));
-  return Object.values(k.eintraege).filter(e => e.typ === 'waffe' && f.has(e.daten.fertigkeit))
+  const angeboren = new Set(angeboreneWaffen(k).map(e => e.id));
+  return Object.values(k.eintraege).filter(e => e.typ === 'waffe' && f.has(e.daten.fertigkeit) && !angeboren.has(e.id))
     .map(e => ({ id: e.id, name: e.name, fertigkeit: k.get(e.daten.fertigkeit)?.name ?? '', modus: String(e.daten.modus ?? ''), schaden: String(e.daten.schaden ?? '') }))
     .sort((a, b) => a.fertigkeit.localeCompare(b.fertigkeit, 'de') || a.name.localeCompare(b.name, 'de'));
 }
+
+/**
+ * Waffen, die jeder hat: Waffen ohne Preis und ohne Verfügbarkeit im Paket (im GRW: Waffenlos, S. 183).
+ * Auslegung: Das Paket kennzeichnet angeborene Waffen nicht eigens; „kein Preis, keine Verfügbarkeit“ trifft nur auf sie zu.
+ */
+export function angeboreneWaffen(k: Katalog) {
+  return Object.values(k.eintraege).filter(e => e.typ === 'waffe' && e.daten.preis?.text === '–' && e.daten.verfuegbarkeit === '–');
+}
+
+/** Kulturmodul (Wahlmöglichkeiten) einer Kultur */
+export function kulturModul(k: Katalog, kultur: string): {
+  fertigkeiten: { text: string; punkte: number; rest_von?: number | null }[];
+  staerke_optionen: { id: string; text: string }[];
+  meisterschaft_optionen: { text: string }[];
+} | null {
+  const mw = k.get(kultur)?.daten.modulwerte;
+  return mw ? { fertigkeiten: mw.fertigkeiten ?? [], staerke_optionen: mw.staerke_optionen ?? [], meisterschaft_optionen: mw.meisterschaft_optionen ?? [] } : null;
+}
+
+/** Text der Attributmodifikatoren einer Rasse */
+export const rasseText = (k: Katalog, rasse: string) => String(k.get(rasse)?.daten.attributsmodifikatoren?.text ?? '');
+
+/** Fertigkeiten, die auf die erste Schwelle angehoben werden können (ohne Gruppenfertigkeiten) */
+export const anhebbareFertigkeiten = (k: Katalog) => Object.values(k.eintraege).filter(e => e.typ === 'fertigkeit' && !e.daten.gruppierte_fertigkeit)
+  .sort((x, y) => x.name.localeCompare(y.name, 'de'));

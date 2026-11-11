@@ -57,11 +57,6 @@
     "src/utils/prerequisiteValidator.ts: tierform"
   ],
   "paketzugriffe": [
-    "src/components/begleiter/BegleiterSpiel.tsx",
-    "src/components/begleiter/GefolgeAbschnitt.tsx",
-    "src/components/begleiter/GolemAbschnitt.tsx",
-    "src/components/begleiter/UntotAbschnitt.tsx",
-    "src/components/begleiter/WesenAbschnitt.tsx",
     "src/components/creation/ErschaffungRegelwerk.tsx",
     "src/components/relikte/ReliktKarte.tsx"
   ]

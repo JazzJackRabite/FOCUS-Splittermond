@@ -5,7 +5,8 @@
  */
 import React, { useContext, useMemo, useState } from 'react';
 import { toast } from 'react-hot-toast';
-import { Heart, Sparkles, RotateCcw, Coffee, HeartCrack, HeartPulse } from 'lucide-react';
+import { Heart, Sparkles, RotateCcw, Coffee, HeartCrack, HeartPulse, Plus } from 'lucide-react';
+import { MarkeMitEntfernen } from './Wertekasten';
 import { CharacterContext, useCharacter } from '../../context/CharacterContext';
 import { usePlaySessionOptional } from '../../context/PlaySessionContext';
 import { RollModal } from '../play/RollModal';
@@ -16,10 +17,12 @@ import { HealModal } from '../play/HealModal';
 import type { RollEntry } from '../play/DiceLog';
 import { aktiverKatalog } from '../../regelwerk/bruecke';
 import { betaeubungsimmun, fokusFrei, gesundheitsfelder, gesundheitsstufen, lebenslage, schadenEintragen, type BegleiterZustand } from '../../regelwerk/vitals';
-import type { Begleiter, Spell } from '../../types';
+import type { Begleiter, Spell, StatusCondition } from '../../types';
 import type { Wertekasten } from '../../regelwerk/begleiter';
 import { generateId } from '../../utils/id';
-import { auswahl } from './Wertekasten';
+import { Auswahl, Eingabe, Knopf, Marke, TON } from '../../fundament';
+import { CONDITIONS_WITH_LEVELS, CONDITIONS_WITHOUT_LEVELS } from '../../data/rules';
+import { getConditionDescription, getConditionMalus } from '../../utils/conditionModifiers';
 
 export interface Waffe { name: string; wert: string | number; schaden: string; wgs: string; ini?: string; merkmale?: string }
 export interface Aktionen {
@@ -58,13 +61,13 @@ export interface BegleiterSpielDaten {
 }
 
 /** Würfeln und Vitalwerte eines Begleiters. Liefert die Aktionen und die Modale (im Eintrag rendern). */
-export function useBegleiterSpiel(b: Begleiter, index: number, daten: BegleiterSpielDaten) {
+export function useBegleiterSpiel(b: Begleiter, index: number, angaben: BegleiterSpielDaten) {
   const { dispatch } = useCharacter();
   const play = usePlaySessionOptional();
   const k = aktiverKatalog();
   const z: BegleiterZustand = b.zustand ?? {};
-  const { stufen, quelle } = useMemo(() => gesundheitsstufen(k, daten.merkmale), [k, daten.merkmale]);
-  const lage = lebenslage(daten.lp, stufen, z);
+  const { stufen, quelle } = useMemo(() => gesundheitsstufen(k, angaben.merkmale), [k, angaben.merkmale]);
+  const lage = lebenslage(angaben.lp, stufen, z);
   const [probe, setProbe] = useState<{ name: string; wert: number } | null>(null);
   const [angriff, setAngriff] = useState<AttackTargetConfig | null>(null);
   const [zauber, setZauber] = useState<{ spell: Spell; wert: number } | null>(null);
@@ -75,35 +78,35 @@ export function useBegleiterSpiel(b: Begleiter, index: number, daten: BegleiterS
     if (play) play.dispatchWithHistory(a); else dispatch(a);
   };
   const log = (category: 'damage' | 'heal' | 'focus' | 'spell' | 'combat' | 'misc', title: string, description?: string, badge?: { text: string; variant: 'danger' | 'warning' | 'info' | 'success' | 'gold' | 'neutral' }) =>
-    play?.logEintrag({ category, title: `${daten.name}: ${title}`, description, badge });
+    play?.logEintrag({ category, title: `${angaben.name}: ${title}`, description, badge });
   const wurfLog = (e: RollEntry) => play?.handleRecordRoll(e);
 
   const aktionen: Aktionen = {
     probe: (name, wert) => setProbe({ name, wert }),
     angriff: w => setAngriff({
       weapon: { name: w.name, damage: String(w.schaden).replace(/[−–]/g, '-'), wgs: zahl(w.wgs) || w.wgs, attributes: w.merkmale },
-      skillName: `${daten.name}: ${w.name}`, skillTotal: zahl(w.wert),
+      skillName: `${angaben.name}: ${w.name}`, skillTotal: zahl(w.wert),
     }),
     schaden: w => {
       const r = wirfFormel(String(w.schaden));
       if (!r) { toast.error(`Schaden „${w.schaden}“ nicht lesbar`); return; }
-      wurfLog({ id: generateId(), type: 'roll', timestamp: zeit(), label: `${daten.name}: Schaden ${w.name} (${r.formel})`, d10s: r.wuerfel, baseVal: 0, modifier: r.mod, total: r.summe,
+      wurfLog({ id: generateId(), type: 'roll', timestamp: zeit(), label: `${angaben.name}: Schaden ${w.name} (${r.formel})`, d10s: r.wuerfel, baseVal: 0, modifier: r.mod, total: r.summe,
         outcome: `[${r.wuerfel.join(', ')}]${r.mod ? (r.mod > 0 ? ` + ${r.mod}` : ` − ${-r.mod}`) : ''} = ${r.summe}` });
-      toast.success(`${daten.name}, ${w.name}: ${r.summe} Schaden (${r.formel} [${r.wuerfel.join(', ')}])`);
+      toast.success(`${angaben.name}, ${w.name}: ${r.summe} Schaden (${r.formel} [${r.wuerfel.join(', ')}])`);
     },
     zaubern: (spell, wert) => setZauber({ spell, wert }),
   };
-  const zahlSR = zahl(daten.sr);
+  const zahlSR = zahl(angaben.sr);
 
   const fokus = z.fokus ?? {};
   const modale = (
     <OhneCharakterBoni>
       {probe && (
-        <RollModal skillName={`${daten.name}: ${probe.name}`} baseValue={probe.wert} woundPenalty={lage.wundabzug} healthLevelName={lage.stufenName}
-          conditions={[]} splitterPoints={0} onClose={() => setProbe(null)} onRecordRoll={wurfLog} />
+        <RollModal skillName={`${angaben.name}: ${probe.name}`} baseValue={probe.wert} woundPenalty={lage.wundabzug} healthLevelName={lage.stufenName}
+          conditions={z.zustaende ?? []} splitterPoints={0} onClose={() => setProbe(null)} onRecordRoll={wurfLog} />
       )}
       {angriff && (
-        <AttackModal target={angriff} woundPenalty={lage.wundabzug} splitterpunkte={0} onClose={() => setAngriff(null)} onSpendSplitterpunkt={() => {}}
+        <AttackModal target={angriff} conditions={z.zustaende ?? []} woundPenalty={lage.wundabzug} splitterpunkte={0} onClose={() => setAngriff(null)} onSpendSplitterpunkt={() => {}}
           onRecordRoll={wurfLog}
           onAttackSuccess={r => {
             log('combat', `Angriff getroffen: ${r.weapon.name} (${r.eg} EG)${r.damageRoll ? ` · ${r.damageRoll.netDamage} Schaden` : ''}`,
@@ -117,8 +120,8 @@ export function useBegleiterSpiel(b: Begleiter, index: number, daten: BegleiterS
           }} />
       )}
       {zauber && (
-        <CastSpellModal spell={zauber.spell} schoolSkillTotal={zauber.wert} schoolSkillName={zauber.spell.school}
-          availableFocus={fokusFrei(daten.fo, z)} maxFO={daten.fo}
+        <CastSpellModal spell={zauber.spell} conditions={z.zustaende ?? []} schoolSkillTotal={zauber.wert} schoolSkillName={zauber.spell.school}
+          availableFocus={fokusFrei(angaben.fo, z)} maxFO={angaben.fo}
           focusState={{ exhausted: fokus.erschoepft ?? 0, channeled: fokus.kanalisiert ?? 0, consumed: fokus.verzehrt ?? 0 }}
           woundPenalty={lage.wundabzug} splitterpunkte={0} onSpendSplitterpunkt={() => {}} onClose={() => setZauber(null)} onRecordRoll={wurfLog}
           onCastSuccess={r => {
@@ -134,11 +137,11 @@ export function useBegleiterSpiel(b: Begleiter, index: number, daten: BegleiterS
           }} />
       )}
       {lpModal === 'schaden' && (
-        <TakeDamageModal begleiter={daten.name} stufen={stufen} maxLP={daten.lp} derivedSR={zahlSR} armorSR={0} currentSplitterPoints={0} activeTempHP={0}
+        <TakeDamageModal begleiter={angaben.name} stufen={stufen} maxLP={angaben.lp} derivedSR={zahlSR} armorSR={0} currentSplitterPoints={0} activeTempHP={0}
           currentHealthSlots={gesundheitsfelder(lage.gesamt, z)} onClose={() => setLpModal(null)}
           onApplyDamage={({ kind, amount, note }) => {
             if (amount <= 0) return;
-            if (kind === 'exhausted' && betaeubungsimmun(k, daten.merkmale)) {
+            if (kind === 'exhausted' && betaeubungsimmun(k, angaben.merkmale)) {
               log('damage', `immun gegen Betäubungsschaden (${amount} ignoriert)`, note, { text: 'immun', variant: 'neutral' });
               return;
             }
@@ -149,7 +152,7 @@ export function useBegleiterSpiel(b: Begleiter, index: number, daten: BegleiterS
           }} />
       )}
       {lpModal === 'heilen' && (
-        <HealModal begleiter={daten.name} stufen={stufen} maxLP={daten.lp} currentHealthSlots={gesundheitsfelder(lage.gesamt, z)} activeConditions={[]}
+        <HealModal begleiter={angaben.name} stufen={stufen} maxLP={angaben.lp} currentHealthSlots={gesundheitsfelder(lage.gesamt, z)} activeConditions={z.zustaende ?? []}
           onClose={() => setLpModal(null)}
           onApplyHeal={({ consumedHealed, exhaustedHealed, channeledHealed, note, healMethod }) => {
             const summe = consumedHealed + exhaustedHealed + channeledHealed;
@@ -164,86 +167,125 @@ export function useBegleiterSpiel(b: Begleiter, index: number, daten: BegleiterS
   return { aktionen, modale, lage, stufenQuelle: quelle, setze, log, zustand: z, schadenModal: () => setLpModal('schaden'), heilenModal: () => setLpModal('heilen') };
 }
 
-/** Lebenspunkte (je Gesundheitsstufe) und Fokus eines Begleiters */
-export const BegleiterVitals: React.FC<{ spiel: ReturnType<typeof useBegleiterSpiel>; daten: BegleiterSpielDaten }> = ({ spiel, daten }) => {
+/** Zustände eines Begleiters: dieselbe Zustandsliste wie beim Abenteurer, Abzüge über getConditionMalus */
+const BegleiterZustaende: React.FC<{ spiel: ReturnType<typeof useBegleiterSpiel> }> = ({ spiel }) => {
+  const { zustand: z, setze, log } = spiel;
+  const [wahl, setWahl] = useState('');
+  const [stufe, setStufe] = useState(1);
+  const liste = z.zustaende ?? [];
+  const mitStufe = (CONDITIONS_WITH_LEVELS as readonly string[]).includes(wahl);
+  const hinzu = () => {
+    if (!wahl) return;
+    const neu: StatusCondition = { id: generateId(), key: wahl, ...(mitStufe ? { level: Math.max(1, stufe) } : {}) };
+    setze({ ...z, zustaende: [...liste.filter(c => c.key !== wahl), neu] });
+    log('misc', `Zustand ${wahl}${mitStufe ? ` ${neu.level}` : ''}`, getConditionDescription(neu), { text: 'Zustand', variant: 'warning' });
+    setWahl(''); setStufe(1);
+  };
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="text-leise">Zustände:</span>
+        {liste.length === 0 && <span className="text-leise">keine</span>}
+        {liste.map(c => {
+          const m = getConditionMalus(c);
+          return (
+            <MarkeMitEntfernen key={c.id} ton="erschoepft" titel={getConditionDescription(c)} label={`Zustand ${c.key} beenden`}
+              onEntfernen={() => { setze({ ...z, zustaende: liste.filter(x => x.id !== c.id) }); log('misc', `Zustand ${c.key} beendet`); }}>
+              {c.key}{c.level ? ` ${c.level}` : ''}{m && m.malus ? ` (${m.malus})` : ''}
+            </MarkeMitEntfernen>
+          );
+        })}
+      </div>
+      <div className="flex flex-wrap gap-2 items-end">
+        <Auswahl beschriftung="Zustand hinzufügen" beschriftungVerborgen value={wahl} onChange={e => setWahl(e.target.value)}>
+          <option value="">Zustand wählen …</option>
+          {[...CONDITIONS_WITH_LEVELS, ...CONDITIONS_WITHOUT_LEVELS].sort((x, y) => x.localeCompare(y, 'de')).map(c => <option key={c} value={c}>{c}</option>)}
+        </Auswahl>
+        {mitStufe && <Eingabe beschriftung="Stufe" beschriftungVerborgen type="number" min={1} max={5} className="w-20" value={stufe} onChange={e => setStufe(Number(e.target.value) || 1)} />}
+        <Knopf disabled={!wahl} onClick={hinzu}><Plus size={14} aria-hidden />Zustand</Knopf>
+      </div>
+    </div>
+  );
+};
+
+/** Lebenspunkte (je Gesundheitsstufe), Fokus und Zustände eines Begleiters */
+export const BegleiterVitals: React.FC<{ spiel: ReturnType<typeof useBegleiterSpiel>; daten: BegleiterSpielDaten }> = ({ spiel, daten: angaben }) => {
   const { lage, zustand: z, setze, log, stufenQuelle } = spiel;
   const [foMenge, setFoMenge] = useState(1);
   const k = aktiverKatalog();
-  const immun = betaeubungsimmun(k, daten.merkmale);
+  const immun = betaeubungsimmun(k, angaben.merkmale);
   const f = z.fokus ?? {};
-  const frei = fokusFrei(daten.fo, z);
+  const frei = fokusFrei(angaben.fo, z);
   const aendern = (neu: BegleiterZustand, titel: string, art: 'damage' | 'heal' | 'focus', badge: string) => {
     setze(neu); log(art, titel, undefined, { text: badge, variant: art === 'damage' ? 'danger' : art === 'heal' ? 'success' : 'info' });
   };
-  if (!daten.lp && !daten.fo) return null;
 
-  // Kästchen je Gesundheitsstufe: echter Schaden, Betäubung, kanalisiert
+  // Kästchen je Gesundheitsstufe: echter Schaden, Betäubung, kanalisiert (Bedeutung als Rahmen auf Grundton)
   const kaestchen: ('s' | 'b' | 'k' | '')[] = [];
   for (let i = 0; i < lage.gesamt; i++) {
     const s = z.schaden ?? 0; const bt = z.betaeubung ?? 0; const kn = z.kanalisiert ?? 0;
     kaestchen.push(i < s ? 's' : i < s + bt ? 'b' : i < s + bt + kn ? 'k' : '');
   }
-  const farbe = { s: 'bg-schaden-grund border-schaden', b: 'bg-erschoepft border-erschoepft', k: 'bg-kanalisiert border-kanalisiert', '': 'bg-flaeche border-rahmen' };
+  const farbe = { s: TON.schaden, b: TON.erschoepft, k: TON.kanalisiert, '': TON.unverletzt };
 
   return (
-    <div className="border border-rahmen rounded-knopf p-2 space-y-2 bg-erhoeht" data-testid="begleiter-vitals">
-      {daten.lp > 0 && (
-        <div>
+    <div className="border border-rahmen rounded-knopf p-3 space-y-3 bg-flaeche" data-testid="begleiter-vitals">
+      {angaben.lp > 0 && (
+        <div className="space-y-2">
           <div className="flex items-center gap-2 flex-wrap">
-            <Heart size={14} className="text-schaden" />
-            <strong>LP {lage.frei}/{lage.gesamt}</strong>
-            <span className={lage.ausser ? 'text-schaden font-bold' : 'text-schrift'}>{lage.stufenName}</span>
-            {lage.wundabzug !== 0 && <span className="text-schaden font-bold">Wundabzug {lage.wundabzug}</span>}
-            <span className="text-leise">{daten.lp} je Stufe, {lage.stufen.length} Stufen{stufenQuelle ? ` (${stufenQuelle})` : ''}</span>
+            <Heart size={16} aria-hidden />
+            <strong className="font-titel text-base">LP {lage.frei}/{lage.gesamt}</strong>
+            <Marke ton={lage.ausser || lage.wundabzug ? 'schaden' : 'unverletzt'} klein>{lage.stufenName}</Marke>
+            {lage.wundabzug !== 0 && <Marke ton="schaden" klein>Wundabzug {lage.wundabzug}</Marke>}
+            <span className="text-leise text-xs">{angaben.lp} je Stufe, {lage.stufen.length} Stufen{stufenQuelle ? ` (${stufenQuelle})` : ''}</span>
           </div>
-          <div className="flex flex-wrap gap-1 mt-1" aria-label="Lebenspunkte">
+          <div className="flex flex-wrap gap-2" aria-label="Lebenspunkte">
             {lage.stufen.map((st, si) => (
               <div key={si} className="flex flex-col items-start">
                 <span className="text-[11px] text-leise">{st.name}{st.wundabzug ? ` (${st.wundabzug})` : ''}</span>
                 <div className="flex gap-0.5">
-                  {kaestchen.slice(si * daten.lp, (si + 1) * daten.lp).map((x, i) => <span key={i} className={`w-3 h-3 rounded-knopf border ${farbe[x]}`} />)}
+                  {kaestchen.slice(si * angaben.lp, (si + 1) * angaben.lp).map((x, i) => <span key={i} className={`w-3.5 h-3.5 rounded-[3px] border ${farbe[x]}`} />)}
                 </div>
               </div>
             ))}
           </div>
-          <div className="flex flex-wrap gap-1 items-center mt-1">
-            <button type="button" className="px-2 py-0.5 rounded-knopf bg-schaden-grund text-schrift font-bold cursor-pointer flex items-center gap-1"
-              onClick={spiel.schadenModal}><HeartCrack size={11} />Schaden erleiden</button>
-            <button type="button" className="px-2 py-0.5 rounded-knopf bg-unverletzt-grund text-schrift font-bold cursor-pointer flex items-center gap-1 disabled:opacity-40" disabled={!lage.verloren}
-              onClick={spiel.heilenModal}><HeartPulse size={11} />Heilen</button>
-            {immun && <span className="text-leise">immun gegen Betäubungsschaden</span>}
+          <div className="flex flex-wrap gap-2 items-center">
+            <Knopf art="gefahr" onClick={spiel.schadenModal}><HeartCrack size={14} aria-hidden />Schaden erleiden</Knopf>
+            <Knopf art="erholung" disabled={!lage.verloren} onClick={spiel.heilenModal}><HeartPulse size={14} aria-hidden />Heilen</Knopf>
+            {immun && <span className="text-leise text-xs">immun gegen Betäubungsschaden</span>}
           </div>
         </div>
       )}
-      {daten.fo > 0 && (
-        <div>
+      {angaben.fo > 0 && (
+        <div className="space-y-2">
           <div className="flex items-center gap-2 flex-wrap">
-            <Sparkles size={14} className="text-schrift" />
-            <strong>Fokus {frei}/{daten.fo}</strong>
-            <span className="text-leise">erschöpft {f.erschoepft ?? 0}, kanalisiert {f.kanalisiert ?? 0}, verzehrt {f.verzehrt ?? 0}</span>
+            <Sparkles size={16} aria-hidden />
+            <strong className="font-titel text-base">Fokus {frei}/{angaben.fo}</strong>
+            {(f.erschoepft ?? 0) > 0 && <Marke ton="erschoepft" klein>erschöpft {f.erschoepft}</Marke>}
+            {(f.kanalisiert ?? 0) > 0 && <Marke ton="kanalisiert" klein>kanalisiert {f.kanalisiert}</Marke>}
+            {(f.verzehrt ?? 0) > 0 && <Marke ton="schaden" klein>verzehrt {f.verzehrt}</Marke>}
           </div>
-          <div className="flex flex-wrap gap-1 items-center mt-1">
-            <input type="number" min={1} value={foMenge} onChange={e => setFoMenge(Number(e.target.value) || 1)} className={`${auswahl} w-14`} aria-label="Menge Fokus" />
-            {([['erschoepft', 'erschöpfen'], ['kanalisiert', 'kanalisieren'], ['verzehrt', 'verzehren']] as const).map(([feld, text]) => (
-              <button key={feld} type="button" className="px-2 py-0.5 rounded-knopf border border-gold text-schrift font-bold cursor-pointer disabled:opacity-40" disabled={frei <= 0}
-                onClick={() => { const m = Math.min(frei, Math.max(1, foMenge)); aendern({ ...z, fokus: { ...f, [feld]: (f[feld] ?? 0) + m } }, `${m} Fokus ${text === 'erschöpfen' ? 'erschöpft' : text === 'kanalisieren' ? 'kanalisiert' : 'verzehrt'}`, 'focus', `−${m} FO`); }}>
+          <div className="flex flex-wrap gap-2 items-end">
+            <Eingabe beschriftung="Menge Fokus" beschriftungVerborgen type="number" min={1} className="w-20" value={foMenge} onChange={e => setFoMenge(Number(e.target.value) || 1)} />
+            {([['erschoepft', 'erschöpfen', 'erschöpft'], ['kanalisiert', 'kanalisieren', 'kanalisiert'], ['verzehrt', 'verzehren', 'verzehrt']] as const).map(([feld, text, partizip]) => (
+              <Knopf key={feld} disabled={frei <= 0}
+                onClick={() => { const m = Math.min(frei, Math.max(1, foMenge)); aendern({ ...z, fokus: { ...f, [feld]: (f[feld] ?? 0) + m } }, `${m} Fokus ${partizip}`, 'focus', `−${m} FO`); }}>
                 {text}
-              </button>
+              </Knopf>
             ))}
             {(f.kanalisiert ?? 0) > 0 && (
-              <button type="button" className="px-2 py-0.5 rounded-knopf border border-gold text-schrift cursor-pointer"
-                onClick={() => aendern({ ...z, fokus: { ...f, kanalisiert: 0, erschoepft: (f.erschoepft ?? 0) + (f.kanalisiert ?? 0) } }, 'Kanalisierung beendet', 'focus', 'K → erschöpft')}>
+              <Knopf onClick={() => aendern({ ...z, fokus: { ...f, kanalisiert: 0, erschoepft: (f.erschoepft ?? 0) + (f.kanalisiert ?? 0) } }, 'Kanalisierung beendet', 'focus', 'K → erschöpft')}>
                 Kanalisierung beenden
-              </button>
+              </Knopf>
             )}
           </div>
         </div>
       )}
-      <div className="flex flex-wrap gap-1">
-        <button type="button" className="px-2 py-0.5 rounded-knopf border border-gold cursor-pointer flex items-center gap-1" title="Betäubungsschaden und erschöpfter Fokus erholen sich"
-          onClick={() => aendern({ ...z, betaeubung: 0, fokus: { ...f, erschoepft: 0 } }, 'Verschnaufpause', 'heal', 'Pause')}><Coffee size={11} />Verschnaufpause</button>
-        <button type="button" className="px-2 py-0.5 rounded-knopf border border-gold cursor-pointer flex items-center gap-1"
-          onClick={() => aendern({}, 'Werte zurückgesetzt (voll)', 'heal', 'voll')}><RotateCcw size={11} />Alles zurücksetzen</button>
+      <BegleiterZustaende spiel={spiel} />
+      <div className="flex flex-wrap gap-2">
+        <Knopf art="erholung" title="Betäubungsschaden und erschöpfter Fokus erholen sich"
+          onClick={() => aendern({ ...z, betaeubung: 0, fokus: { ...f, erschoepft: 0 } }, 'Verschnaufpause', 'heal', 'Pause')}><Coffee size={14} aria-hidden />Verschnaufpause</Knopf>
+        <Knopf onClick={() => aendern({}, 'Werte zurückgesetzt (voll)', 'heal', 'voll')}><RotateCcw size={14} aria-hidden />Alles zurücksetzen</Knopf>
       </div>
     </div>
   );
@@ -256,12 +298,12 @@ export function spielDaten(b: Begleiter, w: Wertekasten | null | undefined): Beg
 }
 
 /** Kurzanzeige im Kopf eines Begleiters: LP und Fokus */
-export const VitalKurz: React.FC<{ spiel: ReturnType<typeof useBegleiterSpiel>; daten: BegleiterSpielDaten }> = ({ spiel, daten }) => {
-  if (!daten.lp) return null;
+export const VitalKurz: React.FC<{ spiel: ReturnType<typeof useBegleiterSpiel>; daten: BegleiterSpielDaten }> = ({ spiel, daten: angaben }) => {
+  if (!angaben.lp) return null;
   const { lage } = spiel;
   return (
-    <span className={`font-bold ${lage.ausser ? 'text-schaden' : lage.wundabzug ? 'text-erschoepft' : 'text-schrift'}`} title={lage.stufenName}>
-      {lage.frei}/{lage.gesamt}{daten.fo ? ` · FO ${fokusFrei(daten.fo, spiel.zustand)}/${daten.fo}` : ''}
-    </span>
+    <Marke klein ton={lage.ausser || lage.wundabzug ? 'schaden' : 'unverletzt'} title={lage.stufenName}>
+      LP {lage.frei}/{lage.gesamt}{angaben.fo ? ` · FO ${fokusFrei(angaben.fo, spiel.zustand)}/${angaben.fo}` : ''}{lage.wundabzug ? ` · ${lage.wundabzug}` : ''}
+    </Marke>
   );
 };

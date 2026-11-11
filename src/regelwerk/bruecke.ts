@@ -263,3 +263,16 @@ export function mitRegelIds<T extends Partial<CharacterState>>(state: T): T {
     return state;
   }
 }
+
+/** Katalog-Zauber als Zauber des Editors (für das Zauber-Modal), in der Magieschule schuleId oder der ersten */
+export function zauberAlsSpell(k: Katalog, id: string, schuleId?: string): import('../types').Spell | null {
+  const e = k.get(id); if (!e || e.typ !== 'zauber') return null;
+  const d = e.daten; const ix = index(k);
+  const s = (d.schulen ?? []).find((x: { id: string }) => x.id === schuleId) ?? d.schulen?.[0];
+  return {
+    name: e.name, school: ix.fertigkeitName.get(s?.id) ?? s?.schule ?? '', grade: zahl(s?.grad), cost: String(d.kosten ?? ''),
+    castTime: d.zauberdauer, range: d.reichweite, duration: d.wirkungsdauer,
+    description: [d.wirkung, d.erfolgsgrade ? `Erfolgsgrade:\n${d.erfolgsgrade}` : ''].filter(Boolean).join('\n\n'),
+    source: k.pakete[e.quelle.paket]?.kuerzel ?? e.quelle.paket, page: seite(e),
+  } as import('../types').Spell;
+}

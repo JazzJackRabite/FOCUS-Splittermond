@@ -92,6 +92,44 @@ describe.skipIf(!MAGIE || !fs.existsSync(MAGIE))('Untote und Golems mit „Die M
     expect(u.hinweise).toEqual(expect.arrayContaining([expect.stringMatching(/Nekromant/), expect.stringMatching(/21 EP verteilt/)]));
   });
 
+  it('Untote: freie Meisterschaften je erreichter Schwelle, nur mit freiem Platz', () => {
+    const katze: Begleiter = { id: 'magie:kreatur:gruftkatze', art: 'untoter', name: 'Gruftkatze', erhebung: 'magie:zauber:totentier', verstaerkungen: 1,
+      steigerung: { fertigkeiten: { 'grw:fertigkeit:wahrnehmung': 6 } } };
+    const u = untotWerte(KM, katze, { nekromant: true, meisterDerAbnormitaeten: false });
+    expect(u.freieMeisterschaften).toEqual([{ fertigkeitId: 'grw:fertigkeit:wahrnehmung', fertigkeit: 'Wahrnehmung', schwelle: 1 }]);
+    const s1 = Object.values(KM.eintraege).filter(e => e.typ === 'meisterschaft' && e.daten.fertigkeit === 'grw:fertigkeit:wahrnehmung');
+    const eins = s1.find(e => Number(e.daten.schwelle) === 1)!; const zwei = s1.find(e => Number(e.daten.schwelle) === 2)!;
+    const mit = untotWerte(KM, { ...katze, meisterschaften: [eins.id] }, { nekromant: true, meisterDerAbnormitaeten: false });
+    expect(mit.meisterschaften[0]).toMatchObject({ ok: true, schwelle: 1 });
+    expect(mit.werte!.meisterschaften).toContain(eins.name);
+    // Schwelle 2 hat keinen Platz (erst ab 9 Punkten), ein zweiter Platz fehlt auch
+    const zuviel = untotWerte(KM, { ...katze, meisterschaften: [eins.id, zwei.id] }, { nekromant: true, meisterDerAbnormitaeten: false });
+    expect(zuviel.meisterschaften[1].ok).toBe(false);
+    expect(zuviel.verstoesse.some(v => v.schluessel === 'meisterschaften')).toBe(true);
+  });
+
+  it('Golem: Feinschliff-Wahlen Meisterschaft, Fertigkeit und Punkte mit Grenzen aus dem Text', () => {
+    const id = (n: string) => Object.values(KM.eintraege).find(e => e.typ === 'golem_baustein' && e.name === n)!.id;
+    const alle = Object.values(KM.eintraege).filter(e => e.typ === 'golem_baustein' && ['Zusätzliche Fähigkeit', 'Rolle'].includes(e.daten.baustein)).map(e => e.id);
+    const g = golemWerte(KM, { id: 'magie:golem_baustein:gross', art: 'golem', name: 'Groß', material: 'magie:material:holz', bausteine: alle, golemRessource: true });
+    const arten = new Set(g.wahlen.map(w => w.art));
+    expect([...arten].sort()).toEqual(['attribut', 'fertigkeit', 'meisterschaft', 'punkte']);
+    const punkte = g.wahlen.find(w => w.art === 'punkte')!;
+    expect(punkte).toMatchObject({ anzahl: 8, max: 2 });
+    // „[Schwelle siehe Schritt 5]“ → Schwelle nach Stufe (Tabelle Schritt 5), „[Schwelle 1]“ → 1
+    const ms = g.wahlen.filter(w => w.art === 'meisterschaft').map(w => (w as { schwelle: number }).schwelle);
+    expect(ms.every(x => Number.isFinite(x) && x >= 1)).toBe(true);
+    expect(ms).toContain(1); expect(ms).toContain(g.meisterschaftSchwelle);
+    const f = g.werte!.fertigkeiten.find(x => x.id)!;
+    const zuviel = golemWerte(KM, { id: 'magie:golem_baustein:gross', art: 'golem', name: 'Groß', material: 'magie:material:holz', bausteine: alle, golemRessource: true,
+      feinschliff: { [punkte.schluessel]: { [f.id!]: 3 } } });
+    expect(zuviel.verstoesse.some(v => v.schluessel.startsWith('max:'))).toBe(true);
+    const gut = golemWerte(KM, { id: 'magie:golem_baustein:gross', art: 'golem', name: 'Groß', material: 'magie:material:holz', bausteine: alle, golemRessource: true,
+      feinschliff: { [punkte.schluessel]: { [f.id!]: 2 } } });
+    expect(gut.werte!.fertigkeiten.find(x => x.id === f.id)!.wert).toBe(g.werte!.fertigkeiten.find(x => x.id === f.id)!.wert + 2);
+    expect(id('Kämpfer')).toBeTruthy();
+  });
+
   it('Golem: Stufe, Werte aus Korpus + Material + Modulen, Applikationen, Preis, Animierung', () => {
     expect(korpusse(KM).map(e => e.name)).toEqual(['Klein', 'Mittel', 'Groß']);
     const id = (n: string) => Object.values(KM.eintraege).find(e => e.typ === 'golem_baustein' && e.name === n)!.id;
@@ -116,7 +154,15 @@ describe.skipIf(!MAGIE || !fs.existsSync(MAGIE))('Untote und Golems mit „Die M
     expect(g.preis).toBe(250 + 0 + 10);
     expect(g.animierung?.name).toBe('Animierung III');
     expect(g.meisterschaftSchwelle).toBe(2);
-    expect(g.feinschliff.some(t => /BEW oder INT oder KON oder STÄ \+1/.test(t))).toBe(true);
+    // Wahlen des Feinschliffs aus den Texten: Kämpfer „BEW oder INT oder KON oder STÄ +1“
+    const attr = g.wahlen.find(w => w.art === 'attribut' && w.quelle === 'Kämpfer')!;
+    expect(attr).toMatchObject({ optionen: ['BEW', 'INT', 'KON', 'STÄ'], bonus: 1 });
+    // gewählt: KON +1 → LP +1 (GK + KON), KW +1 (12 + KON + WIL); Zähigkeit (KON/WIL) +1
+    const mitKon = golemWerte(KM, { ...golem, feinschliff: { [attr.schluessel]: 'KON' } });
+    expect(mitKon.werte!.attribute.KON).toBe(4);
+    expect(mitKon.werte!.abgeleitet.LP).toBe(g.werte!.abgeleitet.LP + 1);
+    expect(mitKon.werte!.abgeleitet.KW).toBe(g.werte!.abgeleitet.KW + 1);
+    expect(golemWerte(KM, { ...golem, feinschliff: { [attr.schluessel]: 'MYS' } }).werte!.attribute.MYS).toBe(g.werte!.attribute.MYS); // nicht wählbar
     // Kämpfer ohne Aggressiv
     const ohne = golemWerte(KM, { ...golem, bausteine: [id('Kämpfer')] });
     expect(ohne.hinweise).toEqual(expect.arrayContaining(['Kämpfer setzt Aggressiv voraus']));
@@ -133,10 +179,10 @@ describe.skipIf(!MAGIE || !fs.existsSync(MAGIE))('Untote und Golems mit „Die M
     fireEvent.click(within(gs).getByRole('button', { name: /Golem hinzufügen/ }));
     fireEvent.click(within(gs).getByRole('button', { name: 'Golem (Klein)' }));
     expect(within(gs).getByText('Golem 1')).toBeTruthy();
-    fireEvent.change(within(gs).getByLabelText('Golemmaterial'), { target: { value: 'magie:material:holz' } });
+    fireEvent.change(within(gs).getByLabelText(/Golemmaterial/), { target: { value: 'magie:material:holz' } });
     const fa = within(gs).getByLabelText('Zusätzliche Fähigkeit wählen') as HTMLSelectElement;
     fireEvent.change(fa, { target: { value: [...fa.options].find(o => o.text.startsWith('Hände'))!.value } });
-    fireEvent.click(within(fa.parentElement!).getByRole('button', { name: /Hinzufügen/ }));
+    fireEvent.click(within(gs).getAllByRole('button', { name: /^Hinzufügen$/ })[0]); // erste Gruppe: Zusätzliche Fähigkeiten
     expect(within(gs).getByText('Golem 2')).toBeTruthy();
     expect(within(gs).getByText(/Animierung II/)).toBeTruthy();
 
