@@ -25,10 +25,10 @@ export const WirkungenKarte: React.FC = () => {
   const [offen, setOffen] = useState<Record<string, boolean>>(() => Object.fromEntries(GRUPPEN.map(g => [g.status, g.offen])));
   if (!w || !w.liste.length) return null;
   return (
-    <div className="bg-flaeche bg-opacity-70 rounded-karte border border-rahmen p-5" data-testid="wirkungen">
+    <div className="bg-flaeche rounded-karte border border-rahmen p-5" data-testid="wirkungen">
       <div className="flex items-center gap-2 border-b border-gold pb-2 mb-3">
         <Sparkles size={18} className="text-gold" />
-        <h3 className="font-bold text-xl fantasy-font text-gold-hell">Wirkungen</h3>
+        <h3 className="font-bold text-[17px] fantasy-font text-gold-hell">Wirkungen</h3>
       </div>
       <div className="space-y-2">
         {GRUPPEN.map(g => {

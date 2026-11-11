@@ -93,7 +93,7 @@ const QuickSpellCard: React.FC<QuickSpellCardProps> = ({ spell, session }) => {
   return (
     <div
       ref={containerRef}
-      className="bg-erhoeht hover:bg-rahmen rounded-karte p-3 text-sm border border-rahmen hover:border-gold shadow-2xs transition-all relative"
+      className="bg-erhoeht hover:bg-rahmen rounded-karte p-3 text-sm border border-rahmen hover:border-gold transition-all relative"
     >
       {/* Unsichtbares Messelement für die unbeschränkte Breite von Name + Grad */}
       <span
@@ -128,7 +128,7 @@ const QuickSpellCard: React.FC<QuickSpellCardProps> = ({ spell, session }) => {
             <button
               type="button"
               onClick={() => session.handleOpenCastSpell(spell)}
-              className="bg-erhoeht hover:bg-rahmen text-schrift text-xs px-2.5 py-1 rounded-knopf font-bold transition-all shadow-2xs flex items-center gap-1 border border-rahmen cursor-pointer whitespace-nowrap active:scale-95"
+              className="bg-erhoeht hover:bg-rahmen text-schrift text-xs px-2.5 py-1 rounded-knopf font-bold transition-all flex items-center gap-1 border border-rahmen cursor-pointer whitespace-nowrap active:scale-95"
             >
               <Sparkles size={12} className="text-gold" />
               <span>Zaubern</span>
@@ -161,7 +161,7 @@ const QuickSpellCard: React.FC<QuickSpellCardProps> = ({ spell, session }) => {
             <button
               type="button"
               onClick={() => session.handleOpenCastSpell(spell)}
-              className="bg-erhoeht hover:bg-rahmen text-schrift text-xs px-2.5 py-1 rounded-knopf font-bold transition-all shadow-2xs flex items-center gap-1 border border-rahmen cursor-pointer whitespace-nowrap active:scale-95"
+              className="bg-erhoeht hover:bg-rahmen text-schrift text-xs px-2.5 py-1 rounded-knopf font-bold transition-all flex items-center gap-1 border border-rahmen cursor-pointer whitespace-nowrap active:scale-95"
             >
               <Sparkles size={12} className="text-gold" />
               <span>Zaubern</span>
@@ -402,9 +402,9 @@ export const CombatMagicTab: React.FC = () => {
         {/* ══════════════════════════════════════════════════════════ */}
         <div className="space-y-6">
           {/* ── NEU: WAFFEN UND ANGRIFFE ── */}
-          <div className="bg-flaeche bg-opacity-70 rounded-karte border border-rahmen p-4 sm:p-5">
+          <div className="bg-flaeche rounded-karte border border-rahmen p-5">
             <div className="flex items-center justify-between gap-3 border-b border-gold pb-3 mb-4">
-              <h3 className="font-bold text-lg sm:text-xl fantasy-font text-gold-hell flex items-center gap-2">
+              <h3 className="font-bold text-[17px] fantasy-font text-gold-hell flex items-center gap-2">
                 <Swords size={20} className="text-gold shrink-0" />
                 <span>Waffen &amp; Angriffe</span>
               </h3>
@@ -421,7 +421,7 @@ export const CombatMagicTab: React.FC = () => {
             {/* List of Weapons */}
             <div className="space-y-3">
               {/* Natural / Unarmed Attack (Always available in Splittermond) */}
-              <div className="bg-erhoeht rounded-karte border border-rahmen p-4 shadow-2xs hover:border-gold transition-all space-y-3">
+              <div className="bg-erhoeht rounded-karte border border-rahmen p-4 hover:border-gold transition-all space-y-3">
                 {/* Header Row: Title & Badges */}
                 <div className="flex items-center justify-between gap-2 flex-wrap">
                   <div className="flex items-center gap-2 flex-wrap">
@@ -440,7 +440,7 @@ export const CombatMagicTab: React.FC = () => {
 
                 {/* Combat Stats Grid */}
                 <div className="grid grid-cols-3 gap-2">
-                  <div className="bg-flaeche rounded-knopf border border-rahmen p-2 text-center shadow-2xs">
+                  <div className="bg-flaeche rounded-knopf border border-rahmen p-2 text-center">
                     <span className="text-[11px] uppercase font-bold text-leise block leading-tight">AT</span>
                     <span className="text-base font-bold tabular-nums text-schrift mt-0.5 block">
                       {getSkillValue('Handgemenge')}
@@ -449,13 +449,13 @@ export const CombatMagicTab: React.FC = () => {
                       )}
                     </span>
                   </div>
-                  <div className="bg-flaeche rounded-knopf border border-rahmen p-2 text-center shadow-2xs">
+                  <div className="bg-flaeche rounded-knopf border border-rahmen p-2 text-center">
                     <span className="text-[11px] uppercase font-bold text-leise block leading-tight">Schaden</span>
                     <span className="text-base font-bold tabular-nums text-schaden mt-0.5 block">
                       1W6 <span className="text-xs text-leise font-normal">(Stumpf)</span>
                     </span>
                   </div>
-                  <div className="bg-flaeche rounded-knopf border border-rahmen p-2 text-center shadow-2xs">
+                  <div className="bg-flaeche rounded-knopf border border-rahmen p-2 text-center">
                     <span className="text-[11px] uppercase font-bold text-leise block leading-tight">WGS</span>
                     <span className="text-base font-bold tabular-nums text-schrift mt-0.5 block">
                       5 <span className="text-xs text-leise font-normal">Ticks</span>
@@ -496,7 +496,7 @@ export const CombatMagicTab: React.FC = () => {
                 return (
                   <div
                     key={w.id}
-                    className={`rounded-karte border p-4 shadow-2xs transition-all space-y-3 ${
+                    className={`rounded-karte border p-4 transition-all space-y-3 ${
                       w.equipped
                         ? enchantments.hasEnchantment
                           ? 'bg-erhoeht border-gold ring-2 ring-gold '
@@ -527,7 +527,7 @@ export const CombatMagicTab: React.FC = () => {
                             </span>
                           )}
                           {enchantments.hasEnchantment && (
-                            <span className="text-[11px] bg-erschoepft-grund text-erschoepft border border-erschoepft font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-2xs">
+                            <span className="text-[11px] bg-erschoepft-grund text-erschoepft border border-erschoepft font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
                               <Sparkles size={11} className="text-erschoepft" />
                               <span>{enchantments.spells.map((s) => s.name).join(', ')}</span>
                             </span>
@@ -591,7 +591,7 @@ export const CombatMagicTab: React.FC = () => {
 
                     {/* Combat Stats Grid (AT, Schaden, WGS, Reichweite) */}
                     <div className={`grid gap-2 ${w.range ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3'}`}>
-                      <div className="bg-flaeche rounded-knopf border border-rahmen p-2 text-center shadow-2xs">
+                      <div className="bg-flaeche rounded-knopf border border-rahmen p-2 text-center">
                         <span className="text-[11px] uppercase font-bold text-leise block leading-tight">AT</span>
                         <span className="text-base font-bold tabular-nums text-schrift mt-0.5 block">
                           {effectiveAT}
@@ -608,7 +608,7 @@ export const CombatMagicTab: React.FC = () => {
                           )}
                         </span>
                       </div>
-                      <div className="bg-flaeche rounded-knopf border border-rahmen p-2 text-center shadow-2xs">
+                      <div className="bg-flaeche rounded-knopf border border-rahmen p-2 text-center">
                         <span className="text-[11px] uppercase font-bold text-leise block leading-tight">Schaden</span>
                         <span className="text-base font-bold tabular-nums text-schaden mt-0.5 block">
                           {w.damage || '1W6'}
@@ -619,14 +619,14 @@ export const CombatMagicTab: React.FC = () => {
                           )}
                         </span>
                       </div>
-                      <div className="bg-flaeche rounded-knopf border border-rahmen p-2 text-center shadow-2xs">
+                      <div className="bg-flaeche rounded-knopf border border-rahmen p-2 text-center">
                         <span className="text-[11px] uppercase font-bold text-leise block leading-tight">WGS</span>
                         <span className="text-base font-bold tabular-nums text-schrift mt-0.5 block">
                           {w.wgs || 7} <span className="text-xs text-leise font-normal">Ticks</span>
                         </span>
                       </div>
                       {w.range && (
-                        <div className="bg-flaeche rounded-knopf border border-rahmen p-2 text-center shadow-2xs">
+                        <div className="bg-flaeche rounded-knopf border border-rahmen p-2 text-center">
                           <span className="text-[11px] uppercase font-bold text-leise block leading-tight">Reichweite</span>
                           <span className="text-base font-bold tabular-nums text-schrift mt-0.5 block">
                             {w.range}
@@ -679,9 +679,9 @@ export const CombatMagicTab: React.FC = () => {
           </div>
 
           {/* ── NEU: RÜSTUNGEN UND SCHILDE ── */}
-          <div className="bg-flaeche bg-opacity-70 rounded-karte border border-rahmen p-4 sm:p-5">
+          <div className="bg-flaeche rounded-karte border border-rahmen p-5">
             <div className="flex items-center justify-between gap-3 border-b border-gold pb-3 mb-4">
-              <h3 className="font-bold text-lg sm:text-xl fantasy-font text-gold-hell flex items-center gap-2">
+              <h3 className="font-bold text-[17px] fantasy-font text-gold-hell flex items-center gap-2">
                 <Shield size={20} className="text-gold shrink-0" />
                 <span>Rüstungen &amp; Schilde</span>
               </h3>
@@ -697,7 +697,7 @@ export const CombatMagicTab: React.FC = () => {
 
             {/* Defense Summary Strip - Responsive Grid that scales gracefully on all viewport sizes */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
-              <div className="bg-erhoeht rounded-karte border border-rahmen p-2.5 text-center flex flex-col justify-center min-w-0 shadow-2xs">
+              <div className="bg-erhoeht rounded-knopf border border-rahmen p-2.5 text-center flex flex-col justify-center min-w-0">
                 <span className="text-[11px] sm:text-[11px] uppercase font-bold text-leise block leading-tight text-center break-words" title="Rüstungsschutz (SR)">
                   Rüstung (SR)
                 </span>
@@ -715,7 +715,7 @@ export const CombatMagicTab: React.FC = () => {
                 </span>
               </div>
 
-              <div className="bg-erhoeht rounded-karte border border-rahmen p-2.5 text-center flex flex-col justify-center min-w-0 shadow-2xs">
+              <div className="bg-erhoeht rounded-knopf border border-rahmen p-2.5 text-center flex flex-col justify-center min-w-0">
                 <span className="text-[11px] sm:text-[11px] uppercase font-bold text-leise block leading-tight text-center break-words" title="Verteidigung (VTD)">
                   Verteidigung
                 </span>
@@ -734,7 +734,7 @@ export const CombatMagicTab: React.FC = () => {
               </div>
 
               <div
-                className="bg-erhoeht rounded-karte border border-rahmen p-2.5 text-center flex flex-col justify-center min-w-0 shadow-2xs cursor-help"
+                className="bg-erhoeht rounded-knopf border border-rahmen p-2.5 text-center flex flex-col justify-center min-w-0 cursor-help"
                 title={`Gesamt-Behinderung: ${calc.totalHandicap ?? calc.gearHandicap} (Rüstung: ${calc.armorHandicap ?? 0}, Schild: ${calc.shieldHandicap ?? 0}${calc.overweightHandicap ? `, Überlast: +${calc.overweightHandicap}` : ''})`}
               >
                 <span className="text-[11px] sm:text-[11px] uppercase font-bold text-leise block leading-tight text-center break-words">
@@ -748,7 +748,7 @@ export const CombatMagicTab: React.FC = () => {
                 </span>
               </div>
 
-              <div className="bg-erhoeht rounded-karte border border-rahmen p-2.5 text-center flex flex-col justify-center min-w-0 shadow-2xs">
+              <div className="bg-erhoeht rounded-knopf border border-rahmen p-2.5 text-center flex flex-col justify-center min-w-0">
                 <span className="text-[11px] sm:text-[11px] uppercase font-bold text-leise block leading-tight text-center break-words" title="Tick-Zuschlag">
                   Tick-Zuschlag
                 </span>
@@ -770,7 +770,7 @@ export const CombatMagicTab: React.FC = () => {
                   return (
                     <div
                       key={a.id}
-                      className={`rounded-karte border p-3.5 shadow-2xs transition-all ${
+                      className={`rounded-karte border p-3.5 transition-all ${
                         a.equipped
                           ? 'bg-erhoeht border-gold ring-1 ring-rahmen'
                           : 'bg-flaeche border-rahmen opacity-80 hover:opacity-100'
@@ -874,8 +874,8 @@ export const CombatMagicTab: React.FC = () => {
           </div>
 
           {/* ── KAMPFFERTIGKEITEN (Combat Skills) ── */}
-          <div className="bg-flaeche bg-opacity-70 rounded-karte border border-rahmen p-5">
-            <h3 className="font-bold text-xl fantasy-font text-gold-hell border-b border-gold pb-2 mb-3 flex items-center gap-2">
+          <div className="bg-flaeche rounded-karte border border-rahmen p-5">
+            <h3 className="font-bold text-[17px] fantasy-font text-gold-hell mb-3.5 flex items-center gap-2">
               <Swords size={20} className="text-gold" />
               Kampffertigkeiten
             </h3>
@@ -934,9 +934,9 @@ export const CombatMagicTab: React.FC = () => {
         {/* ══════════════════════════════════════════════════════════ */}
         <div className="space-y-6">
           {/* ── ZAUBER-SCHNELLZUGRIFF ── */}
-          <div className="bg-flaeche bg-opacity-70 rounded-karte border border-rahmen p-5">
+          <div className="bg-flaeche rounded-karte border border-rahmen p-5">
             <div className="flex justify-between items-center border-b border-gold pb-2 mb-3">
-              <h3 className="font-bold text-xl fantasy-font text-gold-hell flex items-center gap-2">
+              <h3 className="font-bold text-[17px] fantasy-font text-gold-hell flex items-center gap-2">
                 <Sparkles size={20} className="text-gold" />
                 Zauber-Schnellzugriff
               </h3>
@@ -976,8 +976,8 @@ export const CombatMagicTab: React.FC = () => {
           </div>
 
           {/* ── MAGIESCHULEN ── */}
-          <div className="bg-flaeche bg-opacity-70 rounded-karte border border-rahmen p-5">
-            <h3 className="font-bold text-xl fantasy-font text-gold-hell border-b border-gold pb-2 mb-3 flex items-center gap-2">
+          <div className="bg-flaeche rounded-karte border border-rahmen p-5">
+            <h3 className="font-bold text-[17px] fantasy-font text-gold-hell mb-3.5 flex items-center gap-2">
               <Sparkles size={20} className="text-gold" />
               Magieschulen
             </h3>
@@ -991,7 +991,7 @@ export const CombatMagicTab: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => session.openRollForSkill(skill)}
-                      className="min-h-11 w-full flex justify-between items-center bg-erhoeht hover:bg-rahmen rounded-knopf px-3 py-2 text-sm font-bold text-schrift transition-all border border-rahmen hover:border-gold cursor-pointer shadow-2xs"
+                      className="min-h-11 w-full flex justify-between items-center bg-erhoeht hover:bg-rahmen rounded-knopf px-3 py-2 text-sm font-bold text-schrift transition-all border border-rahmen hover:border-gold cursor-pointer"
                     >
                       <span className="flex items-center gap-1.5">
                         <DiceIcon size={14} />
@@ -1043,7 +1043,7 @@ export const CombatMagicTab: React.FC = () => {
                               <button
                                 type="button"
                                 onClick={() => session.handleOpenCastSpell(s)}
-                                className="w-full flex items-center justify-between text-xs bg-erhoeht hover:bg-rahmen active:bg-erhoeht border border-rahmen hover:border-gold rounded-knopf px-2.5 py-1.5 transition-all shadow-2xs cursor-pointer group gap-2 text-left"
+                                className="w-full flex items-center justify-between text-xs bg-erhoeht hover:bg-rahmen active:bg-erhoeht border border-rahmen hover:border-gold rounded-knopf px-2.5 py-1.5 transition-all cursor-pointer group gap-2 text-left"
                                 title="Zauber wirken"
                               >
                                 <div className="text-schrift group-hover:text-gold-hell font-bold truncate flex items-center gap-1.5 min-w-0 flex-1">
@@ -1078,7 +1078,7 @@ export const CombatMagicTab: React.FC = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-seite/80 p-4 overflow-y-auto">
           <div className="bg-flaeche border border-rahmen rounded-karte shadow-2xl max-w-2xl w-full p-5 space-y-4 max-h-[90vh] flex flex-col">
             <div className="flex justify-between items-center border-b border-gold pb-2">
-              <h3 className="font-bold text-lg text-gold-hell fantasy-font flex items-center gap-2">
+              <h3 className="font-bold text-[17px] text-gold-hell fantasy-font flex items-center gap-2">
                 <Swords size={20} className="text-gold" />
                 Waffe auswählen oder erstellen
               </h3>
@@ -1245,7 +1245,7 @@ export const CombatMagicTab: React.FC = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-seite/80 p-4 overflow-y-auto">
           <div className="bg-flaeche border border-rahmen rounded-karte shadow-2xl max-w-2xl w-full p-5 space-y-4 max-h-[90vh] flex flex-col">
             <div className="flex justify-between items-center border-b border-gold pb-2">
-              <h3 className="font-bold text-lg text-gold-hell fantasy-font flex items-center gap-2">
+              <h3 className="font-bold text-[17px] text-gold-hell fantasy-font flex items-center gap-2">
                 <Shield size={20} className="text-gold" />
                 Rüstung oder Schild auswählen
               </h3>

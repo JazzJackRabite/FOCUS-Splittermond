@@ -94,11 +94,11 @@ export const DiceLog: React.FC<DiceLogProps> = ({
   const allEntries: LogEntry[] = entries ?? (rolls ?? []);
 
   return (
-    <div id="protocol-section" className="bg-flaeche bg-opacity-80 rounded-karte border border-rahmen p-4 text-schrift">
+    <div id="protocol-section" className="bg-flaeche rounded-karte border border-rahmen p-5 text-schrift">
       <div className="flex justify-between items-center border-b border-gold pb-2 mb-3">
         <div className="flex items-center gap-2">
           <History className="text-gold" size={20} />
-          <h3 className="font-bold text-lg fantasy-font">Protokoll &amp; Schnellwürfler</h3>
+          <h3 className="font-bold text-[17px] fantasy-font">Protokoll &amp; Schnellwürfler</h3>
         </div>
         <div className="flex items-center gap-2">
           {onUndo && (
@@ -205,7 +205,7 @@ export const DiceLog: React.FC<DiceLogProps> = ({
                 return (
                   <div
                     key={rest.id}
-                    className={`protocol-card ${cardClass} p-2.5 rounded-knopf border text-xs flex justify-between items-center transition-all shadow-2xs`}
+                    className={`protocol-card ${cardClass} p-2.5 rounded-knopf border text-xs flex justify-between items-center transition-all`}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
                       <div className="protocol-icon-box w-7 h-7 rounded-knopf flex items-center justify-center shrink-0 border">
@@ -222,7 +222,7 @@ export const DiceLog: React.FC<DiceLogProps> = ({
                       </div>
                     </div>
 
-                    <span className={`protocol-badge text-[11px] px-2.5 py-0.5 rounded-knopf shrink-0 ml-2 font-bold shadow-2xs ${badgeClass}`}>
+                    <span className={`protocol-badge text-[11px] px-2.5 py-0.5 rounded-knopf shrink-0 ml-2 font-bold ${badgeClass}`}>
                       {isVp ? '15 Min' : '6 Std'}
                     </span>
                   </div>
@@ -284,7 +284,7 @@ export const DiceLog: React.FC<DiceLogProps> = ({
                 return (
                   <div
                     key={act.id}
-                    className={`protocol-card ${cardClass} p-2.5 rounded-knopf border text-xs flex justify-between items-center transition-all shadow-2xs`}
+                    className={`protocol-card ${cardClass} p-2.5 rounded-knopf border text-xs flex justify-between items-center transition-all`}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
                       <div className="protocol-icon-box w-7 h-7 rounded-knopf flex items-center justify-center shrink-0 border">
@@ -304,7 +304,7 @@ export const DiceLog: React.FC<DiceLogProps> = ({
                     </div>
 
                     {act.badge && (
-                      <span className={`protocol-badge text-[11px] px-2.5 py-0.5 rounded-knopf shrink-0 ml-2 font-bold shadow-2xs ${badgeClass}`}>
+                      <span className={`protocol-badge text-[11px] px-2.5 py-0.5 rounded-knopf shrink-0 ml-2 font-bold ${badgeClass}`}>
                         {act.badge.text}
                       </span>
                     )}
@@ -328,7 +328,7 @@ export const DiceLog: React.FC<DiceLogProps> = ({
               return (
                 <div
                   key={r.id}
-                  className={`protocol-card ${cardClass} p-2.5 rounded-knopf border text-xs flex justify-between items-center transition-all shadow-2xs`}
+                  className={`protocol-card ${cardClass} p-2.5 rounded-knopf border text-xs flex justify-between items-center transition-all`}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
                     <div className="protocol-icon-box w-7 h-7 rounded-knopf flex items-center justify-center shrink-0 border">

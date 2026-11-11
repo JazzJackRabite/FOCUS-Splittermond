@@ -99,7 +99,7 @@ export const ChanneledSpellsTracker: React.FC<ChanneledSpellsTrackerProps> = ({
           return (
             <div
               key={spell.id}
-              className="bg-flaeche rounded-knopf border border-rahmen shadow-2xs hover:border-gold transition-all p-3 space-y-2.5"
+              className="bg-flaeche rounded-knopf border border-rahmen hover:border-gold transition-all p-3 space-y-2.5"
             >
               {/* Top Row: Name, School, Focus badge & Release Button */}
               <div className="flex flex-wrap items-center justify-between gap-2">
@@ -111,12 +111,12 @@ export const ChanneledSpellsTracker: React.FC<ChanneledSpellsTrackerProps> = ({
                         {spell.name}
                       </span>
                       {buff && (
-                        <span className="text-[11px] font-bold text-schrift bg-magie-grund border border-magie px-1.5 py-0.5 rounded-knopf shadow-2xs">
+                        <span className="text-[11px] font-bold text-schrift bg-magie-grund border border-magie px-1.5 py-0.5 rounded-knopf">
                           {buff.description}
                         </span>
                       )}
                       {spell.targetItemName && (
-                        <span className="text-[11px] font-bold text-erschoepft bg-erschoepft-grund border border-erschoepft px-1.5 py-0.5 rounded-knopf shadow-2xs flex items-center gap-1">
+                        <span className="text-[11px] font-bold text-erschoepft bg-erschoepft-grund border border-erschoepft px-1.5 py-0.5 rounded-knopf flex items-center gap-1">
                           <Tag size={10} className="text-erschoepft" />
                           <span>Ziel: {spell.targetItemName}</span>
                         </span>
@@ -136,7 +136,7 @@ export const ChanneledSpellsTracker: React.FC<ChanneledSpellsTrackerProps> = ({
                 </div>
 
                 <div className="flex items-center gap-2 shrink-0">
-                  <span className="bg-erhoeht text-schrift border border-rahmen text-xs font-bold px-2 py-1 rounded-knopf tabular-nums shadow-2xs">
+                  <span className="bg-erhoeht text-schrift border border-rahmen text-xs font-bold px-2 py-1 rounded-knopf tabular-nums">
                     {spell.channeledFocus} FO
                   </span>
 
@@ -144,7 +144,7 @@ export const ChanneledSpellsTracker: React.FC<ChanneledSpellsTrackerProps> = ({
                   <button
                     type="button"
                     onClick={() => onCancelSpell(spell)}
-                    className="bg-erhoeht hover:bg-rahmen text-schaden border border-magie rounded-knopf px-2.5 py-1 text-xs font-bold transition-all flex items-center gap-1.5 shadow-2xs cursor-pointer active:scale-95 no-print"
+                    className="bg-erhoeht hover:bg-rahmen text-schaden border border-magie rounded-knopf px-2.5 py-1 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 no-print"
                     title="Kanalisierung sofort beenden – überführt den gebundenen Fokus automatisch in den erschöpften Pool"
                   >
                     <ZapOff size={13} />

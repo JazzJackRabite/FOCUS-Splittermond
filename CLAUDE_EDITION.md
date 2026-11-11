@@ -497,6 +497,11 @@ Alle Begleiter bleiben im Tab „Begleiter“ (Entscheidung 11.11.2026: kein Ber
 - **Offen (Datenseite, Ordner `Werkzeuge`):** Zahlenwerte für Abrichtungen (Boni im Wertekasten), Vertraute aus „Die Magie“ (im Paket
   nur Verweise), Regelwerte von Gefolge/Untoten/Golems in `strukturiert`, fehlende Bestiarium-Werte. **Offen (Entscheidung):**
   Baukasten für beschwörbare Wesen und Bestien braucht eine neue Zeile in der Tabelle „Regelquellen“.
+- **Reiter „Spielen“ und „Kampf & Magie“ im Aussehen des Mockups** (Anordnung und Felder unverändert): Karten auf
+  `flaeche` mit 20 Pixel Innenrand und 20 Pixel Abstand, Titel 17 Pixel, innere Kacheln auf `erhoeht`; Balken 18 Pixel
+  hoch; Legenden als 12-Pixel-Quadrate; Farben nach Bedeutung (echter Schaden/verzehrt `schaden`, Betäubung/erschöpft
+  `erschoepft`, kanalisiert `kanalisiert`, freie Lebenspunkte `unverletzt`-Rand); Knöpfe „Schaden“/„Heilung“ und Zähler
+  44 Pixel hoch; keine Linie mehr unter Kartentiteln.
 
 ## Stand 23 (11.11.2026): Wesen-Baukasten – beschwörbare Wesen und Kreaturen
 

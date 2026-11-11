@@ -151,12 +151,12 @@ export const RestSection: React.FC<RestSectionProps> = ({
   const ruhephaseDuration = hasSegenMondkraft ? '3 Stunden' : '6 Stunden';
 
   return (
-    <div id="rest-section-container" className="bg-flaeche bg-opacity-70 rounded-karte border border-rahmen p-4 sm:p-5 space-y-3.5">
+    <div id="rest-section-container" className="bg-flaeche rounded-karte border border-rahmen p-5 space-y-3.5">
       {/* Section Header */}
       <div className="flex items-center justify-between border-b border-rahmen pb-2">
         <div className="flex items-center gap-2">
           
-          <h3 className="font-bold text-lg sm:text-xl fantasy-font text-gold-hell">
+          <h3 className="font-bold text-[17px] fantasy-font text-gold-hell">
             Regeneration &amp; Pausen
           </h3>
         </div>
@@ -173,7 +173,7 @@ export const RestSection: React.FC<RestSectionProps> = ({
             {/* Top row: Title + Duration */}
             <div className="flex items-start justify-between gap-2">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-knopf bg-erhoeht text-schrift border border-rahmen shadow-2xs">
+                <div className="p-2 rounded-knopf bg-erhoeht text-schrift border border-rahmen">
                   <Sun size={18} className="text-gold" />
                 </div>
                 <div>
@@ -196,7 +196,7 @@ export const RestSection: React.FC<RestSectionProps> = ({
 
               {/* Status Badge when customized */}
               {!isVpDefault && (
-                <span className="text-[11px] px-2 py-0.5 rounded-full font-bold bg-erhoeht text-gold border border-rahmen shadow-2xs">
+                <span className="text-[11px] px-2 py-0.5 rounded-full font-bold bg-erhoeht text-gold border border-rahmen">
                   Angepasst
                 </span>
               )}
@@ -254,7 +254,7 @@ export const RestSection: React.FC<RestSectionProps> = ({
             {/* Top row: Title + Duration */}
             <div className="flex items-start justify-between gap-2">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-knopf bg-erhoeht text-schrift border border-rahmen shadow-2xs">
+                <div className="p-2 rounded-knopf bg-erhoeht text-schrift border border-rahmen">
                   <Moon size={18} className="text-schrift" />
                 </div>
                 <div>
@@ -278,11 +278,11 @@ export const RestSection: React.FC<RestSectionProps> = ({
               {/* Status or preview badges */}
               <div className="flex items-center gap-1.5">
                 {!isRuhephaseDefault && (
-                  <span className="text-[11px] px-2 py-0.5 rounded-full font-bold bg-erhoeht text-gold border border-rahmen shadow-2xs">
+                  <span className="text-[11px] px-2 py-0.5 rounded-full font-bold bg-erhoeht text-gold border border-rahmen">
                     Angepasst
                   </span>
                 )}
-                <span className="text-xs font-bold tabular-nums px-2 py-0.5 rounded-knopf bg-erhoeht text-schrift border border-rahmen shadow-2xs">
+                <span className="text-xs font-bold tabular-nums px-2 py-0.5 rounded-knopf bg-erhoeht text-schrift border border-rahmen">
                   +{customLP} LP · +{customFO} FO
                 </span>
               </div>
@@ -421,7 +421,7 @@ export const RestSection: React.FC<RestSectionProps> = ({
                   {/* Options Settings */}
                   <div className="space-y-3">
                     {/* Betäubungsschaden */}
-                    <div className="bg-flaeche rounded-knopf border border-rahmen p-3 space-y-2 shadow-2xs">
+                    <div className="bg-flaeche rounded-knopf border border-rahmen p-3 space-y-2">
                       <div className="flex items-center justify-between">
                         <span className="font-bold text-schrift flex items-center gap-1.5">
                           <Heart size={15} className="text-schaden" />
@@ -476,7 +476,7 @@ export const RestSection: React.FC<RestSectionProps> = ({
                     </div>
 
                     {/* Erschöpfter Fokus */}
-                    <div className="bg-flaeche rounded-knopf border border-rahmen p-3 space-y-2 shadow-2xs">
+                    <div className="bg-flaeche rounded-knopf border border-rahmen p-3 space-y-2">
                       <div className="flex items-center justify-between">
                         <span className="font-bold text-schrift flex items-center gap-1.5">
                           <Sparkles size={15} className="text-kanalisiert" />
@@ -531,7 +531,7 @@ export const RestSection: React.FC<RestSectionProps> = ({
                     </div>
 
                     {/* Erschöpfung & Zustände */}
-                    <div className="bg-flaeche rounded-knopf border border-rahmen p-3 space-y-2.5 shadow-2xs">
+                    <div className="bg-flaeche rounded-knopf border border-rahmen p-3 space-y-2.5">
                       <div className="flex items-center justify-between">
                         <span className="font-bold text-schrift text-xs">Erschöpfung abbauen:</span>
                         <div className="flex items-center rounded-knopf border border-rahmen bg-erhoeht overflow-hidden h-7">
@@ -640,7 +640,7 @@ export const RestSection: React.FC<RestSectionProps> = ({
                   {/* Manual Value Inputs */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {/* LP Input */}
-                    <div className="bg-flaeche rounded-knopf border border-rahmen p-3 space-y-2 shadow-2xs">
+                    <div className="bg-flaeche rounded-knopf border border-rahmen p-3 space-y-2">
                       <div className="flex items-center justify-between">
                         <label className="font-bold text-schrift text-xs flex items-center gap-1">
                           <Heart size={14} className="text-gold" />
@@ -682,7 +682,7 @@ export const RestSection: React.FC<RestSectionProps> = ({
                     </div>
 
                     {/* FO Input */}
-                    <div className="bg-flaeche rounded-knopf border border-rahmen p-3 space-y-2 shadow-2xs">
+                    <div className="bg-flaeche rounded-knopf border border-rahmen p-3 space-y-2">
                       <div className="flex items-center justify-between">
                         <label className="font-bold text-schrift text-xs flex items-center gap-1">
                           <Sparkles size={14} className="text-schrift" />

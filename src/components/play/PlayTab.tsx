@@ -37,18 +37,18 @@ export const PlayTab: React.FC = () => {
   } = calc;
 
   return (
-    <div className="p-4 md:p-6 space-y-6 w-full">
+    <div className="p-4 md:p-6 space-y-5 w-full">
       {/* ── SHARED VITALS: Live-Status, Lebenspunkte, Fokus, Abgeleitete Werte, Splitterpunkte ── */}
       <PlaySharedVitals isMinimal={true} />
 
       {/* ── SPIELEN & ABENTEUER CONTENT GRID ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* ── Linke Hauptspalte: Allgemeine Fertigkeiten & Stärken, Schwächen, Sprachen ── */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-5">
           {/* ── Allgemeine Fertigkeiten ── */}
-          <div className="bg-flaeche bg-opacity-70 rounded-karte border border-rahmen p-5">
+          <div className="bg-flaeche rounded-karte border border-rahmen p-5">
             <div className="flex justify-between items-center border-b border-gold pb-2 mb-3">
-              <h3 className="font-bold text-xl fantasy-font text-gold-hell">
+              <h3 className="font-bold text-[17px] fantasy-font text-gold-hell">
                 Allgemeine Fertigkeiten
               </h3>
               <span className="text-xs text-leise font-medium">Klick zum Würfeln (2W10 + Wert)</span>
@@ -69,7 +69,7 @@ export const PlayTab: React.FC = () => {
                           ? `${skill}: Basiswert ${total}, Behinderung −${beh} (effektiv ${Number(total) - beh})`
                           : `${skill} würfeln`
                       }
-                      className="flex justify-between items-center bg-erhoeht hover:bg-rahmen rounded-knopf min-h-11 px-3 py-2 text-sm font-bold text-schrift transition-all border border-rahmen hover:border-gold cursor-pointer w-full shadow-2xs"
+                      className="flex justify-between items-center bg-erhoeht hover:bg-rahmen rounded-knopf min-h-11 px-3 py-2 text-sm font-bold text-schrift transition-all border border-rahmen hover:border-gold cursor-pointer w-full"
                     >
                       <span className="flex items-center gap-1 truncate mr-1">
                         <DiceIcon size={14} /> {skill}
@@ -129,8 +129,8 @@ export const PlayTab: React.FC = () => {
 
           {/* ── Stärken, Schwächen & Sprachen ── */}
           {(strengthsList.length > 0 || weaknessesList.length > 0 || languagesList.length > 0) && (
-            <div className="bg-flaeche bg-opacity-70 rounded-karte border border-rahmen p-5">
-              <h3 className="font-bold text-xl fantasy-font text-gold-hell border-b border-gold pb-2 mb-3">
+            <div className="bg-flaeche rounded-karte border border-rahmen p-5">
+              <h3 className="font-bold text-[17px] fantasy-font text-gold-hell mb-3.5">
                 Stärken, Schwächen &amp; Sprachen
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -284,9 +284,9 @@ export const PlayTab: React.FC = () => {
           <WirkungenKarte />
 
           {/* ── Attribute (würfelbar 2W10 + Attr) ── */}
-          <div className="bg-flaeche bg-opacity-70 rounded-karte border border-rahmen p-5">
+          <div className="bg-flaeche rounded-karte border border-rahmen p-5">
             <div className="flex justify-between items-center border-b border-gold pb-2 mb-3">
-              <h3 className="font-bold text-xl fantasy-font text-gold-hell">
+              <h3 className="font-bold text-[17px] fantasy-font text-gold-hell">
                 Attribute
               </h3>
               <span className="text-xs text-leise font-medium">Attributsprobe</span>
@@ -297,7 +297,7 @@ export const PlayTab: React.FC = () => {
                   key={key}
                   type="button"
                   onClick={() => session.openRollForAttr(key)}
-                  className="min-h-11 flex justify-between items-center bg-erhoeht hover:bg-rahmen rounded-knopf px-3 py-2 text-sm font-bold text-schrift transition-all border border-transparent hover:border-gold cursor-pointer shadow-2xs"
+                  className="min-h-11 flex justify-between items-center bg-erhoeht hover:bg-rahmen rounded-knopf px-3 py-2 text-sm font-bold text-schrift transition-all border border-transparent hover:border-gold cursor-pointer"
                   title={`${label}: Klick für Attributsprobe (2W10 + ${key})`}
                 >
                   <span className="flex items-center gap-1.5">
