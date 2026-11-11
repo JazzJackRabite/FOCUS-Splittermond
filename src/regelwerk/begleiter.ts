@@ -177,3 +177,9 @@ export function istReittier(k: Katalog, b: Begleiter): boolean {
   const e = k.get(b.id);
   return (e ? typusListe(e).includes('Reittier') : false) || (b.abrichtungen ?? []).some(i => /reittier-i$/.test(i));
 }
+
+/** Stufe eines beschwörbaren Wesens (null, wenn nicht angegeben) */
+export function wesenStufe(e: Eintrag | undefined): number | null {
+  const s = Number(e?.daten.beschwoerbares_wesen_stufe);
+  return Number.isFinite(s) && s > 0 ? s : null;
+}

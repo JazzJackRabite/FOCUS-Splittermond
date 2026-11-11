@@ -22,7 +22,6 @@ Repository `JazzJackRabite/FOKUS-1.0-claudeedition` (Branch `main`; entstanden a
   13 Charaktere, 120 Berechnungen abgeleiteter Werte und 150 Erschaffungen mit den Ergebnissen des Python-Laders.
   Mit allen Büchern lokal: `FOKUS_BUECHER=<Regelpakete/editor/buecher> FOKUS_REFERENZ_VOLL=<referenz_voll.json> npx vitest run src/regelwerk`.
 
-
 ## Stand 2 (05.11.2026): Regeln aus den Daten, Bücher im Editor
 
 - **Abgeleitete Werte nach den Regeldaten** (`regelwerk/bruecke.ts` → `abgeleiteteFuerCharakter`, eingebunden in
@@ -471,7 +470,36 @@ Dateien aus AI Studio im Repository: `public/assets/aistudio/*.png`, `.aistudio/
 - Offen: Wachsen des Relikts und Chronik, beseelte Gegenstände, Schwerpunkt-Bonus bei Proben, Härte (kein Feld im
   Inventar, nur als Text).
 
+## Stand 22 (11.11.2026): Begleiter – Bausteine, Zustände, waffenlos, freie Meisterschaften, Golem-Feinschliff
+
+Alle Begleiter bleiben im Tab „Begleiter“ (Entscheidung 11.11.2026: kein Bereich im Tab „Kampf & Magie“).
+
+- **Bausteine (FUNDAMENT Teil 3):** Tiere, Gefolge, beschworene Wesen, Untote, Golems und der Spielbereich verwenden `Karte`,
+  `Abschnittstitel`, `Knopf` (44 px), `Marke`, `Auswahl`, `Eingabe`. Gemeinsame Hülle `Eintrag` (aufklappbarer Titel, Marken,
+  Entfernen), `Hinweise`, `Notiz`, `MarkeMitEntfernen` (Entfernen als eigener Knopf neben der Marke) in
+  `components/begleiter/Wertekasten.tsx`. Keine Symbole oder Emojis mehr in Auswahllisten (Wörter statt Häkchen), Bedeutungsfarben
+  als Rahmen, Kurzanzeige LP/FO als Marke.
+- **Paketzugriffe aus den Ansichten entfernt:** Wesen, Untote, Golems und Gefolge fragen `regelwerk/` (`wesenStufe`,
+  `abnormitaetText`, `steigerbareFertigkeiten`, `bausteinInfo`, `materialInfo`, `korpusGK`, `kulturModul`, `rasseText`,
+  `anhebbareFertigkeiten`, `zauberAlsSpell` in `bruecke.ts`). Alle fünf Begleiter-Dateien sind aus der Altlast `paketzugriffe` heraus.
+- **Zustände für Begleiter:** dieselbe Zustandsliste wie beim Abenteurer (`CONDITIONS_WITH_LEVELS`/`…_WITHOUT_LEVELS`, Abzüge über
+  `getConditionMalus`), je Begleiter in `zustand.zustaende`; gehen in Probe, Angriff und Zauber ein.
+- **Waffenloser Angriff für Gefolgsleute:** Waffen ohne Preis und ohne Verfügbarkeit hat jeder (GRW-Paket: nur Waffenlos, S. 183;
+  als Auslegung gekennzeichnet, `angeboreneWaffen()`); Angriffswert Handgemenge + Attribute der Waffe.
+- **Untote: freie Meisterschaften wählbar:** ein Platz je erreichter Schwelle einer gesteigerten Fertigkeit, Auswahl bis zur Schwelle
+  des Platzes, gespeichert in `meisterschaften`; ohne Platz ein Regelverstoß (Hausregeln: Warnung). Im Wertekasten angezeigt.
+- **Golem-Feinschliff bedienbar:** Wahl-Texte der Bausteine werden zu Auswahlen (`leseWahlen`, Zahlen aus dem Paket-Text):
+  Attribut („ein beliebiges Attribut +1“, „BEW oder INT oder KON oder STÄ +1“, wirkt auf abgeleitete Werte und Fertigkeiten),
+  freie Meisterschaft („[Schwelle 1]“ bzw. „[Schwelle siehe Schritt 5]“ nach Stufe), Fertigkeit („auf 6 oder +3“), Punkte verteilen
+  („8 freie Fertigkeitspunkte, max. +2“). Feste Meisterschaften aus den Bausteinen erscheinen im Wertekasten. Feld `feinschliff`.
+- Tests: `begleiter`, `begleiterSpiel`, `gefolge`, `untoteGolems` angepasst und erweitert. 354 grün mit allen Büchern
+  (bekannter Relikte-Test mit älteren Buchpaketen ausgenommen), FUNDAMENT-Prüfungen grün, Build gelingt, im Browser geprüft.
+- **Offen (Datenseite, Ordner `Werkzeuge`):** Zahlenwerte für Abrichtungen (Boni im Wertekasten), Vertraute aus „Die Magie“ (im Paket
+  nur Verweise), Regelwerte von Gefolge/Untoten/Golems in `strukturiert`, fehlende Bestiarium-Werte. **Offen (Entscheidung):**
+  Baukasten für beschwörbare Wesen und Bestien braucht eine neue Zeile in der Tabelle „Regelquellen“.
+
 ## Google AI Studio
 
 Unverändert eine Vite-/React-App mit `metadata.json` im Wurzelordner; Import über „Import from GitHub“, Hosting über Cloud Run.
 Neue Abhängigkeiten gibt es nicht. Die Regelpakete liegen in `public/` und werden zur Laufzeit geladen.
+

@@ -55,12 +55,17 @@ describe('Lebenspunkte und Fokus', () => {
     const anderthalb = Object.values(K.eintraege).find(e => e.typ === 'waffe' && e.name === 'Anderthalbhänder')!;
     const g = gefolgeWerte(K, { id: 'grw:kultur:zwingard', art: 'gefolge', name: 'Zwingard', rasse: 'grw:rasse:menschen', attributFrei: ['Stärke', 'Beweglichkeit'],
       kulturWahl: { fertigkeiten: { 0: 'grw:fertigkeit:stangenwaffen', 4: 'grw:fertigkeit:handwerk', 5: 'grw:fertigkeit:heilkunde' } }, waffen: [anderthalb.id] }, 6);
-    expect(g.waffen[0]).toMatchObject({ name: 'Anderthalbhänder', wert: 2 + 3 + 3, schaden: '2W6', fertigkeit: 'Klingenwaffen' }); // Klingenwaffen 2 + BEW 3 + STÄ 3
-    expect(g.werte.waffen?.[0].wert).toBe('8');
+    expect(g.waffen.find(w => w.name === 'Anderthalbhänder')).toMatchObject({ wert: 2 + 3 + 3, schaden: '2W6', fertigkeit: 'Klingenwaffen', angeboren: false }); // Klingenwaffen 2 + BEW 3 + STÄ 3
+    // Waffenlos hat jeder (Waffe ohne Preis und Verfügbarkeit, GRW S. 183): Handgemenge + BEW + STÄ
+    const hg = g.fertigkeiten.find(f => f.name === 'Handgemenge')?.punkte ?? 0;
+    expect(g.waffen[0]).toMatchObject({ name: 'Waffenlos', wert: hg + 3 + 3, schaden: '1W6', angeboren: true });
+    expect(g.werte.waffen?.map(w => w.name)).toEqual(['Waffenlos', 'Anderthalbhänder']);
   });
   it('Import übernimmt Zustand und Waffen', () => {
-    const r = validateCharacterImport({ ...DEFAULT_STATE, begleiter: [{ id: 'x', art: 'tier', name: 'Wolf', waffen: ['w'], zustand: { schaden: 3, betaeubung: 'x', fokus: { erschoepft: 2 } } }] });
-    expect(r.begleiter?.[0]).toMatchObject({ waffen: ['w'], zustand: { schaden: 3, fokus: { erschoepft: 2 } } });
+    const r = validateCharacterImport({ ...DEFAULT_STATE, begleiter: [{ id: 'x', art: 'tier', name: 'Wolf', waffen: ['w'], feinschliff: { a: 'KON', b: { f: 2 }, c: 3 },
+      zustand: { schaden: 3, betaeubung: 'x', fokus: { erschoepft: 2 }, zustaende: [{ id: 'z', key: 'Benommen', level: 2 }, { foo: 1 }] } }] });
+    expect(r.begleiter?.[0]).toMatchObject({ waffen: ['w'], feinschliff: { a: 'KON', b: { f: 2 } }, zustand: { schaden: 3, fokus: { erschoepft: 2 }, zustaende: [{ id: 'z', key: 'Benommen', level: 2 }] } });
+    expect(r.begleiter?.[0].feinschliff).not.toHaveProperty('c');
     expect(r.begleiter?.[0].zustand).not.toHaveProperty('betaeubung');
   });
 });
@@ -96,10 +101,19 @@ describe('Tab „Begleiter“: würfeln und Lebenspunkte', () => {
     expect(within(v).queryByText(/Wundabzug/)).toBeNull();
     expect(within(v).getByText(`LP ${lp * 3}/${lp * 3}`)).toBeTruthy();
 
+    // Zustand: Benommen 2 → Marke mit Abzug, wirkt in der Probe
+    fireEvent.change(within(v).getByLabelText('Zustand hinzufügen'), { target: { value: 'Benommen' } });
+    fireEvent.change(within(v).getByLabelText('Stufe'), { target: { value: '2' } });
+    fireEvent.click(within(v).getByRole('button', { name: /^Zustand$/ }));
+    expect(within(v).getByText(/Benommen 2 \(-2\)/)).toBeTruthy();
+
     fireEvent.click(within(tiere).getByRole('button', { name: /^Probe Wahrnehmung würfeln$/ }));
+    expect(screen.getAllByText(/Benommen/).length).toBeGreaterThan(1); // auch im Probe-Modal
     expect(screen.getByText(/Grauzahn: Wahrnehmung/)).toBeTruthy();
     fireEvent.click(screen.getByTitle('Schließen'));
     expect(screen.queryByText(/Grauzahn: Wahrnehmung/)).toBeNull();
+    fireEvent.click(within(v).getByRole('button', { name: 'Zustand Benommen beenden' }));
+    expect(within(v).queryByText(/Benommen 2/)).toBeNull();
     fireEvent.click(within(tiere).getAllByRole('button', { name: /^Angriff .* würfeln$/ })[0]);
     expect(screen.getAllByText(/Grauzahn: /).length).toBeGreaterThan(0);
   });

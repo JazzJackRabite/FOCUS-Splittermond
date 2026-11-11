@@ -115,11 +115,14 @@ describe('Tab „Begleiter“: Gefolge', () => {
     fireEvent.click(within(sek).getByRole('button', { name: 'Gefolgsmann (Zwingard)' }));
     fireEvent.change(within(sek).getByPlaceholderText('Leibdiener, Knappe …'), { target: { value: 'Knappe' } });
     expect(within(sek).getByRole('button', { name: 'Knappe (Zwingard)' })).toBeTruthy();
-    fireEvent.change(within(sek).getByLabelText('Freier Attributbonus 1'), { target: { value: 'Stärke' } });
+    fireEvent.change(within(sek).getByLabelText(/^Freier Attributbonus 1/), { target: { value: 'Stärke' } });
     fireEvent.change(within(sek).getByLabelText('Kultur: Hiebwaffen oder Schusswaffen oder Stangenwaffen 1'), { target: { value: 'grw:fertigkeit:stangenwaffen' } });
-    const tabelle = within(sek).getByRole('table');
+    // zwei Tabellen: Waffen (Waffenlos hat jeder) und Fertigkeiten
+    const tabellen = within(sek).getAllByRole('table');
+    expect(within(tabellen[0]).getByText('Waffenlos')).toBeTruthy();
+    const tabelle = tabellen[tabellen.length - 1];
     expect(within(tabelle).getByText('Stangenwaffen')).toBeTruthy();
-    expect(within(sek).getByText('(Kultur)').closest('li')!.textContent).toContain('Schnell wieder auf den Beinen');
+    expect(within(sek).getByText('(Kultur)').parentElement!.textContent).toContain('Schnell wieder auf den Beinen');
     expect(within(sek).getByText(/verbraucht 1\./)).toBeTruthy();
     // Stangenwaffen auf 6 anheben → 2 Punkte, mehr als die Ressource
     const zeile = within(tabelle).getByText('Stangenwaffen').closest('tr')!;
@@ -128,7 +131,7 @@ describe('Tab „Begleiter“: Gefolge', () => {
     expect(within(sek).getByText(/verbraucht 1\./)).toBeTruthy();
     setzeHausregeln(true);
     fireEvent.click(within(zeile).getByRole('button', { name: /anheben/ }));
-    expect(within(zeile).getAllByText('6').length).toBeGreaterThan(0);
+    expect(within(zeile).getAllByText(/^6/).length).toBeGreaterThan(0);
     expect(within(sek).getByText(/verbraucht 2\./)).toBeTruthy();
     expect(within(sek).getByText(/mehr Punkte, als die Ressource Gefolge hergibt/)).toBeTruthy();
     // Meisterschaft der Schwelle ist frei

@@ -528,6 +528,8 @@ export function validateCharacterImport(data: unknown): Partial<CharacterState> 
   const zustand = (z: Record<string, unknown>): NonNullable<Begleiter['zustand']> => ({
     ...(zahlen({ schaden: z.schaden, betaeubung: z.betaeubung, kanalisiert: z.kanalisiert }) ?? {}),
     ...(zahlen(z.fokus) && Object.keys(zahlen(z.fokus)!).length ? { fokus: zahlen(z.fokus) } : {}),
+    ...(Array.isArray(z.zustaende) ? { zustaende: (z.zustaende as Record<string, unknown>[]).filter(c => c && typeof c.key === 'string')
+      .map(c => ({ id: typeof c.id === 'string' ? c.id : String(c.key), key: String(c.key), ...(typeof c.level === 'number' ? { level: c.level } : {}), ...(typeof c.note === 'string' ? { note: c.note } : {}) })) } : {}),
   });
   if (Array.isArray(data.begleiter)) {
     const b = (data.begleiter as unknown[]).filter((x): x is Record<string, unknown> => !!x && typeof x === 'object' && typeof (x as Record<string, unknown>).id === 'string'
@@ -551,6 +553,8 @@ export function validateCharacterImport(data: unknown): Partial<CharacterState> 
         ...(Array.isArray(x.bausteine) ? { bausteine: texte(x.bausteine) } : {}),
         ...(Array.isArray(x.sonderausstattung) ? { sonderausstattung: texte(x.sonderausstattung) } : {}),
         ...(x.golemRessource === true ? { golemRessource: true } : {}),
+        ...(x.feinschliff && typeof x.feinschliff === 'object' && !Array.isArray(x.feinschliff) ? { feinschliff: Object.fromEntries(Object.entries(x.feinschliff as Record<string, unknown>)
+          .flatMap(([kk, v]): [string, string | Record<string, number>][] => typeof v === 'string' ? [[kk, v]] : zahlen(v) ? [[kk, zahlen(v)!]] : [])) } : {}),
         ...(typeof x.erhebung === 'string' ? { erhebung: x.erhebung } : {}),
         ...(typeof x.verstaerkungen === 'number' && x.verstaerkungen >= 0 ? { verstaerkungen: Math.floor(x.verstaerkungen) } : {}),
         ...(typeof x.abnormitaet === 'string' ? { abnormitaet: x.abnormitaet } : {}),

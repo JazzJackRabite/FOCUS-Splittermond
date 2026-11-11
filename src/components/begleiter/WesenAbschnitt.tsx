@@ -1,20 +1,21 @@
 import React, { useMemo, useState } from 'react';
-import { Sparkles, Plus, Trash2, ChevronDown, ChevronRight } from 'lucide-react';
+import { Sparkles, Plus } from 'lucide-react';
 import { useCharacter } from '../../context/CharacterContext';
-import { beschwoerbareWesen, diensteFuer, wertekasten } from '../../regelwerk/begleiter';
+import { beschwoerbareWesen, diensteFuer, wertekasten, wesenStufe } from '../../regelwerk/begleiter';
 import type { Katalog } from '../../regelwerk/katalog';
-import { Werte, auswahl, karte, knopf } from './Wertekasten';
+import { Werte, Eintrag, Notiz } from './Wertekasten';
 import { BegleiterVitals, VitalKurz, spielDaten, useBegleiterSpiel } from './BegleiterSpiel';
+import { Abschnittstitel, Auswahl, Karte, Knopf, Marke } from '../../fundament';
 import type { Begleiter } from '../../types';
 
 const Dienste: React.FC<{ k: Katalog; wesen: string }> = ({ k, wesen }) => {
   const { state } = useCharacter();
   const liste = useMemo(() => diensteFuer(k, wesen, state.masteries), [k, wesen, state.masteries]);
-  if (!liste.length) return <p className="text-xs text-leise">Keine Dienste verfügbar (Paket „Die Magie“ geladen?).</p>;
+  if (!liste.length) return <p className="text-leise">Keine Dienste verfügbar (Paket „Die Magie“ geladen?).</p>;
   const art = { basis: 'Basisdienst', immer: 'immer verfügbar', erweitert: 'Erweiterter Dienst' } as const;
   return (
-    <ul className="text-xs space-y-0.5">
-      {liste.map(d => <li key={d.id}><strong>{k.get(d.id)?.name ?? d.id}</strong> – {art[d.art]}, {d.kosten}</li>)}
+    <ul className="space-y-1">
+      {liste.map(d => <li key={d.id}><strong>{k.get(d.id)?.name ?? d.id}</strong> <span className="text-leise">– {art[d.art]}, {d.kosten}</span></li>)}
     </ul>
   );
 };
@@ -25,29 +26,22 @@ const WesenEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number }> = ({ k
   const e = k.get(b.id); const w = e ? wertekasten(e) : null;
   const daten = spielDaten(b, w);
   const spiel = useBegleiterSpiel(b, index, daten);
+  const aendern = (aenderung: Partial<Begleiter>) => dispatch({ type: 'BEGLEITER_AENDERN', payload: { index, aenderung } });
   return (
-    <li className="border border-rahmen rounded-knopf p-2 bg-flaeche">
-      {spiel.modale}
-      <div className="flex items-center justify-between gap-2">
-        <button type="button" className="flex items-center gap-1 text-sm font-bold text-schrift cursor-pointer" onClick={() => setOffen(o => !o)} aria-expanded={offen}>
-          {offen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}{b.name}
-        </button>
-        <span className="flex items-center gap-2 text-xs text-leise">
-          <VitalKurz spiel={spiel} daten={daten} />
-          Stufe {e?.daten.beschwoerbares_wesen_stufe ?? '?'}
-          {!e && <span className="text-erschoepft">nicht im Katalog (Buch nicht geladen?)</span>}
-          <button type="button" aria-label={`${b.name} entfernen`} onClick={() => dispatch({ type: 'BEGLEITER_ENTFERNEN', payload: { index } })}
-            className="p-1 rounded-knopf hover:bg-black/5 hover:text-schaden cursor-pointer"><Trash2 size={14} /></button>
-        </span>
-      </div>
-      {offen && e && (
-        <div className="mt-2 space-y-2 text-xs">
-          <BegleiterVitals spiel={spiel} daten={daten} />
-          {w ? <Werte w={w} aktionen={spiel.aktionen} /> : <p className="text-xs text-leise">Keine Werte im Katalog ({e.daten.quelle_text ?? 'anderes Werk'}).</p>}
-          <div><strong className="text-xs">Dienste:</strong><Dienste k={k} wesen={b.id} /></div>
-        </div>
-      )}
-    </li>
+    <Eintrag titel={b.rufname ? `${b.rufname} (${b.name})` : b.name} offen={offen} umschalten={() => setOffen(o => !o)} vor={spiel.modale}
+      onEntfernen={() => dispatch({ type: 'BEGLEITER_ENTFERNEN', payload: { index } })}
+      marken={<>
+        <VitalKurz spiel={spiel} daten={daten} />
+        <span>Stufe {wesenStufe(e) ?? '?'}</span>
+        {!e && <Marke klein ton="erschoepft">nicht im Katalog (Buch nicht geladen?)</Marke>}
+      </>}>
+      {e && <>
+        <BegleiterVitals spiel={spiel} daten={daten} />
+        {w ? <Werte w={w} aktionen={spiel.aktionen} /> : <p className="text-leise">Keine Werte in den Paketen.</p>}
+        <div className="space-y-1"><Abschnittstitel als="h3" className="text-[15px]">Dienste</Abschnittstitel><Dienste k={k} wesen={b.id} /></div>
+        <Notiz b={b} aendern={aendern} />
+      </>}
+    </Eintrag>
   );
 };
 
@@ -59,31 +53,31 @@ export const WesenAbschnitt: React.FC<{ k: Katalog }> = ({ k }) => {
   const liste = (state.begleiter ?? []).map((b, i) => ({ b, i })).filter(x => x.b.art === 'wesen');
 
   return (
-    <section className={karte} data-testid="begleiter-wesen">
-      <div className="flex items-center gap-2 mb-2">
-        <Sparkles size={18} className="text-gold" />
-        <h3 className="font-bold text-base text-gold-hell">Beschworene Wesen</h3>
+    <Karte data-testid="begleiter-wesen" className="space-y-3">
+      <div className="flex items-center gap-2">
+        <Sparkles size={18} aria-hidden />
+        <Abschnittstitel>Beschworene Wesen</Abschnittstitel>
       </div>
       {!wesen.length && !liste.length && (
-        <p className="text-xs text-leise">Beschwörbare Wesen und ihre Dienste stehen im Buchpaket „Die Magie“ (Einstellungen → Regelpakete).</p>
+        <p className="text-sm text-leise">Beschwörbare Wesen und ihre Dienste stehen im Buchpaket „Die Magie“ (Einstellungen → Regelpakete).</p>
       )}
       {liste.length > 0 && (
-        <ul className="space-y-2 mb-3">
+        <ul className="space-y-3">
           {liste.map(({ b, i }) => <WesenEintrag key={`${b.id}-${i}`} k={k} b={b} index={i} />)}
         </ul>
       )}
       {wesen.length > 0 && (
-        <div className="flex flex-wrap gap-2 items-center">
-          <select value={wahl} onChange={e => setWahl(e.target.value)} aria-label="Beschworenes Wesen wählen" className={auswahl}>
+        <div className="flex flex-wrap gap-2 items-end">
+          <Auswahl beschriftung="Beschworenes Wesen wählen" beschriftungVerborgen value={wahl} onChange={e => setWahl(e.target.value)}>
             <option value="">Beschworenes Wesen wählen …</option>
             {wesen.map(x => <option key={x.id} value={x.id}>{x.name} (Stufe {x.stufe}, {x.quelle})</option>)}
-          </select>
-          <button type="button" disabled={!wahl} className={knopf} onClick={() => {
+          </Auswahl>
+          <Knopf art="sekundaer" disabled={!wahl} onClick={() => {
             const e = k.get(wahl); if (!e) return;
             dispatch({ type: 'BEGLEITER_HINZU', payload: { id: e.id, art: 'wesen', name: e.name } }); setWahl('');
-          }}><Plus size={12} />Wesen hinzufügen</button>
+          }}><Plus size={14} aria-hidden />Wesen hinzufügen</Knopf>
         </div>
       )}
-    </section>
+    </Karte>
   );
 };

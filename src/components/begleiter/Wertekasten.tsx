@@ -1,8 +1,9 @@
 import React from 'react';
-import { Swords } from 'lucide-react';
+import { Swords, ChevronDown, ChevronRight, Trash2, X } from 'lucide-react';
 import type { Wertekasten } from '../../regelwerk/begleiter';
 import type { Aktionen } from './BegleiterSpiel';
 import DiceIcon from '../ui/DiceIcon';
+import { Knopf, Marke } from '../../fundament';
 
 const ATTR = ['AUS', 'BEW', 'INT', 'KON', 'MYS', 'STÄ', 'VER', 'WIL'];
 const ABGL = ['GK', 'GSW', 'LP', 'FO', 'VTD', 'SR', 'KW', 'GW'];
@@ -26,56 +27,102 @@ export function fertigkeitenAusText(t: string): { name: string; wert: number | n
   });
 }
 
-export const wuerfelKnopf = 'inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-knopf border border-gold bg-erhoeht text-schrift font-bold hover:bg-rahmen cursor-pointer';
-const Wuerfel: React.FC = () => <DiceIcon size={11} />;
+/** Würfelknopf (Baustein Knopf, neutral) mit Würfel- bzw. Schwertsymbol */
+export const WuerfelKnopf: React.FC<{ onClick: () => void; label: string; symbol?: 'wuerfel' | 'schwert' | 'magie'; children: React.ReactNode }> = ({ onClick, label, symbol = 'wuerfel', children }) => (
+  <Knopf className="px-3" onClick={onClick} aria-label={label}>
+    {symbol === 'schwert' ? <Swords size={14} aria-hidden /> : <DiceIcon size={14} />}
+    {children}
+  </Knopf>
+);
 
-/** Wertekasten eines Tieres oder Wesens; mit `aktionen` sind Fertigkeiten, Angriffe und Schaden Würfelknöpfe */
+/** Wertekasten eines Begleiters; mit `aktionen` sind Fertigkeiten, Angriffe und Schaden Würfelknöpfe */
 export const Werte: React.FC<{ w: Wertekasten; aktionen?: Aktionen }> = ({ w, aktionen }) => (
-  <div className="text-xs space-y-2 text-schrift">
-    <div className="grid grid-cols-8 gap-1 text-center">
-      {ATTR.map(a => <div key={a}><div className="font-bold text-[11px] text-leise">{a}</div><div>{w.attribute?.[a] ?? '–'}</div></div>)}
+  <div className="text-sm space-y-3 text-schrift">
+    <div className="grid grid-cols-4 sm:grid-cols-8 gap-2 text-center">
+      {ATTR.map(a => <div key={a}><div className="font-bold text-xs text-leise">{a}</div><div className="font-titel text-base">{w.attribute?.[a] ?? '–'}</div></div>)}
     </div>
-    <div className="grid grid-cols-8 gap-1 text-center">
-      {ABGL.map(a => <div key={a}><div className="font-bold text-[11px] text-leise">{a}</div><div>{w.abgeleitete_werte?.[a] ?? '–'}</div></div>)}
+    <div className="grid grid-cols-4 sm:grid-cols-8 gap-2 text-center">
+      {ABGL.map(a => <div key={a}><div className="font-bold text-xs text-leise">{a}</div><div className="font-titel text-base">{w.abgeleitete_werte?.[a] ?? '–'}</div></div>)}
     </div>
     {(w.waffen ?? []).length > 0 && (
       <div className="overflow-x-auto">
-        <table className="w-full text-left">
-          <thead><tr className="text-[11px] text-leise"><th>Waffe</th><th>Wert</th><th>Schaden</th><th>WGS</th><th>INI</th><th>Merkmale</th></tr></thead>
+        <table className="w-full text-left border-separate border-spacing-y-1">
+          <thead><tr className="text-xs text-leise"><th>Waffe</th><th>Wert</th><th>Schaden</th><th>WGS</th><th>INI</th><th>Merkmale</th></tr></thead>
           <tbody>{w.waffen!.map((x, i) => (
             <tr key={i}>
-              <td>{x.name}</td>
-              <td>{aktionen ? (
-                <button type="button" className={wuerfelKnopf} onClick={() => aktionen.angriff(x)} aria-label={`Angriff ${x.name} würfeln`}><Swords size={11} />{x.wert}</button>
-              ) : x.wert}</td>
-              <td>{aktionen ? (
-                <button type="button" className={wuerfelKnopf} onClick={() => aktionen.schaden(x)} aria-label={`Schaden ${x.name} würfeln`}><Wuerfel />{x.schaden}</button>
-              ) : x.schaden}</td>
-              <td>{x.wgs}</td><td>{x.ini}</td><td>{x.merkmale}</td>
+              <td className="pr-2">{x.name}</td>
+              <td className="pr-2">{aktionen ? <WuerfelKnopf symbol="schwert" onClick={() => aktionen.angriff(x)} label={`Angriff ${x.name} würfeln`}>{x.wert}</WuerfelKnopf> : x.wert}</td>
+              <td className="pr-2">{aktionen ? <WuerfelKnopf onClick={() => aktionen.schaden(x)} label={`Schaden ${x.name} würfeln`}>{x.schaden}</WuerfelKnopf> : x.schaden}</td>
+              <td className="pr-2">{x.wgs}</td><td className="pr-2">{x.ini}</td><td>{x.merkmale}</td>
             </tr>
           ))}</tbody>
         </table>
       </div>
     )}
-    {w.felder?.typus && <div><strong>Typus:</strong> {w.felder.typus}</div>}
+    {w.felder?.typus && <div><span className="text-leise">Typus:</span> {w.felder.typus}</div>}
     {w.felder?.fertigkeiten && (
       aktionen ? (
-        <div className="flex flex-wrap gap-1 items-center"><strong className="mr-1">Fertigkeiten:</strong>
+        <div className="flex flex-wrap gap-2 items-center"><span className="text-leise mr-1">Fertigkeiten:</span>
           {fertigkeitenAusText(w.felder.fertigkeiten).map((f, i) => f.wert !== null ? (
-            <button key={i} type="button" className={wuerfelKnopf} onClick={() => aktionen.probe(f.name, f.wert!)} aria-label={`Probe ${f.name} würfeln`}>
-              <Wuerfel />{f.name} {f.wert}
-            </button>
+            <WuerfelKnopf key={i} onClick={() => aktionen.probe(f.name, f.wert!)} label={`Probe ${f.name} würfeln`}>{f.name} {f.wert}</WuerfelKnopf>
           ) : <span key={i}>{f.text}</span>)}
         </div>
-      ) : <div><strong>Fertigkeiten:</strong> {w.felder.fertigkeiten}</div>
+      ) : <div><span className="text-leise">Fertigkeiten:</span> {w.felder.fertigkeiten}</div>
     )}
-    {(['meisterschaften', 'merkmale'] as const).map(f => w.felder?.[f] ? (
-      <div key={f}><strong className="capitalize">{f}:</strong> {w.felder[f]}</div>
-    ) : null)}
+    {w.felder?.meisterschaften && <div><span className="text-leise">Meisterschaften:</span> {w.felder.meisterschaften}</div>}
+    {w.felder?.merkmale && <div><span className="text-leise">Merkmale:</span> {w.felder.merkmale}</div>}
     {w.berechnet && <div className="text-leise italic">Werte berechnet aus „Werte wie … mit folgenden Änderungen“.</div>}
   </div>
 );
 
-export const knopf = 'px-2 py-1 rounded-knopf border border-gold bg-erhoeht text-schrift text-xs font-bold flex items-center gap-1 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed';
-export const auswahl = 'border border-rahmen rounded-knopf px-2 py-1 text-xs bg-flaeche text-schrift max-w-full';
-export const karte = 'bg-flaeche bg-opacity-70 rounded-karte border border-rahmen p-4';
+/** Kopfzeile eines aufklappbaren Begleiters (Name links, Marken und Aktionen rechts) */
+export const kopfzeile = 'flex items-center justify-between gap-2 flex-wrap';
+/** Rahmen eines einzelnen Begleiters in einer Liste */
+export const eintrag = 'border border-rahmen rounded-knopf p-3 bg-erhoeht';
+
+/** Hülle eines Begleiters: aufklappbarer Titel, Marken, Entfernen; Inhalt nur aufgeklappt */
+export const Eintrag: React.FC<{
+  titel: string; offen: boolean; umschalten: () => void; onEntfernen: () => void;
+  marken?: React.ReactNode; vor?: React.ReactNode; children?: React.ReactNode;
+}> = ({ titel, offen, umschalten, onEntfernen, marken, vor, children }) => (
+  <li className={eintrag}>
+    {vor}
+    <div className={kopfzeile}>
+      <Knopf className="border-transparent! bg-transparent! hover:bg-erhoeht! px-1 font-bold text-[15px]" onClick={umschalten} aria-expanded={offen}>
+        {offen ? <ChevronDown size={16} aria-hidden /> : <ChevronRight size={16} aria-hidden />}{titel}
+      </Knopf>
+      <span className="flex items-center gap-2 text-xs text-leise flex-wrap">
+        {marken}
+        <Knopf nurSymbol aria-label={`${titel} entfernen`} onClick={onEntfernen}><Trash2 size={16} aria-hidden /></Knopf>
+      </span>
+    </div>
+    {offen && <div className="mt-3 space-y-4 text-sm">{children}</div>}
+  </li>
+);
+
+/** Hinweisliste (Regelverstöße, offene Wahlen): Rahmen in der Bedeutungsfarbe, Text in Schrift */
+export const Hinweise: React.FC<{ liste: string[] }> = ({ liste }) => liste.length ? (
+  <ul className="list-disc pl-6 py-2 pr-3 border border-erschoepft bg-erschoepft-grund rounded-knopf text-schrift">
+    {liste.map((h, i) => <li key={i}>{h}</li>)}
+  </ul>
+) : null;
+
+/** Notizfeld eines Begleiters */
+export const Notiz: React.FC<{ b: { notiz?: string }; aendern: (a: { notiz?: string }) => void }> = ({ b, aendern }) => {
+  const id = React.useId();
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label htmlFor={id} className="text-xs text-leise">Notiz</label>
+      <textarea id={id} value={b.notiz ?? ''} onChange={ev => aendern({ notiz: ev.target.value || undefined })} rows={2}
+        className="w-full bg-erhoeht border border-rahmen rounded-knopf px-3 py-2 text-sm text-schrift font-text" />
+    </div>
+  );
+};
+
+/** Marke mit eigenem Entfernen-Knopf daneben (Knopf in voller Größe, FUNDAMENT Teil 3, Regel 4) */
+export const MarkeMitEntfernen: React.FC<{ ton?: import('../../fundament').Ton; titel?: string; label: string; onEntfernen: () => void; children: React.ReactNode }> = ({ ton, titel, label, onEntfernen, children }) => (
+  <span className="inline-flex items-center gap-1">
+    <Marke ton={ton} title={titel}>{children}</Marke>
+    <Knopf nurSymbol aria-label={label} onClick={onEntfernen}><X size={16} aria-hidden /></Knopf>
+  </span>
+);

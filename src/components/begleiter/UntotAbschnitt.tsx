@@ -1,27 +1,26 @@
 import { aenderungGesperrt } from '../../fundament/hausregeln';
 import React, { useMemo, useState } from 'react';
-import { Skull, Plus, Minus, Trash2, ChevronDown, ChevronRight, AlertTriangle } from 'lucide-react';
+import { Skull, Plus, Minus } from 'lucide-react';
 import { useCharacter } from '../../context/CharacterContext';
 import {
-  ANGRIFF, INTELLEKTUELL, abnormitaeten, attributKosten, erhebungen, fertigkeitKosten, untotWerte,
+  ANGRIFF, abnormitaeten, steigerbareFertigkeiten, attributKosten, erhebungen, fertigkeitKosten, meisterschaftenBis, untotWerte,
 } from '../../regelwerk/untote';
 import { ATTRIBUT_KURZ, alsWertekasten } from '../../regelwerk/modifikationen';
 import type { Katalog } from '../../regelwerk/katalog';
 import type { Begleiter } from '../../types';
-import { Werte, auswahl, karte, knopf } from './Wertekasten';
+import { Werte, Eintrag, Hinweise, Notiz, MarkeMitEntfernen } from './Wertekasten';
 import { BegleiterVitals, VitalKurz, spielDaten, useBegleiterSpiel } from './BegleiterSpiel';
+import { Abschnittstitel, Auswahl, Eingabe, Karte, Knopf, Marke } from '../../fundament';
 
 interface Nekromant { nekromant: boolean; meisterDerAbnormitaeten: boolean; zauber: string[] }
 
 const Stufer: React.FC<{ label: string; wert: number; setzen: (n: number) => void; kosten: string }> = ({ label, wert, setzen, kosten }) => (
-  <div className="flex items-center gap-1">
-    <span className="min-w-[7rem]">{label}</span>
-    <button type="button" aria-label={`${label} senken`} disabled={wert <= 0} onClick={() => setzen(wert - 1)}
-      className="p-0.5 rounded-knopf border border-rahmen disabled:opacity-40 cursor-pointer"><Minus size={10} /></button>
-    <span className="w-5 text-center font-bold">+{wert}</span>
-    <button type="button" aria-label={`${label} steigern`} onClick={() => setzen(wert + 1)}
-      className="p-0.5 rounded-knopf border border-rahmen cursor-pointer"><Plus size={10} /></button>
-    <span className="text-leise">{kosten}</span>
+  <div className="flex items-center gap-2">
+    <span className="min-w-[8rem]">{label}</span>
+    <Knopf nurSymbol aria-label={`${label} senken`} disabled={wert <= 0} onClick={() => setzen(wert - 1)}><Minus size={16} aria-hidden /></Knopf>
+    <span className="w-8 text-center font-titel text-base">+{wert}</span>
+    <Knopf nurSymbol aria-label={`${label} steigern`} onClick={() => setzen(wert + 1)}><Plus size={16} aria-hidden /></Knopf>
+    <span className="text-leise text-xs">{kosten}</span>
   </div>
 );
 
@@ -29,6 +28,7 @@ const UntotEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; n: Nekro
   const { dispatch } = useCharacter();
   const [offen, setOffen] = useState(false);
   const [fWahl, setFWahl] = useState('');
+  const [mWahl, setMWahl] = useState('');
   const u = untotWerte(k, b, n);
   const aendern = (aenderung: Partial<Begleiter>) => {
     if (aenderungGesperrt(u.verstoesse, untotWerte(k, { ...b, ...aenderung }, n).verstoesse)) return;
@@ -42,88 +42,101 @@ const UntotEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; n: Nekro
   const daten = spielDaten(b, wk);
   const spiel = useBegleiterSpiel(b, index, daten);
   const vorhanden = new Set([...(u.werte?.fertigkeiten ?? []).map(f => f.id), ...Object.keys(st.fertigkeiten ?? {})]);
-  const steigerbar = useMemo(() => Object.values(k.eintraege).filter(e => e.typ === 'fertigkeit' && !e.daten.gruppierte_fertigkeit
-    && e.daten.kategorie !== 'Magieschule' && !INTELLEKTUELL.includes(e.id)).sort((x, y) => x.name.localeCompare(y.name, 'de')), [k]);
+  const steigerbar = useMemo(() => steigerbareFertigkeiten(k), [k]);
   const fertigkeitsListe = [ANGRIFF, ...[...vorhanden].filter((x): x is string => !!x && x !== ANGRIFF)];
+  const ms = b.meisterschaften ?? [];
+  // Angebot: Meisterschaften der Fertigkeiten mit freiem Platz, bis zur Schwelle des Platzes
+  const plaetzeFrei = u.freieMeisterschaften.length - u.meisterschaften.filter(m => m.ok).length;
+  const angebot = useMemo(() => {
+    const hoechste = new Map<string, { name: string; schwelle: number }>();
+    for (const p of u.freieMeisterschaften) if ((hoechste.get(p.fertigkeitId)?.schwelle ?? 0) < p.schwelle) hoechste.set(p.fertigkeitId, { name: p.fertigkeit, schwelle: p.schwelle });
+    return [...hoechste.entries()].map(([id, x]) => ({ fertigkeit: x.name, liste: meisterschaftenBis(k, id, x.schwelle) }));
+  }, [k, u.freieMeisterschaften]);
 
   return (
-    <li className="border border-rahmen rounded-knopf p-2 bg-flaeche">
-      {spiel.modale}
-      <div className="flex items-center justify-between gap-2 flex-wrap">
-        <button type="button" className="flex items-center gap-1 text-sm font-bold text-schrift cursor-pointer" onClick={() => setOffen(o => !o)} aria-expanded={offen}>
-          {offen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}{titel}
-        </button>
-        <span className="flex items-center gap-2 text-xs text-leise flex-wrap">
-          <VitalKurz spiel={spiel} daten={daten} />
-          {u.erhebung && <span>{u.erhebung.zauber.name}</span>}
-          {u.abnormitaet && <span className="px-1.5 rounded-knopf bg-erhoeht text-schrift font-bold">{u.abnormitaet.name}</span>}
-          <span className={u.epVerbraucht > u.epGesamt ? 'text-schaden font-bold' : ''}>EP {u.epVerbraucht}/{u.epGesamt}</span>
-          {u.hinweise.length > 0 && <span className="text-erschoepft flex items-center gap-0.5" title={u.hinweise.join('\n')}><AlertTriangle size={12} />{u.hinweise.length}</span>}
-          <button type="button" aria-label={`${titel} entfernen`} onClick={() => dispatch({ type: 'BEGLEITER_ENTFERNEN', payload: { index } })}
-            className="p-1 rounded-knopf hover:bg-black/5 hover:text-schaden cursor-pointer"><Trash2 size={14} /></button>
-        </span>
+    <Eintrag titel={titel} offen={offen} umschalten={() => setOffen(o => !o)} vor={spiel.modale}
+      onEntfernen={() => dispatch({ type: 'BEGLEITER_ENTFERNEN', payload: { index } })}
+      marken={<>
+        <VitalKurz spiel={spiel} daten={daten} />
+        {u.erhebung && <span>{u.erhebung.zauber.name}</span>}
+        {u.abnormitaet && <Marke klein>{u.abnormitaet.name}</Marke>}
+        <Marke klein ton={u.epVerbraucht > u.epGesamt ? 'schaden' : 'neutral'}>EP {u.epVerbraucht}/{u.epGesamt}</Marke>
+        {u.hinweise.length > 0 && <Marke klein ton="erschoepft" title={u.hinweise.join('\n')}>{u.hinweise.length} Hinweis{u.hinweise.length > 1 ? 'e' : ''}</Marke>}
+      </>}>
+      <div className="flex flex-wrap gap-3 items-end">
+        <Eingabe beschriftung="Rufname" value={b.rufname ?? ''} onChange={ev => aendern({ rufname: ev.target.value || undefined })} placeholder={b.name} />
+        <Eingabe beschriftung="Anzahl Verstärkungen" type="number" min={0} max={n.nekromant ? 20 : 1} className="w-24" value={b.verstaerkungen ?? 0}
+          onChange={ev => aendern({ verstaerkungen: Math.max(0, Number(ev.target.value) || 0) || undefined })} />
+        <Auswahl beschriftung="Abnormität" value={b.abnormitaet ?? ''} onChange={ev => aendern({ abnormitaet: ev.target.value || undefined })}>
+          <option value="">keine</option>
+          {abnormitaeten(k).map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+        </Auswahl>
+      </div>
+      <p>
+        {u.erhebung ? <>{u.erhebung.zauber.name} (Grad {u.erhebung.grad}): je Verstärkung {u.erhebung.epJeVerstaerkung} EP{n.nekromant ? ', beliebig oft (Nekromant)' : ', einmal (mehrfach mit Nekromant)'}. </> : null}
+        Neue Punkte je Fertigkeit höchstens {u.grenze}. Verstand 0 (frisch erhoben); nur einfache Befehle, ab Verstand 1 auch komplexere (Die Magie S. 182).
+      </p>
+      {u.abnormitaet && <p><span className="text-leise">{u.abnormitaet.name}:</span> {u.abnormitaetText}</p>}
+
+      {wk && <BegleiterVitals spiel={spiel} daten={daten} />}
+      {wk ? <Werte w={wk} aktionen={spiel.aktionen} /> : null}
+
+      <div className="space-y-2">
+        <Abschnittstitel als="h3" className="text-[15px]">Steigerung (von 0 an)</Abschnittstitel>
+        <div className="grid sm:grid-cols-2 gap-x-6 gap-y-2">
+          {ATTRIBUT_KURZ.map(a => (
+            <Stufer key={a} label={a} wert={st.attribute?.[a] ?? 0} setzen={v => setzeA(a, v)} kosten={`${attributKosten(st.attribute?.[a] ?? 0)} EP`} />
+          ))}
+        </div>
+        <div className="grid sm:grid-cols-2 gap-x-6 gap-y-2">
+          {fertigkeitsListe.map(f => (
+            <Stufer key={f} label={f === ANGRIFF ? 'Angriff (Waffen)' : k.get(f)?.name ?? f} wert={st.fertigkeiten?.[f] ?? 0} setzen={v => setzeF(f, v)}
+              kosten={`${fertigkeitKosten(st.fertigkeiten?.[f] ?? 0)} EP`} />
+          ))}
+        </div>
+        <div className="flex flex-wrap gap-2 items-end">
+          <Auswahl beschriftung="Neue Fertigkeit für Untoten" beschriftungVerborgen value={fWahl} onChange={ev => setFWahl(ev.target.value)}>
+            <option value="">weitere Fertigkeit …</option>
+            {steigerbar.filter(e => !vorhanden.has(e.id)).map(e => <option key={e.id} value={e.id}>{e.name}</option>)}
+          </Auswahl>
+          <Knopf disabled={!fWahl} onClick={() => { setzeF(fWahl, 1); setFWahl(''); }}><Plus size={14} aria-hidden />Steigern</Knopf>
+        </div>
+        <p className="text-xs text-leise">Fertigkeitspunkte 1–6 je 3 EP, 7–9 je 5 EP …; Attribute 10, 15, … EP. Keine Magieschulen, kein Arkane Kunde / Geschichte und Mythen.</p>
       </div>
 
-      {offen && (
-        <div className="mt-2 space-y-3 text-xs">
-          <div className="flex flex-wrap gap-3 items-end">
-            <label className="flex flex-col gap-0.5">Rufname
-              <input value={b.rufname ?? ''} onChange={ev => aendern({ rufname: ev.target.value || undefined })} className={auswahl} placeholder={b.name} />
-            </label>
-            <label className="flex flex-col gap-0.5">Verstärkung (EP) gewählt
-              <input type="number" min={0} max={n.nekromant ? 20 : 1} value={b.verstaerkungen ?? 0} className={`${auswahl} w-20`} aria-label="Anzahl Verstärkungen"
-                onChange={ev => aendern({ verstaerkungen: Math.max(0, Number(ev.target.value) || 0) || undefined })} />
-            </label>
-            <label className="flex flex-col gap-0.5">Abnormität (5 EP)
-              <select value={b.abnormitaet ?? ''} onChange={ev => aendern({ abnormitaet: ev.target.value || undefined })} className={auswahl} aria-label="Abnormität">
-                <option value="">keine</option>
-                {abnormitaeten(k).map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
-              </select>
-            </label>
-          </div>
-          <p className="text-schrift">
-            {u.erhebung ? <>{u.erhebung.zauber.name} (Grad {u.erhebung.grad}): je Verstärkung {u.erhebung.epJeVerstaerkung} EP{n.nekromant ? ', beliebig oft (Nekromant)' : ', einmal (mehrfach mit Nekromant)'}. </> : null}
-            Neue Punkte je Fertigkeit höchstens {u.grenze}. Verstand 0 (frisch erhoben); nur einfache Befehle, ab Verstand 1 auch komplexere (S. 182).
-            {u.abnormitaet && <span className="block mt-1">{u.abnormitaet.name}: {u.abnormitaet.daten.beschreibung}</span>}
-          </p>
-
-          {wk && <BegleiterVitals spiel={spiel} daten={daten} />}
-          {wk ? <Werte w={wk} aktionen={spiel.aktionen} /> : null}
-
-          <div>
-            <h4 className="font-bold text-gold-hell mb-1">Steigerung (von 0 an)</h4>
-            <div className="grid sm:grid-cols-2 gap-x-6 gap-y-1">
-              {ATTRIBUT_KURZ.map(a => (
-                <Stufer key={a} label={a} wert={st.attribute?.[a] ?? 0} setzen={v => setzeA(a, v)} kosten={`${attributKosten(st.attribute?.[a] ?? 0)} EP`} />
+      {(u.freieMeisterschaften.length > 0 || ms.length > 0) && (
+        <div className="space-y-2">
+          <Abschnittstitel als="h3" className="text-[15px]">Freie Meisterschaften</Abschnittstitel>
+          <p className="text-leise">Plätze: {u.freieMeisterschaften.map(p => `${p.fertigkeit} (Schwelle ${p.schwelle})`).join(', ') || 'keine'}; frei {Math.max(0, plaetzeFrei)}.</p>
+          {u.meisterschaften.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {u.meisterschaften.map((m, i) => (
+                <MarkeMitEntfernen key={`${m.id}-${i}`} ton={m.ok ? 'neutral' : 'erschoepft'} label={`Meisterschaft ${m.name} entfernen`}
+                  onEntfernen={() => aendern({ meisterschaften: ms.filter((_, j) => j !== i) })}>
+                  {m.name} ({m.fertigkeit}, S{m.schwelle}){m.ok ? '' : ' – ohne Platz'}
+                </MarkeMitEntfernen>
               ))}
             </div>
-            <div className="grid sm:grid-cols-2 gap-x-6 gap-y-1 mt-2">
-              {fertigkeitsListe.map(f => (
-                <Stufer key={f} label={f === ANGRIFF ? 'Angriff (Waffen)' : k.get(f)?.name ?? f} wert={st.fertigkeiten?.[f] ?? 0} setzen={v => setzeF(f, v)}
-                  kosten={`${fertigkeitKosten(st.fertigkeiten?.[f] ?? 0)} EP`} />
-              ))}
+          )}
+          {plaetzeFrei > 0 && (
+            <div className="flex flex-wrap gap-2 items-end">
+              <Auswahl beschriftung="Freie Meisterschaft wählen" beschriftungVerborgen value={mWahl} onChange={ev => setMWahl(ev.target.value)}>
+                <option value="">Meisterschaft wählen …</option>
+                {angebot.map(g => (
+                  <optgroup key={g.fertigkeit} label={g.fertigkeit}>
+                    {g.liste.map(m => <option key={m.id} value={m.id} disabled={ms.includes(m.id)}>{m.name} (S{m.schwelle})</option>)}
+                  </optgroup>
+                ))}
+              </Auswahl>
+              <Knopf art="sekundaer" disabled={!mWahl} onClick={() => { aendern({ meisterschaften: [...ms, mWahl] }); setMWahl(''); }}><Plus size={14} aria-hidden />Meisterschaft</Knopf>
             </div>
-            <div className="flex flex-wrap gap-2 items-center mt-1">
-              <select value={fWahl} onChange={ev => setFWahl(ev.target.value)} aria-label="Neue Fertigkeit für Untoten" className={auswahl}>
-                <option value="">weitere Fertigkeit …</option>
-                {steigerbar.filter(e => !vorhanden.has(e.id)).map(e => <option key={e.id} value={e.id}>{e.name}</option>)}
-              </select>
-              <button type="button" disabled={!fWahl} className={knopf} onClick={() => { setzeF(fWahl, 1); setFWahl(''); }}><Plus size={12} />Steigern</button>
-            </div>
-            {u.freieMeisterschaften.length > 0 && (
-              <p className="text-schrift mt-1">Freie Meisterschaften: {u.freieMeisterschaften.map(m => `${m.fertigkeit} (Schwelle ${m.schwelle})`).join(', ')} – in der Notiz festhalten.</p>
-            )}
-            <p className="text-leise mt-1">Fertigkeitspunkte 1–6 je 3 EP, 7–9 je 5 EP …; Attribute 10, 15, … EP. Keine Magieschulen, kein Arkane Kunde / Geschichte und Mythen.</p>
-          </div>
-
-          {u.hinweise.length > 0 && <ul className="text-erschoepft list-disc pl-4">{u.hinweise.map((h, i) => <li key={i}>{h}</li>)}</ul>}
-
-          <label className="flex flex-col gap-0.5">Notiz
-            <textarea value={b.notiz ?? ''} onChange={ev => aendern({ notiz: ev.target.value || undefined })} rows={2} className={`${auswahl} w-full`} />
-          </label>
+          )}
         </div>
       )}
-    </li>
+
+      <Hinweise liste={u.hinweise} />
+      <Notiz b={b} aendern={aendern} />
+    </Eintrag>
   );
 };
 
@@ -144,31 +157,31 @@ export const UntotAbschnitt: React.FC<{ k: Katalog }> = ({ k }) => {
   if (!liste.length) return null;
 
   return (
-    <section className={karte} data-testid="begleiter-untote">
-      <div className="flex items-center gap-2 mb-2">
-        <Skull size={18} className="text-schrift" />
-        <h3 className="font-bold text-base text-gold-hell">Erhobene Untote</h3>
+    <Karte data-testid="begleiter-untote" className="space-y-3">
+      <div className="flex items-center gap-2">
+        <Skull size={18} aria-hidden />
+        <Abschnittstitel>Erhobene Untote</Abschnittstitel>
       </div>
-      <p className="text-xs text-leise mb-3">
+      <p className="text-sm text-leise">
         Der Erhebungszauber bestimmt den Wertesatz; Steigerungen mit den EP aus seiner Verstärkung (Die Magie S. 182–184).
         {!liste.some(x => x.zauber.quelle.paket === 'magie') && ' Weitere Zauber und Abnormitäten im Buchpaket „Die Magie“.'}
       </p>
-      {eigene.length > 0 && <ul className="space-y-2 mb-3">{eigene.map(({ b, i }) => <UntotEintrag key={`${b.id}-${i}`} k={k} b={b} index={i} n={n} />)}</ul>}
-      <div className="flex flex-wrap gap-2 items-center">
-        <select value={zauber} onChange={e => { setZauber(e.target.value); setSatz(''); }} aria-label="Erhebungszauber wählen" className={auswahl}>
+      {eigene.length > 0 && <ul className="space-y-3">{eigene.map(({ b, i }) => <UntotEintrag key={`${b.id}-${i}`} k={k} b={b} index={i} n={n} />)}</ul>}
+      <div className="flex flex-wrap gap-2 items-end">
+        <Auswahl beschriftung="Erhebungszauber wählen" beschriftungVerborgen value={zauber} onChange={e => { setZauber(e.target.value); setSatz(''); }}>
           <option value="">Erhebungszauber …</option>
-          {liste.map(x => <option key={x.zauber.id} value={x.zauber.id}>{n.zauber.includes(x.zauber.name) ? '✓ ' : ''}{x.zauber.name} (Tod {x.grad})</option>)}
-        </select>
-        <select value={satz} onChange={e => setSatz(e.target.value)} aria-label="Wertesatz wählen" className={auswahl} disabled={!gew}>
+          {liste.map(x => <option key={x.zauber.id} value={x.zauber.id}>{x.zauber.name} (Tod {x.grad}){n.zauber.includes(x.zauber.name) ? ' – bekannt' : ''}</option>)}
+        </Auswahl>
+        <Auswahl beschriftung="Wertesatz wählen" beschriftungVerborgen value={satz} onChange={e => setSatz(e.target.value)} disabled={!gew}>
           <option value="">Wertesatz …</option>
           {(gew?.wertesaetze ?? []).map(w => <option key={w.name} value={w.name}>{w.name}{w.id ? '' : ` (Werte: ${w.quelle})`}</option>)}
-        </select>
-        <button type="button" disabled={!gew || !satz} className={knopf} onClick={() => {
+        </Auswahl>
+        <Knopf art="sekundaer" disabled={!gew || !satz} onClick={() => {
           const w = gew!.wertesaetze.find(x => x.name === satz)!;
           dispatch({ type: 'BEGLEITER_HINZU', payload: { id: w.id ?? `untoter:${w.name}`, art: 'untoter', name: w.name, erhebung: gew!.zauber.id } });
           setSatz('');
-        }}><Plus size={12} />Untoten hinzufügen</button>
+        }}><Plus size={14} aria-hidden />Untoten hinzufügen</Knopf>
       </div>
-    </section>
+    </Karte>
   );
 };

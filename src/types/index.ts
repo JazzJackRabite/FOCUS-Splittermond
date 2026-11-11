@@ -259,6 +259,8 @@ export interface Begleiter {
   sonderausstattung?: string[];
   /** über die Ressource Golem dauerhaft animiert (Großer Ritus) */
   golemRessource?: boolean;
+  /** Wahlen beim Feinschliff je Wahl-Schlüssel: Attribut, Meisterschaft, Fertigkeit oder verteilte Punkte */
+  feinschliff?: Record<string, string | Record<string, number>>;
   // ---- Erhobener Untoter (Die Magie S. 182–184); id = Wertesatz (Kreatur) oder „untoter:<Name>“
   /** Zauber, mit dem der Untote erhoben wurde */
   erhebung?: string;
@@ -272,6 +274,8 @@ export interface Begleiter {
   zustand?: {
     schaden?: number; betaeubung?: number; kanalisiert?: number;
     fokus?: { erschoepft?: number; kanalisiert?: number; verzehrt?: number };
+    /** Zustände wie beim Abenteurer */
+    zustaende?: StatusCondition[];
   };
 }
 
