@@ -185,7 +185,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ onClose, onSelectPro
           <button
             onClick={() => setTab('profiles')}
             className={`flex-1 py-3 text-center font-bold text-sm uppercase tracking-wider transition-all ${
-              tab === 'profiles' ? 'bg-erhoeht text-schrift border-b-2 border-gold' : 'text-leise hover:bg-rahmen'
+              tab === 'profiles' ? 'bg-erhoeht text-schrift border-b-2 border-gold' : 'text-leise hover:bg-rahmen hover:text-schrift'
             }`}
           >
             Meine Charaktere ({profiles.length})
@@ -193,7 +193,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ onClose, onSelectPro
           <button
             onClick={() => setTab('presets')}
             className={`flex-1 py-3 text-center font-bold text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-1 ${
-              tab === 'presets' ? 'bg-erhoeht text-schrift border-b-2 border-gold' : 'text-leise hover:bg-rahmen'
+              tab === 'presets' ? 'bg-erhoeht text-schrift border-b-2 border-gold' : 'text-leise hover:bg-rahmen hover:text-schrift'
             }`}
           >
             <Sparkles size={16} className="text-gold" /> Archetypen & Vorlagen
@@ -245,7 +245,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ onClose, onSelectPro
                       <div className="flex items-center gap-3 cursor-pointer flex-1" onClick={() => handleSwitchProfile(p.id)}>
                         <div
                           className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm border ${
-                            isActive ? 'bg-gold text-seite border-rahmen' : 'bg-erhoeht text-seite border-gold'
+                            isActive ? 'bg-gold text-seite border-rahmen' : 'bg-erhoeht text-schrift border-gold'
                           }`}
                         >
                           {p.name.charAt(0).toUpperCase()}
@@ -295,7 +295,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ onClose, onSelectPro
                         {profiles.length > 1 && (
                           <button
                             onClick={() => handleDeleteProfile(p.id)}
-                            className={`p-2 rounded-knopf hover:bg-schaden hover:text-schrift transition-colors cursor-pointer ${
+                            className={`p-2 rounded-knopf hover:bg-schaden-grund hover:text-schrift transition-colors cursor-pointer ${
                               isActive ? 'text-schaden' : 'text-schaden'
                             }`}
                             title="Löschen"

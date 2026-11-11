@@ -404,7 +404,7 @@ export const RestSection: React.FC<RestSectionProps> = ({
                             </span>
                           )}
                           {hasMeditation && (
-                            <span className="px-2 py-0.5 rounded-knopf bg-kanalisiert-grund text-kanalisiert border border-kanalisiert text-[11px] font-semibold">
+                            <span className="px-2 py-0.5 rounded-knopf bg-kanalisiert-grund text-schrift border border-kanalisiert text-[11px] font-semibold">
                               Meditation (T1): Fokus in 10 Min
                             </span>
                           )}
@@ -618,17 +618,17 @@ export const RestSection: React.FC<RestSectionProps> = ({
                             </span>
                           )}
                           {hasSchnellAufBeinen && (
-                            <span className="px-2 py-0.5 rounded-knopf bg-kanalisiert-grund text-kanalisiert font-semibold border border-kanalisiert">
+                            <span className="px-2 py-0.5 rounded-knopf bg-kanalisiert-grund text-schrift font-semibold border border-kanalisiert">
                               Meisterschaft: Schnell wieder auf den Beinen (+1 LP)
                             </span>
                           )}
                           {hasGesunderGeist && (
-                            <span className="px-2 py-0.5 rounded-knopf bg-kanalisiert-grund text-kanalisiert font-semibold border border-kanalisiert">
+                            <span className="px-2 py-0.5 rounded-knopf bg-kanalisiert-grund text-schrift font-semibold border border-kanalisiert">
                               Meisterschaft: Gesunder Geist in gesundem Körper (+1 LP)
                             </span>
                           )}
                           {hasDahinsiechen && (
-                            <span className="px-2 py-0.5 rounded-knopf bg-schaden-grund text-schaden font-semibold border border-schaden">
+                            <span className="px-2 py-0.5 rounded-knopf bg-schaden-grund text-schrift font-semibold border border-schaden">
                               Schwäche: Dahinsiechen (keine LP-Regeneration)
                             </span>
                           )}

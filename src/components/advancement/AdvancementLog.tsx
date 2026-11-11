@@ -165,9 +165,9 @@ export const AdvancementLog: React.FC<AdvancementLogProps> = ({
       case 'attr':
         return 'bg-erschoepft-grund text-erschoepft border-erschoepft';
       case 'skill':
-        return 'bg-kanalisiert-grund text-kanalisiert border-kanalisiert';
+        return 'bg-kanalisiert-grund text-schrift border-kanalisiert';
       case 'mastery':
-        return 'bg-kanalisiert-grund text-kanalisiert border-kanalisiert';
+        return 'bg-kanalisiert-grund text-schrift border-kanalisiert';
       case 'spell':
         return 'bg-erhoeht text-schrift border-rahmen';
       case 'strength':
@@ -237,7 +237,7 @@ export const AdvancementLog: React.FC<AdvancementLogProps> = ({
               className={`flex items-center gap-1 px-2.5 py-1.5 rounded-knopf text-xs font-bold transition border ${
                 canUndo
                   ? 'bg-erhoeht text-schrift hover:bg-rahmen border-gold cursor-pointer active:scale-95'
-                  : 'bg-rahmen text-leise border-rahmen cursor-not-allowed opacity-60'
+                  : 'bg-rahmen text-schrift border-rahmen cursor-not-allowed opacity-60'
               }`}
               title={
                 canUndo

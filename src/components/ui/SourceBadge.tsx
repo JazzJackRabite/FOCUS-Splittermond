@@ -177,7 +177,7 @@ export const SourceBadge: React.FC<SourceBadgeProps> = ({ source, page, tooltipD
         onClick={handleClick}
       >
         <span
-          className={`inline-block bg-erhoeht text-leise text-[11px] px-1.5 rounded-knopf tabular-nums border border-rahmen align-middle ${tooltipData ? 'cursor-help hover:bg-gold hover:text-schrift hover:border-gold' : ''}`}
+          className={`inline-block bg-erhoeht text-leise text-[11px] px-1.5 rounded-knopf tabular-nums border border-rahmen align-middle ${tooltipData ? 'cursor-help hover:bg-gold hover:text-seite hover:border-gold' : ''}`}
         >
           {displaySource} {page ? `S. ${page}` : ''}
         </span>

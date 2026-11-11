@@ -99,3 +99,86 @@ export function paketzugriffe(): string[] {
   }
   return out.sort();
 }
+
+// ---------------------------------------------------------------- Lesbarkeit (Kontrast)
+
+/** Benannte Farben aus fundament.css als RGB */
+export function farbtabelle(): Record<string, [number, number, number]> {
+  const css = fs.readFileSync(path.join(SRC, 'fundament', 'fundament.css'), 'utf8');
+  const out: Record<string, [number, number, number]> = {};
+  for (const m of css.matchAll(/--color-([a-z-]+):\s*#([0-9a-fA-F]{6})/g)) {
+    out[m[1]] = [0, 2, 4].map((i) => parseInt(m[2].slice(i, i + 2), 16)) as [number, number, number];
+  }
+  return out;
+}
+
+function leuchtdichte([r, g, b]: number[]): number {
+  const k = [r, g, b].map((v) => { const x = v / 255; return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; });
+  return 0.2126 * k[0] + 0.7152 * k[1] + 0.0722 * k[2];
+}
+
+/** Kontrastverhältnis nach WCAG (1 = gleich, 21 = Schwarz auf Weiß) */
+export function kontrast(a: number[], b: number[]): number {
+  const [h, d] = [leuchtdichte(a), leuchtdichte(b)].sort((x, y) => y - x);
+  return (h + 0.05) / (d + 0.05);
+}
+
+const mischen = (v: number[], h: number[], a: number) => v.map((x, i) => Math.round(x * a + h[i] * (1 - a)));
+
+interface Paar { grund?: string; text?: string }
+/** Hintergrund und Schriftfarbe je Zustand (Grundzustand, hover, disabled …) aus einer Klassenliste */
+function paare(klassen: string): Record<string, Paar> {
+  const out: Record<string, Paar> = {};
+  for (const k of klassen.split(/\s+/)) {
+    const m = k.match(/^((?:[a-z0-9-]+:)*)(bg|text)-([a-z]+(?:-[a-z]+)?(?:\/\d+)?)$/);
+    if (!m) continue;
+    const zustand = m[1].replace(/(sm|md|lg|xl|2xl):/g, '');
+    (out[zustand] ??= {})[m[2] === 'bg' ? 'grund' : 'text'] = m[3];
+  }
+  return out;
+}
+
+/**
+ * Sucht Stellen, an denen Schrift und Hintergrund desselben Elements zu wenig Kontrast haben
+ * (dunkel auf dunkel, hell auf hell). Geprüft wird je Zeichenkette mit Klassen; bei zusammengesetzten
+ * Klassenlisten (`…${bedingung ? 'a' : 'b'}`) jeder Zweig zusammen mit dem festen Teil.
+ */
+export function kontrastBefunde(mindest: number): string[] {
+  const farben = farbtabelle();
+  const farbe = (name: string | undefined, hinter: number[]): number[] | null => {
+    if (!name) return null;
+    const [n, a] = name.split('/');
+    if (!farben[n]) return null;
+    return a ? mischen(farben[n], hinter, Number(a) / 100) : farben[n];
+  };
+  const befunde: string[] = [];
+  const pruefe = (datei: string, zeile: number, klassen: string) => {
+    const p = paare(klassen);
+    const basis = p[''] ?? {};
+    for (const [zustand, z] of Object.entries(p)) {
+      const g = z.grund ?? basis.grund; const t = z.text ?? basis.text;
+      if (!g || !t || (!z.grund && !z.text)) continue;
+      if (zustand.includes('group-') || zustand.includes('peer-')) continue;
+      const gf = farbe(g, farben.flaeche); if (!gf) continue;
+      const tf = farbe(t, gf); if (!tf) continue;
+      const k = kontrast(gf, tf);
+      if (k < mindest) befunde.push(`${datei}:${zeile} ${zustand}bg-${g} + ${zustand && z.text ? zustand : ''}text-${t} (Kontrast ${k.toFixed(1)})`);
+    }
+  };
+  for (const p of dateien(SRC)) {
+    if (!p.endsWith('.tsx') || p.includes('__tests__')) continue;
+    const text = fs.readFileSync(p, 'utf8');
+    const zeileVon = (i: number) => text.slice(0, i).split('\n').length;
+    for (const m of text.matchAll(/`([^`]*)`|"([^"\n]*)"|'([^'\n]*)'/g)) {
+      if (m[1] !== undefined) {
+        const fest = m[1].replace(/\$\{[^}]*\}/g, ' ');
+        const zweige = [...m[1].matchAll(/'([^'\n]*)'|"([^"\n]*)"/g)].map((x) => x[1] ?? x[2]).filter((s) => /\b(bg|text)-/.test(s));
+        if (!zweige.length) pruefe(rel(p), zeileVon(m.index!), fest);
+        for (const z of zweige) pruefe(rel(p), zeileVon(m.index!), `${fest} ${z}`);
+      } else if (!/`[^`]*$/.test(text.slice(Math.max(0, m.index! - 400), m.index!).split('\n').slice(-1)[0])) {
+        pruefe(rel(p), zeileVon(m.index!), (m[2] ?? m[3])!);
+      }
+    }
+  }
+  return [...new Set(befunde)].sort();
+}

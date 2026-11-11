@@ -576,7 +576,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                         className={`px-2 py-1 text-xs rounded-knopf border transition-all cursor-pointer tabular-nums font-semibold ${
                           targetVTD === val
                             ? 'bg-gold text-seite border-gold-hell'
-                            : 'bg-seite text-seite border-rahmen hover:bg-flaeche'
+                            : 'bg-seite text-schrift border-rahmen hover:bg-flaeche hover:text-schrift'
                         }`}
                         title={`Standard VTD ${val}`}
                       >
@@ -622,7 +622,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                         onClick={() => setTargetArmor(rs)}
                         className={`px-2 py-1 text-xs rounded-knopf border transition-all cursor-pointer tabular-nums font-semibold ${
                           targetArmor === rs
-                            ? 'bg-erschoepft text-schrift border-erschoepft'
+                            ? 'bg-erschoepft text-seite border-erschoepft'
                             : 'bg-seite text-schrift border-rahmen hover:bg-flaeche'
                         }`}
                       >
@@ -644,7 +644,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                     <Sparkles size={13} className="text-magie" /> Aktive Zauber-Wirkungen
                   </span>
                   {spellAttackBonusTotal > 0 && (
-                    <span className="tabular-nums font-bold px-2 py-0.5 rounded-knopf bg-magie-grund text-magie border border-magie">
+                    <span className="tabular-nums font-bold px-2 py-0.5 rounded-knopf bg-magie-grund text-schrift border border-magie">
                       AT-Bonus: +{spellAttackBonusTotal}
                       {spellAttackBonusRoh > spellAttackBonusTotal && ` (von +${spellAttackBonusRoh}, Höchstbonus GRW S. 18)`}
                     </span>
@@ -688,7 +688,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                 onClick={() => setTargetLying((prev) => !prev)}
                 className={`px-2.5 py-1 rounded-knopf border transition-all flex items-center gap-1.5 cursor-pointer font-semibold ${
                   targetLying
-                    ? 'bg-magie-grund text-magie border-magie'
+                    ? 'bg-magie-grund text-schrift border-magie'
                     : 'bg-seite text-leise border-rahmen hover:bg-seite'
                 }`}
               >
@@ -701,7 +701,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                 onClick={() => setAdvantageFlank((prev) => !prev)}
                 className={`px-2.5 py-1 rounded-knopf border transition-all flex items-center gap-1.5 cursor-pointer font-semibold ${
                   advantageFlank
-                    ? 'bg-magie-grund text-magie border-magie'
+                    ? 'bg-magie-grund text-schrift border-magie'
                     : 'bg-seite text-leise border-rahmen hover:bg-seite'
                 }`}
               >
@@ -752,7 +752,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                   Aktive Abzüge:
                 </span>
                 {woundPenalty !== 0 && (
-                  <span className="bg-schaden text-schrift px-2 py-0.5 rounded-knopf text-[11px] font-bold border border-schaden">
+                  <span className="bg-schaden-grund text-schrift px-2 py-0.5 rounded-knopf text-[11px] font-bold border border-schaden">
                     Wundabzug: {woundPenalty}
                   </span>
                 )}
@@ -765,7 +765,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                     }
                     className={`px-2 py-0.5 rounded-knopf text-[11px] font-bold border transition-colors cursor-pointer ${
                       activeConditionsState[c.id]
-                        ? 'bg-schaden-grund text-schaden border-schaden'
+                        ? 'bg-schaden-grund text-schrift border-schaden'
                         : 'bg-seite text-leise border-rahmen line-through'
                     }`}
                   >
@@ -984,7 +984,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                           ? isCrit
                             ? 'bg-erschoepft-grund text-gold-hell border-erschoepft'
                             : 'bg-unverletzt-grund text-unverletzt border-unverletzt'
-                          : 'bg-schaden-grund text-schaden border-schaden'
+                          : 'bg-schaden-grund text-schrift border-schaden'
                       }`}
                     >
                       {egCalculation.outcomeLabel}

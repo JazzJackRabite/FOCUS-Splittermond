@@ -443,7 +443,7 @@ export const InventoryView: React.FC = () => {
               state.ignoreEncumbrance
                 ? 'bg-erhoeht'
                 : isOverweight
-                  ? 'bg-schaden'
+                  ? 'bg-schaden-grund'
                   : totalLoad > loadCapacity * 0.8
                     ? 'bg-erschoepft'
                     : 'bg-unverletzt-grund'
@@ -588,7 +588,7 @@ export const InventoryView: React.FC = () => {
                           </span>
                         )}
                         {item.damage && (
-                          <span className="bg-schaden-grund text-schaden border border-schaden px-2 py-0.5 rounded-knopf text-[11px] font-semibold">
+                          <span className="bg-schaden-grund text-schrift border border-schaden px-2 py-0.5 rounded-knopf text-[11px] font-semibold">
                             Schaden: <strong className="text-schaden">{item.damage}</strong>
                           </span>
                         )}
@@ -666,7 +666,7 @@ export const InventoryView: React.FC = () => {
                       onClick={() => dispatch({ type: 'TOGGLE_EQUIP_ITEM', payload: { id: item.id } })}
                       className={`px-2.5 py-1 rounded-knopf border text-xs font-bold transition-all cursor-pointer ${
                         item.equipped
-                          ? 'bg-erschoepft-grund text-erschoepft border-erschoepft hover:bg-erschoepft'
+                          ? 'bg-erschoepft-grund text-erschoepft border-erschoepft hover:bg-erschoepft hover:text-seite'
                           : 'bg-erhoeht text-schrift border-gold hover:bg-rahmen'
                       }`}
                     >
@@ -691,7 +691,7 @@ export const InventoryView: React.FC = () => {
                       dispatch({ type: 'REMOVE_INVENTORY_ITEM', payload: { id: item.id } });
                       toast.success(`'${item.name}' entfernt`);
                     }}
-                    className="p-1.5 rounded-knopf text-leise hover:text-schaden hover:bg-schaden-grund transition-all cursor-pointer"
+                    className="p-1.5 rounded-knopf text-leise hover:text-schrift hover:bg-schaden-grund transition-all cursor-pointer"
                     title="Gegenstand löschen"
                   >
                     <Trash2 size={16} />

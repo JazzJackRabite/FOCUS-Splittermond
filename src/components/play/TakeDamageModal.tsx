@@ -224,7 +224,7 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
         {/* Header */}
         <div className="px-4 sm:px-5 py-3.5 border-b border-gold flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-full bg-schaden-grund border border-schaden flex items-center justify-center text-schaden">
+            <div className="w-8 h-8 rounded-full bg-schaden-grund border border-schaden flex items-center justify-center text-schrift">
               <Flame size={18} />
             </div>
             <div>
@@ -427,7 +427,7 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
                 className={`text-[11px] font-bold px-2 py-0.5 rounded-knopf border ${
                   currentSplitterPoints > 0
                     ? 'bg-erhoeht text-gold border-gold'
-                    : 'bg-schaden-grund text-schaden border-schaden'
+                    : 'bg-schaden-grund text-schrift border-schaden'
                 }`}
               >
                 {currentSplitterPoints} SP verfügbar
@@ -502,7 +502,7 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
                               className={`w-5 h-5 rounded-knopf text-[11px] font-bold flex items-center justify-center cursor-pointer transition-colors ${
                                 level === lvl
                                   ? 'bg-gold text-seite'
-                                  : 'bg-flaeche text-seite hover:bg-erhoeht'
+                                  : 'bg-flaeche text-schrift hover:bg-erhoeht hover:text-schrift'
                               }`}
                             >
                               {lvl}
@@ -601,7 +601,7 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
             </div>
 
             {woundPreview.isDying && (
-              <div className="mt-1 bg-schaden-grund border border-schaden rounded-knopf px-2.5 py-1 text-xs text-schaden flex items-center gap-1.5">
+              <div className="mt-1 bg-schaden-grund border border-schaden rounded-knopf px-2.5 py-1 text-xs text-schrift flex items-center gap-1.5">
                 <AlertTriangle size={14} className="text-schaden shrink-0" />
                 <span className="font-bold">
                   Achtung: Todgeweiht oder alle Lebenspunkte aufgebraucht (Sterbend / Bewusstlos)!

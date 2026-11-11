@@ -439,6 +439,12 @@ Dateien aus AI Studio im Repository: `public/assets/aistudio/*.png`, `.aistudio/
   und Würfeldialog sowie bei kanalisierten Zaubern in Lila. Im Browser geprüft: alle fünf Reiter, Erschaffung,
   Einstellungen, Würfel-, Schadens-, Heil- und Angriffsdialog, dazu Spielen und Kampf in Handybreite (390 Pixel, kein
   seitliches Rollen). Nicht geöffnet: Zauberdialog, Meisterschafts- und Zauberauswahl, Relikt-Werkstatt.
+- **Nachtrag Lesbarkeit (11.11.2026):** Fehler aus der automatischen Umstellung behoben – in Auswahlknöpfen mit zwei
+  Zuständen (z. B. VTD-Schnellwahl im Angriffsdialog) stand dunkle Schrift auf dunklem Grund. Neue Regel 6 im Fundament
+  (Kontrast mindestens 4,5 : 1, Tabelle erlaubter Paare) und eine Prüfung, die jede Klassenliste nachrechnet
+  (`kontrastBefunde` in `src/fundament/__tests__/pruefen.ts`). 66 Stellen korrigiert: Schrift auf gedämpften Grundtönen
+  ist `schrift`, auf Gold `seite`; kräftige Bedeutungsfarben sind keine Textflächen mehr.
+- **Splitterpunkte als Rauten** wie im Mockup (neuer Baustein `Rauten`), statt Sternen in Kreisen.
 
 ## Google AI Studio
 

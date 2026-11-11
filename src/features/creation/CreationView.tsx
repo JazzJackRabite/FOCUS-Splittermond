@@ -392,7 +392,7 @@ export function CreationView() {
                       <button
                         key={attr} onClick={() => toggleRaceBonus(attr)}
                         disabled={mode !== 'creation'}
-                        className={`text-[11px] px-2 py-1 border rounded-knopf uppercase font-bold ${isSelected ? 'bg-erhoeht text-schrift border-gold' : 'bg-flaeche text-leise border-rahmen hover:bg-rahmen'}`}
+                        className={`text-[11px] px-2 py-1 border rounded-knopf uppercase font-bold ${isSelected ? 'bg-erhoeht text-schrift border-gold' : 'bg-flaeche text-leise border-rahmen hover:bg-rahmen hover:text-schrift'}`}
                       >{attr}</button>
                     );
                   })}
