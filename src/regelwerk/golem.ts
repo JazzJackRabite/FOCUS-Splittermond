@@ -9,6 +9,7 @@
  * - Preis (Kasten „Einen Golem kaufen“): 50 L je Stufe, 10 L je zusätzlicher Applikation nach der ersten, 5 L je Sonderausstattung.
  * - Konstruktion: erweiterte Probe gegen 20 + 2 × Stufe, Fortschrittspunkte 2 × Stufe (S. 200).
  */
+import type { Verstoss } from '../fundament/hausregeln';
 import type { Katalog } from './katalog';
 import type { Eintrag } from './typen';
 import type { Begleiter } from '../types';
@@ -99,11 +100,15 @@ export interface GolemWerte {
   animierung: Eintrag | null;
   feinschliff: string[];
   hinweise: string[];
+  /** Hinweise, die ein Regelverstoß sind */
+  verstoesse: Verstoss[];
 }
 
 export function golemWerte(k: Katalog, b: Begleiter): GolemWerte {
   const korpus = k.get(b.id);
   const hinweise: string[] = [];
+  const verstoesse: Verstoss[] = [];
+  const verstoss = (text: string, schluessel: string, mass = 1) => { hinweise.push(text); verstoesse.push({ text, schluessel, mass }); };
   const gewaehlt: Record<string, Eintrag[]> = Object.fromEntries(BAUSTEIN_ARTEN.map(a => [a, []]));
   for (const i of b.bausteine ?? []) { const e = k.get(i); if (e?.typ === 'golem_baustein' && gewaehlt[e.daten.baustein]) gewaehlt[e.daten.baustein].push(e); }
   const anzahl = (e: Eintrag) => (b.bausteine ?? []).filter(x => x === e.id).length;
@@ -117,9 +122,9 @@ export function golemWerte(k: Katalog, b: Begleiter): GolemWerte {
 
   // Mehrfachwahl und Voraussetzungen
   for (const e of new Set(Object.values(gewaehlt).flat())) {
-    if (anzahl(e) > hoechstens(e)) hinweise.push(`${e.name} ist höchstens ${hoechstens(e)}-mal wählbar`);
+    if (anzahl(e) > hoechstens(e)) verstoss(`${e.name} ist höchstens ${hoechstens(e)}-mal wählbar`, `anzahl:${e.id}`, anzahl(e) - hoechstens(e));
     const v = voraussetzung(e);
-    if (v && !Object.values(gewaehlt).flat().some(x => x.name === v)) hinweise.push(`${e.name} setzt ${v} voraus`);
+    if (v && !Object.values(gewaehlt).flat().some(x => x.name === v)) verstoss(`${e.name} setzt ${v} voraus`, `voraus:${e.id}`);
   }
   const material = b.material ? k.get(b.material) : undefined;
   if (!material) hinweise.push('Material wählen (Schritt 2)');
@@ -129,15 +134,15 @@ export function golemWerte(k: Katalog, b: Begleiter): GolemWerte {
   const applikationenExtra = Math.max(0, gewaehlt.Applikation.length - applikationenFrei);
   const schwachpunkteNoetig = applikationenExtra;
   if (gewaehlt.Schwachpunkt.length < schwachpunkteNoetig)
-    hinweise.push(`Für ${applikationenExtra} zusätzliche Applikation${applikationenExtra > 1 ? 'en' : ''} fehlen ${schwachpunkteNoetig - gewaehlt.Schwachpunkt.length} Schwachpunkt(e)`);
+    verstoss(`Für ${applikationenExtra} zusätzliche Applikation${applikationenExtra > 1 ? 'en' : ''} fehlen ${schwachpunkteNoetig - gewaehlt.Schwachpunkt.length} Schwachpunkt(e)`, 'schwachpunkte', schwachpunkteNoetig - gewaehlt.Schwachpunkt.length);
   const instruktionenErlaubt = 1 + gewaehlt.Applikation.filter(e => /zusaetzliche-instruktion$/.test(e.id)).length;
   const instr = gewaehlt.Instruktion.filter(e => !IMMER_INSTRUKTIONEN.includes(e.name));
-  if (instr.length > instruktionenErlaubt) hinweise.push(`Mehr Instruktionen (${instr.length}) als implementierbar (${instruktionenErlaubt}); weitere über die Applikation Zusätzliche Instruktion`);
+  if (instr.length > instruktionenErlaubt) verstoss(`Mehr Instruktionen (${instr.length}) als implementierbar (${instruktionenErlaubt}); weitere über die Applikation Zusätzliche Instruktion`, 'instruktionen', instr.length - instruktionenErlaubt);
   const verfuegungenAktiv = b.golemRessource ? Math.max(1, stufe) : null;
-  if (verfuegungenAktiv !== null && gewaehlt['Verfügung'].length > verfuegungenAktiv) hinweise.push(`Höchstens ${verfuegungenAktiv} aktive Verfügungen (Ressource Golem)`);
+  if (verfuegungenAktiv !== null && gewaehlt['Verfügung'].length > verfuegungenAktiv) verstoss(`Höchstens ${verfuegungenAktiv} aktive Verfügungen (Ressource Golem)`, 'verfuegungen', gewaehlt['Verfügung'].length - verfuegungenAktiv);
   const sonderausstattungPlaetze = Math.floor(stufe / 2);
   const sa = (b.sonderausstattung ?? []).slice(0, sonderausstattungPlaetze).filter(Boolean);
-  if ((b.sonderausstattung ?? []).filter(Boolean).length > sonderausstattungPlaetze) hinweise.push(`Höchstens ${sonderausstattungPlaetze} Sonderausstattung(en)`);
+  if ((b.sonderausstattung ?? []).filter(Boolean).length > sonderausstattungPlaetze) verstoss(`Höchstens ${sonderausstattungPlaetze} Sonderausstattung(en)`, 'sonderausstattung', (b.sonderausstattung ?? []).filter(Boolean).length - sonderausstattungPlaetze);
 
   // Werte
   let werte: Werteblock | null = null;
@@ -163,6 +168,6 @@ export function golemWerte(k: Katalog, b: Begleiter): GolemWerte {
     korpus, stufe, stufePosten, werte, gewaehlt, applikationenFrei, applikationenExtra, schwachpunkteNoetig, materialSchwachpunkt,
     instruktionenErlaubt, verfuegungenAktiv, sonderausstattungPlaetze, meisterschaftSchwelle: golemSchwelle(k, stufe),
     preis, konstruktion: { schwierigkeit: 20 + 2 * stufe + applikationenExtra, fortschritt: 2 * stufe + 3 * applikationenExtra },
-    animierung: animierung(k, stufe), feinschliff, hinweise,
+    animierung: animierung(k, stufe), feinschliff, hinweise, verstoesse,
   };
 }

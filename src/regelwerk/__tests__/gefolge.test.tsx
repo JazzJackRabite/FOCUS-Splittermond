@@ -1,6 +1,7 @@
 /**
  * Gefolge (Ressource Gefolge, GRW S. 77–78): Werte eines Gefolgsmanns, Gefolge-Punkte, Tab „Begleiter“.
  */
+import { setzeHausregeln } from '../../fundament/hausregeln';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, within } from '@testing-library/react';
@@ -122,6 +123,10 @@ describe('Tab „Begleiter“: Gefolge', () => {
     expect(within(sek).getByText(/verbraucht 1\./)).toBeTruthy();
     // Stangenwaffen auf 6 anheben → 2 Punkte, mehr als die Ressource
     const zeile = within(tabelle).getByText('Stangenwaffen').closest('tr')!;
+    // ohne Hausregeln gesperrt (FUNDAMENT, Grundsatz 7), mit Hausregeln nur eine Warnung
+    fireEvent.click(within(zeile).getByRole('button', { name: /anheben/ }));
+    expect(within(sek).getByText(/verbraucht 1\./)).toBeTruthy();
+    setzeHausregeln(true);
     fireEvent.click(within(zeile).getByRole('button', { name: /anheben/ }));
     expect(within(zeile).getAllByText('6').length).toBeGreaterThan(0);
     expect(within(sek).getByText(/verbraucht 2\./)).toBeTruthy();
@@ -133,5 +138,6 @@ describe('Tab „Begleiter“: Gefolge', () => {
     fireEvent.click(within(sek).getByRole('button', { name: /Meisterschaft hinzufügen/ }));
     expect(within(sek).getByText(/frei durch Schwelle/)).toBeTruthy();
     expect(within(sek).getByText(/verbraucht 2\./)).toBeTruthy();
+    setzeHausregeln(false);
   });
 });

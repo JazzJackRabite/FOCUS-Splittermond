@@ -1,7 +1,7 @@
 /** Grundsatz 7: Sperren als Standard; „Hausregeln erlauben“ macht aus Sperren Warnungen. */
 import { beforeEach, describe, expect, it } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
-import { hausregelnErlaubt, regelverstoss, setzeHausregeln, useHausregeln } from '../hausregeln';
+import { aenderungGesperrt, hausregelnErlaubt, regelverstoss, setzeHausregeln, useHausregeln } from '../hausregeln';
 import { useItemHandlers } from '../../hooks/useItemHandlers';
 import type { CharacterAction } from '../../types';
 
@@ -38,5 +38,16 @@ describe('Hausregeln', () => {
     setzeHausregeln(true);
     act(() => result.current.addListEntry('strength', 'Beispiel', 1, '', 1, 'GRW', undefined));
     expect(aktionen.map((a) => a.type)).toEqual(['ADD_STRENGTH']);
+  });
+
+  it('zusammengesetzte Einträge: gesperrt ist nur, was einen Verstoß neu schafft oder vergrößert', () => {
+    const v = (schluessel: string, mass: number) => ({ text: schluessel, schluessel, mass });
+    expect(aenderungGesperrt([], [v('ep', 2)])).toBe(true);
+    expect(aenderungGesperrt([v('ep', 2)], [v('ep', 3)])).toBe(true);
+    expect(aenderungGesperrt([v('ep', 3)], [v('ep', 2)])).toBe(false);
+    expect(aenderungGesperrt([v('ep', 3)], [v('ep', 3)])).toBe(false);
+    expect(aenderungGesperrt([v('ep', 3)], [])).toBe(false);
+    setzeHausregeln(true);
+    expect(aenderungGesperrt([], [v('ep', 2)])).toBe(false);
   });
 });

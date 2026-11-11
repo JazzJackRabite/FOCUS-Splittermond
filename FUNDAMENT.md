@@ -30,8 +30,9 @@ Gemini in Google AI Studio – liest diese Datei zuerst und hält sich daran.
 7. **Sperren als Standard, Hausregeln auf Wunsch** (Entscheidung 11.11.2026). Verstößt eine Eingabe gegen eine Regel,
    sperrt der Editor sie und sagt, warum. Mit dem Schalter „Hausregeln erlauben“ (Einstellungen → Allgemein, Standard:
    aus) wird aus jeder Sperre eine Warnung. Keine Ansicht entscheidet das selbst: Regelprüfungen laufen über
-   `regelverstoss()` und `useHausregeln()` aus `src/fundament/hausregeln.ts`. Noch nicht umgestellt (warnen immer nur):
-   Gefolge, erhobene Untote und Golems im Tab „Begleiter“.
+   `regelverstoss()`, `aenderungGesperrt()` und `useHausregeln()` aus `src/fundament/hausregeln.ts`. Bei zusammengesetzten
+   Einträgen (Gefolge, Untote, Golems) ist gesperrt, was einen Verstoß neu schafft oder vergrößert; Änderungen, die nichts
+   verschlimmern, gehen immer.
 
 ## 2. Regelquellen
 

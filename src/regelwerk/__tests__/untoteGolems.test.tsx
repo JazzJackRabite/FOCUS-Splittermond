@@ -1,6 +1,7 @@
 /**
  * Begleiter Teil 3: Modifikationen-Texte, erhobene Untote und Golems (Die Magie S. 182–184, 197–207; lokal mit FOKUS_BUECHER).
  */
+import { setzeHausregeln } from '../../fundament/hausregeln';
 import React from 'react';
 import fs from 'fs';
 import path from 'path';
@@ -147,8 +148,13 @@ describe.skipIf(!MAGIE || !fs.existsSync(MAGIE))('Untote und Golems mit „Die M
     fireEvent.change(within(us).getByLabelText('Anzahl Verstärkungen'), { target: { value: '1' } });
     fireEvent.click(within(us).getByLabelText('KON steigern'));
     expect(within(us).getByText('EP 10/10')).toBeTruthy();
+    // 15 EP bei 10 verfügbaren: ohne Hausregeln gesperrt, mit Hausregeln nur eine Warnung
+    fireEvent.change(within(us).getByLabelText('Abnormität'), { target: { value: 'magie:abnormitaet:mordlust' } });
+    expect(within(us).getByText('EP 10/10')).toBeTruthy();
+    setzeHausregeln(true);
     fireEvent.change(within(us).getByLabelText('Abnormität'), { target: { value: 'magie:abnormitaet:mordlust' } });
     expect(within(us).getByText('EP 15/10')).toBeTruthy();
+    setzeHausregeln(false);
   });
 });
 

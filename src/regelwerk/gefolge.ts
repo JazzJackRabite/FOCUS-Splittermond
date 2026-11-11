@@ -8,6 +8,7 @@
  * Zauber nach der Erschaffungsregel (GRW S. 30, Beispiel Klingentänzerin): je Magieschule ab 1 Punkt ein Zauber des Grades 0,
  * ab 3 Punkten einer des Grades 1, ab 6 Punkten einer des Grades 2. Zaubergrad n braucht 3·n Punkte (Grad 0: 1 Punkt).
  */
+import type { Verstoss } from '../fundament/hausregeln';
 import type { Katalog } from './katalog';
 import type { Begleiter } from '../types';
 import { abgeleiteteWerte } from './abgeleitet';
@@ -129,11 +130,15 @@ export interface GefolgeWerte {
   /** Gefolge-Punkte für diesen Gefolgsmann: 1 + Schwellen + Meisterschaften/Zauber über den freien */
   punkte: number;
   hinweise: string[];
+  /** Hinweise, die ein Regelverstoß sind (nicht bloß „noch wählen“) */
+  verstoesse: Verstoss[];
 }
 
 /** Alle Werte eines Gefolgsmanns. maxFertigkeit = höchster Fertigkeitswert nach Heldengrad des Abenteurers (GRW S. 87). */
 export function gefolgeWerte(k: Katalog, b: Begleiter, maxFertigkeit: number): GefolgeWerte {
   const hinweise: string[] = [];
+  const verstoesse: Verstoss[] = [];
+  const verstoss = (text: string, schluessel: string, mass = 1) => { hinweise.push(text); verstoesse.push({ text, schluessel, mass }); };
   const rasse = b.rasse && k.get(b.rasse) ? b.rasse : undefined;
   if (!rasse) hinweise.push('Rasse wählen');
   const A: Record<string, number> = Object.fromEntries(ATTRIBUTE.map(([, n]) => [n, 2]));
@@ -160,7 +165,7 @@ export function gefolgeWerte(k: Katalog, b: Begleiter, maxFertigkeit: number): G
     return { id, name: e?.name ?? id, punkte: p, wert: attr.length ? p + attr.reduce((s, a) => s + (A[a] ?? 0), 0) : null, schwelle: schwelleBei(k, p),
       angehoben: angehoben.has(id), zuHoch: p > maxFertigkeit };
   }).sort((x, y) => x.name.localeCompare(y.name, 'de'));
-  for (const f of fertigkeiten) if (f.zuHoch) hinweise.push(`${f.name} ${f.punkte} ist höher, als der Heldengrad des Abenteurers zulässt (${maxFertigkeit})`);
+  for (const f of fertigkeiten) if (f.zuHoch) verstoss(`${f.name} ${f.punkte} ist höher, als der Heldengrad des Abenteurers zulässt (${maxFertigkeit})`, `hoch:${f.id}`, f.punkte - maxFertigkeit);
 
   const staerken = [
     ...(rasse ? (k.get(rasse)!.daten.staerken_refs ?? []).map((s: { id?: string }) => s.id).filter(Boolean) : []),
@@ -178,7 +183,7 @@ export function gefolgeWerte(k: Katalog, b: Begleiter, maxFertigkeit: number): G
     const ok = !!e && (f ? p >= 1 && s <= Math.max(1, schwelleBei(k, p)) : true);
     return { id, name: e?.name ?? id, fertigkeit: f ? k.get(f)?.name ?? f : undefined, schwelle: s, ok };
   });
-  for (const m of meisterschaften) if (!m.ok) hinweise.push(`Meisterschaft ${m.name}: Fertigkeit fehlt oder Schwelle nicht erreicht`);
+  for (const m of meisterschaften) if (!m.ok) verstoss(`Meisterschaft ${m.name}: Fertigkeit fehlt oder Schwelle nicht erreicht`, `ms:${m.id}`);
 
   const zauber: GefolgeZauber[] = (b.zauber ?? []).map(id => {
     const e = k.get(id);
@@ -187,7 +192,7 @@ export function gefolgeWerte(k: Katalog, b: Begleiter, maxFertigkeit: number): G
     const s = passend ?? schulen.find(x => pkt(x.id) > 0) ?? schulen[0];
     return { id, name: e?.name ?? id, schule: s?.schule, schuleId: s?.id, grad: s?.grad, ok: !!passend };
   });
-  for (const z of zauber) if (!z.ok) hinweise.push(`Zauber ${z.name}: Magieschule fehlt oder zu wenige Punkte für Grad ${z.grad ?? '?'}`);
+  for (const z of zauber) if (!z.ok) verstoss(`Zauber ${z.name}: Magieschule fehlt oder zu wenige Punkte für Grad ${z.grad ?? '?'}`, `z:${z.id}`);
 
   const magie = fertigkeiten.filter(f => k.get(f.id)?.daten.kategorie === 'Magieschule');
   const freieZauber = magie.reduce((s, f) => s + freieZauberBei(f.punkte), 0);
@@ -212,7 +217,7 @@ export function gefolgeWerte(k: Katalog, b: Begleiter, maxFertigkeit: number): G
   }
   return {
     attribute: A, werte, fertigkeiten, staerken, kulturMeisterschaft: kw.meisterschaft, meisterschaften, zauber, waffen,
-    freieMeisterschaften, freieZauber, punkte: gesamtPunkte, hinweise,
+    freieMeisterschaften, freieZauber, punkte: gesamtPunkte, hinweise, verstoesse,
   };
 }
 

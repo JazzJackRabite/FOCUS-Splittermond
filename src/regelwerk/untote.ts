@@ -8,6 +8,7 @@
  * - Keine Magieschulen, keine „intellektuellen“ Fertigkeiten (z. B. Arkane Kunde, Geschichte und Mythen).
  * - Abnormität (Meisterschaft Meister der Abnormitäten): 5 EP, höchstens eine je Untotem.
  */
+import type { Verstoss } from '../fundament/hausregeln';
 import type { Katalog } from './katalog';
 import type { Eintrag } from './typen';
 import type { Begleiter } from '../types';
@@ -73,16 +74,20 @@ export interface UntotWerte {
   freieMeisterschaften: { fertigkeit: string; schwelle: number }[];
   abnormitaet: Eintrag | null;
   hinweise: string[];
+  /** Hinweise, die ein Regelverstoß sind */
+  verstoesse: Verstoss[];
 }
 
 export function untotWerte(k: Katalog, b: Begleiter, opt: { nekromant: boolean; meisterDerAbnormitaeten: boolean }): UntotWerte {
   const hinweise: string[] = [];
+  const verstoesse: Verstoss[] = [];
+  const verstoss = (text: string, schluessel: string, mass = 1) => { hinweise.push(text); verstoesse.push({ text, schluessel, mass }); };
   const erhebung = erhebungen(k).find(x => x.zauber.id === b.erhebung) ?? null;
   const wertesatz = erhebung?.wertesaetze.find(w => w.id === b.id || w.name === b.name) ?? null;
   const grad = erhebung?.grad ?? 3;
   const grenze = hoechstePunkte(grenzHeldengrad(grad));
   const verst = b.verstaerkungen ?? 0;
-  if (verst > 1 && !opt.nekromant) hinweise.push('Die Verstärkung mehrfach zu wählen erfordert die Meisterschaft Nekromant');
+  if (verst > 1 && !opt.nekromant) verstoss('Die Verstärkung mehrfach zu wählen erfordert die Meisterschaft Nekromant', 'verstaerkung', verst - 1);
   const epGesamt = verst * (erhebung?.epJeVerstaerkung ?? 0);
 
   const st = b.steigerung ?? {};
@@ -93,17 +98,17 @@ export function untotWerte(k: Katalog, b: Begleiter, opt: { nekromant: boolean; 
     if (n <= 0) continue;
     const name = f === ANGRIFF ? 'Angriff' : k.get(f)?.name ?? f;
     posten.push({ text: `${name} +${n}`, ep: fertigkeitKosten(n) });
-    if (n > grenze) hinweise.push(`${name}: höchstens ${grenze} neue Punkte (Zaubergrad ${grad})`);
-    if (f !== ANGRIFF && (INTELLEKTUELL.includes(f) || k.get(f)?.daten.kategorie === 'Magieschule')) hinweise.push(`${name} kann ein erhobener Untoter nicht steigern`);
+    if (n > grenze) verstoss(`${name}: höchstens ${grenze} neue Punkte (Zaubergrad ${grad})`, `grenze:${f}`, n - grenze);
+    if (f !== ANGRIFF && (INTELLEKTUELL.includes(f) || k.get(f)?.daten.kategorie === 'Magieschule')) verstoss(`${name} kann ein erhobener Untoter nicht steigern`, `nicht:${f}`, n);
     const s = freieSchwelle(n); if (s) freieMeisterschaften.push({ fertigkeit: name, schwelle: s });
   }
   const abnormitaet = b.abnormitaet ? k.get(b.abnormitaet) ?? null : null;
   if (abnormitaet) {
     posten.push({ text: `Abnormität ${abnormitaet.name}`, ep: Number(abnormitaet.daten.kosten_ep) || 5 });
-    if (!opt.meisterDerAbnormitaeten) hinweise.push('Abnormitäten erfordern die Meisterschaft Meister der Abnormitäten');
+    if (!opt.meisterDerAbnormitaeten) verstoss('Abnormitäten erfordern die Meisterschaft Meister der Abnormitäten', 'abnormitaet');
   }
   const epVerbraucht = posten.reduce((s, p) => s + p.ep, 0);
-  if (epVerbraucht > epGesamt) hinweise.push(`${epVerbraucht} EP verteilt, aber nur ${epGesamt} EP aus der Verstärkung`);
+  if (epVerbraucht > epGesamt) verstoss(`${epVerbraucht} EP verteilt, aber nur ${epGesamt} EP aus der Verstärkung`, 'ep', epVerbraucht - epGesamt);
   if (!erhebung) hinweise.push('Erhebungszauber nicht im Katalog');
 
   // Werte: Wertesatz, Verstand 0, Steigerungen mit Auswirkung auf abgeleitete Werte, Abnormität
@@ -136,7 +141,7 @@ export function untotWerte(k: Katalog, b: Begleiter, opt: { nekromant: boolean; 
   } else if (wertesatz) {
     hinweise.push(`Wertesatz ${wertesatz.name} steht nicht in den Regelpaketen – Werte aus ${wertesatz.quelle}`);
   }
-  return { erhebung, wertesatz, werte, epGesamt, epVerbraucht, posten, grenze, freieMeisterschaften, abnormitaet, hinweise };
+  return { erhebung, wertesatz, werte, epGesamt, epVerbraucht, posten, grenze, freieMeisterschaften, abnormitaet, hinweise, verstoesse };
 }
 
 export const abnormitaeten = (k: Katalog) => Object.values(k.eintraege).filter(e => e.typ === 'abnormitaet').sort((a, b) => a.name.localeCompare(b.name, 'de'));

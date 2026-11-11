@@ -1,3 +1,4 @@
+import { aenderungGesperrt } from '../../fundament/hausregeln';
 import React, { useMemo, useState } from 'react';
 import { Bot, Plus, Trash2, ChevronDown, ChevronRight, X, AlertTriangle } from 'lucide-react';
 import { useCharacter } from '../../context/CharacterContext';
@@ -66,8 +67,11 @@ const BausteinGruppe: React.FC<{ k: Katalog; art: string; b: Begleiter; aendern:
 const GolemEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; besitzer: Besitzer }> = ({ k, b, index, besitzer }) => {
   const { dispatch } = useCharacter();
   const [offen, setOffen] = useState(false);
-  const aendern = (aenderung: Partial<Begleiter>) => dispatch({ type: 'BEGLEITER_AENDERN', payload: { index, aenderung } });
   const g = golemWerte(k, b);
+  const aendern = (aenderung: Partial<Begleiter>) => {
+    if (aenderungGesperrt(g.verstoesse, golemWerte(k, { ...b, ...aenderung }).verstoesse)) return;
+    dispatch({ type: 'BEGLEITER_AENDERN', payload: { index, aenderung } });
+  };
   const sa = sonderausstattungen(k);
   const titel = b.rufname ? `${b.rufname} (Golem, ${b.name})` : `Golem (${b.name})`;
   const kennt = g.animierung ? besitzer.zauber.includes(g.animierung.name) : false;

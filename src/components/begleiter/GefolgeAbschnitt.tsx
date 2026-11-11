@@ -1,3 +1,4 @@
+import { aenderungGesperrt, regelverstoss } from '../../fundament/hausregeln';
 import React, { useMemo, useState } from 'react';
 import { Users, Plus, Trash2, ChevronDown, ChevronRight, X, AlertTriangle } from 'lucide-react';
 import { useCharacter } from '../../context/CharacterContext';
@@ -16,15 +17,20 @@ function useGefolgePunkte(): number {
   return state.resourcesList.filter(r => /^Gefolge\b/.test(r.name)).reduce((s, r) => s + (Number(r.level) || 0), 0);
 }
 
-const GefolgeEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; maxFertigkeit: number }> = ({ k, b, index, maxFertigkeit }) => {
+const GefolgeEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; maxFertigkeit: number; punkteFrei: number }> = ({ k, b, index, maxFertigkeit, punkteFrei }) => {
   const { dispatch } = useCharacter();
   const [offen, setOffen] = useState(false);
   const [msWahl, setMsWahl] = useState('');
   const [zWahl, setZWahl] = useState('');
   const [fWahl, setFWahl] = useState('');
   const [wWahl, setWWahl] = useState('');
-  const aendern = (aenderung: Partial<Begleiter>) => dispatch({ type: 'BEGLEITER_AENDERN', payload: { index, aenderung } });
   const g = gefolgeWerte(k, b, maxFertigkeit);
+  const aendern = (aenderung: Partial<Begleiter>) => {
+    const neu = gefolgeWerte(k, { ...b, ...aenderung }, maxFertigkeit);
+    if (aenderungGesperrt(g.verstoesse, neu.verstoesse)) return;
+    if (neu.punkte > g.punkte && neu.punkte - g.punkte > punkteFrei && regelverstoss('Dafür reichen die Punkte der Ressource Gefolge nicht.')) return;
+    dispatch({ type: 'BEGLEITER_AENDERN', payload: { index, aenderung } });
+  };
   const kultur = k.get(b.id);
   const mw = kultur?.daten.modulwerte;
   const plaetze = freieAttribute(k, b.rasse);
@@ -295,7 +301,7 @@ export const GefolgeAbschnitt: React.FC<{ k: Katalog }> = ({ k }) => {
 
       {eigene.length > 0 && (
         <ul className="space-y-2 mb-3">
-          {eigene.map(({ b, i }) => <GefolgeEintrag key={`${b.id}-${i}`} k={k} b={b} index={i} maxFertigkeit={maxFertigkeit} />)}
+          {eigene.map(({ b, i }) => <GefolgeEintrag key={`${b.id}-${i}`} k={k} b={b} index={i} maxFertigkeit={maxFertigkeit} punkteFrei={punkte - verbraucht} />)}
         </ul>
       )}
 
@@ -309,7 +315,7 @@ export const GefolgeAbschnitt: React.FC<{ k: Katalog }> = ({ k }) => {
           {ku.map(c => <option key={c.id} value={c.id}>{c.name}{c.quelle.paket !== 'grw' ? ` (${k.pakete[c.quelle.paket]?.kuerzel ?? c.quelle.paket})` : ''}</option>)}
         </select>
         <button type="button" disabled={!rasse || !kultur} className={knopf}
-          onClick={() => { dispatch({ type: 'BEGLEITER_HINZU', payload: { id: kultur, art: 'gefolge', name: k.get(kultur)!.name, rasse } }); setKultur(''); }}>
+          onClick={() => { if (verbraucht + 1 > punkte && regelverstoss('Dafür reichen die Punkte der Ressource Gefolge nicht.')) return; dispatch({ type: 'BEGLEITER_HINZU', payload: { id: kultur, art: 'gefolge', name: k.get(kultur)!.name, rasse } }); setKultur(''); }}>
           <Plus size={12} />Gefolgsmann hinzufügen
         </button>
       </div>

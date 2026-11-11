@@ -45,3 +45,17 @@ export function regelverstoss(meldung: string): boolean {
   toast.error(meldung, { id: `regel:${meldung}` });
   return true;
 }
+
+/** Ein Regelverstoß eines zusammengesetzten Eintrags (Gefolge, Untoter, Golem): Kennung der Regel und Ausmaß */
+export interface Verstoss { text: string; schluessel: string; mass: number }
+
+/**
+ * Prüft eine Änderung an einem Eintrag: Entsteht ein neuer Verstoß oder wird ein bestehender größer, ist die Änderung
+ * gesperrt (Rückgabe true) bzw. mit Hausregeln nur eine Warnung. Änderungen, die nichts verschlimmern, gehen immer –
+ * so lässt sich ein regelwidriger Eintrag auch ohne Hausregeln wieder in Ordnung bringen.
+ */
+export function aenderungGesperrt(vorher: Verstoss[], nachher: Verstoss[]): boolean {
+  const alt = new Map(vorher.map((v) => [v.schluessel, v.mass]));
+  const schlimmer = nachher.find((v) => v.mass > (alt.get(v.schluessel) ?? 0));
+  return !!schlimmer && regelverstoss(schlimmer.text);
+}

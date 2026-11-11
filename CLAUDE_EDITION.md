@@ -411,7 +411,11 @@ Dateien aus AI Studio im Repository: `public/assets/aistudio/*.png`, `.aistudio/
   und Punktegrenzen bei Stärken, Ressourcen, Sprachen, Meisterschaften, Zaubern, Attributen und Fertigkeiten; Grenzen des
   Heldengrads; Entfernen von Erschaffungswahlen in der Steigerung; Zauber über dem Fertigkeitswert; Voraussetzungen und
   Schwellen der Meisterschaften. Neu gesperrt (vorher nur Warnung): Relikt mit Regelverstoß speichern, Abrichtung mit
-  nicht erfüllter Voraussetzung. Offen: Gefolge, Untote, Golems warnen weiterhin nur.
+  nicht erfüllter Voraussetzung.
+- **Nachtrag 11.11.2026 – Hausregeln auch für Gefolge, Untote, Golems:** `gefolgeWerte`, `untotWerte`, `golemWerte`
+  liefern neben `hinweise` jetzt `verstoesse` (Kennung und Ausmaß; „noch wählen“-Hinweise zählen nicht dazu).
+  `aenderungGesperrt()` sperrt jede Änderung, die einen Verstoß neu schafft oder vergrößert; dazu die Punkte der
+  Ressource Gefolge (auch beim Hinzufügen). Nicht gesperrt bleibt der Hinweis „Ressource Golem nötig“.
 
 ## Google AI Studio
 

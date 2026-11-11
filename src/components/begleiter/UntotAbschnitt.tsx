@@ -1,3 +1,4 @@
+import { aenderungGesperrt } from '../../fundament/hausregeln';
 import React, { useMemo, useState } from 'react';
 import { Skull, Plus, Minus, Trash2, ChevronDown, ChevronRight, AlertTriangle } from 'lucide-react';
 import { useCharacter } from '../../context/CharacterContext';
@@ -28,8 +29,11 @@ const UntotEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; n: Nekro
   const { dispatch } = useCharacter();
   const [offen, setOffen] = useState(false);
   const [fWahl, setFWahl] = useState('');
-  const aendern = (aenderung: Partial<Begleiter>) => dispatch({ type: 'BEGLEITER_AENDERN', payload: { index, aenderung } });
   const u = untotWerte(k, b, n);
+  const aendern = (aenderung: Partial<Begleiter>) => {
+    if (aenderungGesperrt(u.verstoesse, untotWerte(k, { ...b, ...aenderung }, n).verstoesse)) return;
+    dispatch({ type: 'BEGLEITER_AENDERN', payload: { index, aenderung } });
+  };
   const st = b.steigerung ?? {};
   const setzeA = (a: string, v: number) => aendern({ steigerung: { ...st, attribute: { ...(st.attribute ?? {}), [a]: Math.max(0, v) } } });
   const setzeF = (f: string, v: number) => aendern({ steigerung: { ...st, fertigkeiten: { ...(st.fertigkeiten ?? {}), [f]: Math.max(0, v) } } });
