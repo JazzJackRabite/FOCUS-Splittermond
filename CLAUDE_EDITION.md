@@ -379,6 +379,27 @@ Dateien aus AI Studio im Repository: `public/assets/aistudio/*.png`, `.aistudio/
 - Damit steht kein Zauber mehr mit Namen in `utils/magicRules.ts`.
 - 326 Tests grün ohne Bücher; neues GRW-Paket in `public/regelpakete`.
 
+## Stand 19 (11.11.2026): Fundament – ein dunkles CI, Bausteine, Prüfungen
+
+- **`FUNDAMENT.md` im Wurzelordner** ist ab jetzt die verbindliche Grundlage: Grundsätze, Regelquellen (welche Regel der
+  Editor aus welchem Feld der Regelpakete liest, samt Liste der Altlasten im Code), Gestaltung, Arbeitsweise. Entwurf –
+  Teil 2 (Regelquellen) ist vom Projektinhaber noch gegenzulesen. Diese Datei hier bleibt das Protokoll der Stände.
+- **Helles Design und Farbschema-Menü entfernt** (Entscheidung 11.11.2026): `useTheme`, `themePalettes`,
+  `ThemeSettingsModal`, der Umschalter in den Einstellungen, alle Regeln für `focus-light` (85 Regeln) und die unbenutzte
+  `tailwind.config.ts` (Tailwind 4 liest sie nicht). Die App ist immer dunkel (`data-theme="focus-dark"` steht fest in
+  `index.html`).
+- **`src/fundament/`:** `fundament.css` mit den benannten Werten des CI (`@theme` → Klassen wie `bg-flaeche`, `text-leise`,
+  `border-gold`, `font-titel`, `rounded-karte`) und dem Scrollbalken; `bausteine.tsx` mit Knopf, Karte, Abschnittstitel,
+  Marke, Eingabe, Auswahl, Rollbereich, Dialog; `uebergang.css` = die bisherigen Umbiege-Regeln aus `index.css` (Altlast,
+  schrumpft mit der Umstellung). `index.css` bindet nur noch diese Dateien ein.
+- **Prüfungen** (`src/fundament/__tests__/fundament.test.tsx`): Farbwerte nur in `fundament.css`; keine Zauber-,
+  Meisterschafts- oder Stärkennamen als Text im Programmcode. Bestand als Altlast in `src/fundament/altlasten.json`:
+  3344 Farbwerte in 46 Dateien, 53 Regelnamen. Darf nur weniger werden; neu schreiben mit
+  `FUNDAMENT_ALTLASTEN=schreiben npx vitest run src/fundament`.
+- Die Ansichten sind noch nicht auf die Bausteine umgestellt; sie sehen aus wie bisher im Dunkelmodus, nur der Scrollbalken
+  ist neu. Reihenfolge der Umstellung: Dialoge, Spielen und Kampf, Charakter, Inventar, Begleiter, Erschaffung.
+- 329 Tests grün ohne Bücher; Build läuft.
+
 ## Google AI Studio
 
 Unverändert eine Vite-/React-App mit `metadata.json` im Wurzelordner; Import über „Import from GitHub“, Hosting über Cloud Run.

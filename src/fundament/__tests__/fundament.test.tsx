@@ -1,0 +1,79 @@
+/**
+ * Prüfungen zum FUNDAMENT (siehe FUNDAMENT.md im Wurzelordner). Sie setzen durch, was dort steht:
+ *   1. Farbwerte stehen nur in src/fundament/fundament.css.
+ *   2. Regeln hängen nicht an Zauber-, Meisterschafts- oder Stärkennamen im Programmcode.
+ * Was heute noch dagegen verstößt, steht als Altlast in src/fundament/altlasten.json und darf nur weniger werden.
+ * Altlastenliste nach einer Umstellung neu schreiben:  FUNDAMENT_ALTLASTEN=schreiben npx vitest run src/fundament
+ */
+import React from 'react';
+import fs from 'node:fs';
+import path from 'node:path';
+import { describe, expect, it, vi } from 'vitest';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { FARBEN_ERLAUBT, WURZEL, farbwerte, regelnamenImCode } from './pruefen';
+import { Abschnittstitel, Auswahl, Dialog, Eingabe, Karte, Knopf, Marke, Rollbereich } from '..';
+
+const ALTLASTEN = path.join(WURZEL, 'src/fundament/altlasten.json');
+
+describe('Fundament: Altlasten dürfen nur weniger werden', () => {
+  const ist = { farbwerte: farbwerte(), regelnamen: regelnamenImCode() };
+  if (process.env.FUNDAMENT_ALTLASTEN === 'schreiben') {
+    fs.writeFileSync(ALTLASTEN, JSON.stringify({
+      _hinweis: 'Bekannte Verstöße gegen FUNDAMENT.md. Wird nur kleiner: nach einer Umstellung mit FUNDAMENT_ALTLASTEN=schreiben npx vitest run src/fundament neu schreiben. Nie von Hand erweitern.',
+      farbwerte: ist.farbwerte,
+      regelnamen: ist.regelnamen,
+    }, null, 2) + '\n');
+  }
+  const soll = JSON.parse(fs.readFileSync(ALTLASTEN, 'utf8')) as { farbwerte: Record<string, number>; regelnamen: string[] };
+
+  it(`Farbwerte stehen nur in ${FARBEN_ERLAUBT}`, () => {
+    const zuviel = Object.entries(ist.farbwerte)
+      .filter(([datei, n]) => n > (soll.farbwerte[datei] ?? 0))
+      .map(([datei, n]) => `${datei}: ${n} Farbwerte (erlaubt: ${soll.farbwerte[datei] ?? 0})`);
+    expect(zuviel, 'Neue fest eingetragene Farbwerte. Stattdessen die benannten Werte aus fundament.css verwenden (z. B. bg-flaeche, text-leise, border-gold) oder die Bausteine aus src/fundament.').toEqual([]);
+  });
+
+  it('keine neuen Regelnamen im Programmcode', () => {
+    const neu = ist.regelnamen.filter((x) => !soll.regelnamen.includes(x));
+    expect(neu, 'Ein Zauber-, Meisterschafts- oder Stärkenname steht als Text im Code. Regeln kommen aus den Regelpaketen (FUNDAMENT.md, Regelquellen): den Wert ins Paket legen und über die ID oder das Datenfeld lesen.').toEqual([]);
+  });
+
+  it('die Bausteine selbst enthalten keinen Farbwert', () => {
+    expect(ist.farbwerte['src/fundament/bausteine.tsx'] ?? 0).toBe(0);
+  });
+});
+
+describe('Fundament: Bausteine', () => {
+  it('Knopf: echte Schaltfläche, Art bestimmt das Aussehen, gesperrt löst nicht aus', () => {
+    const klick = vi.fn();
+    render(<><Knopf art="primaer" onClick={klick}>Würfeln</Knopf><Knopf disabled onClick={klick}>Gesperrt</Knopf></>);
+    const knopf = screen.getByRole('button', { name: 'Würfeln' });
+    expect(knopf.getAttribute('type')).toBe('button');
+    expect(knopf.className).toContain('bg-gold');
+    fireEvent.click(knopf);
+    fireEvent.click(screen.getByRole('button', { name: 'Gesperrt' }));
+    expect(klick).toHaveBeenCalledTimes(1);
+  });
+
+  it('Eingabe und Auswahl sind mit ihrer Beschriftung verbunden', () => {
+    render(<><Eingabe beschriftung="Zusätzlicher Modifikator" defaultValue={0} /><Auswahl beschriftung="Wurfart"><option>Standard</option></Auswahl></>);
+    expect(screen.getByLabelText('Zusätzlicher Modifikator').tagName).toBe('INPUT');
+    expect(screen.getByLabelText('Wurfart').tagName).toBe('SELECT');
+  });
+
+  it('Karte, Titel, Marke und Rollbereich', () => {
+    render(<Karte><Abschnittstitel>Zustände</Abschnittstitel><Marke ton="schaden">Blutend 2</Marke><Rollbereich beschriftung="Liste der Fertigkeiten">Inhalt</Rollbereich></Karte>);
+    expect(screen.getByRole('heading', { name: 'Zustände' })).toBeTruthy();
+    expect(screen.getByText('Blutend 2').className).toContain('border-schaden');
+    expect(screen.getByRole('region', { name: 'Liste der Fertigkeiten' }).getAttribute('tabindex')).toBe('0');
+  });
+
+  it('Dialog: benannt, schließt über Knopf und Escape', () => {
+    const zu = vi.fn();
+    render(<Dialog titel="Wahrnehmung" untertitel="Fertigkeitsprobe" onSchliessen={zu} fuss={<Knopf art="primaer">Würfeln</Knopf>}>Inhalt</Dialog>);
+    expect(screen.getByRole('dialog', { name: 'Wahrnehmung' })).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Schließen' }));
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(zu).toHaveBeenCalledTimes(2);
+  });
+});

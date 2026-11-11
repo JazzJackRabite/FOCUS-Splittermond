@@ -1,0 +1,1790 @@
+/*
+ * ÜBERGANGSSCHICHT – Altlast, wird mit jeder umgestellten Ansicht kleiner und am Ende gelöscht.
+ *
+ * Diese Regeln biegen die fest eingetragenen Farbwerte der alten Ansichten (z. B. bg-[#1B365D]) auf das dunkle CI um.
+ * Neue Ansichten und die Bausteine in src/fundament/ brauchen sie nicht: Sie verwenden die benannten Werte aus
+ * fundament.css. Hier nichts Neues eintragen – siehe FUNDAMENT.md, Abschnitt Gestaltung.
+ */
+:root {
+  --split-blue: #242A3B;
+  --split-blue-hover: #2C3347;
+  --split-blue-dark: #1C2130;
+  --split-gold: #C9A24C;
+  --split-gold-hover: #D9B563;
+  --parchment-dark: #1C2130;
+  --parchment-paper: #242A3B;
+  --parchment-border: #3A4258;
+  --text-main: #E6E1D3;
+  --text-light: #F5F2EA;
+  --card-bg: rgba(36, 42, 59, 0.95);
+  --card-bg-solid: #242A3B;
+  --shadow-color: rgba(15, 18, 26, 0.65);
+
+  --accent-yellow-bg: #332A19;
+  --accent-yellow-border: #C99A4E;
+  --accent-yellow-text: #FBEFCE;
+  --accent-blue-bg: #1F2836;
+  --accent-blue-border: #6C8CAA;
+  --accent-blue-text: #DCE8F4;
+  --accent-red-bg: #33211D;
+  --accent-red-border: #B06258;
+  --accent-red-text: #F9DEDC;
+  --accent-green-bg: #26301F;
+  --accent-green-border: #7A9D76;
+  --accent-green-text: #E0EEDF;
+}
+
+[data-theme="focus-dark"] {
+  --bg-page: #1C2130;
+  --bg-surface: #242A3B;
+  --bg-surface-alt: #2C3347;
+  --bg-input: #202636;
+  --border: #3A4258;
+  --border-strong: #4A5470;
+  --text-primary: #E6E1D3;
+  --text-secondary: #A3A096;
+  --text-muted: #6F6C63;
+  --gold: #C9A24C;
+  --gold-hover: #D9B563;
+  --gold-soft: #3A3120;
+  --green: #7A9D76;
+  --green-soft: #26301F;
+  --amber: #C99A4E;
+  --amber-soft: #332A19;
+  --red: #B06258;
+  --red-soft: #33211D;
+  --blue: #6C8CAA;
+  --blue-soft: #1F2836;
+  --purple: #9683AB;
+  --purple-soft: #292233;
+  --teal: #6BA99C;
+  --teal-soft: #1E2D29;
+
+  --split-blue: #242A3B;
+  --split-blue-hover: #2C3347;
+  --split-blue-dark: #1C2130;
+  --split-gold: #C9A24C;
+  --split-gold-hover: #D9B563;
+  --parchment-dark: #1C2130;
+  --parchment-paper: #242A3B;
+  --parchment-border: #3A4258;
+  --text-main: #E6E1D3;
+  --text-light: #F5F2EA;
+  --card-bg: rgba(36, 42, 59, 0.95);
+  --card-bg-solid: #242A3B;
+  --shadow-color: rgba(15, 18, 26, 0.65);
+
+  --accent-yellow-bg: #332A19;
+  --accent-yellow-border: #C99A4E;
+  --accent-yellow-text: #C99A4E;
+  --accent-blue-bg: #1F2836;
+  --accent-blue-border: #6C8CAA;
+  --accent-blue-text: #6C8CAA;
+  --accent-red-bg: #33211D;
+  --accent-red-border: #B06258;
+  --accent-red-text: #B06258;
+  --accent-green-bg: #26301F;
+  --accent-green-border: #7A9D76;
+  --accent-green-text: #7A9D76;
+}
+
+body {
+  font-family: 'Merriweather', serif;
+  background-color: var(--parchment-dark);
+  color: var(--text-main);
+  background-image: url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.07'/%3E%3C/svg%3E");
+  overflow-y: auto;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+h1, h2, h3, .fantasy-font {
+  font-family: 'Cinzel', serif;
+}
+
+.paper-bg {
+  background-color: var(--parchment-paper);
+  border: 1px solid var(--parchment-border);
+  box-shadow: 0 0 20px var(--shadow-color);
+  position: relative;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Global color mapping for active themes */
+[data-theme] .bg-\[\#1B365D\] {
+  background-color: var(--split-blue) !important;
+}
+[data-theme="focus-dark"] .text-\[\#1B365D\] {
+  color: #E6E1D3 !important;
+}
+[data-theme="focus-dark"] .bg-\[\#C5A059\] .text-\[\#1B365D\],
+[data-theme="focus-dark"] .bg-\[\#C5A059\].text-\[\#1B365D\],
+[data-theme="focus-dark"] button.bg-\[\#C5A059\] {
+  color: #241D10 !important;
+}
+[data-theme]:not([data-theme="classic"]) .border-\[\#1B365D\] {
+  border-color: var(--split-blue) !important;
+}
+[data-theme]:not([data-theme="classic"]) .bg-\[\#C5A059\] {
+  background-color: var(--split-gold) !important;
+}
+[data-theme]:not([data-theme="classic"]) .text-\[\#C5A059\] {
+  color: var(--split-gold) !important;
+}
+[data-theme]:not([data-theme="classic"]) .border-\[\#C5A059\],
+[data-theme]:not([data-theme="classic"]) .hover\:border-\[\#C5A059\]:hover {
+  border-color: var(--split-gold) !important;
+}
+[data-theme]:not([data-theme="classic"]) .bg-\[\#0f2340\] {
+  background-color: var(--split-blue-dark) !important;
+}
+[data-theme]:not([data-theme="classic"]) .text-\[\#f3e5cf\] {
+  color: var(--text-light) !important;
+}
+[data-theme]:not([data-theme="classic"]) .bg-\[\#faf4e6\],
+[data-theme]:not([data-theme="classic"]) .bg-\[\#faf4e6\]\/70,
+[data-theme]:not([data-theme="classic"]) .bg-\[\#faf4e6\]\/80 {
+  background-color: var(--parchment-paper) !important;
+}
+[data-theme]:not([data-theme="classic"]) .border-\[\#d1c4b0\] {
+  border-color: var(--parchment-border) !important;
+}
+[data-theme]:not([data-theme="classic"]) .text-\[\#2C1810\],
+[data-theme]:not([data-theme="classic"]) .text-\[\#2C1810\]\/90,
+[data-theme]:not([data-theme="classic"]) .text-\[\#2C1810\]\/80,
+[data-theme]:not([data-theme="classic"]) .text-\[\#2C1810\]\/70,
+[data-theme]:not([data-theme="classic"]) .text-\[\#2C1810\]\/60 {
+  color: var(--text-main) !important;
+}
+[data-theme]:not([data-theme="classic"]) .hover\:bg-\[\#2c4b7a\]:hover,
+[data-theme]:not([data-theme="classic"]) .hover\:bg-\[\#2a4f7e\]:hover {
+  background-color: var(--split-blue-hover) !important;
+}
+[data-theme]:not([data-theme="classic"]) .hover\:bg-\[\#b38d48\]:hover {
+  background-color: var(--split-gold-hover) !important;
+}
+
+/* Reduced garishness on status accents */
+[data-theme]:not([data-theme="classic"]) .bg-yellow-100 {
+  background-color: var(--accent-yellow-bg) !important;
+}
+[data-theme]:not([data-theme="classic"]) .border-yellow-500,
+[data-theme]:not([data-theme="classic"]) .border-yellow-400 {
+  border-color: var(--accent-yellow-border) !important;
+}
+[data-theme]:not([data-theme="classic"]) .text-yellow-900,
+[data-theme]:not([data-theme="classic"]) .text-yellow-800 {
+  color: var(--accent-yellow-text) !important;
+}
+[data-theme]:not([data-theme="classic"]) .bg-yellow-200,
+[data-theme]:not([data-theme="classic"]) .bg-yellow-500 {
+  background-color: var(--accent-yellow-border) !important;
+}
+
+[data-theme]:not([data-theme="classic"]) .bg-blue-100 {
+  background-color: var(--accent-blue-bg) !important;
+}
+[data-theme]:not([data-theme="classic"]) .border-blue-400,
+[data-theme]:not([data-theme="classic"]) .border-blue-500 {
+  border-color: var(--accent-blue-border) !important;
+}
+[data-theme]:not([data-theme="classic"]) .text-blue-900,
+[data-theme]:not([data-theme="classic"]) .text-blue-800 {
+  color: var(--accent-blue-text) !important;
+}
+[data-theme]:not([data-theme="classic"]) .bg-blue-200,
+[data-theme]:not([data-theme="classic"]) .bg-blue-500,
+[data-theme]:not([data-theme="classic"]) .bg-blue-600 {
+  background-color: var(--accent-blue-border) !important;
+}
+
+[data-theme]:not([data-theme="classic"]) .bg-red-100 {
+  background-color: var(--accent-red-bg) !important;
+}
+[data-theme]:not([data-theme="classic"]) .border-red-700,
+[data-theme]:not([data-theme="classic"]) .border-red-500 {
+  border-color: var(--accent-red-border) !important;
+}
+[data-theme]:not([data-theme="classic"]) .text-red-900,
+[data-theme]:not([data-theme="classic"]) .text-red-800 {
+  color: var(--accent-red-text) !important;
+}
+[data-theme]:not([data-theme="classic"]) :not(button).bg-red-800,
+[data-theme]:not([data-theme="classic"]) :not(button).bg-red-700,
+[data-theme]:not([data-theme="classic"]) :not(button).bg-red-600 {
+  background-color: var(--accent-red-border) !important;
+}
+
+[data-theme]:not([data-theme="classic"]) .bg-green-100,
+[data-theme]:not([data-theme="classic"]) .bg-emerald-100 {
+  background-color: var(--accent-green-bg) !important;
+}
+[data-theme]:not([data-theme="classic"]) .border-green-500,
+[data-theme]:not([data-theme="classic"]) .border-emerald-500 {
+  border-color: var(--accent-green-border) !important;
+}
+[data-theme]:not([data-theme="classic"]) .text-green-800,
+[data-theme]:not([data-theme="classic"]) .text-green-900,
+[data-theme]:not([data-theme="classic"]) .text-emerald-800 {
+  color: var(--accent-green-text) !important;
+}
+
+/* Card surfaces */
+[data-theme]:not([data-theme="classic"]) .bg-white.bg-opacity-70,
+[data-theme]:not([data-theme="classic"]) .bg-white\/70,
+[data-theme]:not([data-theme="classic"]) .bg-white\/80 {
+  background-color: var(--card-bg) !important;
+}
+
+/* =========================================================
+   Focus Dunkelblau & Gold (Augenschonendes Dunkel-Layout)
+   ========================================================= */
+[data-theme="focus-dark"] .paper-bg {
+  background-color: #242A3B !important;
+  border-color: #3A4258 !important;
+  box-shadow: 0 0 25px rgba(15, 18, 26, 0.65) !important;
+}
+
+/* Base card surfaces and white containers */
+[data-theme="focus-dark"] .bg-white,
+[data-theme="focus-dark"] .bg-white\/20,
+[data-theme="focus-dark"] .bg-white\/30,
+[data-theme="focus-dark"] .bg-white\/40,
+[data-theme="focus-dark"] .bg-white\/50,
+[data-theme="focus-dark"] .bg-white\/60,
+[data-theme="focus-dark"] .bg-white\/70,
+[data-theme="focus-dark"] .bg-white\/75,
+[data-theme="focus-dark"] .bg-white\/80,
+[data-theme="focus-dark"] .bg-white\/85,
+[data-theme="focus-dark"] .bg-white\/90,
+[data-theme="focus-dark"] .bg-white\/95,
+[data-theme="focus-dark"] .bg-white.bg-opacity-20,
+[data-theme="focus-dark"] .bg-white.bg-opacity-30,
+[data-theme="focus-dark"] .bg-white.bg-opacity-40,
+[data-theme="focus-dark"] .bg-white.bg-opacity-50,
+[data-theme="focus-dark"] .bg-white.bg-opacity-60,
+[data-theme="focus-dark"] .bg-white.bg-opacity-70,
+[data-theme="focus-dark"] .bg-white.bg-opacity-80,
+[data-theme="focus-dark"] .bg-white.bg-opacity-90 {
+  background-color: #242A3B !important;
+  border-color: #3A4258 !important;
+  color: #E6E1D3 !important;
+}
+
+/* Light parchment, stone, gray, neutral fields transformed into elevated surface #2C3347 */
+[data-theme="focus-dark"] .bg-gray-50,
+[data-theme="focus-dark"] .bg-gray-50\/50,
+[data-theme="focus-dark"] .bg-gray-50\/70,
+[data-theme="focus-dark"] .bg-gray-100,
+[data-theme="focus-dark"] .bg-gray-100\/50,
+[data-theme="focus-dark"] .bg-gray-100\/60,
+[data-theme="focus-dark"] .bg-gray-200,
+[data-theme="focus-dark"] .bg-gray-300,
+[data-theme="focus-dark"] .bg-stone-50,
+[data-theme="focus-dark"] .bg-stone-100,
+[data-theme="focus-dark"] .bg-stone-200,
+[data-theme="focus-dark"] .bg-stone-300,
+[data-theme="focus-dark"] .bg-stone-100\/50,
+[data-theme="focus-dark"] .bg-stone-100\/60,
+[data-theme="focus-dark"] .bg-stone-100\/70,
+[data-theme="focus-dark"] .bg-stone-100\/80,
+[data-theme="focus-dark"] .bg-stone-200\/50,
+[data-theme="focus-dark"] .bg-zinc-50,
+[data-theme="focus-dark"] .bg-zinc-100,
+[data-theme="focus-dark"] .bg-zinc-200,
+[data-theme="focus-dark"] .bg-neutral-50,
+[data-theme="focus-dark"] .bg-neutral-100,
+[data-theme="focus-dark"] .bg-neutral-200,
+[data-theme="focus-dark"] .bg-slate-50,
+[data-theme="focus-dark"] .bg-slate-100,
+[data-theme="focus-dark"] .bg-slate-200,
+[data-theme="focus-dark"] .bg-\[\#e8dcca\],
+[data-theme="focus-dark"] .bg-\[\#e8dcca\]\/40,
+[data-theme="focus-dark"] .bg-\[\#e8dcca\]\/50,
+[data-theme="focus-dark"] .bg-\[\#e8dcca\]\/60,
+[data-theme="focus-dark"] .bg-\[\#e8dcca\]\/70,
+[data-theme="focus-dark"] .bg-\[\#e8dcca\]\/80,
+[data-theme="focus-dark"] .bg-\[\#e8dcca\]\/90,
+[data-theme="focus-dark"] .bg-\[\#f3e5cf\],
+[data-theme="focus-dark"] .bg-\[\#f3e5cf\]\/40,
+[data-theme="focus-dark"] .bg-\[\#f3e5cf\]\/50,
+[data-theme="focus-dark"] .bg-\[\#f3e5cf\]\/60,
+[data-theme="focus-dark"] .bg-\[\#f3e5cf\]\/70,
+[data-theme="focus-dark"] .bg-\[\#f3e5cf\]\/80,
+[data-theme="focus-dark"] .bg-\[\#f2e5cf\],
+[data-theme="focus-dark"] .bg-\[\#ebdcc4\],
+[data-theme="focus-dark"] .bg-\[\#ebdcc3\],
+[data-theme="focus-dark"] .bg-\[\#f4ede2\],
+[data-theme="focus-dark"] .bg-\[\#fcfaf7\],
+[data-theme="focus-dark"] .bg-\[\#fbf8f2\],
+[data-theme="focus-dark"] .bg-\[\#f3e9db\],
+[data-theme="focus-dark"] .bg-\[\#faf6ee\],
+[data-theme="focus-dark"] .bg-\[\#fffaf0\],
+[data-theme="focus-dark"] .bg-\[\#fdfbf7\],
+[data-theme="focus-dark"] .bg-\[\#f8f3e8\],
+[data-theme="focus-dark"] .bg-\[\#faf4e6\],
+[data-theme="focus-dark"] .bg-\[\#faf4e6\]\/70,
+[data-theme="focus-dark"] .bg-\[\#faf4e6\]\/80,
+[data-theme="focus-dark"] .bg-\[\#faf4e6\]\/90 {
+  background-color: #2C3347 !important;
+  border-color: #3A4258 !important;
+  color: #E6E1D3 !important;
+}
+
+/* Inactive and disabled slots/buttons in focus-dark */
+[data-theme="focus-dark"] .dark-theme-slot-inactive,
+[data-theme="focus-dark"] .bg-stone-100.cursor-not-allowed,
+[data-theme="focus-dark"] .bg-gray-100.cursor-not-allowed,
+[data-theme="focus-dark"] button:disabled.bg-stone-100,
+[data-theme="focus-dark"] button:disabled.bg-gray-100,
+[data-theme="focus-dark"] .bg-stone-100.opacity-70,
+[data-theme="focus-dark"] .bg-stone-100.opacity-50,
+[data-theme="focus-dark"] .cursor-not-allowed.bg-stone-100 {
+  background-color: #1A1F2C !important;
+  border-color: #3A4258 !important;
+  color: #8F8A7E !important;
+}
+
+[data-theme="focus-dark"] .dark-theme-slot-active {
+  background-color: #2C3347 !important;
+  border-color: #C9A24C !important;
+  color: #E6E1D3 !important;
+}
+
+/* Interactive hover states on secondary surfaces */
+[data-theme="focus-dark"] .hover\:bg-\[\#e3d4b9\]:hover,
+[data-theme="focus-dark"] .hover\:bg-\[\#ebdcc4\]:hover,
+[data-theme="focus-dark"] .hover\:bg-\[\#ebdcc3\]:hover,
+[data-theme="focus-dark"] .hover\:bg-\[\#f4ede2\]:hover,
+[data-theme="focus-dark"] .hover\:bg-\[\#f8f3e8\]:hover,
+[data-theme="focus-dark"] .hover\:bg-stone-50:hover,
+[data-theme="focus-dark"] .hover\:bg-stone-100:hover,
+[data-theme="focus-dark"] .hover\:bg-stone-200:hover,
+[data-theme="focus-dark"] .hover\:bg-stone-300:hover,
+[data-theme="focus-dark"] .hover\:bg-gray-50:hover,
+[data-theme="focus-dark"] .hover\:bg-gray-100:hover,
+[data-theme="focus-dark"] .hover\:bg-gray-200:hover,
+[data-theme="focus-dark"] .hover\:bg-gray-300:hover {
+  background-color: #343D54 !important;
+}
+
+/* Tab bar and header strip */
+[data-theme="focus-dark"] .bg-\[\#e3d4b9\] {
+  background-color: #1C2130 !important;
+  border-color: #3A4258 !important;
+  color: #E6E1D3 !important;
+}
+[data-theme="focus-dark"] .bg-\[\#d1c4b0\] {
+  background-color: #2C3347 !important;
+  border-color: #3A4258 !important;
+  color: #E6E1D3 !important;
+}
+
+/* High contrast, warm eye-friendly typography */
+[data-theme="focus-dark"] h1,
+[data-theme="focus-dark"] h2,
+[data-theme="focus-dark"] h3,
+[data-theme="focus-dark"] h4,
+[data-theme="focus-dark"] h5,
+[data-theme="focus-dark"] .fantasy-font {
+  color: #E6E1D3 !important;
+}
+
+[data-theme="focus-dark"] .text-gray-950,
+[data-theme="focus-dark"] .text-gray-900,
+[data-theme="focus-dark"] .text-gray-800,
+[data-theme="focus-dark"] .text-gray-700,
+[data-theme="focus-dark"] .text-stone-950,
+[data-theme="focus-dark"] .text-stone-900,
+[data-theme="focus-dark"] .text-stone-800,
+[data-theme="focus-dark"] .text-stone-700,
+[data-theme="focus-dark"] .text-black,
+[data-theme="focus-dark"] .text-\[\#2C1810\],
+[data-theme="focus-dark"] .text-\[\#2C1810\]\/90,
+[data-theme="focus-dark"] .text-\[\#2C1810\]\/80,
+[data-theme="focus-dark"] .text-\[\#2C1810\]\/70,
+[data-theme="focus-dark"] .text-\[\#2C1810\]\/60,
+[data-theme="focus-dark"] .text-\[\#1B365D\],
+[data-theme="focus-dark"] .text-\[\#1b365d\] {
+  color: #E6E1D3 !important;
+}
+
+[data-theme="focus-dark"] .text-gray-600,
+[data-theme="focus-dark"] .text-gray-500,
+[data-theme="focus-dark"] .text-stone-600,
+[data-theme="focus-dark"] .text-stone-500 {
+  color: #C5BFB2 !important;
+}
+
+[data-theme="focus-dark"] .text-gray-400,
+[data-theme="focus-dark"] .text-stone-400 {
+  color: #A39E93 !important;
+}
+
+[data-theme="focus-dark"] .hover\:text-black:hover,
+[data-theme="focus-dark"] .hover\:text-gray-900:hover,
+[data-theme="focus-dark"] .hover\:text-\[\#1B365D\]:hover {
+  color: #D9B563 !important;
+}
+
+/* Inline style color overrides for #1B365D */
+[data-theme="focus-dark"] [style*="color: #1B365D"],
+[data-theme="focus-dark"] [style*="color: rgb(27, 54, 93)"],
+[data-theme="focus-dark"] [style*="color:#1B365D"] {
+  color: #E6E1D3 !important;
+}
+
+/* Accent texts - soft, desaturated according to concept */
+[data-theme="focus-dark"] .text-amber-950,
+[data-theme="focus-dark"] .text-amber-900,
+[data-theme="focus-dark"] .text-amber-800,
+[data-theme="focus-dark"] .text-amber-700,
+[data-theme="focus-dark"] .text-amber-600,
+[data-theme="focus-dark"] .text-yellow-950,
+[data-theme="focus-dark"] .text-yellow-900,
+[data-theme="focus-dark"] .text-yellow-800,
+[data-theme="focus-dark"] .text-yellow-700,
+[data-theme="focus-dark"] .text-yellow-600,
+[data-theme="focus-dark"] .text-orange-900,
+[data-theme="focus-dark"] .text-orange-800,
+[data-theme="focus-dark"] .text-orange-700,
+[data-theme="focus-dark"] .text-orange-600 {
+  color: #C99A4E !important;
+}
+
+[data-theme="focus-dark"] .text-indigo-950,
+[data-theme="focus-dark"] .text-indigo-900,
+[data-theme="focus-dark"] .text-indigo-800,
+[data-theme="focus-dark"] .text-indigo-700,
+[data-theme="focus-dark"] .text-indigo-600,
+[data-theme="focus-dark"] .text-blue-950,
+[data-theme="focus-dark"] .text-blue-900,
+[data-theme="focus-dark"] .text-blue-800,
+[data-theme="focus-dark"] .text-blue-700,
+[data-theme="focus-dark"] .text-blue-600 {
+  color: #6C8CAA !important;
+}
+
+[data-theme="focus-dark"] .text-red-950,
+[data-theme="focus-dark"] .text-red-900,
+[data-theme="focus-dark"] .text-red-800,
+[data-theme="focus-dark"] .text-red-700,
+[data-theme="focus-dark"] .text-red-600,
+[data-theme="focus-dark"] .text-red-500 {
+  color: #B06258 !important;
+}
+
+[data-theme="focus-dark"] .text-green-950,
+[data-theme="focus-dark"] .text-green-900,
+[data-theme="focus-dark"] .text-green-800,
+[data-theme="focus-dark"] .text-green-700,
+[data-theme="focus-dark"] .text-green-600,
+[data-theme="focus-dark"] .text-green-500,
+[data-theme="focus-dark"] .text-emerald-950,
+[data-theme="focus-dark"] .text-emerald-900,
+[data-theme="focus-dark"] .text-emerald-800,
+[data-theme="focus-dark"] .text-emerald-700,
+[data-theme="focus-dark"] .text-emerald-600,
+[data-theme="focus-dark"] .text-emerald-500 {
+  color: #7A9D76 !important;
+}
+
+[data-theme="focus-dark"] .text-teal-950,
+[data-theme="focus-dark"] .text-teal-900,
+[data-theme="focus-dark"] .text-teal-800,
+[data-theme="focus-dark"] .text-teal-700,
+[data-theme="focus-dark"] .text-teal-600,
+[data-theme="focus-dark"] .text-teal-500 {
+  color: #6BA99C !important;
+}
+
+[data-theme="focus-dark"] .text-\[\#6b4c85\],
+[data-theme="focus-dark"] .text-\[\#533968\] {
+  color: #D9B563 !important;
+}
+
+[data-theme="focus-dark"] .text-purple-600,
+[data-theme="focus-dark"] .text-purple-700,
+[data-theme="focus-dark"] .text-purple-800 {
+  color: #9683AB !important;
+}
+
+[data-theme="focus-dark"] .text-\[\#5c4a30\] {
+  color: #A3A096 !important;
+}
+
+/* Gold elements */
+[data-theme="focus-dark"] .text-\[\#C5A059\],
+[data-theme="focus-dark"] .text-\[\#c5a059\] {
+  color: #C9A24C !important;
+}
+[data-theme="focus-dark"] .bg-\[\#C5A059\] {
+  background-color: #C9A24C !important;
+  color: #241D10 !important;
+}
+[data-theme="focus-dark"] .hover\:bg-\[\#b38d48\]:hover,
+[data-theme="focus-dark"] .hover\:bg-\[\#b58f48\]:hover {
+  background-color: #D9B563 !important;
+  color: #241D10 !important;
+}
+
+/* Form inputs & dropdowns */
+[data-theme="focus-dark"] input:not([type="checkbox"]):not([type="radio"]):not(.bg-transparent),
+[data-theme="focus-dark"] select,
+[data-theme="focus-dark"] textarea {
+  background-color: #202636 !important;
+  color: #E6E1D3 !important;
+  border-color: #3A4258 !important;
+}
+
+[data-theme="focus-dark"] input::placeholder,
+[data-theme="focus-dark"] textarea::placeholder {
+  color: #8F8A7E !important;
+}
+
+/* QuickNumberInput & Presets */
+[data-theme="focus-dark"] .bg-gray-100,
+[data-theme="focus-dark"] .bg-gray-50,
+[data-theme="focus-dark"] .bg-gray-200 {
+  background-color: #2C3347 !important;
+  border-color: #3A4258 !important;
+  color: #E6E1D3 !important;
+}
+
+[data-theme="focus-dark"] .hover\:bg-gray-100:hover,
+[data-theme="focus-dark"] .hover\:bg-gray-200:hover,
+[data-theme="focus-dark"] .hover\:bg-amber-50:hover {
+  background-color: #343D54 !important;
+}
+
+/* Soft status background chips & trackers */
+[data-theme="focus-dark"] .bg-amber-50,
+[data-theme="focus-dark"] .bg-amber-100,
+[data-theme="focus-dark"] .bg-yellow-100,
+[data-theme="focus-dark"] .bg-orange-100,
+[data-theme="focus-dark"] .bg-orange-50,
+[data-theme="focus-dark"] .bg-amber-50\/60,
+[data-theme="focus-dark"] .bg-amber-50\/70,
+[data-theme="focus-dark"] .bg-amber-50\/80,
+[data-theme="focus-dark"] .bg-amber-50\/90,
+[data-theme="focus-dark"] .bg-amber-400\/20 {
+  background-color: #332A19 !important;
+  border-color: #C99A4E !important;
+  color: #C99A4E !important;
+}
+
+[data-theme="focus-dark"] .bg-blue-50,
+[data-theme="focus-dark"] .bg-blue-100,
+[data-theme="focus-dark"] .bg-indigo-50,
+[data-theme="focus-dark"] .bg-indigo-100,
+[data-theme="focus-dark"] .bg-blue-50\/60,
+[data-theme="focus-dark"] .bg-blue-50\/70,
+[data-theme="focus-dark"] .bg-blue-50\/80,
+[data-theme="focus-dark"] .bg-blue-50\/90,
+[data-theme="focus-dark"] .bg-indigo-50\/80 {
+  background-color: #1F2836 !important;
+  border-color: #6C8CAA !important;
+  color: #6C8CAA !important;
+}
+
+[data-theme="focus-dark"] .bg-red-50,
+[data-theme="focus-dark"] .bg-red-100,
+[data-theme="focus-dark"] .bg-red-50\/60,
+[data-theme="focus-dark"] .bg-red-50\/70,
+[data-theme="focus-dark"] .bg-red-50\/80,
+[data-theme="focus-dark"] .bg-red-50\/90 {
+  background-color: #33211D !important;
+  border-color: #B06258 !important;
+  color: #B06258 !important;
+}
+
+[data-theme="focus-dark"] .hover\:bg-red-100:hover,
+[data-theme="focus-dark"] .hover\:bg-red-50:hover {
+  background-color: #3E2520 !important;
+}
+
+[data-theme="focus-dark"] .bg-green-50,
+[data-theme="focus-dark"] .bg-green-100,
+[data-theme="focus-dark"] .bg-emerald-50,
+[data-theme="focus-dark"] .bg-emerald-100,
+[data-theme="focus-dark"] .bg-green-50\/60,
+[data-theme="focus-dark"] .bg-green-50\/70,
+[data-theme="focus-dark"] .bg-green-50\/80,
+[data-theme="focus-dark"] .bg-green-50\/90 {
+  background-color: #26301F !important;
+  border-color: #7A9D76 !important;
+  color: #7A9D76 !important;
+}
+
+/* Status Badges: Unverletzt, Wundabzug, Bewusstlos, Tod, Sterbend */
+[data-theme="focus-dark"] .bg-green-600,
+[data-theme="focus-dark"] .bg-green-700,
+[data-theme="focus-dark"] .bg-green-800,
+[data-theme="focus-dark"] .bg-emerald-600,
+[data-theme="focus-dark"] .bg-emerald-700,
+[data-theme="focus-dark"] .bg-\[\#1e4a38\] {
+  background-color: #26301F !important;
+  color: #7A9D76 !important;
+  border: 1px solid #7A9D76 !important;
+}
+
+[data-theme="focus-dark"] :not(button).bg-red-600,
+[data-theme="focus-dark"] :not(button).bg-red-700,
+[data-theme="focus-dark"] :not(button).bg-red-800,
+[data-theme="focus-dark"] :not(button).bg-red-900 {
+  background-color: #33211D !important;
+  color: #B06258 !important;
+  border: 1px solid #B06258 !important;
+}
+
+/* Damage roll & red action buttons in dark theme: rich ruby gradient with crystal-clear white text */
+.damage-roll-btn,
+button.bg-red-600,
+button.bg-red-700,
+button.bg-red-800,
+button.bg-red-900,
+[data-theme="focus-dark"] .damage-roll-btn,
+[data-theme="focus-dark"] button.bg-red-600,
+[data-theme="focus-dark"] button.bg-red-700,
+[data-theme="focus-dark"] button.bg-red-800,
+[data-theme="focus-dark"] button.bg-red-900 {
+  background: linear-gradient(135deg, #7A1C30 0%, #9E223D 100%) !important;
+  color: #FFFFFF !important;
+  border: 1px solid #D45B72 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+}
+
+.damage-roll-btn:hover,
+button.bg-red-600:hover,
+button.bg-red-700:hover,
+button.bg-red-800:hover,
+button.bg-red-900:hover,
+[data-theme="focus-dark"] .damage-roll-btn:hover,
+[data-theme="focus-dark"] button.bg-red-600:hover,
+[data-theme="focus-dark"] button.bg-red-700:hover,
+[data-theme="focus-dark"] button.bg-red-800:hover,
+[data-theme="focus-dark"] button.bg-red-900:hover {
+  background: linear-gradient(135deg, #942139 0%, #B82847 100%) !important;
+  border-color: #FFAAB8 !important;
+  color: #FFFFFF !important;
+}
+
+.damage-roll-btn *,
+button.bg-red-600 *,
+button.bg-red-700 *,
+button.bg-red-800 *,
+button.bg-red-900 *,
+[data-theme="focus-dark"] .damage-roll-btn *,
+[data-theme="focus-dark"] button.bg-red-600 *,
+[data-theme="focus-dark"] button.bg-red-700 *,
+[data-theme="focus-dark"] button.bg-red-800 *,
+[data-theme="focus-dark"] button.bg-red-900 * {
+  color: #FFFFFF !important;
+}
+
+/* Wundabzug immer im Splittermond CD-Rot #8B263E */
+#badge-wound-penalty,
+#cast-spell-badge-wound-penalty,
+.badge-wound-penalty,
+[id*="wound-penalty"] {
+  background-color: #8B263E !important;
+  color: #FFFFFF !important;
+  border-color: #A8324E !important;
+}
+
+/* RollModal Patzer Banner: Splittermond CI Rubinrot #8B263E mit weißem Kontrasttext */
+.roll-patzer-banner,
+div.roll-patzer-banner,
+[data-theme] .roll-patzer-banner,
+[data-theme="focus-dark"] .roll-patzer-banner {
+  background: linear-gradient(135deg, #6E1829 0%, #8B263E 50%, #A8324E 100%) !important;
+  background-color: #8B263E !important;
+  color: #FFFFFF !important;
+  border: 1.5px solid #D45B72 !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6) !important;
+  box-shadow: 0 4px 12px rgba(139, 38, 62, 0.45) !important;
+}
+
+.roll-patzer-banner *,
+div.roll-patzer-banner *,
+[data-theme] .roll-patzer-banner *,
+[data-theme="focus-dark"] .roll-patzer-banner * {
+  color: #FFFFFF !important;
+}
+
+/* RollModal Triumph Banner: Splittermond CI Gold #C5A059 */
+.roll-triumph-banner,
+div.roll-triumph-banner,
+[data-theme] .roll-triumph-banner,
+[data-theme="focus-dark"] .roll-triumph-banner {
+  background: linear-gradient(135deg, #9C7830 0%, #C5A059 50%, #D8B468 100%) !important;
+  background-color: #C5A059 !important;
+  color: #141c28 !important;
+  border: 1.5px solid #F3DEAC !important;
+  text-shadow: none !important;
+  box-shadow: 0 4px 12px rgba(197, 160, 89, 0.45) !important;
+}
+
+.roll-triumph-banner *,
+div.roll-triumph-banner *,
+[data-theme] .roll-triumph-banner *,
+[data-theme="focus-dark"] .roll-triumph-banner * {
+  color: #141c28 !important;
+}
+
+#badge-wound-penalty *,
+#cast-spell-badge-wound-penalty *,
+.badge-wound-penalty *,
+[id*="wound-penalty"] * {
+  color: #FFFFFF !important;
+}
+
+[data-theme="focus-dark"] .bg-\[\#8B263E\],
+[data-theme="focus-dark"] #badge-wound-penalty,
+[data-theme="focus-dark"] #cast-spell-badge-wound-penalty,
+[data-theme="focus-dark"] .badge-wound-penalty,
+[data-theme="focus-dark"] [id*="wound-penalty"] {
+  background-color: #8B263E !important;
+  color: #FFFFFF !important;
+  border-color: #A8324E !important;
+}
+
+[data-theme="focus-dark"] .bg-\[\#8B263E\] *,
+[data-theme="focus-dark"] #badge-wound-penalty *,
+[data-theme="focus-dark"] #cast-spell-badge-wound-penalty *,
+[data-theme="focus-dark"] .badge-wound-penalty *,
+[data-theme="focus-dark"] [id*="wound-penalty"] * {
+  color: #FFFFFF !important;
+}
+
+[data-theme="focus-dark"] .text-\[\#8B263E\] {
+  color: #E25B77 !important;
+}
+
+/* Gratis-Meisterschaften & Gratis-Zauber Badges (CD-konform ohne helle Flächen) */
+.badge-free-mastery {
+  background-color: #1B365D;
+  color: #C5A059;
+  border-color: rgba(197, 160, 89, 0.6);
+}
+
+.badge-free-spell {
+  background-color: #1B365D;
+  color: #8FB3D5;
+  border-color: rgba(143, 179, 213, 0.6);
+}
+
+[data-theme="focus-dark"] .badge-free-mastery {
+  background-color: #332A19 !important;
+  border-color: #C9A24C !important;
+  color: #D9B563 !important;
+}
+
+[data-theme="focus-dark"] .badge-free-spell {
+  background-color: #1F2836 !important;
+  border-color: #6C8CAA !important;
+  color: #8FB3D5 !important;
+}
+
+[data-theme="focus-dark"] .hover\:bg-red-700:hover,
+[data-theme="focus-dark"] .hover\:bg-red-800:hover {
+  background-color: #442621 !important;
+}
+
+[data-theme="focus-dark"] .hover\:bg-green-700:hover {
+  background-color: #313D28 !important;
+}
+
+[data-theme="focus-dark"] .bg-gray-800,
+[data-theme="focus-dark"] .bg-gray-900 {
+  background-color: #2C3347 !important;
+  color: #A3A096 !important;
+  border: 1px solid #4A5470 !important;
+}
+
+[data-theme="focus-dark"] .bg-black.text-red-500,
+[data-theme="focus-dark"] .bg-black.border-red-900,
+[data-theme="focus-dark"] div.bg-black.border-red-900 {
+  background-color: #201414 !important;
+  color: #B06258 !important;
+  border: 1px solid #B06258 !important;
+}
+
+/* Purple Condition Chips */
+[data-theme="focus-dark"] .bg-purple-100,
+[data-theme="focus-dark"] .bg-purple-50 {
+  background-color: #292233 !important;
+  color: #9683AB !important;
+  border-color: #9683AB !important;
+}
+
+/* Temp LP & Teal elements */
+[data-theme="focus-dark"] .bg-teal-50,
+[data-theme="focus-dark"] .bg-teal-100,
+[data-theme="focus-dark"] .bg-teal-200 {
+  background-color: #1E2D29 !important;
+  border-color: #6BA99C !important;
+  color: #6BA99C !important;
+}
+
+[data-theme="focus-dark"] .border-teal-300,
+[data-theme="focus-dark"] .border-teal-400,
+[data-theme="focus-dark"] .border-teal-500,
+[data-theme="focus-dark"] .border-teal-600,
+[data-theme="focus-dark"] .border-teal-700 {
+  border-color: #6BA99C !important;
+}
+
+[data-theme="focus-dark"] .bg-teal-600,
+[data-theme="focus-dark"] .bg-teal-700 {
+  background-color: #2D423D !important;
+  border-color: #6BA99C !important;
+  color: #E6E1D3 !important;
+}
+
+[data-theme="focus-dark"] .hover\:bg-teal-100:hover,
+[data-theme="focus-dark"] .hover\:bg-teal-200:hover {
+  background-color: #2D423D !important;
+  color: #E6E1D3 !important;
+}
+
+/* Health & Focus Slot Boxes */
+[data-theme="focus-dark"] div.w-6.h-6.bg-white,
+[data-theme="focus-dark"] div.w-3.h-3.bg-white,
+[data-theme="focus-dark"] button.w-6.h-6.bg-white,
+[data-theme="focus-dark"] button.w-3.h-3.bg-white {
+  background-color: #202636 !important;
+  border-color: #4A5470 !important;
+  color: #E6E1D3 !important;
+}
+
+[data-theme="focus-dark"] div.w-6.h-6.bg-yellow-200,
+[data-theme="focus-dark"] div.w-3.h-3.bg-yellow-200,
+[data-theme="focus-dark"] button.w-6.h-6.bg-yellow-200,
+[data-theme="focus-dark"] button.w-3.h-3.bg-yellow-200 {
+  background-color: #332A19 !important;
+  border-color: #C99A4E !important;
+  color: #C99A4E !important;
+}
+
+[data-theme="focus-dark"] div.w-6.h-6.bg-red-800,
+[data-theme="focus-dark"] div.w-3.h-3.bg-red-800,
+[data-theme="focus-dark"] button.w-6.h-6.bg-red-800,
+[data-theme="focus-dark"] button.w-3.h-3.bg-red-800 {
+  background-color: #33211D !important;
+  border-color: #B06258 !important;
+  color: #B06258 !important;
+}
+
+[data-theme="focus-dark"] div.w-6.h-6.bg-blue-200,
+[data-theme="focus-dark"] div.w-3.h-3.bg-blue-200,
+[data-theme="focus-dark"] button.w-6.h-6.bg-blue-200,
+[data-theme="focus-dark"] button.w-3.h-3.bg-blue-200 {
+  background-color: #1F2836 !important;
+  border-color: #6C8CAA !important;
+  color: #6C8CAA !important;
+}
+
+[data-theme="focus-dark"] div.w-6.h-6.bg-teal-100,
+[data-theme="focus-dark"] button.w-6.h-6.bg-teal-100 {
+  background-color: #1E2D29 !important;
+  border-color: #6BA99C !important;
+  color: #6BA99C !important;
+}
+
+[data-theme="focus-dark"] div.w-6.h-6.bg-teal-600,
+[data-theme="focus-dark"] button.w-6.h-6.bg-teal-600 {
+  background-color: #2D423D !important;
+  border-color: #6BA99C !important;
+  color: #E6E1D3 !important;
+}
+
+/* Tracker rows & seamless number inputs */
+[data-theme="focus-dark"] input.bg-transparent,
+[data-theme="focus-dark"] .bg-transparent {
+  background-color: transparent !important;
+  border: 0 !important;
+  border-color: transparent !important;
+}
+
+[data-theme="focus-dark"] .bg-yellow-100 input.bg-transparent {
+  color: #C99A4E !important;
+}
+[data-theme="focus-dark"] .bg-red-100 input.bg-transparent {
+  color: #B06258 !important;
+}
+[data-theme="focus-dark"] .bg-blue-100 input.bg-transparent {
+  color: #6C8CAA !important;
+}
+[data-theme="focus-dark"] .bg-teal-100 input.bg-transparent {
+  color: #6BA99C !important;
+}
+
+[data-theme="focus-dark"] .bg-yellow-100 button {
+  color: #C99A4E !important;
+}
+[data-theme="focus-dark"] .bg-yellow-100 button:hover {
+  background-color: #443722 !important;
+  color: #E6E1D3 !important;
+}
+
+[data-theme="focus-dark"] .bg-red-100 button {
+  color: #B06258 !important;
+}
+[data-theme="focus-dark"] .bg-red-100 button:hover {
+  background-color: #442621 !important;
+  color: #E6E1D3 !important;
+}
+
+[data-theme="focus-dark"] .bg-blue-100 button {
+  color: #6C8CAA !important;
+}
+[data-theme="focus-dark"] .bg-blue-100 button:hover {
+  background-color: #2B374A !important;
+  color: #E6E1D3 !important;
+}
+
+[data-theme="focus-dark"] .bg-teal-100 button {
+  color: #6BA99C !important;
+}
+[data-theme="focus-dark"] .bg-teal-100 button:hover {
+  background-color: #2D423D !important;
+  color: #E6E1D3 !important;
+}
+
+/* Primary actions and buttons in focus-dark */
+[data-theme="focus-dark"] .bg-\[\#1B365D\],
+[data-theme="focus-dark"] .bg-\[\#1b365d\],
+[data-theme="focus-dark"] .bg-\[\#0f2340\] {
+  background-color: #2C3852 !important;
+  border-color: #C9A24C !important;
+  color: #E6E1D3 !important;
+}
+
+[data-theme="focus-dark"] .hover\:bg-\[\#2a4f7e\]:hover,
+[data-theme="focus-dark"] .hover\:bg-\[\#2c4b7a\]:hover,
+[data-theme="focus-dark"] .hover\:bg-\[\#254a80\]:hover {
+  background-color: #3B4866 !important;
+  color: #FFFFFF !important;
+}
+
+[data-theme="focus-dark"] button.bg-linear-to-r.from-purple-700 {
+  background: #C9A24C !important;
+  color: #241D10 !important;
+  border: 1px solid #D9B563 !important;
+}
+[data-theme="focus-dark"] button.bg-linear-to-r.from-purple-700:hover {
+  background: #D9B563 !important;
+}
+
+[data-theme="focus-dark"] button.bg-red-50 {
+  background-color: #33211D !important;
+  color: #B06258 !important;
+  border-color: #B06258 !important;
+}
+[data-theme="focus-dark"] button.bg-red-50:hover {
+  background-color: #442621 !important;
+}
+
+/* Specific colored borders */
+[data-theme="focus-dark"] .border-yellow-400,
+[data-theme="focus-dark"] .border-yellow-500,
+[data-theme="focus-dark"] .border-amber-300,
+[data-theme="focus-dark"] .border-amber-400,
+[data-theme="focus-dark"] .border-amber-500 {
+  border-color: #C99A4E !important;
+}
+
+[data-theme="focus-dark"] .border-red-400,
+[data-theme="focus-dark"] .border-red-600,
+[data-theme="focus-dark"] .border-red-700,
+[data-theme="focus-dark"] .border-red-800,
+[data-theme="focus-dark"] .border-red-900 {
+  border-color: #B06258 !important;
+}
+
+[data-theme="focus-dark"] .border-blue-200,
+[data-theme="focus-dark"] .border-blue-300,
+[data-theme="focus-dark"] .border-blue-400,
+[data-theme="focus-dark"] .border-blue-500 {
+  border-color: #6C8CAA !important;
+}
+
+[data-theme="focus-dark"] .border-green-200,
+[data-theme="focus-dark"] .border-green-300,
+[data-theme="focus-dark"] .border-green-500,
+[data-theme="focus-dark"] .border-green-600 {
+  border-color: #7A9D76 !important;
+}
+
+/* Active tab top/bottom border in App.tsx */
+[data-theme="focus-dark"] .border-\[\#1B365D\],
+[data-theme="focus-dark"] .border-\[\#1b365d\] {
+  border-color: #C9A24C !important;
+}
+
+/* SVG fills for dice and icons */
+[data-theme="focus-dark"] svg path[fill="#1B365D"],
+[data-theme="focus-dark"] svg [fill="#1B365D"],
+[data-theme="focus-dark"] svg [fill="#1b365d"] {
+  fill: #C9A24C !important;
+}
+
+/* RestSection themed cards */
+[data-theme="focus-dark"] #verschnaufpause-card {
+  background: linear-gradient(135deg, rgba(51, 42, 25, 0.9) 0%, rgba(38, 48, 31, 0.9) 100%) !important;
+  border-color: #C99A4E !important;
+}
+
+[data-theme="focus-dark"] #ruhephase-card {
+  background: linear-gradient(135deg, rgba(31, 40, 54, 0.9) 0%, rgba(41, 34, 51, 0.9) 100%) !important;
+  border-color: #6C8CAA !important;
+}
+
+[data-theme="focus-dark"] #ruhephase-card .bg-white\/90 {
+  background-color: #242A3B !important;
+  border-color: #4A5470 !important;
+  color: #E6E1D3 !important;
+}
+
+/* Modals & Dialogs */
+[data-theme="focus-dark"] .dark-theme-panel {
+  background-color: #242A3B !important;
+  border-color: #C9A24C !important;
+  color: #E6E1D3 !important;
+}
+
+[data-theme="focus-dark"] .dark-theme-panel button.bg-green-600 {
+  background-color: #2E4627 !important;
+  color: #E6E1D3 !important;
+  border: 1px solid #7A9D76 !important;
+}
+[data-theme="focus-dark"] .dark-theme-panel button.bg-green-600:hover {
+  background-color: #3A5732 !important;
+}
+[data-theme="focus-dark"] .dark-theme-panel button.bg-red-700 {
+  background-color: #4A241F !important;
+  color: #E6E1D3 !important;
+  border: 1px solid #B06258 !important;
+}
+[data-theme="focus-dark"] .dark-theme-panel button.bg-red-700:hover {
+  background-color: #5C2D27 !important;
+}
+
+/* Stat-boxes and general borders */
+[data-theme="focus-dark"] .stat-box {
+  background: rgba(36, 42, 59, 0.95) !important;
+  border-color: #C9A24C !important;
+  color: #E6E1D3 !important;
+}
+
+[data-theme="focus-dark"] .border-gray-200,
+[data-theme="focus-dark"] .border-gray-300,
+[data-theme="focus-dark"] .border-gray-400,
+[data-theme="focus-dark"] .border-stone-200,
+[data-theme="focus-dark"] .border-stone-300,
+[data-theme="focus-dark"] .border-\[\#e5dcce\],
+[data-theme="focus-dark"] .border-\[\#c5b59e\],
+[data-theme="focus-dark"] .border-\[\#d1c4b0\] {
+  border-color: #3A4258 !important;
+}
+
+/* =========================================================================
+   Focus Hell: Marineblau & Bronze (Offizielles CD-Konzept)
+   ========================================================================= */
+
+/* Paper backgrounds and surfaces */
+
+/* Secondary neutral fields and badges */
+
+/* Primary actions and buttons with blue background */
+
+/* Red action & danger buttons */
+
+/* StatusWidget unfulfilled red boxes & green boxes */
+
+/* Status Badges */
+
+/* Transparent Inputs inside Damage and Focus Trackers */
+
+/* Health and Focus Slots */
+
+/* Modals & Dialogs */
+
+/* Stat-boxes and general borders */
+
+/* Active tab borders */
+
+/* SVG fills for dice and icons */
+
+/* RestSection themed cards */
+
+.btn-primary {
+  background-color: var(--split-blue);
+  color: #fff;
+  transition: all 0.2s;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #2c4b7a;
+  transform: translateY(-1px);
+}
+
+.btn-primary:disabled {
+  background-color: #5a6b82;
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Remove stepper / spinner arrows from all number inputs globally across all browsers */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button,
+.input-hide-arrows::-webkit-outer-spin-button,
+.input-hide-arrows::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+  margin: 0 !important;
+}
+
+input[type="number"],
+.input-hide-arrows {
+  -moz-appearance: textfield !important;
+  appearance: textfield !important;
+}
+
+.stat-box {
+  border: 2px solid var(--split-gold);
+  background: rgba(255,255,255,0.6);
+  border-radius: 4px;
+}
+
+/* Chrome, Edge, Safari, Opera (Webkit) */
+.modal-body-scroll {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* ========================================================
+   DICE LOG & PROTOCOL ENTRIES (Splittermond CI)
+   Guaranteed contrast & theme fidelity
+======================================================== */
+
+.protocol-card {
+  transition: all 0.15s ease-in-out;
+  border-left-width: 4px !important;
+}
+
+/* Light / Classic theme defaults */
+.protocol-card-combat {
+  background-color: #FAF4F2 !important;
+  border-color: #E2CCC8 !important;
+  border-left-color: #8B263E !important;
+}
+.protocol-card-combat .protocol-icon-box {
+  background-color: rgba(139, 38, 62, 0.12) !important;
+  color: #8B263E !important;
+  border-color: rgba(139, 38, 62, 0.25) !important;
+}
+.protocol-card-combat .protocol-title {
+  color: #1B365D !important;
+}
+.protocol-card-combat .protocol-desc {
+  color: #382F2D !important;
+}
+.protocol-card-combat .protocol-time {
+  color: #77746A !important;
+}
+
+.protocol-card-spell {
+  background-color: #F6F4FB !important;
+  border-color: #D8D0E8 !important;
+  border-left-color: #5C3E75 !important;
+}
+.protocol-card-spell .protocol-icon-box {
+  background-color: rgba(92, 62, 117, 0.12) !important;
+  color: #5C3E75 !important;
+  border-color: rgba(92, 62, 117, 0.25) !important;
+}
+.protocol-card-spell .protocol-title {
+  color: #1B365D !important;
+}
+.protocol-card-spell .protocol-desc {
+  color: #3B3047 !important;
+}
+.protocol-card-spell .protocol-time {
+  color: #77746A !important;
+}
+
+.protocol-card-damage {
+  background-color: #FBF2F1 !important;
+  border-color: #E8C6C0 !important;
+  border-left-color: #A83244 !important;
+}
+.protocol-card-damage .protocol-icon-box {
+  background-color: rgba(168, 50, 68, 0.12) !important;
+  color: #A83244 !important;
+  border-color: rgba(168, 50, 68, 0.25) !important;
+}
+.protocol-card-damage .protocol-title {
+  color: #8B263E !important;
+}
+.protocol-card-damage .protocol-desc {
+  color: #423030 !important;
+}
+.protocol-card-damage .protocol-time {
+  color: #77746A !important;
+}
+
+.protocol-card-heal {
+  background-color: #F2F7F3 !important;
+  border-color: #BDDAC3 !important;
+  border-left-color: #2E7D46 !important;
+}
+.protocol-card-heal .protocol-icon-box {
+  background-color: rgba(46, 125, 70, 0.12) !important;
+  color: #2E7D46 !important;
+  border-color: rgba(46, 125, 70, 0.25) !important;
+}
+.protocol-card-heal .protocol-title {
+  color: #1D5C32 !important;
+}
+.protocol-card-heal .protocol-desc {
+  color: #233627 !important;
+}
+.protocol-card-heal .protocol-time {
+  color: #77746A !important;
+}
+
+.protocol-card-focus {
+  background-color: #F2F5FB !important;
+  border-color: #BDCCE6 !important;
+  border-left-color: #1B365D !important;
+}
+.protocol-card-focus .protocol-icon-box {
+  background-color: rgba(27, 54, 93, 0.12) !important;
+  color: #1B365D !important;
+  border-color: rgba(27, 54, 93, 0.25) !important;
+}
+.protocol-card-focus .protocol-title {
+  color: #1B365D !important;
+}
+.protocol-card-focus .protocol-desc {
+  color: #26354A !important;
+}
+.protocol-card-focus .protocol-time {
+  color: #77746A !important;
+}
+
+.protocol-card-condition {
+  background-color: #FAF5EB !important;
+  border-color: #E2D3B0 !important;
+  border-left-color: #BD9351 !important;
+}
+.protocol-card-condition .protocol-icon-box {
+  background-color: rgba(189, 147, 81, 0.15) !important;
+  color: #A06C18 !important;
+  border-color: rgba(189, 147, 81, 0.3) !important;
+}
+.protocol-card-condition .protocol-title {
+  color: #7D4F06 !important;
+}
+.protocol-card-condition .protocol-desc {
+  color: #45371E !important;
+}
+.protocol-card-condition .protocol-time {
+  color: #77746A !important;
+}
+
+.protocol-card-splitter {
+  background-color: #FAF5EB !important;
+  border-color: #D6C292 !important;
+  border-left-color: #C5A059 !important;
+}
+.protocol-card-splitter .protocol-icon-box {
+  background-color: rgba(197, 160, 89, 0.2) !important;
+  color: #996515 !important;
+  border-color: rgba(197, 160, 89, 0.4) !important;
+}
+.protocol-card-splitter .protocol-title {
+  color: #1B365D !important;
+}
+.protocol-card-splitter .protocol-desc {
+  color: #42361E !important;
+}
+.protocol-card-splitter .protocol-time {
+  color: #77746A !important;
+}
+
+.protocol-card-rest-vp {
+  background-color: #FAF5EB !important;
+  border-color: #D6C292 !important;
+  border-left-color: #C5A059 !important;
+}
+.protocol-card-rest-vp .protocol-icon-box {
+  background-color: rgba(197, 160, 89, 0.2) !important;
+  color: #996515 !important;
+  border-color: rgba(197, 160, 89, 0.4) !important;
+}
+.protocol-card-rest-vp .protocol-title {
+  color: #1B365D !important;
+}
+.protocol-card-rest-vp .protocol-desc {
+  color: #42361E !important;
+}
+.protocol-card-rest-vp .protocol-time {
+  color: #77746A !important;
+}
+
+.protocol-card-rest-rp {
+  background-color: #F2F5FB !important;
+  border-color: #BDCCE6 !important;
+  border-left-color: #1B365D !important;
+}
+.protocol-card-rest-rp .protocol-icon-box {
+  background-color: rgba(27, 54, 93, 0.12) !important;
+  color: #1B365D !important;
+  border-color: rgba(27, 54, 93, 0.25) !important;
+}
+.protocol-card-rest-rp .protocol-title {
+  color: #1B365D !important;
+}
+.protocol-card-rest-rp .protocol-desc {
+  color: #26354A !important;
+}
+.protocol-card-rest-rp .protocol-time {
+  color: #77746A !important;
+}
+
+.protocol-card-default {
+  background-color: #FDFCF9 !important;
+  border-color: #E1DAC8 !important;
+  border-left-color: #77746A !important;
+}
+.protocol-card-default .protocol-title {
+  color: #2C2A24 !important;
+}
+.protocol-card-default .protocol-desc {
+  color: #3E3B33 !important;
+}
+.protocol-card-default .protocol-time {
+  color: #77746A !important;
+}
+
+/* Roll Entries Light */
+.protocol-card-roll-triumph {
+  background-color: #FAF5EB !important;
+  border-color: #D6C292 !important;
+  border-left-color: #C5A059 !important;
+}
+.protocol-card-roll-triumph .protocol-icon-box {
+  background-color: rgba(197, 160, 89, 0.2) !important;
+  color: #996515 !important;
+  border-color: rgba(197, 160, 89, 0.4) !important;
+}
+.protocol-card-roll-patzer {
+  background-color: #FBF2F1 !important;
+  border-color: #E8C4BE !important;
+  border-left-color: #8B263E !important;
+}
+.protocol-card-roll-patzer .protocol-icon-box {
+  background-color: rgba(168, 50, 68, 0.15) !important;
+  color: #A83244 !important;
+  border-color: rgba(168, 50, 68, 0.3) !important;
+}
+.protocol-card-roll-win {
+  background-color: #F2F7F3 !important;
+  border-color: #BDDAC3 !important;
+  border-left-color: #2E7D46 !important;
+}
+.protocol-card-roll-win .protocol-icon-box {
+  background-color: rgba(46, 125, 70, 0.15) !important;
+  color: #2E7D46 !important;
+  border-color: rgba(46, 125, 70, 0.3) !important;
+}
+.protocol-card-roll-fail {
+  background-color: #FDFCF9 !important;
+  border-color: #E1DAC8 !important;
+  border-left-color: #A39E93 !important;
+}
+.protocol-card-roll-fail .protocol-icon-box {
+  background-color: rgba(119, 116, 106, 0.1) !important;
+  color: #77746A !important;
+  border-color: rgba(119, 116, 106, 0.2) !important;
+}
+
+/* Badges Light */
+.protocol-badge-danger {
+  background-color: #8B263E !important;
+  color: #FFFFFF !important;
+  border: 1px solid #7A1C30 !important;
+  font-weight: 700 !important;
+}
+.protocol-badge-success {
+  background-color: #2E7D46 !important;
+  color: #FFFFFF !important;
+  border: 1px solid #236537 !important;
+  font-weight: 700 !important;
+}
+.protocol-badge-gold {
+  background-color: rgba(197, 160, 89, 0.25) !important;
+  color: #1B365D !important;
+  border: 1px solid #C5A059 !important;
+  font-weight: 700 !important;
+}
+.protocol-badge-info {
+  background-color: #E3EAF5 !important;
+  color: #1B365D !important;
+  border: 1px solid #A4BCD9 !important;
+  font-weight: 700 !important;
+}
+.protocol-badge-warning {
+  background-color: #FCEFD7 !important;
+  color: #7D4F06 !important;
+  border: 1px solid #DFBE7B !important;
+  font-weight: 700 !important;
+}
+.protocol-badge-neutral {
+  background-color: #EEE7D8 !important;
+  color: #38342D !important;
+  border: 1px solid #D5CCA8 !important;
+  font-weight: 700 !important;
+}
+
+/* ========================================================
+   DICE LOG & PROTOCOL ENTRIES (focus-dark CI)
+======================================================== */
+[data-theme="focus-dark"] .protocol-card-combat {
+  background-color: #281D24 !important;
+  border-color: #4A303A !important;
+  border-left-color: #D45B72 !important;
+}
+[data-theme="focus-dark"] .protocol-card-combat .protocol-icon-box {
+  background-color: rgba(212, 91, 114, 0.22) !important;
+  color: #FF8B9E !important;
+  border-color: rgba(212, 91, 114, 0.4) !important;
+}
+[data-theme="focus-dark"] .protocol-card-combat .protocol-title {
+  color: #F3E5CF !important;
+}
+[data-theme="focus-dark"] .protocol-card-combat .protocol-desc {
+  color: #D8D0C5 !important;
+}
+[data-theme="focus-dark"] .protocol-card-combat .protocol-time {
+  color: #A3A096 !important;
+}
+
+[data-theme="focus-dark"] .protocol-card-spell {
+  background-color: #221E2C !important;
+  border-color: #423554 !important;
+  border-left-color: #9683AB !important;
+}
+[data-theme="focus-dark"] .protocol-card-spell .protocol-icon-box {
+  background-color: rgba(150, 131, 171, 0.22) !important;
+  color: #CBB9DF !important;
+  border-color: rgba(150, 131, 171, 0.4) !important;
+}
+[data-theme="focus-dark"] .protocol-card-spell .protocol-title {
+  color: #E6E1D3 !important;
+}
+[data-theme="focus-dark"] .protocol-card-spell .protocol-desc {
+  color: #D5CCE0 !important;
+}
+[data-theme="focus-dark"] .protocol-card-spell .protocol-time {
+  color: #A3A096 !important;
+}
+
+[data-theme="focus-dark"] .protocol-card-damage {
+  background-color: #2B1D20 !important;
+  border-color: #4E2A30 !important;
+  border-left-color: #E05A6D !important;
+}
+[data-theme="focus-dark"] .protocol-card-damage .protocol-icon-box {
+  background-color: rgba(224, 90, 109, 0.22) !important;
+  color: #FF8091 !important;
+  border-color: rgba(224, 90, 109, 0.4) !important;
+}
+[data-theme="focus-dark"] .protocol-card-damage .protocol-title {
+  color: #FFA4B0 !important;
+}
+[data-theme="focus-dark"] .protocol-card-damage .protocol-desc {
+  color: #E2D3D5 !important;
+}
+[data-theme="focus-dark"] .protocol-card-damage .protocol-time {
+  color: #A3A096 !important;
+}
+
+[data-theme="focus-dark"] .protocol-card-heal {
+  background-color: #1C261F !important;
+  border-color: #2C4533 !important;
+  border-left-color: #52A669 !important;
+}
+[data-theme="focus-dark"] .protocol-card-heal .protocol-icon-box {
+  background-color: rgba(82, 166, 105, 0.22) !important;
+  color: #72D28D !important;
+  border-color: rgba(82, 166, 105, 0.4) !important;
+}
+[data-theme="focus-dark"] .protocol-card-heal .protocol-title {
+  color: #88E2A2 !important;
+}
+[data-theme="focus-dark"] .protocol-card-heal .protocol-desc {
+  color: #CFE3D3 !important;
+}
+[data-theme="focus-dark"] .protocol-card-heal .protocol-time {
+  color: #A3A096 !important;
+}
+
+[data-theme="focus-dark"] .protocol-card-focus {
+  background-color: #1D2636 !important;
+  border-color: #344766 !important;
+  border-left-color: #6C8CAA !important;
+}
+[data-theme="focus-dark"] .protocol-card-focus .protocol-icon-box {
+  background-color: rgba(108, 140, 170, 0.22) !important;
+  color: #9EC0E2 !important;
+  border-color: rgba(108, 140, 170, 0.4) !important;
+}
+[data-theme="focus-dark"] .protocol-card-focus .protocol-title {
+  color: #B5D4F5 !important;
+}
+[data-theme="focus-dark"] .protocol-card-focus .protocol-desc {
+  color: #CBD8EB !important;
+}
+[data-theme="focus-dark"] .protocol-card-focus .protocol-time {
+  color: #A3A096 !important;
+}
+
+[data-theme="focus-dark"] .protocol-card-condition {
+  background-color: #282218 !important;
+  border-color: #4C3C24 !important;
+  border-left-color: #C99A4E !important;
+}
+[data-theme="focus-dark"] .protocol-card-condition .protocol-icon-box {
+  background-color: rgba(201, 154, 78, 0.22) !important;
+  color: #E2B66C !important;
+  border-color: rgba(201, 154, 78, 0.4) !important;
+}
+[data-theme="focus-dark"] .protocol-card-condition .protocol-title {
+  color: #ECC785 !important;
+}
+[data-theme="focus-dark"] .protocol-card-condition .protocol-desc {
+  color: #DFD5C2 !important;
+}
+[data-theme="focus-dark"] .protocol-card-condition .protocol-time {
+  color: #A3A096 !important;
+}
+
+[data-theme="focus-dark"] .protocol-card-splitter {
+  background-color: #2A241A !important;
+  border-color: #55442A !important;
+  border-left-color: #C9A24C !important;
+}
+[data-theme="focus-dark"] .protocol-card-splitter .protocol-icon-box {
+  background-color: rgba(201, 162, 76, 0.25) !important;
+  color: #E7C36F !important;
+  border-color: rgba(201, 162, 76, 0.45) !important;
+}
+[data-theme="focus-dark"] .protocol-card-splitter .protocol-title {
+  color: #F5E5C9 !important;
+}
+[data-theme="focus-dark"] .protocol-card-splitter .protocol-desc {
+  color: #E3D9C4 !important;
+}
+[data-theme="focus-dark"] .protocol-card-splitter .protocol-time {
+  color: #A3A096 !important;
+}
+
+[data-theme="focus-dark"] .protocol-card-rest-vp {
+  background-color: #2A241A !important;
+  border-color: #55442A !important;
+  border-left-color: #C9A24C !important;
+}
+[data-theme="focus-dark"] .protocol-card-rest-vp .protocol-icon-box {
+  background-color: rgba(201, 162, 76, 0.25) !important;
+  color: #E7C36F !important;
+  border-color: rgba(201, 162, 76, 0.45) !important;
+}
+[data-theme="focus-dark"] .protocol-card-rest-vp .protocol-title {
+  color: #F5E5C9 !important;
+}
+[data-theme="focus-dark"] .protocol-card-rest-vp .protocol-desc {
+  color: #E3D9C4 !important;
+}
+[data-theme="focus-dark"] .protocol-card-rest-vp .protocol-time {
+  color: #A3A096 !important;
+}
+
+[data-theme="focus-dark"] .protocol-card-rest-rp {
+  background-color: #1D2636 !important;
+  border-color: #344766 !important;
+  border-left-color: #6C8CAA !important;
+}
+[data-theme="focus-dark"] .protocol-card-rest-rp .protocol-icon-box {
+  background-color: rgba(108, 140, 170, 0.22) !important;
+  color: #9EC0E2 !important;
+  border-color: rgba(108, 140, 170, 0.4) !important;
+}
+[data-theme="focus-dark"] .protocol-card-rest-rp .protocol-title {
+  color: #B5D4F5 !important;
+}
+[data-theme="focus-dark"] .protocol-card-rest-rp .protocol-desc {
+  color: #CBD8EB !important;
+}
+[data-theme="focus-dark"] .protocol-card-rest-rp .protocol-time {
+  color: #A3A096 !important;
+}
+
+[data-theme="focus-dark"] .protocol-card-default {
+  background-color: #242A3B !important;
+  border-color: #3A4258 !important;
+  border-left-color: #6F6C63 !important;
+}
+[data-theme="focus-dark"] .protocol-card-default .protocol-title {
+  color: #E6E1D3 !important;
+}
+[data-theme="focus-dark"] .protocol-card-default .protocol-desc {
+  color: #C5BFB2 !important;
+}
+[data-theme="focus-dark"] .protocol-card-default .protocol-time {
+  color: #A3A096 !important;
+}
+
+/* Roll Entries Dark */
+[data-theme="focus-dark"] .protocol-card-roll-triumph {
+  background-color: #2A241A !important;
+  border-color: #55442A !important;
+  border-left-color: #C9A24C !important;
+}
+[data-theme="focus-dark"] .protocol-card-roll-triumph .protocol-icon-box {
+  background-color: rgba(201, 162, 76, 0.25) !important;
+  color: #E7C36F !important;
+  border-color: rgba(201, 162, 76, 0.45) !important;
+}
+[data-theme="focus-dark"] .protocol-card-roll-patzer {
+  background-color: #2B1D20 !important;
+  border-color: #4E2A30 !important;
+  border-left-color: #E05A6D !important;
+}
+[data-theme="focus-dark"] .protocol-card-roll-patzer .protocol-icon-box {
+  background-color: rgba(224, 90, 109, 0.22) !important;
+  color: #FF8091 !important;
+  border-color: rgba(224, 90, 109, 0.4) !important;
+}
+[data-theme="focus-dark"] .protocol-card-roll-win {
+  background-color: #1C261F !important;
+  border-color: #2C4533 !important;
+  border-left-color: #52A669 !important;
+}
+[data-theme="focus-dark"] .protocol-card-roll-win .protocol-icon-box {
+  background-color: rgba(82, 166, 105, 0.22) !important;
+  color: #72D28D !important;
+  border-color: rgba(82, 166, 105, 0.4) !important;
+}
+[data-theme="focus-dark"] .protocol-card-roll-fail {
+  background-color: #242A3B !important;
+  border-color: #3A4258 !important;
+  border-left-color: #6F6C63 !important;
+}
+[data-theme="focus-dark"] .protocol-card-roll-fail .protocol-icon-box {
+  background-color: rgba(163, 160, 150, 0.15) !important;
+  color: #C5BFB2 !important;
+  border-color: rgba(163, 160, 150, 0.25) !important;
+}
+
+/* Badges Dark */
+[data-theme="focus-dark"] .protocol-badge-danger {
+  background-color: #7A1C30 !important;
+  color: #FFFFFF !important;
+  border: 1px solid #D45B72 !important;
+  font-weight: 800 !important;
+}
+[data-theme="focus-dark"] .protocol-badge-success {
+  background-color: #21542F !important;
+  color: #FFFFFF !important;
+  border: 1px solid #52A669 !important;
+  font-weight: 800 !important;
+}
+[data-theme="focus-dark"] .protocol-badge-gold {
+  background-color: #3A3120 !important;
+  color: #D9B563 !important;
+  border: 1px solid #C9A24C !important;
+  font-weight: 800 !important;
+}
+[data-theme="focus-dark"] .protocol-badge-info {
+  background-color: #1F2836 !important;
+  color: #9EC0E2 !important;
+  border: 1px solid #6C8CAA !important;
+  font-weight: 800 !important;
+}
+[data-theme="focus-dark"] .protocol-badge-warning {
+  background-color: #332A19 !important;
+  color: #E2B66C !important;
+  border: 1px solid #C99A4E !important;
+  font-weight: 800 !important;
+}
+[data-theme="focus-dark"] .protocol-badge-neutral {
+  background-color: #2C3347 !important;
+  color: #E6E1D3 !important;
+  border: 1px solid #3A4258 !important;
+  font-weight: 700 !important;
+}
+
+@keyframes diceRoll {
+  0%   { transform: rotate(-15deg) scale(0.9); }
+  25%  { transform: rotate(100deg) scale(1.05); }
+  50%  { transform: rotate(172deg) scale(0.95); }
+  75%  { transform: rotate(275deg) scale(1.02); }
+  100% { transform: rotate(345deg) scale(0.9); }
+}
+
+.dice-roll {
+  animation: diceRoll 0.12s ease-in-out infinite;
+  display: inline-block;
+}
+
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+
+  .paper-bg {
+    box-shadow: none;
+    border: none;
+    background: white;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  button {
+    display: none !important;
+  }
+
+  .skill-details {
+    display: block !important;
+  }
+}
+
+/* Ensure toast notifications always render on top of modals and never in blurred background */
+[data-toaster],
+.toaster-container,
+div[style*="z-index"][style*="position: fixed"] {
+  /* react-hot-toast creates a fixed div */
+}
+
+/* Container Query for Derived Stats (Abgeleitete Werte) */
+.derived-stats-card {
+  container-type: inline-size;
+}
+
+@container (min-width: 480px) {
+  .derived-stats-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  }
+}
+
+

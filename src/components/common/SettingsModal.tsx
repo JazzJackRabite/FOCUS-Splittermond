@@ -1,29 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import {
   X,
-  Sun,
-  Moon,
   Settings,
   Sliders,
   Info,
   ShieldCheck,
-  CheckCircle2,
   BookOpen,
 } from 'lucide-react';
-import { ThemePalette, THEME_PALETTES } from '../../data/themePalettes';
 import { RegelpaketeTab } from './RegelpaketeTab';
 
 interface SettingsModalProps {
-  currentThemeId: ThemePalette['id'];
-  onSelectTheme: (id: ThemePalette['id']) => void;
   onClose: () => void;
 }
 
 type SettingsTab = 'general' | 'regelpakete' | 'info';
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
-  currentThemeId,
-  onSelectTheme,
   onClose,
 }) => {
   const [activeTab, setActiveTab] = useState<SettingsTab>('general');
@@ -35,16 +27,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
-
-  const isLightMode = currentThemeId === 'focus-light';
-
-  const handleToggleMode = () => {
-    if (isLightMode) {
-      onSelectTheme('focus-dark');
-    } else {
-      onSelectTheme('focus-light');
-    }
-  };
 
   return (
     <div
@@ -72,23 +54,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 Einstellungen
               </h2>
               <p className="text-xs sm:text-sm text-gray-600">
-                Passe Anzeigeoptionen und Systemressourcen an.
+                Datenspeicherung, Regelpakete und Informationen zur App.
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Simple Light/Dark Switch Button */}
-            <button
-              type="button"
-              onClick={handleToggleMode}
-              className="p-2 rounded-lg border border-[#C5A059] bg-[#1B365D] text-[#f3e5cf] hover:bg-[#C5A059] hover:text-[#1B365D] transition-colors cursor-pointer flex items-center justify-center shadow-xs"
-              title={isLightMode ? 'Zu Dunkelmodus wechseln' : 'Zu Hellmodus wechseln'}
-              aria-label={isLightMode ? 'Zu Dunkelmodus wechseln' : 'Zu Hellmodus wechseln'}
-            >
-              {isLightMode ? <Moon size={20} /> : <Sun size={20} />}
-            </button>
-
             {/* Close Button */}
             <button
               type="button"
@@ -113,7 +84,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             }`}
           >
             <Sliders size={16} />
-            <span>Allgemein & Farbschema</span>
+            <span>Allgemein</span>
           </button>
 
           <button
@@ -146,53 +117,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         </div>
 
         {/* ------------------------------------------------------------- */}
-        {/* Tab 1: Allgemein & Farbschema */}
+        {/* Tab 1: Allgemein */}
         {/* ------------------------------------------------------------- */}
         {activeTab === 'general' && (
           <div className="overflow-y-auto space-y-4 pr-1.5 flex-1 custom-scrollbar modal-body-scroll">
-            <div className="bg-white/70 p-4 rounded-xl border border-[#d1c4b0]">
-              <h3 className="font-bold text-sm text-[#1B365D] mb-2 flex items-center gap-2">
-                <Sun size={18} className="text-[#C5A059]" />
-                <span>Erscheinungsbild</span>
-              </h3>
-              <p className="text-xs text-gray-600 mb-3">
-                Wähle zwischen Hell- und Dunkelmodus für die optimale Lesbarkeit.
-              </p>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => onSelectTheme('focus-light')}
-                  className={`p-3 rounded-lg border flex items-center justify-between transition-all cursor-pointer ${
-                    currentThemeId === 'focus-light'
-                      ? 'border-[#1B365D] bg-[#1B365D]/10 font-bold text-[#1B365D]'
-                      : 'border-gray-300 bg-white text-gray-700 hover:border-[#C5A059]'
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <Sun size={18} />
-                    <span>Hellmodus</span>
-                  </div>
-                  {currentThemeId === 'focus-light' && <CheckCircle2 size={16} className="text-[#1B365D]" />}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => onSelectTheme('focus-dark')}
-                  className={`p-3 rounded-lg border flex items-center justify-between transition-all cursor-pointer ${
-                    currentThemeId === 'focus-dark'
-                      ? 'border-[#1B365D] bg-[#1B365D]/10 font-bold text-[#1B365D]'
-                      : 'border-gray-300 bg-white text-gray-700 hover:border-[#C5A059]'
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <Moon size={18} />
-                    <span>Dunkelmodus</span>
-                  </div>
-                  {currentThemeId === 'focus-dark' && <CheckCircle2 size={16} className="text-[#1B365D]" />}
-                </button>
-              </div>
-            </div>
-
             <div className="bg-white/70 p-4 rounded-xl border border-[#d1c4b0]">
               <h3 className="font-bold text-sm text-[#1B365D] mb-1">
                 Lokale Datenspeicherung
@@ -231,9 +159,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
         {/* Footer */}
         <div className="flex items-center justify-between pt-3 mt-3 border-t border-[#C5A059] shrink-0">
-          <span className="text-xs text-gray-500">
-            Modus: <strong className="text-[#1B365D]">{isLightMode ? 'Hellmodus' : 'Dunkelmodus'}</strong>
-          </span>
+          <span />
           <button
             type="button"
             onClick={onClose}

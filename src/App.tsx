@@ -8,7 +8,6 @@ import { useNamensAbgleich } from './regelwerk/useNamensAbgleich';
 import { CharacterContext, useCharacter } from './context/CharacterContext';
 import { ProfileModal } from './components/modals/ProfileModal';
 import { SettingsModal } from './components/common/SettingsModal';
-import { useTheme } from './hooks/useTheme';
 import { loadFromLocalStorage } from './hooks/useLocalStorage';
 import { ConfirmDialog } from './components/ui/ConfirmDialog';
 import { CreationView } from './features/creation/CreationView';
@@ -72,7 +71,6 @@ const App: React.FC = () => {
   const { state, dispatch } = useCharacterState();
   const calc = useCalculations(state);
   useNamensAbgleich(state, dispatch);
-  const { currentThemeId, setTheme } = useTheme();
 
   const { mode } = state;
   const { xpAvailable, isCreationComplete } = calc;
@@ -261,8 +259,6 @@ const App: React.FC = () => {
           {/* Settings Modal */}
           {showThemeModal && (
             <SettingsModal
-              currentThemeId={currentThemeId}
-              onSelectTheme={(themeId) => setTheme(themeId)}
               onClose={() => setShowThemeModal(false)}
             />
           )}
