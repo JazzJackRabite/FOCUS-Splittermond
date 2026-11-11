@@ -10,7 +10,7 @@ import { basisAusDateien } from './hilfen';
 import { setzeAktivenKatalog } from '../bruecke';
 import { alleAusruestung } from '../ausruestung';
 import {
-  bausteineAktiv, reliktAlsInventar, reliktAenderungen, reliktBausteine, reliktWerte, reliktWiderstand, reliktZauber, pruefeRelikt, reliktBaukasten,
+  bausteineAktiv, reliktAlsInventar, reliktAenderungen, veralteteReliktEintraege, reliktBausteine, reliktWerte, reliktWiderstand, reliktZauber, pruefeRelikt, reliktBaukasten,
   type BausteinInfo,
 } from '../relikte';
 import { calculateCharacter } from '../../utils/characterCalculations';
@@ -154,5 +154,19 @@ describe('Werkstatt: Sperre bei Regelverstoß, mit Hausregeln Warnung (Grundsatz
     fireEvent.click(within(dlg).getByRole('button', { name: 'Relikt speichern' }));
     expect(screen.queryByRole('dialog', { name: 'Relikt-Werkstatt' })).toBeNull();
     expect(screen.getByTestId('inv').textContent).toBe('Langschwert:1W6+5');
+  });
+});
+
+describe('Abgleich alter Relikte (vor Stand 21 gebaut)', () => {
+  it('trägt die Werte nach, wenn der Inventareintrag noch die Grundwerte hat; sonst nichts', () => {
+    const r = relikt({ basisId: langschwert.id, bausteine: [{ id: 'grw:verbesserung:waffenschaden-1', anzahl: 2 }] });
+    const aktuell = reliktAlsInventar(r, bs, langschwert, undefined, K);
+    const alt = { ...aktuell, damage: '1W6+4', desc: 'alt', equipped: true };
+    const neu = veralteteReliktEintraege([r], [alt], bs, K);
+    expect(neu).toHaveLength(1);
+    expect(neu[0].damage).toBe('1W6+6');
+    expect(neu[0].equipped).toBe(true);
+    expect(veralteteReliktEintraege([r], [aktuell], bs, K)).toHaveLength(0);
+    expect(veralteteReliktEintraege([r], [], bs, K)).toHaveLength(0);
   });
 });

@@ -16,6 +16,7 @@ import { CombatMagicTab } from './components/combat/CombatMagicTab';
 import { InventoryView } from './features/inventory/InventoryView';
 import { BegleiterView } from './features/begleiter/BegleiterView';
 import { PlaySessionProvider, usePlaySession } from './context/PlaySessionContext';
+import { ReliktAbgleich } from './components/relikte/ReliktKarte';
 import type { ConfirmDialogState } from './hooks/useModals';
 import type { AppMode } from './types';
 
@@ -180,6 +181,7 @@ const App: React.FC = () => {
         }}
       />
 
+      <ReliktAbgleich />
       <PlaySessionProvider>
         <div className="relative z-0 paper-bg rounded-knopf min-h-[90vh] flex flex-col shadow-2xl pb-20 w-full">
           {/* Confirm Dialog */}

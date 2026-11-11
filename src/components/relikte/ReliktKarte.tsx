@@ -3,14 +3,14 @@
  * Alle Regeln kommen aus den Paketen (regelwerk/relikte.ts); Verstöße sperren das Speichern, mit Hausregeln nur Warnung
  * (FUNDAMENT.md, Grundsatz 7). Aufgebaut aus den Bausteinen des Fundaments.
  */
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Gem, Plus, Minus, Trash2, Pencil, Info, AlertTriangle } from 'lucide-react';
 import { useCharacter } from '../../context/CharacterContext';
 import { useRegelwerk } from '../../regelwerk/RegelwerkContext';
 import { alleAusruestung, type AusruestungsItem } from '../../regelwerk/ausruestung';
 import {
   AUSWAHL, GEGENSTANDSARTEN, artVon, auswahlAnzeige, kostenVon, passtZu, pruefeRelikt, reliktAlsInventar, reliktBaukasten, reliktBausteine,
-  reliktWerte, reliktWiderstand, ressourcePunkte, wahlText, zauberMitGrad, type BausteinInfo,
+  reliktWerte, reliktWiderstand, veralteteReliktEintraege, ressourcePunkte, wahlText, zauberMitGrad, type BausteinInfo,
 } from '../../regelwerk/relikte';
 import type { Katalog } from '../../regelwerk/katalog';
 import type { Relikt, ReliktBaustein } from '../../types';
@@ -288,4 +288,23 @@ export const ReliktKarte: React.FC = () => {
         onCancel={() => setLoeschen(null)} onConfirm={() => { dispatch({ type: 'RELIKT_LOESCHEN', payload: { id: loeschen.id } }); setLoeschen(null); }} />}
     </Karte>
   );
+};
+
+/**
+ * Hält die Inventareinträge der Relikte bei den Regeln: Relikte, die vor einer Regeländerung gebaut wurden, bekommen
+ * die Spielwerte aus ihren Bausteinen nachgetragen. Ohne Ansicht; einmal in der App eingehängt.
+ */
+export const ReliktAbgleich: React.FC = () => {
+  const { katalog: k } = useRegelwerk();
+  const { state, dispatch } = useCharacter();
+  const bausteine = useMemo(() => reliktBausteine(k, reliktBaukasten(k)), [k]);
+  useEffect(() => {
+    if (!state.relikte?.length) return;
+    const neu = veralteteReliktEintraege(state.relikte, state.inventory ?? [], bausteine, k);
+    for (const inventar of neu) {
+      const relikt = state.relikte.find(r => r.inventarId === inventar.id);
+      if (relikt) dispatch({ type: 'RELIKT_SPEICHERN', payload: { relikt, inventar } });
+    }
+  }, [state.relikte, state.inventory, bausteine, k, dispatch]);
+  return null;
 };
