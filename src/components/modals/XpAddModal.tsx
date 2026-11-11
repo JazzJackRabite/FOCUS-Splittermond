@@ -20,14 +20,14 @@ export const XpAddModal: React.FC<XpAddModalProps> = ({ onClose, onAdd }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-3 sm:p-4">
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-3 sm:p-4">
       <div
         id="xp-add-modal-dialog"
-        className="bg-[#faf4e6] dark-theme-panel rounded-xl border-2 border-[#C5A059] shadow-2xl max-w-md w-full max-h-[90vh] flex flex-col overflow-hidden"
+        className="bg-flaeche rounded-karte border border-rahmen shadow-2xl max-w-md w-full max-h-[90vh] flex flex-col overflow-hidden"
       >
-        <div className="px-5 py-4 border-b border-[#C5A059] flex items-center gap-2 shrink-0">
-          <Sparkles className="w-5 h-5 text-[#C5A059]" />
-          <h3 className="fantasy-font text-xl text-[#1B365D]">
+        <div className="px-5 py-4 border-b border-gold flex items-center gap-2 shrink-0">
+          <Sparkles className="w-5 h-5 text-gold" />
+          <h3 className="fantasy-font text-xl text-gold-hell">
             Erfahrungspunkte (EP) hinzufügen
           </h3>
         </div>
@@ -36,7 +36,7 @@ export const XpAddModal: React.FC<XpAddModalProps> = ({ onClose, onAdd }) => {
           <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-4 custom-scrollbar modal-body-scroll">
             {/* Quick buttons */}
             <div>
-              <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">
+              <label className="block text-xs font-bold text-leise mb-1.5 uppercase tracking-wide">
                 Schnellauswahl
               </label>
               <div className="grid grid-cols-6 gap-1.5">
@@ -45,10 +45,10 @@ export const XpAddModal: React.FC<XpAddModalProps> = ({ onClose, onAdd }) => {
                     key={amt}
                     type="button"
                     onClick={() => setVal(amt)}
-                    className={`py-1.5 text-xs font-bold rounded-lg border transition-colors cursor-pointer ${
+                    className={`py-1.5 text-xs font-bold rounded-knopf border transition-colors cursor-pointer ${
                       val === amt
-                        ? 'bg-[#1B365D] text-[#f3e5cf] border-[#10233f] shadow-xs'
-                        : 'bg-white text-[#1B365D] border-[#d1c4b0] hover:bg-[#f3e5cf]'
+                        ? 'bg-erhoeht text-schrift border-rahmen '
+                        : 'bg-flaeche text-schrift border-rahmen hover:bg-rahmen'
                     }`}
                   >
                     +{amt}
@@ -59,14 +59,14 @@ export const XpAddModal: React.FC<XpAddModalProps> = ({ onClose, onAdd }) => {
 
             {/* Stepper Input */}
             <div className="flex flex-col items-center justify-center pt-2">
-              <label className="text-xs font-bold text-gray-600 mb-2 uppercase tracking-wide">
+              <label className="text-xs font-bold text-leise mb-2 uppercase tracking-wide">
                 EP-Menge
               </label>
               <div className="flex items-center justify-center space-x-3">
                 <button
                   type="button"
                   onClick={() => setVal(Math.max(1, val - 1))}
-                  className="w-10 h-10 rounded-lg bg-[#f3e5cf] hover:bg-[#ebdcc4] active:scale-95 font-bold flex items-center justify-center text-[#1B365D] border border-[#d1c4b0] shadow-2xs touch-manipulation cursor-pointer transition-all"
+                  className="w-10 h-10 rounded-knopf bg-erhoeht hover:bg-rahmen active:scale-95 font-bold flex items-center justify-center text-schrift border border-rahmen shadow-2xs touch-manipulation cursor-pointer transition-all"
                 >
                   <Minus size={18} />
                 </button>
@@ -75,13 +75,13 @@ export const XpAddModal: React.FC<XpAddModalProps> = ({ onClose, onAdd }) => {
                   min="1"
                   value={val || ''}
                   onChange={(e) => setVal(parseInt(e.target.value, 10) || 0)}
-                  className="w-24 text-center text-2xl font-bold bg-white border border-[#C5A059] rounded-lg p-2 text-[#1B365D] shadow-inner focus:outline-none focus:ring-2 focus:ring-[#C5A059]"
+                  className="w-24 text-center text-2xl font-bold bg-flaeche border border-gold rounded-knopf p-2 text-schrift focus:outline-none focus:ring-2 focus:ring-gold"
                   autoFocus
                 />
                 <button
                   type="button"
                   onClick={() => setVal(val + 1)}
-                  className="w-10 h-10 rounded-lg bg-[#f3e5cf] hover:bg-[#ebdcc4] active:scale-95 font-bold flex items-center justify-center text-[#1B365D] border border-[#d1c4b0] shadow-2xs touch-manipulation cursor-pointer transition-all"
+                  className="w-10 h-10 rounded-knopf bg-erhoeht hover:bg-rahmen active:scale-95 font-bold flex items-center justify-center text-schrift border border-rahmen shadow-2xs touch-manipulation cursor-pointer transition-all"
                 >
                   <Plus size={18} />
                 </button>
@@ -90,7 +90,7 @@ export const XpAddModal: React.FC<XpAddModalProps> = ({ onClose, onAdd }) => {
 
             {/* Note Input */}
             <div>
-              <label className="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wide">
+              <label className="block text-xs font-bold text-leise mb-1 uppercase tracking-wide">
                 Grund / Abenteuer-Notiz (optional)
               </label>
               <input
@@ -98,23 +98,23 @@ export const XpAddModal: React.FC<XpAddModalProps> = ({ onClose, onAdd }) => {
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 placeholder="z. B. Abenteuer 1, Spielleiter-Bonus, Meilenstein"
-                className="w-full bg-white border border-[#d1c4b0] rounded-lg p-2 text-sm text-[#2C1810] focus:outline-none focus:ring-2 focus:ring-[#C5A059]"
+                className="w-full bg-flaeche border border-rahmen rounded-knopf p-2 text-sm text-schrift focus:outline-none focus:ring-2 focus:ring-gold"
               />
             </div>
           </div>
 
-          <div className="px-5 py-3.5 border-t border-[#C5A059]/40 bg-black/5 flex justify-end space-x-2 shrink-0">
+          <div className="px-5 py-3.5 border-t border-rahmen bg-black/5 flex justify-end space-x-2 shrink-0">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-[#1B365D] hover:bg-[#ebdcc4] rounded-lg text-sm font-semibold transition-colors cursor-pointer"
+              className="px-4 py-2 text-schrift hover:bg-rahmen rounded-knopf text-sm font-semibold transition-colors cursor-pointer"
             >
               Abbrechen
             </button>
             <button
               type="submit"
               disabled={val <= 0}
-              className="px-5 py-2 bg-[#1B365D] hover:bg-[#2a4f7e] text-white rounded-lg font-bold text-sm shadow-xs border border-[#10233f] disabled:opacity-50 transition-all cursor-pointer"
+              className="px-5 py-2 bg-erhoeht hover:bg-rahmen text-schrift rounded-knopf font-bold text-sm border border-rahmen disabled:opacity-50 transition-all cursor-pointer"
             >
               +{val} EP Hinzufügen
             </button>

@@ -33,18 +33,18 @@ export const StatusWidget: React.FC<StatusWidgetProps> = ({
   const hgRank = hgMatch ? hgMatch[2] : '';
 
   return (
-    <div className="bg-[#1B365D] p-4 rounded border-2 border-[#C5A059] shadow-lg text-[#f3e5cf] mb-6 print:hidden">
+    <div className="bg-erhoeht p-4 rounded-knopf border border-gold text-schrift mb-6 print:hidden">
       <div className="flex justify-between items-start mb-4 gap-4">
         {/* Left: Status & Heldengrad */}
         <div className="flex flex-col">
           <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap">
-            <h3 className="font-bold text-xl fantasy-font tracking-widest text-white">STATUS</h3>
+            <h3 className="font-bold text-xl fantasy-font tracking-widest text-gold-hell">STATUS</h3>
             {onToggleCreationMode && (
               mode === 'creation' ? (
                 <button
                   type="button"
                   onClick={onToggleCreationMode}
-                  className="px-2.5 py-1 rounded text-xs font-bold transition bg-[#C5A059] text-[#1B365D] hover:bg-[#d6b16a] active:scale-95 shadow-xs cursor-pointer border border-[#e3d4b9] whitespace-nowrap"
+                  className="px-2.5 py-1 rounded-knopf text-xs font-bold transition bg-gold text-seite hover:bg-gold-hell active:scale-95 cursor-pointer border border-rahmen whitespace-nowrap"
                   title="Charaktererschaffung abschließen und Steigerung freischalten"
                 >
                   Erschaffung abschließen
@@ -53,7 +53,7 @@ export const StatusWidget: React.FC<StatusWidgetProps> = ({
                 <button
                   type="button"
                   onClick={onToggleCreationMode}
-                  className="px-2.5 py-1 rounded text-xs font-bold transition bg-[#0f2340] text-[#f3e5cf] hover:bg-[#C5A059] hover:text-[#1B365D] active:scale-95 shadow-xs cursor-pointer border border-[#C5A059] whitespace-nowrap"
+                  className="px-2.5 py-1 rounded-knopf text-xs font-bold transition bg-erhoeht text-schrift hover:bg-rahmen hover:text-gold-hell active:scale-95 cursor-pointer border border-gold whitespace-nowrap"
                   title="Charaktererschaffung wieder bearbeiten"
                 >
                   Erschaffung
@@ -63,11 +63,11 @@ export const StatusWidget: React.FC<StatusWidgetProps> = ({
           </div>
           {heldengrad && hgTitle && (
             <div className="mt-1 flex items-center gap-1.5 flex-wrap">
-              <span className="text-xs sm:text-sm font-bold text-[#C5A059] fantasy-font leading-tight">
+              <span className="text-xs sm:text-sm font-bold text-gold fantasy-font leading-tight">
                 {hgTitle}
               </span>
               {hgRank && (
-                <span className="text-[11px] sm:text-xs text-[#f3e5cf]/85 font-medium leading-tight">
+                <span className="text-[11px] sm:text-xs text-schrift font-medium leading-tight">
                   {hgRank}
                 </span>
               )}
@@ -78,17 +78,17 @@ export const StatusWidget: React.FC<StatusWidgetProps> = ({
         {/* Right: Verfügbare EP & Gesamt-EP */}
         <div className="text-right flex flex-col items-end">
           <div>
-            <div className="text-[10px] uppercase tracking-wider text-[#C5A059]">Verfügbare EP</div>
-            <div className="text-2xl font-bold leading-none text-white">{xpAvailable}</div>
+            <div className="text-[11px] uppercase tracking-wider text-gold">Verfügbare EP</div>
+            <div className="text-2xl font-bold leading-none text-schrift">{xpAvailable}</div>
           </div>
 
           {xpTotal !== undefined && (
             <div className="mt-2 flex items-center gap-1.5 flex-wrap justify-end">
-              <span className="text-[10px] uppercase tracking-wider text-gray-300 font-semibold leading-none">
+              <span className="text-[11px] uppercase tracking-wider text-schrift font-semibold leading-none">
                 Gesamt-EP
               </span>
               <span
-                className="bg-[#faf4e6] text-[#1B365D] font-bold text-xs px-2 py-0.5 rounded border border-[#C5A059] shadow-xs select-none"
+                className="bg-erhoeht text-schrift font-bold text-xs px-2 py-0.5 rounded-knopf border border-gold select-none"
                 title="Gesamt-Erfahrungspunkte"
               >
                 {xpTotal}
@@ -97,7 +97,7 @@ export const StatusWidget: React.FC<StatusWidgetProps> = ({
                 <button
                   type="button"
                   onClick={onAddXp}
-                  className="px-2 py-0.5 rounded text-xs font-bold bg-[#C5A059] text-[#1B365D] hover:bg-[#d6b16a] active:scale-95 transition-all shadow-xs cursor-pointer leading-none"
+                  className="px-2 py-0.5 rounded-knopf text-xs font-bold bg-gold text-seite hover:bg-gold-hell active:scale-95 transition-all cursor-pointer leading-none"
                   title="Erfahrungspunkte hinzufügen"
                 >
                   +EP
@@ -137,16 +137,16 @@ export const StatusWidget: React.FC<StatusWidgetProps> = ({
           return (
             <div
               key={label}
-              className={`p-2 rounded text-center border border-opacity-30 ${
-                done ? 'bg-green-900 border-green-500' : 'bg-[#2c1810] border-red-500'
+              className={`p-2 rounded-knopf text-center border border-opacity-30 ${
+                done ? 'bg-unverletzt-grund border-unverletzt' : 'bg-erschoepft-grund border-schaden'
               }`}
             >
-              <div className="text-[10px] uppercase text-gray-300">{label}</div>
-              <div className={`font-bold text-lg ${done ? 'text-green-400' : 'text-red-400'}`}>
+              <div className="text-[11px] uppercase text-schrift">{label}</div>
+              <div className={`font-bold text-lg ${done ? 'text-unverletzt' : 'text-schaden'}`}>
                 {current}/{max}
               </div>
               {extra && (
-                <div className="text-[8px] text-red-300 leading-tight">{extra}</div>
+                <div className="text-[11px] text-schaden leading-tight">{extra}</div>
               )}
             </div>
           );
@@ -154,13 +154,13 @@ export const StatusWidget: React.FC<StatusWidgetProps> = ({
       </div>
     )}
 
-    <div className="space-y-1 text-sm border-t border-[#C5A059] pt-2">
+    <div className="space-y-1 text-sm border-t border-gold pt-2">
       {mode === 'creation' && (
         <div className="flex justify-between">
-          <span className="text-gray-300">Start-Meisterschaften:</span>
+          <span className="text-schrift">Start-Meisterschaften:</span>
           <span
             className={`font-bold ${
-              creationUsage.creationMasteries === 3 ? 'text-green-400' : 'text-red-400'
+              creationUsage.creationMasteries === 3 ? 'text-unverletzt' : 'text-schaden'
             }`}
           >
             {creationUsage.creationMasteries}/3
@@ -168,12 +168,12 @@ export const StatusWidget: React.FC<StatusWidgetProps> = ({
         </div>
       )}
       <div className="flex justify-between">
-        <span className="text-gray-300">Gratis-Meisterschaften:</span>
-        <span className="font-bold text-white">{freeMasteries} offen</span>
+        <span className="text-schrift">Gratis-Meisterschaften:</span>
+        <span className="font-bold text-schrift">{freeMasteries} offen</span>
       </div>
       <div className="flex justify-between">
-        <span className="text-gray-300">Gratis-Zauber:</span>
-        <span className="font-bold text-white">{freeSpells} offen</span>
+        <span className="text-schrift">Gratis-Zauber:</span>
+        <span className="font-bold text-schrift">{freeSpells} offen</span>
       </div>
     </div>
   </div>

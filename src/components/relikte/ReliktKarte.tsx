@@ -12,8 +12,8 @@ import type { Katalog } from '../../regelwerk/katalog';
 import type { Relikt, ReliktBaustein } from '../../types';
 import { generateId } from '../../utils/id';
 
-const knopf = 'px-2 py-1 rounded border border-[#C5A059] bg-[#1B365D] text-[#f3e5cf] text-xs font-bold flex items-center gap-1 cursor-pointer disabled:opacity-50';
-const feld = 'border border-[#d1c4b0] rounded px-2 py-1 text-xs bg-white text-[#2C1810]';
+const knopf = 'px-2 py-1 rounded-knopf border border-gold bg-erhoeht text-schrift text-xs font-bold flex items-center gap-1 cursor-pointer disabled:opacity-50';
+const feld = 'border border-rahmen rounded-knopf px-2 py-1 text-xs bg-flaeche text-schrift';
 
 const typName = (k: Katalog, typ: string) => (typ === 'material' ? 'Besondere Materialien' : k.manifest.typen?.[typ]?.bezeichnung ?? typ);
 
@@ -78,59 +78,59 @@ const Werkstatt: React.FC<{ k: Katalog; start: Relikt; frei: number; schliessen:
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto" role="dialog" aria-label="Relikt-Werkstatt">
-      <div className="bg-[#faf4e6] border-2 border-[#C5A059] rounded-2xl shadow-2xl max-w-5xl w-full p-5 space-y-3 max-h-[92vh] flex flex-col">
-        <div className="flex items-center justify-between border-b border-[#C5A059]/40 pb-2">
-          <h3 className="font-bold text-lg text-[#1B365D] flex items-center gap-2"><Gem size={18} className="text-[#C5A059]" />Relikt-Werkstatt</h3>
-          <button type="button" onClick={schliessen} aria-label="Schließen" className="p-1 rounded hover:bg-black/5 cursor-pointer"><X size={18} /></button>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 overflow-y-auto" role="dialog" aria-label="Relikt-Werkstatt">
+      <div className="bg-flaeche border border-rahmen rounded-karte shadow-2xl max-w-5xl w-full p-5 space-y-3 max-h-[92vh] flex flex-col">
+        <div className="flex items-center justify-between border-b border-rahmen pb-2">
+          <h3 className="font-bold text-lg text-gold-hell flex items-center gap-2"><Gem size={18} className="text-gold" />Relikt-Werkstatt</h3>
+          <button type="button" onClick={schliessen} aria-label="Schließen" className="p-1 rounded-knopf hover:bg-black/5 cursor-pointer"><X size={18} /></button>
         </div>
 
         <div className="grid md:grid-cols-2 gap-4 min-h-0 flex-1 overflow-y-auto md:overflow-hidden">
           {/* links: Relikt */}
-          <div className="space-y-3 text-xs text-[#2C1810] md:overflow-y-auto md:pr-1">
+          <div className="space-y-3 text-xs text-schrift md:overflow-y-auto md:pr-1">
             <label className="block">
-              <span className="font-bold text-[#1B365D]">Name</span>
+              <span className="font-bold text-schrift">Name</span>
               <input value={r.name} onChange={e => setR({ ...r, name: e.target.value })} placeholder="z. B. Großvaters Klinge" className={`${feld} w-full mt-0.5`} />
             </label>
             <div className="relative">
-              <span className="font-bold text-[#1B365D]">Grundgegenstand</span>
+              <span className="font-bold text-schrift">Grundgegenstand</span>
               <input value={basisSuche} onChange={e => setBasisSuche(e.target.value)} placeholder="Ausrüstung suchen (oder frei benennen)" aria-label="Grundgegenstand" className={`${feld} w-full mt-0.5`} />
               {basisTreffer.length > 0 && (
-                <ul className="absolute z-10 left-0 right-0 bg-white border border-[#d1c4b0] rounded shadow max-h-56 overflow-y-auto">
+                <ul className="absolute z-10 left-0 right-0 bg-flaeche border border-rahmen rounded-knopf max-h-56 overflow-y-auto">
                   {basisTreffer.map(i => (
                     <li key={i.id}>
-                      <button type="button" className="w-full text-left px-2 py-1 hover:bg-[#f3e5cf] cursor-pointer"
+                      <button type="button" className="w-full text-left px-2 py-1 hover:bg-rahmen cursor-pointer"
                         onClick={() => { setR({ ...r, basisId: i.id, art: artVon(i), name: r.name || i.name }); setBasisSuche(i.name); }}>
-                        {i.name} <span className="text-stone-500">({i.category}, {i.source})</span>
+                        {i.name} <span className="text-leise">({i.category}, {i.source})</span>
                       </button>
                     </li>
                   ))}
                 </ul>
               )}
-              {basis && <p className="text-[11px] text-stone-600 mt-0.5">{basis.category} · {basis.source}{basis.page ? ` S. ${basis.page}` : ''}{(basis as { attributes?: string }).attributes ? ` · ${(basis as { attributes?: string }).attributes}` : ''}</p>}
+              {basis && <p className="text-[11px] text-leise mt-0.5">{basis.category} · {basis.source}{basis.page ? ` S. ${basis.page}` : ''}{(basis as { attributes?: string }).attributes ? ` · ${(basis as { attributes?: string }).attributes}` : ''}</p>}
             </div>
             <div className="flex flex-wrap gap-3 items-end">
               <label>
-                <span className="font-bold text-[#1B365D] block">Art</span>
+                <span className="font-bold text-schrift block">Art</span>
                 <select value={r.art} onChange={e => setR({ ...r, art: e.target.value })} aria-label="Art des Gegenstands" className={feld}>
                   {Object.entries(GEGENSTANDSARTEN).map(([a, n]) => <option key={a} value={a}>{n}</option>)}
                 </select>
               </label>
               <label>
-                <span className="font-bold text-[#1B365D] block">Punkte</span>
+                <span className="font-bold text-schrift block">Punkte</span>
                 <input type="number" min={1} value={r.punkte} onChange={e => setR({ ...r, punkte: Math.max(0, parseInt(e.target.value, 10) || 0) })} aria-label="Punkte des Relikts" className={`${feld} w-16`} />
               </label>
-              <span className="text-stone-600">noch frei aus der Ressource Relikt: {frei}</span>
+              <span className="text-leise">noch frei aus der Ressource Relikt: {frei}</span>
             </div>
 
             <div>
-              <div className="font-bold text-[#1B365D] mb-1">Bausteine</div>
-              {r.bausteine.length === 0 && <p className="italic text-stone-500">Noch keine Bausteine – rechts auswählen.</p>}
+              <div className="font-bold text-schrift mb-1">Bausteine</div>
+              {r.bausteine.length === 0 && <p className="italic text-leise">Noch keine Bausteine – rechts auswählen.</p>}
               <ul className="space-y-1.5">
                 {r.bausteine.map((w, i) => {
                   const b = nachId.get(w.id);
                   return (
-                    <li key={`${w.id}-${i}`} className="border border-[#d1c4b0] rounded p-1.5 bg-white flex flex-wrap items-center gap-1.5">
+                    <li key={`${w.id}-${i}`} className="border border-rahmen rounded-knopf p-1.5 bg-flaeche flex flex-wrap items-center gap-1.5">
                       <span className="font-semibold">{b?.name ?? w.name ?? w.id}</span>
                       {b?.kostenNachGrad && (
                         <select value={w.grad ?? 0} onChange={e => setzeW(i, { grad: Number(e.target.value), auswahl: '' })} aria-label="Zaubergrad" className={feld}>
@@ -143,13 +143,13 @@ const Werkstatt: React.FC<{ k: Katalog; start: Relikt; frei: number; schliessen:
                       {b && <AuswahlFeld k={k} b={b} w={w} setze={u => setzeW(i, u)} />}
                       {b && b.maxAnzahl !== 1 && !b.auswahl && !b.kostenNachGrad && (
                         <span className="flex items-center gap-0.5">
-                          <button type="button" aria-label="weniger" onClick={() => (w.anzahl > 1 ? setzeW(i, { anzahl: w.anzahl - 1 }) : entferneW(i))} className="p-0.5 rounded border border-[#d1c4b0] cursor-pointer"><Minus size={10} /></button>
+                          <button type="button" aria-label="weniger" onClick={() => (w.anzahl > 1 ? setzeW(i, { anzahl: w.anzahl - 1 }) : entferneW(i))} className="p-0.5 rounded-knopf border border-rahmen cursor-pointer"><Minus size={10} /></button>
                           <span className="w-5 text-center">{w.anzahl}</span>
-                          <button type="button" aria-label="mehr" onClick={() => setzeW(i, { anzahl: w.anzahl + 1 })} className="p-0.5 rounded border border-[#d1c4b0] cursor-pointer"><Plus size={10} /></button>
+                          <button type="button" aria-label="mehr" onClick={() => setzeW(i, { anzahl: w.anzahl + 1 })} className="p-0.5 rounded-knopf border border-rahmen cursor-pointer"><Plus size={10} /></button>
                         </span>
                       )}
-                      <span className="ml-auto text-stone-600">{b ? `${kostenVon(b, w)} P.` : '?'}</span>
-                      <button type="button" aria-label={`${b?.name ?? w.id} entfernen`} onClick={() => entferneW(i)} className="p-1 rounded hover:bg-black/5 hover:text-red-700 cursor-pointer"><Trash2 size={12} /></button>
+                      <span className="ml-auto text-leise">{b ? `${kostenVon(b, w)} P.` : '?'}</span>
+                      <button type="button" aria-label={`${b?.name ?? w.id} entfernen`} onClick={() => entferneW(i)} className="p-1 rounded-knopf hover:bg-black/5 hover:text-schaden cursor-pointer"><Trash2 size={12} /></button>
                     </li>
                   );
                 })}
@@ -157,52 +157,52 @@ const Werkstatt: React.FC<{ k: Katalog; start: Relikt; frei: number; schliessen:
             </div>
 
             <label className="block">
-              <span className="font-bold text-[#1B365D]">Notiz (Herkunft, legendäre Taten …)</span>
+              <span className="font-bold text-schrift">Notiz (Herkunft, legendäre Taten …)</span>
               <textarea value={r.notiz ?? ''} onChange={e => setR({ ...r, notiz: e.target.value })} rows={2} className={`${feld} w-full mt-0.5`} />
             </label>
 
-            <div className={`rounded-lg p-2 border ${pruefung.warnungen.length ? 'bg-amber-50 border-amber-300' : 'bg-emerald-50 border-emerald-300'}`} data-testid="relikt-pruefung">
+            <div className={`rounded-knopf p-2 border ${pruefung.warnungen.length ? 'bg-erschoepft-grund border-erschoepft' : 'bg-unverletzt-grund border-unverletzt'}`} data-testid="relikt-pruefung">
               <div className="font-bold">{pruefung.verwendet} von {r.punkte} Punkten verwendet</div>
-              {pruefung.warnungen.map((t, i) => <div key={i} className="flex gap-1 text-amber-800"><AlertTriangle size={12} className="shrink-0 mt-0.5" />{t}</div>)}
+              {pruefung.warnungen.map((t, i) => <div key={i} className="flex gap-1 text-erschoepft"><AlertTriangle size={12} className="shrink-0 mt-0.5" />{t}</div>)}
             </div>
           </div>
 
           {/* rechts: Bausteine aus den Regelpaketen */}
-          <div className="space-y-2 text-xs text-[#2C1810] md:overflow-y-auto md:pr-1">
+          <div className="space-y-2 text-xs text-schrift md:overflow-y-auto md:pr-1">
             <div className="flex flex-wrap gap-2 items-center">
               <input value={suche} onChange={e => setSuche(e.target.value)} placeholder="Bausteine suchen" aria-label="Bausteine suchen" className={`${feld} flex-1 min-w-[10rem]`} />
               <label className="flex items-center gap-1"><input type="checkbox" checked={alleZeigen} onChange={e => setAlleZeigen(e.target.checked)} />auch unpassende</label>
             </div>
             {gruppen.map(g => (
               <div key={g.typ}>
-                <div className="font-bold text-[#1B365D] border-b border-[#C5A059]/40 mb-1">{typName(k, g.typ)}</div>
+                <div className="font-bold text-schrift border-b border-rahmen mb-1">{typName(k, g.typ)}</div>
                 <ul className="space-y-1">
                   {g.liste.map(b => (
-                    <li key={b.id} className="bg-white border border-[#d1c4b0] rounded p-1.5">
+                    <li key={b.id} className="bg-flaeche border border-rahmen rounded-knopf p-1.5">
                       <div className="flex items-center gap-1.5">
-                        <button type="button" onClick={() => hinzu(b)} aria-label={`${b.name} hinzufügen`} className="p-0.5 rounded bg-[#1B365D] text-[#f3e5cf] cursor-pointer"><Plus size={12} /></button>
+                        <button type="button" onClick={() => hinzu(b)} aria-label={`${b.name} hinzufügen`} className="p-0.5 rounded-knopf bg-erhoeht text-schrift cursor-pointer"><Plus size={12} /></button>
                         <span className="font-semibold">{b.name}</span>
-                        <span className="text-stone-500">
+                        <span className="text-leise">
                           {b.kostenNachGrad ? `${b.kostenNachGrad.map(g2 => g2.kosten).join('/')} P. je Grad` : `${b.kosten} P.${b.kostenJe ? ' je Stufe' : ''}`}
                           {b.maxAnzahl !== null ? `, max. ${b.maxAnzahl}×` : ''}{b.mindestPunkte ? `, ab ${b.mindestPunkte} P.` : ''}
                         </span>
-                        <span className="ml-auto text-[10px] text-stone-500">{b.quelle}</span>
-                        <button type="button" onClick={() => setInfo(info === b.id ? null : b.id)} aria-label={`${b.name}: Beschreibung`} className="p-0.5 rounded hover:bg-black/5 cursor-pointer"><Info size={12} /></button>
+                        <span className="ml-auto text-[11px] text-leise">{b.quelle}</span>
+                        <button type="button" onClick={() => setInfo(info === b.id ? null : b.id)} aria-label={`${b.name}: Beschreibung`} className="p-0.5 rounded-knopf hover:bg-black/5 cursor-pointer"><Info size={12} /></button>
                       </div>
-                      {info === b.id && <p className="mt-1 whitespace-pre-line text-stone-700">{b.beschreibung || '—'}</p>}
+                      {info === b.id && <p className="mt-1 whitespace-pre-line text-schrift">{b.beschreibung || '—'}</p>}
                     </li>
                   ))}
                 </ul>
               </div>
             ))}
-            {!gruppen.length && <p className="italic text-stone-500">Keine passenden Bausteine.</p>}
-            <p className="text-[10px] text-stone-500">Regeln: {(bk?.quellen ?? []).map(e => quelleKurz(k, e.quelle.paket, e.quelle.buch_seiten)).join(' · ')}</p>
+            {!gruppen.length && <p className="italic text-leise">Keine passenden Bausteine.</p>}
+            <p className="text-[11px] text-leise">Regeln: {(bk?.quellen ?? []).map(e => quelleKurz(k, e.quelle.paket, e.quelle.buch_seiten)).join(' · ')}</p>
           </div>
         </div>
 
-        <div className="flex justify-end gap-2 border-t border-[#C5A059]/40 pt-2">
-          <button type="button" onClick={schliessen} className="px-3 py-1.5 rounded-lg border border-[#d1c4b0] text-xs cursor-pointer">Abbrechen</button>
-          <button type="button" onClick={speichern} className="bg-[#C5A059] hover:bg-[#b08e4d] text-[#1B365D] font-bold px-5 py-1.5 rounded-lg text-xs shadow-xs cursor-pointer">Relikt speichern</button>
+        <div className="flex justify-end gap-2 border-t border-rahmen pt-2">
+          <button type="button" onClick={schliessen} className="px-3 py-1.5 rounded-knopf border border-rahmen text-xs cursor-pointer">Abbrechen</button>
+          <button type="button" onClick={speichern} className="bg-gold hover:bg-gold text-seite font-bold px-5 py-1.5 rounded-knopf text-xs cursor-pointer">Relikt speichern</button>
         </div>
       </div>
     </div>
@@ -230,17 +230,17 @@ export const ReliktKarte: React.FC = () => {
   const neu = (): Relikt => ({ id: generateId(), name: '', punkte: Math.max(1, ressource - vergeben), art: 'nahkampfwaffe', bausteine: [], inventarId: generateId() });
 
   return (
-    <div className="bg-white bg-opacity-70 rounded-xl border border-[#d1c4b0] shadow p-4" data-testid="relikte">
+    <div className="bg-flaeche bg-opacity-70 rounded-karte border border-rahmen p-4" data-testid="relikte">
       <div className="flex items-center justify-between gap-2 mb-2">
         <div className="flex items-center gap-2">
-          <Gem size={18} className="text-[#1B365D]" />
-          <h3 className="font-bold text-base text-[#1B365D]">Relikte</h3>
+          <Gem size={18} className="text-schrift" />
+          <h3 className="font-bold text-base text-gold-hell">Relikte</h3>
         </div>
         <button type="button" onClick={() => setBearbeiten(neu())} className={knopf}><Plus size={12} />Relikt bauen</button>
       </div>
-      <p className="text-xs text-gray-600 mb-2">
+      <p className="text-xs text-leise mb-2">
         Ressource Relikt: {ressource} Punkte, davon in Relikten {vergeben}.
-        {vergeben > ressource && <strong className="block text-amber-700">Mehr Punkte in Relikten als in der Ressource Relikt.</strong>}
+        {vergeben > ressource && <strong className="block text-erschoepft">Mehr Punkte in Relikten als in der Ressource Relikt.</strong>}
         {ressource === 0 && <span className="block">Ohne die Ressource Relikt kann ein Relikt nur mit Zustimmung der Spielleitung entstehen.</span>}
       </p>
       {relikte.length > 0 && (
@@ -249,23 +249,23 @@ export const ReliktKarte: React.FC = () => {
             const p = pruefeRelikt(r, bausteine, bk, alleAusruestung(k).find(i => i.id === r.basisId) ?? null);
             const imInventar = (state.inventory ?? []).some(it => it.id === r.inventarId);
             return (
-              <li key={r.id} className="border border-[#d1c4b0] rounded-lg p-2 bg-white text-xs">
+              <li key={r.id} className="border border-rahmen rounded-knopf p-2 bg-flaeche text-xs">
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-sm text-[#1B365D]">{r.name}</span>
-                  <span className="text-stone-500">{r.basisName ? `${r.basisName}, ` : ''}{p.verwendet}/{r.punkte} Punkte</span>
-                  {p.warnungen.length > 0 && <span className="text-amber-700 flex items-center gap-0.5" title={p.warnungen.join('\n')}><AlertTriangle size={12} />{p.warnungen.length}</span>}
-                  {!imInventar && <span className="text-amber-700">nicht im Inventar – „Bearbeiten“ und speichern legt ihn neu an</span>}
+                  <span className="font-bold text-sm text-schrift">{r.name}</span>
+                  <span className="text-leise">{r.basisName ? `${r.basisName}, ` : ''}{p.verwendet}/{r.punkte} Punkte</span>
+                  {p.warnungen.length > 0 && <span className="text-erschoepft flex items-center gap-0.5" title={p.warnungen.join('\n')}><AlertTriangle size={12} />{p.warnungen.length}</span>}
+                  {!imInventar && <span className="text-erschoepft">nicht im Inventar – „Bearbeiten“ und speichern legt ihn neu an</span>}
                   <span className="ml-auto flex gap-1">
-                    <button type="button" aria-label={`${r.name} bearbeiten`} onClick={() => setBearbeiten(r)} className="p-1 rounded hover:bg-black/5 cursor-pointer"><Pencil size={13} /></button>
+                    <button type="button" aria-label={`${r.name} bearbeiten`} onClick={() => setBearbeiten(r)} className="p-1 rounded-knopf hover:bg-black/5 cursor-pointer"><Pencil size={13} /></button>
                     <button type="button" aria-label={`${r.name} löschen`} onClick={() => { if (window.confirm(`Relikt „${r.name}“ und seinen Inventareintrag löschen?`)) dispatch({ type: 'RELIKT_LOESCHEN', payload: { id: r.id } }); }}
-                      className="p-1 rounded hover:bg-black/5 hover:text-red-700 cursor-pointer"><Trash2 size={13} /></button>
+                      className="p-1 rounded-knopf hover:bg-black/5 hover:text-schaden cursor-pointer"><Trash2 size={13} /></button>
                   </span>
                 </div>
                 {r.bausteine.length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-1">
                     {r.bausteine.map((w, i) => {
                       const b = nachId.get(w.id);
-                      return <span key={i} className="bg-[#f3e5cf] text-[#1B365D] border border-[#d1c4b0] px-1.5 py-0.5 rounded">
+                      return <span key={i} className="bg-erhoeht text-schrift border border-rahmen px-1.5 py-0.5 rounded-knopf">
                         {b?.name ?? w.name ?? w.id}{w.anzahl > 1 ? ` ×${w.anzahl}` : ''}{w.auswahl ? ` (${w.auswahl})` : ''}
                       </span>;
                     })}

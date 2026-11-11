@@ -417,6 +417,24 @@ Dateien aus AI Studio im Repository: `public/assets/aistudio/*.png`, `.aistudio/
   `aenderungGesperrt()` sperrt jede Änderung, die einen Verstoß neu schafft oder vergrößert; dazu die Punkte der
   Ressource Gefolge (auch beim Hinzufügen). Nicht gesperrt bleibt der Hinweis „Ressource Golem nötig“.
 
+## Stand 20 (11.11.2026): Alle Ansichten auf das dunkle CI umgestellt
+
+- **Bilder des Mockups** liegen in `docs/fundament/` und sind in `FUNDAMENT.md` verlinkt.
+- **Farben:** 4361 Farbklassen in 46 Dateien durch die benannten Werte ersetzt (`bg-flaeche`, `text-leise`, `border-gold`,
+  `bg-schaden-grund` …). Grundlage war die Farbe, die jede alte Klasse im Dunkelmodus tatsächlich hatte (im Browser
+  ausgelesen), zugeordnet zum nächsten Wert des CI; Bedeutungsfarben nach Farbfamilie. Fest eingetragene Farbwerte: 0
+  außerhalb von `fundament.css`.
+- **Form:** Rundungen einheitlich (`rounded-karte`, `rounded-knopf`), keine Verläufe, keine Schatten außer bei Dialogen,
+  kein Weichzeichner, Rahmen 1 Pixel, kleinste Schrift 11 Pixel, Abschnittstitel in Gold, keine Festbreitenschrift mehr
+  (Zahlen mit `tabular-nums`).
+- **Kopf und Reiter** nach dem Mockup: flache Kopfzeile, goldener Schriftzug, aktiver Reiter mit goldener Linie.
+- **Dialograhmen** aller Dialoge einheitlich (Fläche, Rahmen, Rundung). Der **Würfeldialog** ist als erster ganz auf die
+  Bausteine `Dialog` und `Knopf` umgestellt.
+- **`uebergang.css` gelöscht** (1790 Zeilen). Neu `src/fundament/klassen.css` (ca. 100 Zeilen): Grundstil, Protokollkarten,
+  Würfelbanner, Druck – nur mit benannten Werten.
+- Offen: Die übrigen Dialoge und Ansichten bauen Knöpfe und Rahmen noch selbst statt mit den Bausteinen; Knöpfe sind dort
+  teils kleiner als 44 Pixel. Zauberwirkungen erscheinen an einigen Stellen grün statt lila.
+
 ## Google AI Studio
 
 Unverändert eine Vite-/React-App mit `metadata.json` im Wurzelordner; Import über „Import from GitHub“, Hosting über Cloud Run.

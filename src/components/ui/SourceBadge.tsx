@@ -132,36 +132,36 @@ export const SourceBadge: React.FC<SourceBadgeProps> = ({ source, page, tooltipD
 
   const renderContent = () => (
     <>
-      <h4 className="font-bold text-[#1B365D] text-sm border-b border-[#C5A059] pb-1 mb-2 fantasy-font pr-6">
+      <h4 className="font-bold text-gold-hell text-sm border-b border-gold pb-1 mb-2 fantasy-font pr-6">
         {tooltipData?.title}
       </h4>
       {isMobile && (
         <button
           onClick={() => setIsOpen(false)}
-          className="absolute top-2 right-2 text-gray-500 hover:text-red-600 p-1 cursor-pointer"
+          className="absolute top-2 right-2 text-leise hover:text-schaden p-1 cursor-pointer"
         >
           <X size={16} />
         </button>
       )}
       {tooltipData?.description && (
-        <div className="text-xs text-gray-800 italic mb-2 leading-snug whitespace-pre-line">
+        <div className="text-xs text-schrift italic mb-2 leading-snug whitespace-pre-line">
           {tooltipData.description}
         </div>
       )}
       {tooltipData?.stats && tooltipData.stats.length > 0 && (
-        <div className="grid grid-cols-2 gap-x-3 gap-y-1 bg-white bg-opacity-50 p-2 rounded border border-gray-200 mb-2">
+        <div className="grid grid-cols-2 gap-x-3 gap-y-1 bg-flaeche bg-opacity-50 p-2 rounded-knopf border border-rahmen mb-2">
           {tooltipData.stats.map((s, i) => (
             <div
               key={i}
-              className={`text-[10px] flex justify-between border-b border-gray-100 last:border-0 pb-0.5 ${s.colSpan ? 'col-span-2' : ''}`}
+              className={`text-[11px] flex justify-between border-b border-rahmen last:border-0 pb-0.5 ${s.colSpan ? 'col-span-2' : ''}`}
             >
-              <span className="font-bold text-gray-600 mr-2">{s.label}:</span>
-              <span className="text-[#1B365D] font-mono text-right">{s.value}</span>
+              <span className="font-bold text-leise mr-2">{s.label}:</span>
+              <span className="text-schrift tabular-nums text-right">{s.value}</span>
             </div>
           ))}
         </div>
       )}
-      <div className="text-[9px] text-[#C5A059] font-bold text-right mt-1 uppercase tracking-wider">
+      <div className="text-[11px] text-gold font-bold text-right mt-1 uppercase tracking-wider">
         Quelle: {displaySource} {page ? `S. ${page}` : ''}
       </div>
     </>
@@ -177,7 +177,7 @@ export const SourceBadge: React.FC<SourceBadgeProps> = ({ source, page, tooltipD
         onClick={handleClick}
       >
         <span
-          className={`inline-block bg-gray-200 text-gray-600 text-[9px] px-1.5 rounded font-mono border border-gray-300 align-middle ${tooltipData ? 'cursor-help hover:bg-[#C5A059] hover:text-white hover:border-[#b08d45]' : ''}`}
+          className={`inline-block bg-erhoeht text-leise text-[11px] px-1.5 rounded-knopf tabular-nums border border-rahmen align-middle ${tooltipData ? 'cursor-help hover:bg-gold hover:text-schrift hover:border-gold' : ''}`}
         >
           {displaySource} {page ? `S. ${page}` : ''}
         </span>
@@ -189,7 +189,7 @@ export const SourceBadge: React.FC<SourceBadgeProps> = ({ source, page, tooltipD
             onClick={() => setIsOpen(false)}
           >
             <div
-              className="bg-[#faf4e6] dark-theme-panel border-2 border-[#C5A059] shadow-2xl rounded p-4 w-full max-w-xs relative max-h-[85vh] overflow-y-auto"
+              className="bg-flaeche border border-rahmen shadow-2xl rounded-karte p-4 w-full max-w-xs relative max-h-[85vh] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
               {renderContent()}
@@ -198,7 +198,7 @@ export const SourceBadge: React.FC<SourceBadgeProps> = ({ source, page, tooltipD
         ) : (
           <div
             ref={tooltipRef}
-            className="fixed z-[9999] w-80 max-w-[calc(100vw-24px)] max-h-[calc(100vh-24px)] overflow-y-auto bg-[#faf4e6] dark-theme-panel border-2 border-[#C5A059] shadow-2xl rounded-lg p-3 text-left pointer-events-none"
+            className="fixed z-[9999] w-80 max-w-[calc(100vw-24px)] max-h-[calc(100vh-24px)] overflow-y-auto bg-erhoeht dark-theme-panel border border-gold shadow-2xl rounded-knopf p-3 text-left pointer-events-none"
             style={{ top: coords.y, left: coords.x }}
           >
             {renderContent()}

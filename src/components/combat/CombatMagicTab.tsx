@@ -92,7 +92,7 @@ const QuickSpellCard: React.FC<QuickSpellCardProps> = ({ spell, session }) => {
   return (
     <div
       ref={containerRef}
-      className="bg-[#faf6ee] hover:bg-[#f4ebe0] rounded-xl p-3 text-sm border border-[#d1c4b0] hover:border-[#C5A059] shadow-2xs transition-all relative"
+      className="bg-erhoeht hover:bg-rahmen rounded-karte p-3 text-sm border border-rahmen hover:border-gold shadow-2xs transition-all relative"
     >
       {/* Unsichtbares Messelement für die unbeschränkte Breite von Name + Grad */}
       <span
@@ -111,25 +111,25 @@ const QuickSpellCard: React.FC<QuickSpellCardProps> = ({ spell, session }) => {
             className="cursor-pointer flex items-center gap-1.5 w-full min-w-0"
             title={`${spell.name} (Grad ${spell.grade}) – Zaubern öffnen`}
           >
-            <Wand2 size={15} className="text-[#C5A059] shrink-0" />
-            <span className="font-bold text-base text-[#1B365D] hover:text-[#2a4f7e] leading-snug truncate">
+            <Wand2 size={15} className="text-gold shrink-0" />
+            <span className="font-bold text-base text-schrift hover:text-leise leading-snug truncate">
               {spell.name}
             </span>
-            <span className="text-[11px] font-semibold text-stone-500 shrink-0">
+            <span className="text-[11px] font-semibold text-leise shrink-0">
               (Grad {spell.grade})
             </span>
           </div>
 
           <div
             ref={buttonsRef}
-            className="flex items-center justify-end gap-1.5 shrink-0 pt-1 border-t border-[#d1c4b0]/40"
+            className="flex items-center justify-end gap-1.5 shrink-0 pt-1 border-t border-rahmen"
           >
             <button
               type="button"
               onClick={() => session.handleOpenCastSpell(spell)}
-              className="bg-[#1B365D] hover:bg-[#2a4f7e] text-[#f3e5cf] text-xs px-2.5 py-1 rounded font-bold transition-all shadow-2xs flex items-center gap-1 border border-[#C5A059]/40 cursor-pointer whitespace-nowrap active:scale-95"
+              className="bg-erhoeht hover:bg-rahmen text-schrift text-xs px-2.5 py-1 rounded-knopf font-bold transition-all shadow-2xs flex items-center gap-1 border border-rahmen cursor-pointer whitespace-nowrap active:scale-95"
             >
-              <Sparkles size={12} className="text-[#C5A059]" />
+              <Sparkles size={12} className="text-gold" />
               <span>Zaubern</span>
             </button>
             <SourceBadge
@@ -147,11 +147,11 @@ const QuickSpellCard: React.FC<QuickSpellCardProps> = ({ spell, session }) => {
             className="cursor-pointer flex items-center gap-1.5 min-w-0 flex-1"
             title={`${spell.name} (Grad ${spell.grade}) – Zaubern öffnen`}
           >
-            <Wand2 size={15} className="text-[#C5A059] shrink-0" />
-            <span className="font-bold text-base text-[#1B365D] hover:text-[#2a4f7e] leading-snug truncate">
+            <Wand2 size={15} className="text-gold shrink-0" />
+            <span className="font-bold text-base text-schrift hover:text-leise leading-snug truncate">
               {spell.name}
             </span>
-            <span className="text-[11px] font-semibold text-stone-500 shrink-0">
+            <span className="text-[11px] font-semibold text-leise shrink-0">
               (Grad {spell.grade})
             </span>
           </div>
@@ -160,9 +160,9 @@ const QuickSpellCard: React.FC<QuickSpellCardProps> = ({ spell, session }) => {
             <button
               type="button"
               onClick={() => session.handleOpenCastSpell(spell)}
-              className="bg-[#1B365D] hover:bg-[#2a4f7e] text-[#f3e5cf] text-xs px-2.5 py-1 rounded font-bold transition-all shadow-2xs flex items-center gap-1 border border-[#C5A059]/40 cursor-pointer whitespace-nowrap active:scale-95"
+              className="bg-erhoeht hover:bg-rahmen text-schrift text-xs px-2.5 py-1 rounded-knopf font-bold transition-all shadow-2xs flex items-center gap-1 border border-rahmen cursor-pointer whitespace-nowrap active:scale-95"
             >
-              <Sparkles size={12} className="text-[#C5A059]" />
+              <Sparkles size={12} className="text-gold" />
               <span>Zaubern</span>
             </button>
             <SourceBadge
@@ -396,18 +396,18 @@ export const CombatMagicTab: React.FC = () => {
         {/* ══════════════════════════════════════════════════════════ */}
         <div className="space-y-6">
           {/* ── NEU: WAFFEN UND ANGRIFFE ── */}
-          <div className="bg-white bg-opacity-70 rounded-xl border border-[#d1c4b0] shadow p-4 sm:p-5">
-            <div className="flex items-center justify-between gap-3 border-b border-[#C5A059] pb-3 mb-4">
-              <h3 className="font-bold text-lg sm:text-xl fantasy-font text-[#1B365D] flex items-center gap-2">
-                <Swords size={20} className="text-[#C5A059] shrink-0" />
+          <div className="bg-flaeche bg-opacity-70 rounded-karte border border-rahmen p-4 sm:p-5">
+            <div className="flex items-center justify-between gap-3 border-b border-gold pb-3 mb-4">
+              <h3 className="font-bold text-lg sm:text-xl fantasy-font text-gold-hell flex items-center gap-2">
+                <Swords size={20} className="text-gold shrink-0" />
                 <span>Waffen &amp; Angriffe</span>
               </h3>
               <button
                 type="button"
                 onClick={() => setShowAddWeaponModal(true)}
-                className="bg-[#1B365D] hover:bg-[#254a80] text-[#f3e5cf] border border-[#C5A059] px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs shrink-0 whitespace-nowrap active:scale-95"
+                className="bg-erhoeht hover:bg-rahmen text-schrift border border-gold px-3 py-1.5 rounded-knopf text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap active:scale-95"
               >
-                <Plus size={14} className="text-[#C5A059]" />
+                <Plus size={14} className="text-gold" />
                 <span>Waffe</span>
               </button>
             </div>
@@ -415,67 +415,67 @@ export const CombatMagicTab: React.FC = () => {
             {/* List of Weapons */}
             <div className="space-y-3">
               {/* Natural / Unarmed Attack (Always available in Splittermond) */}
-              <div className="bg-[#faf6ee] rounded-xl border border-[#d1c4b0] p-4 shadow-2xs hover:border-[#C5A059] transition-all space-y-3">
+              <div className="bg-erhoeht rounded-karte border border-rahmen p-4 shadow-2xs hover:border-gold transition-all space-y-3">
                 {/* Header Row: Title & Badges */}
                 <div className="flex items-center justify-between gap-2 flex-wrap">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-bold text-base text-[#1B365D]">Waffenlos</span>
-                    <span className="text-xs bg-[#f3e5cf] text-[#1B365D] font-semibold px-2 py-0.5 rounded border border-[#d1c4b0]">
+                    <span className="font-bold text-base text-schrift">Waffenlos</span>
+                    <span className="text-xs bg-erhoeht text-schrift font-semibold px-2 py-0.5 rounded-knopf border border-rahmen">
                       Handgemenge (FW {getSkillValue('Handgemenge')})
                     </span>
-                    <span className="text-[10px] text-stone-500 font-medium bg-stone-100 px-1.5 py-0.5 rounded border border-stone-200">
+                    <span className="text-[11px] text-leise font-medium bg-seite px-1.5 py-0.5 rounded-knopf border border-rahmen">
                       Nahkampf
                     </span>
                   </div>
-                  <span className="text-[10px] text-stone-500 italic">
+                  <span className="text-[11px] text-leise italic">
                     Stets verfügbar
                   </span>
                 </div>
 
                 {/* Combat Stats Grid */}
                 <div className="grid grid-cols-3 gap-2">
-                  <div className="bg-white/80 rounded-lg border border-[#d1c4b0]/70 p-2 text-center shadow-2xs">
-                    <span className="text-[10px] uppercase font-bold text-stone-500 block leading-tight">AT</span>
-                    <span className="text-base font-bold font-mono text-[#1B365D] mt-0.5 block">
+                  <div className="bg-flaeche rounded-knopf border border-rahmen p-2 text-center shadow-2xs">
+                    <span className="text-[11px] uppercase font-bold text-leise block leading-tight">AT</span>
+                    <span className="text-base font-bold tabular-nums text-schrift mt-0.5 block">
                       {getSkillValue('Handgemenge')}
                       {currentWoundPenalty !== 0 && (
-                        <span className="text-red-600 text-xs font-normal"> ({currentWoundPenalty})</span>
+                        <span className="text-schaden text-xs font-normal"> ({currentWoundPenalty})</span>
                       )}
                     </span>
                   </div>
-                  <div className="bg-white/80 rounded-lg border border-[#d1c4b0]/70 p-2 text-center shadow-2xs">
-                    <span className="text-[10px] uppercase font-bold text-stone-500 block leading-tight">Schaden</span>
-                    <span className="text-base font-bold font-mono text-red-700 mt-0.5 block">
-                      1W6 <span className="text-xs text-stone-500 font-sans font-normal">(Stumpf)</span>
+                  <div className="bg-flaeche rounded-knopf border border-rahmen p-2 text-center shadow-2xs">
+                    <span className="text-[11px] uppercase font-bold text-leise block leading-tight">Schaden</span>
+                    <span className="text-base font-bold tabular-nums text-schaden mt-0.5 block">
+                      1W6 <span className="text-xs text-leise font-normal">(Stumpf)</span>
                     </span>
                   </div>
-                  <div className="bg-white/80 rounded-lg border border-[#d1c4b0]/70 p-2 text-center shadow-2xs">
-                    <span className="text-[10px] uppercase font-bold text-stone-500 block leading-tight">WGS</span>
-                    <span className="text-base font-bold font-mono text-stone-800 mt-0.5 block">
-                      5 <span className="text-xs text-stone-500 font-sans font-normal">Ticks</span>
+                  <div className="bg-flaeche rounded-knopf border border-rahmen p-2 text-center shadow-2xs">
+                    <span className="text-[11px] uppercase font-bold text-leise block leading-tight">WGS</span>
+                    <span className="text-base font-bold tabular-nums text-schrift mt-0.5 block">
+                      5 <span className="text-xs text-leise font-normal">Ticks</span>
                     </span>
                   </div>
                 </div>
 
                 {/* Primary Action Buttons */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-[#d1c4b0]/40">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-rahmen">
                   <button
                     type="button"
                     onClick={() => session.openRollForWeapon('Waffenlos', 'Handgemenge', 0, 15, { id: 'waffenlos', damage: '1W6', wgs: 5, attributes: 'Stumpf' })}
-                    className="w-full bg-[#1B365D] hover:bg-[#254a80] text-[#f3e5cf] border border-[#C5A059] px-3 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
+                    className="w-full bg-erhoeht hover:bg-rahmen text-schrift border border-gold px-3 py-2 rounded-knopf text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
                     title="Angriffsprobe & Manöver öffnen (2W10 + AT vs. VTD)"
                   >
-                    <DiceIcon size={15} fill="#C5A059" stroke="#1B365D" />
+                    <DiceIcon size={15} />
                     <span>Angriff (Handgemenge)</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => session.handleRollDiceFormula(getWeaponEnchantments({ id: 'waffenlos', name: 'Waffenlos', damage: '1W6' }, channeledSpells).damageRollFormula, 'Waffenloser Schaden')}
-                    className="damage-roll-btn w-full px-3 py-2 rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer flex items-center justify-center gap-1.5 active:scale-95"
+                    className="damage-roll-btn w-full px-3 py-2 rounded-knopf text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 active:scale-95"
                     title="Schaden würfeln (1W6)"
                   >
                     <span className="text-xs">🎲</span>
-                    <span className="tracking-wide text-white font-extrabold">1W6 Schaden</span>
+                    <span className="tracking-wide text-schrift font-extrabold">1W6 Schaden</span>
                   </button>
                 </div>
               </div>
@@ -490,39 +490,39 @@ export const CombatMagicTab: React.FC = () => {
                 return (
                   <div
                     key={w.id}
-                    className={`rounded-xl border p-4 shadow-2xs transition-all space-y-3 ${
+                    className={`rounded-karte border p-4 shadow-2xs transition-all space-y-3 ${
                       w.equipped
                         ? enchantments.hasEnchantment
-                          ? 'bg-[#faf6ee] border-[#C5A059] ring-2 ring-amber-400/60 shadow-md'
-                          : 'bg-[#faf6ee] border-[#C5A059] ring-1 ring-[#C5A059]/30'
-                        : 'bg-white/80 border-[#d1c4b0] opacity-85 hover:opacity-100'
+                          ? 'bg-erhoeht border-gold ring-2 ring-gold '
+                          : 'bg-erhoeht border-gold ring-1 ring-rahmen'
+                        : 'bg-flaeche border-rahmen opacity-85 hover:opacity-100'
                     }`}
                   >
                     {/* Header Row: Title, Badges & Secondary Controls */}
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-                          <span className="font-bold text-base text-[#1B365D] truncate">{w.name}</span>
-                          <span className="text-xs bg-[#f3e5cf] text-[#1B365D] font-semibold px-2 py-0.5 rounded border border-[#d1c4b0]">
+                          <span className="font-bold text-base text-schrift truncate">{w.name}</span>
+                          <span className="text-xs bg-erhoeht text-schrift font-semibold px-2 py-0.5 rounded-knopf border border-rahmen">
                             {skillName} (FW {skillVal})
                           </span>
                           {w.equipped ? (
-                            <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded border border-emerald-300">
+                            <span className="text-[11px] bg-unverletzt-grund text-unverletzt font-bold px-1.5 py-0.5 rounded-knopf border border-unverletzt">
                               Ausgerüstet
                             </span>
                           ) : (
-                            <span className="text-[10px] bg-stone-100 text-stone-600 font-medium px-1.5 py-0.5 rounded border border-stone-200">
+                            <span className="text-[11px] bg-seite text-leise font-medium px-1.5 py-0.5 rounded-knopf border border-rahmen">
                               Im Rucksack
                             </span>
                           )}
                           {w.category && (
-                            <span className="text-[10px] text-stone-500 font-medium bg-stone-100 px-1.5 py-0.5 rounded">
+                            <span className="text-[11px] text-leise font-medium bg-seite px-1.5 py-0.5 rounded-knopf">
                               {w.category}
                             </span>
                           )}
                           {enchantments.hasEnchantment && (
-                            <span className="text-[10px] bg-amber-100 text-amber-900 border border-amber-300 font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-2xs">
-                              <Sparkles size={11} className="text-amber-600" />
+                            <span className="text-[11px] bg-erschoepft-grund text-erschoepft border border-erschoepft font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-2xs">
+                              <Sparkles size={11} className="text-erschoepft" />
                               <span>{enchantments.spells.map((s) => s.name).join(', ')}</span>
                             </span>
                           )}
@@ -560,10 +560,10 @@ export const CombatMagicTab: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => dispatch({ type: 'TOGGLE_EQUIP_ITEM', payload: { id: w.id } })}
-                          className={`px-2.5 py-1 rounded-lg border text-xs cursor-pointer transition-all whitespace-nowrap font-medium ${
+                          className={`px-2.5 py-1 rounded-knopf border text-xs cursor-pointer transition-all whitespace-nowrap font-medium ${
                             w.equipped
-                              ? 'bg-amber-50 text-amber-800 border-amber-300 hover:bg-amber-100'
-                              : 'bg-stone-50 text-stone-700 border-stone-300 hover:bg-stone-100'
+                              ? 'bg-erschoepft-grund text-erschoepft border-erschoepft hover:bg-erschoepft'
+                              : 'bg-erhoeht text-schrift border-rahmen hover:bg-rahmen'
                           }`}
                           title={w.equipped ? 'Waffe wegstecken (in Rucksack)' : 'Waffe ziehen / ausrüsten'}
                         >
@@ -575,7 +575,7 @@ export const CombatMagicTab: React.FC = () => {
                             dispatch({ type: 'REMOVE_INVENTORY_ITEM', payload: { id: w.id } });
                             toast.success(`'${w.name}' entfernt`);
                           }}
-                          className="p-1 rounded-lg text-stone-400 hover:text-red-600 hover:bg-red-50 transition-all cursor-pointer"
+                          className="p-1 rounded-knopf text-leise hover:text-schaden hover:bg-schaden-grund transition-all cursor-pointer"
                           title="Waffe löschen"
                         >
                           <Trash2 size={15} />
@@ -585,44 +585,44 @@ export const CombatMagicTab: React.FC = () => {
 
                     {/* Combat Stats Grid (AT, Schaden, WGS, Reichweite) */}
                     <div className={`grid gap-2 ${w.range ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3'}`}>
-                      <div className="bg-white/80 rounded-lg border border-[#d1c4b0]/70 p-2 text-center shadow-2xs">
-                        <span className="text-[10px] uppercase font-bold text-stone-500 block leading-tight">AT</span>
-                        <span className="text-base font-bold font-mono text-[#1B365D] mt-0.5 block">
+                      <div className="bg-flaeche rounded-knopf border border-rahmen p-2 text-center shadow-2xs">
+                        <span className="text-[11px] uppercase font-bold text-leise block leading-tight">AT</span>
+                        <span className="text-base font-bold tabular-nums text-schrift mt-0.5 block">
                           {effectiveAT}
                           {enchantments.atBonus > 0 && (
                             <span
-                              className="text-emerald-700 text-xs font-bold font-mono ml-1"
+                              className="text-unverletzt text-xs font-bold tabular-nums ml-1"
                               title="Bonus durch Zauber"
                             >
                               (+{enchantments.atBonus})
                             </span>
                           )}
                           {currentWoundPenalty !== 0 && (
-                            <span className="text-red-600 text-xs font-normal"> ({currentWoundPenalty})</span>
+                            <span className="text-schaden text-xs font-normal"> ({currentWoundPenalty})</span>
                           )}
                         </span>
                       </div>
-                      <div className="bg-white/80 rounded-lg border border-[#d1c4b0]/70 p-2 text-center shadow-2xs">
-                        <span className="text-[10px] uppercase font-bold text-stone-500 block leading-tight">Schaden</span>
-                        <span className="text-base font-bold font-mono text-red-700 mt-0.5 block">
+                      <div className="bg-flaeche rounded-knopf border border-rahmen p-2 text-center shadow-2xs">
+                        <span className="text-[11px] uppercase font-bold text-leise block leading-tight">Schaden</span>
+                        <span className="text-base font-bold tabular-nums text-schaden mt-0.5 block">
                           {w.damage || '1W6'}
                           {enchantments.extraDamageText && (
-                            <span className="text-orange-600 text-xs font-bold font-mono ml-1 block sm:inline">
+                            <span className="text-erschoepft text-xs font-bold tabular-nums ml-1 block sm:inline">
                               ({enchantments.extraDamageText})
                             </span>
                           )}
                         </span>
                       </div>
-                      <div className="bg-white/80 rounded-lg border border-[#d1c4b0]/70 p-2 text-center shadow-2xs">
-                        <span className="text-[10px] uppercase font-bold text-stone-500 block leading-tight">WGS</span>
-                        <span className="text-base font-bold font-mono text-stone-800 mt-0.5 block">
-                          {w.wgs || 7} <span className="text-xs text-stone-500 font-sans font-normal">Ticks</span>
+                      <div className="bg-flaeche rounded-knopf border border-rahmen p-2 text-center shadow-2xs">
+                        <span className="text-[11px] uppercase font-bold text-leise block leading-tight">WGS</span>
+                        <span className="text-base font-bold tabular-nums text-schrift mt-0.5 block">
+                          {w.wgs || 7} <span className="text-xs text-leise font-normal">Ticks</span>
                         </span>
                       </div>
                       {w.range && (
-                        <div className="bg-white/80 rounded-lg border border-[#d1c4b0]/70 p-2 text-center shadow-2xs">
-                          <span className="text-[10px] uppercase font-bold text-stone-500 block leading-tight">Reichweite</span>
-                          <span className="text-base font-bold font-mono text-stone-800 mt-0.5 block">
+                        <div className="bg-flaeche rounded-knopf border border-rahmen p-2 text-center shadow-2xs">
+                          <span className="text-[11px] uppercase font-bold text-leise block leading-tight">Reichweite</span>
+                          <span className="text-base font-bold tabular-nums text-schrift mt-0.5 block">
                             {w.range}
                           </span>
                         </div>
@@ -631,21 +631,21 @@ export const CombatMagicTab: React.FC = () => {
 
                     {/* Merkmale / Traits */}
                     {w.attributes && (
-                      <div className="bg-[#f3e5cf]/40 border border-[#d1c4b0]/50 rounded-lg px-2.5 py-1 text-xs text-stone-700 flex items-start gap-1.5">
-                        <span className="font-semibold text-stone-800 shrink-0">Merkmale:</span>
+                      <div className="bg-erhoeht border border-rahmen rounded-knopf px-2.5 py-1 text-xs text-schrift flex items-start gap-1.5">
+                        <span className="font-semibold text-schrift shrink-0">Merkmale:</span>
                         <span className="italic">{w.attributes}</span>
                       </div>
                     )}
 
                     {/* Primary Combat Action Buttons (Roll Attack & Roll Damage) */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-[#d1c4b0]/40">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-rahmen">
                       <button
                         type="button"
                         onClick={() => session.openRollForWeapon(w.name, skillName, 0, 15, w)}
-                        className="w-full bg-[#1B365D] hover:bg-[#254a80] text-[#f3e5cf] border border-[#C5A059] px-3 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
+                        className="w-full bg-erhoeht hover:bg-rahmen text-schrift border border-gold px-3 py-2 rounded-knopf text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
                         title={`Angriff & Manöver mit ${w.name} öffnen (2W10 + AT vs. VTD)`}
                       >
-                        <DiceIcon size={15} fill="#C5A059" stroke="#1B365D" />
+                        <DiceIcon size={15} />
                         <span>
                           Angriff ({skillName})
                           {enchantments.atBonus > 0 && ` +${enchantments.atBonus}`}
@@ -659,11 +659,11 @@ export const CombatMagicTab: React.FC = () => {
                             `${w.name} Schaden${enchantments.extraDamageText ? ` (${enchantments.extraDamageText})` : ''}`
                           )
                         }
-                        className="damage-roll-btn w-full px-3 py-2 rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer flex items-center justify-center gap-1.5 active:scale-95"
+                        className="damage-roll-btn w-full px-3 py-2 rounded-knopf text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 active:scale-95"
                         title={`Schaden würfeln (${enchantments.damageRollFormula})`}
                       >
                         <DiceIcon size={15} />
-                        <span className="tracking-wide text-white font-extrabold">{enchantments.buttonDamageLabel}</span>
+                        <span className="tracking-wide text-schrift font-extrabold">{enchantments.buttonDamageLabel}</span>
                       </button>
                     </div>
                   </div>
@@ -673,34 +673,34 @@ export const CombatMagicTab: React.FC = () => {
           </div>
 
           {/* ── NEU: RÜSTUNGEN UND SCHILDE ── */}
-          <div className="bg-white bg-opacity-70 rounded-xl border border-[#d1c4b0] shadow p-4 sm:p-5">
-            <div className="flex items-center justify-between gap-3 border-b border-[#C5A059] pb-3 mb-4">
-              <h3 className="font-bold text-lg sm:text-xl fantasy-font text-[#1B365D] flex items-center gap-2">
-                <Shield size={20} className="text-[#C5A059] shrink-0" />
+          <div className="bg-flaeche bg-opacity-70 rounded-karte border border-rahmen p-4 sm:p-5">
+            <div className="flex items-center justify-between gap-3 border-b border-gold pb-3 mb-4">
+              <h3 className="font-bold text-lg sm:text-xl fantasy-font text-gold-hell flex items-center gap-2">
+                <Shield size={20} className="text-gold shrink-0" />
                 <span>Rüstungen &amp; Schilde</span>
               </h3>
               <button
                 type="button"
                 onClick={() => setShowAddArmorModal(true)}
-                className="bg-[#1B365D] hover:bg-[#254a80] text-[#f3e5cf] border border-[#C5A059] px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs shrink-0 whitespace-nowrap active:scale-95"
+                className="bg-erhoeht hover:bg-rahmen text-schrift border border-gold px-3 py-1.5 rounded-knopf text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap active:scale-95"
               >
-                <Plus size={14} className="text-[#C5A059]" />
+                <Plus size={14} className="text-gold" />
                 <span>Rüstung / Schild</span>
               </button>
             </div>
 
             {/* Defense Summary Strip - Responsive Grid that scales gracefully on all viewport sizes */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
-              <div className="bg-[#faf6ee] rounded-xl border border-[#d1c4b0] p-2.5 text-center flex flex-col justify-center min-w-0 shadow-2xs">
-                <span className="text-[10px] sm:text-[11px] uppercase font-bold text-stone-600 block leading-tight text-center break-words" title="Rüstungsschutz (SR)">
+              <div className="bg-erhoeht rounded-karte border border-rahmen p-2.5 text-center flex flex-col justify-center min-w-0 shadow-2xs">
+                <span className="text-[11px] sm:text-[11px] uppercase font-bold text-leise block leading-tight text-center break-words" title="Rüstungsschutz (SR)">
                   Rüstung (SR)
                 </span>
-                <span className="text-lg sm:text-xl font-bold text-[#1B365D] font-mono mt-0.5">
+                <span className="text-lg sm:text-xl font-bold text-schrift tabular-nums mt-0.5">
                   {derived.SR + activeSpellMods.srBonus}
-                  {armorSR > 0 && <span className="text-xs text-amber-700 ml-1 font-semibold">({armorSR})</span>}
+                  {armorSR > 0 && <span className="text-xs text-erschoepft ml-1 font-semibold">({armorSR})</span>}
                   {activeSpellMods.srBonus > 0 && (
                     <span
-                      className="text-xs text-emerald-600 ml-1 font-semibold"
+                      className="text-xs text-unverletzt ml-1 font-semibold"
                       title={`+${activeSpellMods.srBonus} SR durch Zauber (${activeSpellMods.breakdown.filter((b) => b.sr).map((b) => b.spellName).join(', ')})`}
                     >
                       +{activeSpellMods.srBonus} Zauber
@@ -709,16 +709,16 @@ export const CombatMagicTab: React.FC = () => {
                 </span>
               </div>
 
-              <div className="bg-[#faf6ee] rounded-xl border border-[#d1c4b0] p-2.5 text-center flex flex-col justify-center min-w-0 shadow-2xs">
-                <span className="text-[10px] sm:text-[11px] uppercase font-bold text-stone-600 block leading-tight text-center break-words" title="Verteidigung (VTD)">
+              <div className="bg-erhoeht rounded-karte border border-rahmen p-2.5 text-center flex flex-col justify-center min-w-0 shadow-2xs">
+                <span className="text-[11px] sm:text-[11px] uppercase font-bold text-leise block leading-tight text-center break-words" title="Verteidigung (VTD)">
                   Verteidigung
                 </span>
-                <span className="text-lg sm:text-xl font-bold text-[#1B365D] font-mono mt-0.5">
+                <span className="text-lg sm:text-xl font-bold text-schrift tabular-nums mt-0.5">
                   {derived.VTD + activeSpellMods.vtdBonus}
-                  {gearVtdBonus > 0 && <span className="text-xs text-emerald-600 ml-1 font-semibold">+{gearVtdBonus}</span>}
+                  {gearVtdBonus > 0 && <span className="text-xs text-unverletzt ml-1 font-semibold">+{gearVtdBonus}</span>}
                   {activeSpellMods.vtdBonus > 0 && (
                     <span
-                      className="text-xs text-emerald-600 ml-1 font-semibold"
+                      className="text-xs text-unverletzt ml-1 font-semibold"
                       title={`+${activeSpellMods.vtdBonus} VTD durch Zauber (${activeSpellMods.breakdown.filter((b) => b.vtd).map((b) => b.spellName).join(', ')})`}
                     >
                       +{activeSpellMods.vtdBonus} Zauber
@@ -728,25 +728,25 @@ export const CombatMagicTab: React.FC = () => {
               </div>
 
               <div
-                className="bg-[#faf6ee] rounded-xl border border-[#d1c4b0] p-2.5 text-center flex flex-col justify-center min-w-0 shadow-2xs cursor-help"
+                className="bg-erhoeht rounded-karte border border-rahmen p-2.5 text-center flex flex-col justify-center min-w-0 shadow-2xs cursor-help"
                 title={`Gesamt-Behinderung: ${calc.totalHandicap ?? calc.gearHandicap} (Rüstung: ${calc.armorHandicap ?? 0}, Schild: ${calc.shieldHandicap ?? 0}${calc.overweightHandicap ? `, Überlast: +${calc.overweightHandicap}` : ''})`}
               >
-                <span className="text-[10px] sm:text-[11px] uppercase font-bold text-stone-600 block leading-tight text-center break-words">
+                <span className="text-[11px] sm:text-[11px] uppercase font-bold text-leise block leading-tight text-center break-words">
                   Behinderung
                 </span>
-                <span className={`text-lg sm:text-xl font-bold font-mono mt-0.5 ${(calc.totalHandicap ?? calc.gearHandicap) > 0 ? 'text-[#8B263E]' : 'text-stone-800'}`}>
+                <span className={`text-lg sm:text-xl font-bold tabular-nums mt-0.5 ${(calc.totalHandicap ?? calc.gearHandicap) > 0 ? 'text-schaden' : 'text-schrift'}`}>
                   {calc.totalHandicap ?? calc.gearHandicap}
                   {calc.overweightHandicap > 0 && (
-                    <span className="text-[10px] text-[#8B263E] ml-1 font-bold">+{calc.overweightHandicap}</span>
+                    <span className="text-[11px] text-schaden ml-1 font-bold">+{calc.overweightHandicap}</span>
                   )}
                 </span>
               </div>
 
-              <div className="bg-[#faf6ee] rounded-xl border border-[#d1c4b0] p-2.5 text-center flex flex-col justify-center min-w-0 shadow-2xs">
-                <span className="text-[10px] sm:text-[11px] uppercase font-bold text-stone-600 block leading-tight text-center break-words" title="Tick-Zuschlag">
+              <div className="bg-erhoeht rounded-karte border border-rahmen p-2.5 text-center flex flex-col justify-center min-w-0 shadow-2xs">
+                <span className="text-[11px] sm:text-[11px] uppercase font-bold text-leise block leading-tight text-center break-words" title="Tick-Zuschlag">
                   Tick-Zuschlag
                 </span>
-                <span className="text-lg sm:text-xl font-bold text-stone-800 font-mono mt-0.5">
+                <span className="text-lg sm:text-xl font-bold text-schrift tabular-nums mt-0.5">
                   {calc.gearTickModifier}
                 </span>
               </div>
@@ -755,7 +755,7 @@ export const CombatMagicTab: React.FC = () => {
             {/* List of Armor / Shields */}
             <div className="space-y-3">
               {armorsAndShields.length === 0 ? (
-                <p className="text-xs text-stone-500 italic p-3 text-center bg-[#faf6ee] rounded-lg border border-[#d1c4b0]/50">
+                <p className="text-xs text-leise italic p-3 text-center bg-erhoeht rounded-knopf border border-rahmen">
                   Keine Rüstung oder Schild ausgerüstet. Klicke auf &quot;Rüstung / Schild&quot; um aus dem Katalog zu wählen.
                 </p>
               ) : (
@@ -764,25 +764,25 @@ export const CombatMagicTab: React.FC = () => {
                   return (
                     <div
                       key={a.id}
-                      className={`rounded-xl border p-3.5 shadow-2xs transition-all ${
+                      className={`rounded-karte border p-3.5 shadow-2xs transition-all ${
                         a.equipped
-                          ? 'bg-[#faf6ee] border-[#C5A059] ring-1 ring-[#C5A059]/30'
-                          : 'bg-white/80 border-[#d1c4b0] opacity-80 hover:opacity-100'
+                          ? 'bg-erhoeht border-gold ring-1 ring-rahmen'
+                          : 'bg-flaeche border-rahmen opacity-80 hover:opacity-100'
                       }`}
                     >
                       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="font-bold text-base text-[#1B365D] truncate">{a.name}</span>
-                            <span className="text-xs bg-[#f3e5cf] text-[#1B365D] font-semibold px-2 py-0.5 rounded border border-[#d1c4b0]">
+                            <span className="font-bold text-base text-schrift truncate">{a.name}</span>
+                            <span className="text-xs bg-erhoeht text-schrift font-semibold px-2 py-0.5 rounded-knopf border border-rahmen">
                               {a.type === 'shield' ? '🛡️ Schild' : '🛡️ Rüstung'}
                             </span>
                             {a.equipped ? (
-                              <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded border border-emerald-300">
+                              <span className="text-[11px] bg-unverletzt-grund text-unverletzt font-bold px-1.5 py-0.5 rounded-knopf border border-unverletzt">
                                 Angelegt
                               </span>
                             ) : (
-                              <span className="text-[10px] bg-stone-100 text-stone-600 font-medium px-1.5 py-0.5 rounded">
+                              <span className="text-[11px] bg-seite text-leise font-medium px-1.5 py-0.5 rounded-knopf">
                                 Abgelegt
                               </span>
                             )}
@@ -804,45 +804,45 @@ export const CombatMagicTab: React.FC = () => {
                           </div>
 
                         {/* Armor stats bar */}
-                        <div className="flex items-center gap-x-3 gap-y-1.5 text-xs text-stone-700 mt-2 flex-wrap font-mono">
+                        <div className="flex items-center gap-x-3 gap-y-1.5 text-xs text-schrift mt-2 flex-wrap tabular-nums">
                           {a.type === 'armor' && (
                             <span>
-                              <strong className="text-stone-900 font-sans">SR:</strong>{' '}
-                              <span className="font-bold text-amber-700">{a.sr ?? 0}</span>
+                              <strong className="text-schrift ">SR:</strong>{' '}
+                              <span className="font-bold text-erschoepft">{a.sr ?? 0}</span>
                             </span>
                           )}
                           <span>
-                            <strong className="text-stone-900 font-sans">VTD:</strong>{' '}
-                            <span className="font-bold text-emerald-700">+{a.vtdBonus ?? 0}</span>
+                            <strong className="text-schrift ">VTD:</strong>{' '}
+                            <span className="font-bold text-unverletzt">+{a.vtdBonus ?? 0}</span>
                           </span>
                           <span>
-                            <strong className="text-stone-900 font-sans">Behinderung:</strong> {a.handicap ?? 0}
+                            <strong className="text-schrift ">Behinderung:</strong> {a.handicap ?? 0}
                           </span>
                           <span>
-                            <strong className="text-stone-900 font-sans">Tick-Mod:</strong> +{a.tickModifier ?? 0}
+                            <strong className="text-schrift ">Tick-Mod:</strong> +{a.tickModifier ?? 0}
                           </span>
                           {a.minStrength !== undefined && a.minStrength > 0 && (
                             <span>
-                              <strong className="text-stone-900 font-sans">Min-STA:</strong> {a.minStrength}
+                              <strong className="text-schrift ">Min-STA:</strong> {a.minStrength}
                             </span>
                           )}
                         </div>
 
                         {a.attributes && (
-                          <div className="mt-1.5 text-xs text-stone-600 italic">
-                            <span className="font-semibold text-stone-700 not-italic">Merkmale:</span> {a.attributes}
+                          <div className="mt-1.5 text-xs text-leise italic">
+                            <span className="font-semibold text-schrift not-italic">Merkmale:</span> {a.attributes}
                           </div>
                         )}
                       </div>
 
-                      <div className="flex items-center gap-1.5 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-[#d1c4b0]/40 justify-start sm:justify-end">
+                      <div className="flex items-center gap-1.5 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-rahmen justify-start sm:justify-end">
                         <button
                           type="button"
                           onClick={() => dispatch({ type: 'TOGGLE_EQUIP_ITEM', payload: { id: a.id } })}
-                          className={`px-3 py-1 rounded-lg border text-xs font-bold cursor-pointer transition-all whitespace-nowrap ${
+                          className={`px-3 py-1 rounded-knopf border text-xs font-bold cursor-pointer transition-all whitespace-nowrap ${
                             a.equipped
-                              ? 'bg-amber-100 text-amber-800 border-amber-300 hover:bg-amber-200'
-                              : 'bg-[#1B365D] text-white border-[#1B365D] hover:bg-[#254a80]'
+                              ? 'bg-erschoepft-grund text-erschoepft border-erschoepft hover:bg-erschoepft'
+                              : 'bg-erhoeht text-schrift border-gold hover:bg-rahmen'
                           }`}
                         >
                           {a.equipped ? 'Ablegen' : 'Anlegen'}
@@ -853,7 +853,7 @@ export const CombatMagicTab: React.FC = () => {
                             dispatch({ type: 'REMOVE_INVENTORY_ITEM', payload: { id: a.id } });
                             toast.success(`'${a.name}' entfernt`);
                           }}
-                          className="p-1.5 rounded-lg text-stone-400 hover:text-red-600 hover:bg-red-50 transition-all cursor-pointer"
+                          className="p-1.5 rounded-knopf text-leise hover:text-schaden hover:bg-schaden-grund transition-all cursor-pointer"
                           title="Löschen"
                         >
                           <Trash2 size={15} />
@@ -868,9 +868,9 @@ export const CombatMagicTab: React.FC = () => {
           </div>
 
           {/* ── KAMPFFERTIGKEITEN (Combat Skills) ── */}
-          <div className="bg-white bg-opacity-70 rounded-xl border border-[#d1c4b0] shadow p-5">
-            <h3 className="font-bold text-xl fantasy-font text-[#1B365D] border-b border-[#C5A059] pb-2 mb-3 flex items-center gap-2">
-              <Swords size={20} className="text-[#C5A059]" />
+          <div className="bg-flaeche bg-opacity-70 rounded-karte border border-rahmen p-5">
+            <h3 className="font-bold text-xl fantasy-font text-gold-hell border-b border-gold pb-2 mb-3 flex items-center gap-2">
+              <Swords size={20} className="text-gold" />
               Kampffertigkeiten
             </h3>
             <div className="space-y-2">
@@ -882,13 +882,13 @@ export const CombatMagicTab: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => session.openRollForCombat(skill)}
-                      className="w-full flex justify-between items-center bg-[#f3e5cf] hover:bg-[#e3d4b9] rounded px-3 py-2 text-sm font-bold text-[#1B365D] transition-all border border-transparent hover:border-[#C5A059] cursor-pointer"
+                      className="w-full flex justify-between items-center bg-erhoeht hover:bg-rahmen rounded-knopf px-3 py-2 text-sm font-bold text-schrift transition-all border border-transparent hover:border-gold cursor-pointer"
                     >
                       <span className="flex items-center gap-1.5">
-                        <DiceIcon size={14} fill="currentColor" stroke="currentColor" />
+                        <DiceIcon size={14} />
                         <span>{skill}</span>
                       </span>
-                      <span className="text-lg font-mono">{val}</span>
+                      <span className="text-lg tabular-nums">{val}</span>
                     </button>
                     {skillMasteries.length > 0 && (
                       <ul className="ml-2 mt-1 space-y-1">
@@ -900,7 +900,7 @@ export const CombatMagicTab: React.FC = () => {
                           return (
                             <li
                               key={m.id}
-                              className="text-xs text-stone-700 flex items-center justify-between gap-1 py-0.5 border-b border-[#d1c4b0]/30 last:border-0"
+                              className="text-xs text-schrift flex items-center justify-between gap-1 py-0.5 border-b border-rahmen last:border-0"
                             >
                               <span className="truncate" title={m.name}>
                                 · {m.name}
@@ -928,16 +928,16 @@ export const CombatMagicTab: React.FC = () => {
         {/* ══════════════════════════════════════════════════════════ */}
         <div className="space-y-6">
           {/* ── ZAUBER-SCHNELLZUGRIFF ── */}
-          <div className="bg-white bg-opacity-70 rounded-xl border border-[#d1c4b0] shadow p-5">
-            <div className="flex justify-between items-center border-b border-[#C5A059] pb-2 mb-3">
-              <h3 className="font-bold text-xl fantasy-font text-[#1B365D] flex items-center gap-2">
-                <Sparkles size={20} className="text-[#C5A059]" />
+          <div className="bg-flaeche bg-opacity-70 rounded-karte border border-rahmen p-5">
+            <div className="flex justify-between items-center border-b border-gold pb-2 mb-3">
+              <h3 className="font-bold text-xl fantasy-font text-gold-hell flex items-center gap-2">
+                <Sparkles size={20} className="text-gold" />
                 Zauber-Schnellzugriff
               </h3>
             </div>
 
             {spellsList.length === 0 ? (
-              <p className="text-xs text-stone-500 italic p-3 text-center bg-[#faf6ee] rounded-lg border border-[#d1c4b0]/50">
+              <p className="text-xs text-leise italic p-3 text-center bg-erhoeht rounded-knopf border border-rahmen">
                 Noch keine Zauber erlernt. Erlerne Zauber in der Steigerung.
               </p>
             ) : (
@@ -954,9 +954,9 @@ export const CombatMagicTab: React.FC = () => {
           </div>
 
           {/* ── MAGIESCHULEN ── */}
-          <div className="bg-white bg-opacity-70 rounded-xl border border-[#d1c4b0] shadow p-5">
-            <h3 className="font-bold text-xl fantasy-font text-[#1B365D] border-b border-[#C5A059] pb-2 mb-3 flex items-center gap-2">
-              <Sparkles size={20} className="text-[#C5A059]" />
+          <div className="bg-flaeche bg-opacity-70 rounded-karte border border-rahmen p-5">
+            <h3 className="font-bold text-xl fantasy-font text-gold-hell border-b border-gold pb-2 mb-3 flex items-center gap-2">
+              <Sparkles size={20} className="text-gold" />
               Magieschulen
             </h3>
             <div className="space-y-2">
@@ -969,14 +969,14 @@ export const CombatMagicTab: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => session.openRollForSkill(skill)}
-                      className="w-full flex justify-between items-center bg-[#faf6ee] hover:bg-[#f4ebe0] rounded-lg px-3 py-2 text-sm font-bold text-[#1B365D] transition-all border border-[#d1c4b0]/70 hover:border-[#C5A059] cursor-pointer shadow-2xs"
+                      className="w-full flex justify-between items-center bg-erhoeht hover:bg-rahmen rounded-knopf px-3 py-2 text-sm font-bold text-schrift transition-all border border-rahmen hover:border-gold cursor-pointer shadow-2xs"
                     >
                       <span className="flex items-center gap-1.5">
-                        <DiceIcon size={14} fill="currentColor" stroke="currentColor" />
-                        <Sparkles size={14} className="text-[#C5A059]" />
+                        <DiceIcon size={14} />
+                        <Sparkles size={14} className="text-gold" />
                         <span>{skill}</span>
                       </span>
-                      <span className="text-sm font-mono font-bold">{total}</span>
+                      <span className="text-sm tabular-nums font-bold">{total}</span>
                     </button>
                     {skillMasteries.length > 0 && (
                       <ul className="ml-2 mt-1 space-y-1">
@@ -988,7 +988,7 @@ export const CombatMagicTab: React.FC = () => {
                           return (
                             <li
                               key={m.id}
-                              className="text-xs text-stone-700 flex items-center justify-between gap-1 py-0.5 border-b border-[#d1c4b0]/30 last:border-0"
+                              className="text-xs text-schrift flex items-center justify-between gap-1 py-0.5 border-b border-rahmen last:border-0"
                             >
                               <span className="truncate" title={m.name}>
                                 · {m.name}
@@ -1021,13 +1021,13 @@ export const CombatMagicTab: React.FC = () => {
                               <button
                                 type="button"
                                 onClick={() => session.handleOpenCastSpell(s)}
-                                className="w-full flex items-center justify-between text-xs bg-[#faf6ee] hover:bg-[#f4ebe0] active:bg-[#ebdcc4] border border-[#d1c4b0]/70 hover:border-[#C5A059] rounded-lg px-2.5 py-1.5 transition-all shadow-2xs cursor-pointer group gap-2 text-left"
+                                className="w-full flex items-center justify-between text-xs bg-erhoeht hover:bg-rahmen active:bg-erhoeht border border-rahmen hover:border-gold rounded-knopf px-2.5 py-1.5 transition-all shadow-2xs cursor-pointer group gap-2 text-left"
                                 title="Zauber wirken"
                               >
-                                <div className="text-[#1B365D] group-hover:text-[#2a4f7e] font-bold truncate flex items-center gap-1.5 min-w-0 flex-1">
-                                  <Sparkles size={11} className="text-[#C5A059] shrink-0" />
+                                <div className="text-schrift group-hover:text-gold-hell font-bold truncate flex items-center gap-1.5 min-w-0 flex-1">
+                                  <Sparkles size={11} className="text-gold shrink-0" />
                                   <span className="truncate">
-                                    {s.name} <span className="text-stone-500 font-medium text-[11px]">(G{s.grade})</span>
+                                    {s.name} <span className="text-leise font-medium text-[11px]">(G{s.grade})</span>
                                   </span>
                                 </div>
                                 <div className="shrink-0 ml-auto flex items-center" onClick={(e) => e.stopPropagation()}>
@@ -1053,17 +1053,17 @@ export const CombatMagicTab: React.FC = () => {
 
       {/* ── MODAL: Waffe hinzufügen ── */}
       {showAddWeaponModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto">
-          <div className="bg-[#faf4e6] border-2 border-[#C5A059] rounded-2xl shadow-2xl max-w-2xl w-full p-5 space-y-4 max-h-[90vh] flex flex-col">
-            <div className="flex justify-between items-center border-b border-[#C5A059] pb-2">
-              <h3 className="font-bold text-lg text-[#1B365D] fantasy-font flex items-center gap-2">
-                <Swords size={20} className="text-[#C5A059]" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 overflow-y-auto">
+          <div className="bg-flaeche border border-rahmen rounded-karte shadow-2xl max-w-2xl w-full p-5 space-y-4 max-h-[90vh] flex flex-col">
+            <div className="flex justify-between items-center border-b border-gold pb-2">
+              <h3 className="font-bold text-lg text-gold-hell fantasy-font flex items-center gap-2">
+                <Swords size={20} className="text-gold" />
                 Waffe auswählen oder erstellen
               </h3>
               <button
                 type="button"
                 onClick={() => setShowAddWeaponModal(false)}
-                className="text-stone-500 hover:text-stone-800 font-bold text-lg px-2"
+                className="text-leise hover:text-schrift font-bold text-lg px-2"
               >
                 ✕
               </button>
@@ -1072,19 +1072,19 @@ export const CombatMagicTab: React.FC = () => {
             {/* Search & Filter */}
             <div className="flex gap-2">
               <div className="relative flex-1">
-                <Search size={16} className="absolute left-2.5 top-2.5 text-stone-400" />
+                <Search size={16} className="absolute left-2.5 top-2.5 text-leise" />
                 <input
                   type="text"
                   placeholder="Splittermond-Waffen suchen..."
                   value={weaponSearch}
                   onChange={(e) => setWeaponSearch(e.target.value)}
-                  className="w-full bg-[#faf4e6] border border-[#d1c4b0] rounded-lg pl-8 pr-3 py-1.5 text-xs text-[#1B365D] placeholder:text-stone-400 focus:outline-none focus:border-[#C5A059]"
+                  className="w-full bg-erhoeht border border-rahmen rounded-knopf pl-8 pr-3 py-1.5 text-xs text-schrift placeholder:text-leise focus:outline-none focus:border-gold"
                 />
               </div>
               <select
                 value={weaponCategoryFilter}
                 onChange={(e) => setWeaponCategoryFilter(e.target.value)}
-                className="bg-[#faf4e6] border border-[#d1c4b0] rounded-lg px-2 py-1.5 text-xs text-[#1B365D] focus:outline-none focus:border-[#C5A059]"
+                className="bg-erhoeht border border-rahmen rounded-knopf px-2 py-1.5 text-xs text-schrift focus:outline-none focus:border-gold"
               >
                 <option value="Alle">Alle Fertigkeiten</option>
                 {SKILL_CATEGORIES.COMBAT.map((c) => (
@@ -1100,15 +1100,15 @@ export const CombatMagicTab: React.FC = () => {
               {filteredCatalogWeapons.slice(0, 40).map((w) => (
                 <div
                   key={w.id || w.name}
-                  className="bg-[#faf6ee] rounded-lg p-2.5 border border-[#d1c4b0] hover:border-[#C5A059] flex justify-between items-center gap-2 text-xs"
+                  className="bg-erhoeht rounded-knopf p-2.5 border border-rahmen hover:border-gold flex justify-between items-center gap-2 text-xs"
                 >
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-bold text-[#1B365D]">{w.name}</span>
-                      <span className="bg-[#f3e5cf] text-[#1B365D] px-1.5 py-0.5 rounded text-[10px] font-semibold">
+                      <span className="font-bold text-schrift">{w.name}</span>
+                      <span className="bg-erhoeht text-schrift px-1.5 py-0.5 rounded-knopf text-[11px] font-semibold">
                         {w.skill}
                       </span>
-                      <span className="text-stone-500">{w.category}</span>
+                      <span className="text-leise">{w.category}</span>
                       <SourceBadge
                         source={w.source || 'GRW'}
                         page={w.page}
@@ -1118,20 +1118,20 @@ export const CombatMagicTab: React.FC = () => {
                         }}
                       />
                     </div>
-                    <div className="text-[11px] text-stone-600 mt-1 flex gap-3 font-mono">
-                      <span>Schaden: <strong className="text-red-700">{w.damage}</strong></span>
+                    <div className="text-[11px] text-leise mt-1 flex gap-3 tabular-nums">
+                      <span>Schaden: <strong className="text-schaden">{w.damage}</strong></span>
                       <span>WGS: {w.wgs}</span>
                       {w.range && <span>Reichweite: {w.range}</span>}
                       <span>Preis: {w.price}</span>
                     </div>
                     {w.attributes && (
-                      <div className="text-[10px] text-stone-500 italic mt-0.5">{w.attributes}</div>
+                      <div className="text-[11px] text-leise italic mt-0.5">{w.attributes}</div>
                     )}
                   </div>
                   <button
                     type="button"
                     onClick={() => handleAddCatalogWeapon(w)}
-                    className="bg-[#1B365D] hover:bg-[#254a80] text-white px-2.5 py-1 rounded font-bold text-xs shrink-0 cursor-pointer"
+                    className="bg-erhoeht hover:bg-rahmen text-schrift px-2.5 py-1 rounded-knopf font-bold text-xs shrink-0 cursor-pointer"
                   >
                     + Hinzufügen
                   </button>
@@ -1140,21 +1140,21 @@ export const CombatMagicTab: React.FC = () => {
             </div>
 
             {/* Custom Weapon Accordion / Form */}
-            <form onSubmit={handleAddCustomWeapon} className="pt-3 border-t border-[#d1c4b0] space-y-2">
-              <span className="font-bold text-xs text-[#1B365D]">Oder eigene Waffe erstellen:</span>
+            <form onSubmit={handleAddCustomWeapon} className="pt-3 border-t border-rahmen space-y-2">
+              <span className="font-bold text-xs text-schrift">Oder eigene Waffe erstellen:</span>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                 <input
                   type="text"
                   placeholder="Waffenname"
                   value={customWeapon.name}
                   onChange={(e) => setCustomWeapon({ ...customWeapon, name: e.target.value })}
-                  className="bg-white border border-[#d1c4b0] rounded px-2 py-1 col-span-2 text-xs"
+                  className="bg-flaeche border border-rahmen rounded-knopf px-2 py-1 col-span-2 text-xs"
                   required
                 />
                 <select
                   value={customWeapon.weaponSkill}
                   onChange={(e) => setCustomWeapon({ ...customWeapon, weaponSkill: e.target.value })}
-                  className="bg-white border border-[#d1c4b0] rounded px-2 py-1 text-xs"
+                  className="bg-flaeche border border-rahmen rounded-knopf px-2 py-1 text-xs"
                 >
                   {SKILL_CATEGORIES.COMBAT.map((s) => (
                     <option key={s} value={s}>
@@ -1167,48 +1167,48 @@ export const CombatMagicTab: React.FC = () => {
                   placeholder="Schaden (z.B. 1W6+3)"
                   value={customWeapon.damage}
                   onChange={(e) => setCustomWeapon({ ...customWeapon, damage: e.target.value })}
-                  className="bg-white border border-[#d1c4b0] rounded px-2 py-1 text-xs"
+                  className="bg-flaeche border border-rahmen rounded-knopf px-2 py-1 text-xs"
                 />
                 <input
                   type="text"
                   placeholder="WGS (Ticks, z.B. 7)"
                   value={customWeapon.wgs}
                   onChange={(e) => setCustomWeapon({ ...customWeapon, wgs: e.target.value })}
-                  className="bg-white border border-[#d1c4b0] rounded px-2 py-1 text-xs"
+                  className="bg-flaeche border border-rahmen rounded-knopf px-2 py-1 text-xs"
                 />
                 <input
                   type="text"
                   placeholder="Reichweite (z.B. 20m)"
                   value={customWeapon.range}
                   onChange={(e) => setCustomWeapon({ ...customWeapon, range: e.target.value })}
-                  className="bg-white border border-[#d1c4b0] rounded px-2 py-1 text-xs"
+                  className="bg-flaeche border border-rahmen rounded-knopf px-2 py-1 text-xs"
                 />
                 <input
                   type="text"
                   placeholder="Merkmale (z.B. Scharf 2)"
                   value={customWeapon.attributes}
                   onChange={(e) => setCustomWeapon({ ...customWeapon, attributes: e.target.value })}
-                  className="bg-white border border-[#d1c4b0] rounded px-2 py-1 col-span-2 text-xs"
+                  className="bg-flaeche border border-rahmen rounded-knopf px-2 py-1 col-span-2 text-xs"
                 />
                 <input
                   type="text"
                   placeholder="Quelle (z.B. GRW, MSK, Eigen)"
                   value={customWeapon.source}
                   onChange={(e) => setCustomWeapon({ ...customWeapon, source: e.target.value })}
-                  className="bg-white border border-[#d1c4b0] rounded px-2 py-1 text-xs"
+                  className="bg-flaeche border border-rahmen rounded-knopf px-2 py-1 text-xs"
                 />
                 <input
                   type="number"
                   placeholder="Seite (z.B. 183)"
                   value={customWeapon.page}
                   onChange={(e) => setCustomWeapon({ ...customWeapon, page: e.target.value })}
-                  className="bg-white border border-[#d1c4b0] rounded px-2 py-1 text-xs"
+                  className="bg-flaeche border border-rahmen rounded-knopf px-2 py-1 text-xs"
                 />
               </div>
               <div className="flex justify-end pt-1">
                 <button
                   type="submit"
-                  className="bg-[#C5A059] hover:bg-[#b08e4d] text-[#1B365D] font-bold px-4 py-1.5 rounded-lg text-xs cursor-pointer shadow-xs"
+                  className="bg-gold hover:bg-gold text-seite font-bold px-4 py-1.5 rounded-knopf text-xs cursor-pointer "
                 >
                   Eigene Waffe erstellen
                 </button>
@@ -1220,17 +1220,17 @@ export const CombatMagicTab: React.FC = () => {
 
       {/* ── MODAL: Rüstung oder Schild hinzufügen ── */}
       {showAddArmorModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto">
-          <div className="bg-[#faf4e6] border-2 border-[#C5A059] rounded-2xl shadow-2xl max-w-2xl w-full p-5 space-y-4 max-h-[90vh] flex flex-col">
-            <div className="flex justify-between items-center border-b border-[#C5A059] pb-2">
-              <h3 className="font-bold text-lg text-[#1B365D] fantasy-font flex items-center gap-2">
-                <Shield size={20} className="text-[#C5A059]" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 overflow-y-auto">
+          <div className="bg-flaeche border border-rahmen rounded-karte shadow-2xl max-w-2xl w-full p-5 space-y-4 max-h-[90vh] flex flex-col">
+            <div className="flex justify-between items-center border-b border-gold pb-2">
+              <h3 className="font-bold text-lg text-gold-hell fantasy-font flex items-center gap-2">
+                <Shield size={20} className="text-gold" />
                 Rüstung oder Schild auswählen
               </h3>
               <button
                 type="button"
                 onClick={() => setShowAddArmorModal(false)}
-                className="text-stone-500 hover:text-stone-800 font-bold text-lg px-2"
+                className="text-leise hover:text-schrift font-bold text-lg px-2"
               >
                 ✕
               </button>
@@ -1239,23 +1239,23 @@ export const CombatMagicTab: React.FC = () => {
             {/* Filter buttons */}
             <div className="flex gap-2">
               <div className="relative flex-1">
-                <Search size={16} className="absolute left-2.5 top-2.5 text-stone-400" />
+                <Search size={16} className="absolute left-2.5 top-2.5 text-leise" />
                 <input
                   type="text"
                   placeholder="Rüstung oder Schild suchen..."
                   value={armorSearch}
                   onChange={(e) => setArmorSearch(e.target.value)}
-                  className="w-full bg-[#faf4e6] border border-[#d1c4b0] rounded-lg pl-8 pr-3 py-1.5 text-xs text-[#1B365D] placeholder:text-stone-400 focus:outline-none focus:border-[#C5A059]"
+                  className="w-full bg-erhoeht border border-rahmen rounded-knopf pl-8 pr-3 py-1.5 text-xs text-schrift placeholder:text-leise focus:outline-none focus:border-gold"
                 />
               </div>
-              <div className="flex rounded-lg border border-[#d1c4b0] overflow-hidden text-xs">
+              <div className="flex rounded-knopf border border-rahmen overflow-hidden text-xs">
                 <button
                   type="button"
                   onClick={() => setArmorTypeFilter('all')}
                   className={`px-3 py-1 font-bold transition-all ${
                     armorTypeFilter === 'all'
-                      ? 'bg-[#1B365D] text-[#f3e5cf]'
-                      : 'bg-[#faf4e6] text-[#1B365D] hover:bg-[#ebdcc4]'
+                      ? 'bg-erhoeht text-schrift'
+                      : 'bg-erhoeht text-schrift hover:bg-rahmen'
                   }`}
                 >
                   Alle
@@ -1265,8 +1265,8 @@ export const CombatMagicTab: React.FC = () => {
                   onClick={() => setArmorTypeFilter('armor')}
                   className={`px-3 py-1 font-bold transition-all ${
                     armorTypeFilter === 'armor'
-                      ? 'bg-[#1B365D] text-[#f3e5cf]'
-                      : 'bg-[#faf4e6] text-[#1B365D] hover:bg-[#ebdcc4]'
+                      ? 'bg-erhoeht text-schrift'
+                      : 'bg-erhoeht text-schrift hover:bg-rahmen'
                   }`}
                 >
                   Rüstungen
@@ -1276,8 +1276,8 @@ export const CombatMagicTab: React.FC = () => {
                   onClick={() => setArmorTypeFilter('shield')}
                   className={`px-3 py-1 font-bold transition-all ${
                     armorTypeFilter === 'shield'
-                      ? 'bg-[#1B365D] text-[#f3e5cf]'
-                      : 'bg-[#faf4e6] text-[#1B365D] hover:bg-[#ebdcc4]'
+                      ? 'bg-erhoeht text-schrift'
+                      : 'bg-erhoeht text-schrift hover:bg-rahmen'
                   }`}
                 >
                   Schilde
@@ -1293,15 +1293,15 @@ export const CombatMagicTab: React.FC = () => {
                 return (
                   <div
                     key={a.id || a.name}
-                    className="bg-[#faf6ee] rounded-lg p-2.5 border border-[#d1c4b0] hover:border-[#C5A059] flex justify-between items-center gap-2 text-xs"
+                    className="bg-erhoeht rounded-knopf p-2.5 border border-rahmen hover:border-gold flex justify-between items-center gap-2 text-xs"
                   >
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-bold text-[#1B365D]">{a.name}</span>
-                        <span className="bg-[#f3e5cf] text-[#1B365D] px-1.5 py-0.5 rounded text-[10px] font-semibold">
+                        <span className="font-bold text-schrift">{a.name}</span>
+                        <span className="bg-erhoeht text-schrift px-1.5 py-0.5 rounded-knopf text-[11px] font-semibold">
                           {isArmor ? 'Rüstung' : 'Schild'}
                         </span>
-                        <span className="text-stone-500">{a.category}</span>
+                        <span className="text-leise">{a.category}</span>
                         <SourceBadge
                           source={a.source || 'GRW'}
                           page={a.page}
@@ -1311,21 +1311,21 @@ export const CombatMagicTab: React.FC = () => {
                           }}
                         />
                       </div>
-                      <div className="text-[11px] text-stone-600 mt-1 flex gap-3 font-mono flex-wrap">
-                        {isArmor && <span>SR: <strong className="text-amber-700">{armorItem.sr}</strong></span>}
-                        <span>VTD: <strong className="text-emerald-700">+{a.vtdBonus}</strong></span>
+                      <div className="text-[11px] text-leise mt-1 flex gap-3 tabular-nums flex-wrap">
+                        {isArmor && <span>SR: <strong className="text-erschoepft">{armorItem.sr}</strong></span>}
+                        <span>VTD: <strong className="text-unverletzt">+{a.vtdBonus}</strong></span>
                         <span>Behinderung: {a.handicap}</span>
                         <span>Tick: +{a.tickModifier}</span>
                         <span>Preis: {a.price}</span>
                       </div>
                       {a.attributes && (
-                        <div className="text-[10px] text-stone-500 italic mt-0.5">{a.attributes}</div>
+                        <div className="text-[11px] text-leise italic mt-0.5">{a.attributes}</div>
                       )}
                     </div>
                     <button
                       type="button"
                       onClick={() => handleAddCatalogArmor(a)}
-                      className="bg-[#1B365D] hover:bg-[#254a80] text-white px-2.5 py-1 rounded font-bold text-xs shrink-0 cursor-pointer"
+                      className="bg-erhoeht hover:bg-rahmen text-schrift px-2.5 py-1 rounded-knopf font-bold text-xs shrink-0 cursor-pointer"
                     >
                       + Anlegen
                     </button>
@@ -1335,21 +1335,21 @@ export const CombatMagicTab: React.FC = () => {
             </div>
 
             {/* Custom Armor / Shield Form */}
-            <form onSubmit={handleAddCustomArmor} className="pt-3 border-t border-[#d1c4b0] space-y-2">
-              <span className="font-bold text-xs text-[#1B365D]">Oder eigene Rüstung / Schild erstellen:</span>
+            <form onSubmit={handleAddCustomArmor} className="pt-3 border-t border-rahmen space-y-2">
+              <span className="font-bold text-xs text-schrift">Oder eigene Rüstung / Schild erstellen:</span>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                 <input
                   type="text"
                   placeholder="Name"
                   value={customArmor.name}
                   onChange={(e) => setCustomArmor({ ...customArmor, name: e.target.value })}
-                  className="bg-white border border-[#d1c4b0] rounded px-2 py-1 col-span-2 text-xs"
+                  className="bg-flaeche border border-rahmen rounded-knopf px-2 py-1 col-span-2 text-xs"
                   required
                 />
                 <select
                   value={customArmor.type}
                   onChange={(e) => setCustomArmor({ ...customArmor, type: e.target.value as 'armor' | 'shield' })}
-                  className="bg-white border border-[#d1c4b0] rounded px-2 py-1 text-xs"
+                  className="bg-flaeche border border-rahmen rounded-knopf px-2 py-1 text-xs"
                 >
                   <option value="armor">Rüstung</option>
                   <option value="shield">Schild</option>
@@ -1363,7 +1363,7 @@ export const CombatMagicTab: React.FC = () => {
                       max={10}
                       value={customArmor.sr}
                       onChange={(e) => setCustomArmor({ ...customArmor, sr: parseInt(e.target.value, 10) || 0 })}
-                      className="w-12 bg-white border border-[#d1c4b0] rounded px-1.5 py-1 text-center text-xs"
+                      className="w-12 bg-flaeche border border-rahmen rounded-knopf px-1.5 py-1 text-center text-xs"
                     />
                   </div>
                 ) : (
@@ -1375,7 +1375,7 @@ export const CombatMagicTab: React.FC = () => {
                       max={5}
                       value={customArmor.vtdBonus}
                       onChange={(e) => setCustomArmor({ ...customArmor, vtdBonus: parseInt(e.target.value, 10) || 0 })}
-                      className="w-12 bg-white border border-[#d1c4b0] rounded px-1.5 py-1 text-center text-xs"
+                      className="w-12 bg-flaeche border border-rahmen rounded-knopf px-1.5 py-1 text-center text-xs"
                     />
                   </div>
                 )}
@@ -1387,7 +1387,7 @@ export const CombatMagicTab: React.FC = () => {
                     max={10}
                     value={customArmor.handicap}
                     onChange={(e) => setCustomArmor({ ...customArmor, handicap: parseInt(e.target.value, 10) || 0 })}
-                    className="w-12 bg-white border border-[#d1c4b0] rounded px-1.5 py-1 text-center text-xs"
+                    className="w-12 bg-flaeche border border-rahmen rounded-knopf px-1.5 py-1 text-center text-xs"
                   />
                 </div>
                 <div className="flex items-center gap-1">
@@ -1398,7 +1398,7 @@ export const CombatMagicTab: React.FC = () => {
                     max={5}
                     value={customArmor.tickModifier}
                     onChange={(e) => setCustomArmor({ ...customArmor, tickModifier: parseInt(e.target.value, 10) || 0 })}
-                    className="w-12 bg-white border border-[#d1c4b0] rounded px-1.5 py-1 text-center text-xs"
+                    className="w-12 bg-flaeche border border-rahmen rounded-knopf px-1.5 py-1 text-center text-xs"
                   />
                 </div>
                 <input
@@ -1406,27 +1406,27 @@ export const CombatMagicTab: React.FC = () => {
                   placeholder="Merkmale (optional)"
                   value={customArmor.attributes}
                   onChange={(e) => setCustomArmor({ ...customArmor, attributes: e.target.value })}
-                  className="bg-white border border-[#d1c4b0] rounded px-2 py-1 col-span-2 text-xs"
+                  className="bg-flaeche border border-rahmen rounded-knopf px-2 py-1 col-span-2 text-xs"
                 />
                 <input
                   type="text"
                   placeholder="Quelle (z.B. GRW, MSK, Eigen)"
                   value={customArmor.source}
                   onChange={(e) => setCustomArmor({ ...customArmor, source: e.target.value })}
-                  className="bg-white border border-[#d1c4b0] rounded px-2 py-1 text-xs"
+                  className="bg-flaeche border border-rahmen rounded-knopf px-2 py-1 text-xs"
                 />
                 <input
                   type="number"
                   placeholder="Seite (z.B. 183)"
                   value={customArmor.page}
                   onChange={(e) => setCustomArmor({ ...customArmor, page: e.target.value })}
-                  className="bg-white border border-[#d1c4b0] rounded px-2 py-1 text-xs"
+                  className="bg-flaeche border border-rahmen rounded-knopf px-2 py-1 text-xs"
                 />
               </div>
               <div className="flex justify-end pt-1">
                 <button
                   type="submit"
-                  className="bg-[#C5A059] hover:bg-[#b08e4d] text-[#1B365D] font-bold px-4 py-1.5 rounded-lg text-xs cursor-pointer shadow-xs"
+                  className="bg-gold hover:bg-gold text-seite font-bold px-4 py-1.5 rounded-knopf text-xs cursor-pointer "
                 >
                   Erstellen &amp; Anlegen
                 </button>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo, useContext } from 'react';
 import { X, Sparkles, RotateCw, Zap, Check } from 'lucide-react';
 import DiceIcon from '../ui/DiceIcon';
+import { Dialog, Knopf } from '../../fundament';
 import type { RollEntry } from './DiceLog';
 import { generateId } from '../../utils/id';
 import type { StatusCondition, ChanneledSpell } from '../../types';
@@ -132,10 +133,10 @@ const D10Face: React.FC<{ value: number; dimmed?: boolean }> = ({ value, dimmed 
       className={`relative inline-flex items-center justify-center drop-shadow-md${dimmed ? ' opacity-40' : ''}`}
       style={{ width: iconSize, height: iconHeight }}
     >
-      <DiceIcon size={iconSize} fill="#faf4e6" stroke="#C5A059" />
+      <DiceIcon size={iconSize} />
       <span
         className="absolute inset-0 flex items-center justify-center font-bold"
-        style={{ fontFamily: 'Cinzel, serif', fontSize: 18, color: '#1B365D' }}
+        style={{ fontFamily: 'var(--font-titel)', fontSize: 18, color: 'var(--color-schrift)' }}
       >
         {value}
       </span>
@@ -369,36 +370,17 @@ export const RollModal: React.FC<RollModalProps> = ({
       : null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-3 sm:p-4 no-print">
-      <div
-        id="roll-modal-dialog"
-        className="bg-[#faf4e6] dark-theme-panel rounded-xl shadow-2xl border-2 border-[#C5A059] max-w-md w-full my-auto max-h-[90vh] flex flex-col overflow-hidden"
-      >
-        <div className="px-5 py-4 border-b border-[#C5A059]/40 flex justify-between items-start shrink-0">
-          <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-[#1B365D] fantasy-font mb-0.5">{skillName}</h2>
-            <p className="text-xs text-gray-600">Fertigkeitsprobe</p>
-          </div>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-red-500 transition-colors p-1 rounded-lg hover:bg-black/5 cursor-pointer"
-            title="Schließen"
-          >
-            <X size={20} />
-          </button>
-        </div>
-
-        <div className="p-4 sm:p-5 overflow-y-auto flex-1 custom-scrollbar modal-body-scroll space-y-3">
+    <Dialog titel={skillName} untertitel="Fertigkeitsprobe" onSchliessen={onClose} breite="schmal">
           {/* Basiswert Info */}
-          <div className="bg-[#e3d4b9] rounded-lg p-3 text-sm space-y-1">
+          <div className="bg-seite rounded-knopf p-3 text-sm space-y-1">
           <div className="flex justify-between items-center">
-            <span className="text-gray-700 font-medium">Basiswert:</span>
-            <span className="font-bold text-lg text-[#1B365D]">{baseValue}</span>
+            <span className="text-schrift font-medium">Basiswert:</span>
+            <span className="font-bold text-lg text-schrift">{baseValue}</span>
           </div>
           {effectiveModifier !== 0 && (
-            <div className="flex justify-between items-center pt-1 border-t border-[#d1c4b0]">
-              <span className="text-gray-700 font-medium">Gesamt-Modifikator:</span>
-              <span className={`font-bold ${effectiveModifier < 0 ? 'text-red-600' : 'text-green-700'}`}>
+            <div className="flex justify-between items-center pt-1 border-t border-rahmen">
+              <span className="text-schrift font-medium">Gesamt-Modifikator:</span>
+              <span className={`font-bold ${effectiveModifier < 0 ? 'text-schaden' : 'text-unverletzt'}`}>
                 {effectiveModifier >= 0 ? `+${effectiveModifier}` : effectiveModifier}
               </span>
             </div>
@@ -407,17 +389,17 @@ export const RollModal: React.FC<RollModalProps> = ({
 
         {/* Aktive Zauber-Wirkungen (GRW: Bärenstärke, Katzenreflexe, Sinne verstärken, etc.) */}
         {spellBonuses.length > 0 && (
-          <div className="bg-[#e4ede6] rounded-xl p-3 mb-3 border border-[#b8d9bf]">
+          <div className="bg-erhoeht rounded-karte p-3 mb-3 border border-rahmen">
             <div className="flex justify-between items-center mb-1.5">
-              <span className="text-xs font-bold uppercase tracking-wider text-emerald-900 fantasy-font flex items-center gap-1.5">
-                <Sparkles size={14} className="text-emerald-700" /> Aktive Zauber-Wirkungen
+              <span className="text-xs font-bold uppercase tracking-wider text-magie fantasy-font flex items-center gap-1.5">
+                <Sparkles size={14} className="text-magie" /> Aktive Zauber-Wirkungen
               </span>
-              <span className="text-xs font-bold font-mono px-2 py-0.5 rounded-md border bg-emerald-800 text-white border-emerald-900">
+              <span className="text-xs font-bold tabular-nums px-2 py-0.5 rounded-knopf border bg-magie-grund text-schrift border-magie">
                 Bonus: +{spellBonusTotal}
                 {spellBonusRoh > spellBonusTotal && ` (von +${spellBonusRoh})`}
               </span>
             </div>
-            <p className="text-xs text-emerald-950/80 mb-2 leading-relaxed">
+            <p className="text-xs text-magie mb-2 leading-relaxed">
               Aus aktiven Zaubern. Anklicken zum Ab- oder Zuwählen; durchgestrichene gelten nur in bestimmten Lagen.
               {spellBonusRoh > spellBonusTotal && ` Zauberboni sind auf den Höchstbonus +${hoechstbonusZauber} begrenzt (GRW S. 18).`}
             </p>
@@ -430,21 +412,21 @@ export const RollModal: React.FC<RollModalProps> = ({
                     type="button"
                     onClick={() => toggleSpellBonus(b.id)}
                     title={`${b.description} (Klicken zum ${isActive ? 'Abwählen' : 'Aktivieren'})`}
-                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all border shadow-2xs cursor-pointer ${
+                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-knopf text-xs font-bold transition-all border shadow-2xs cursor-pointer ${
                       isActive
-                        ? 'bg-emerald-800 text-white border-emerald-900 shadow-xs hover:bg-emerald-700 active:scale-98'
-                        : 'bg-white/90 text-stone-600 border-[#d1c4b0] line-through hover:opacity-100'
+                        ? 'bg-magie-grund text-schrift border-magie hover:bg-magie active:scale-98'
+                        : 'bg-flaeche text-leise border-rahmen line-through hover:opacity-100'
                     }`}
                   >
                     {isActive ? (
-                      <Check size={12} strokeWidth={3} className="shrink-0 text-emerald-300" />
+                      <Check size={12} strokeWidth={3} className="shrink-0 text-magie" />
                     ) : (
-                      <X size={12} strokeWidth={3} className="shrink-0 text-stone-500" />
+                      <X size={12} strokeWidth={3} className="shrink-0 text-leise" />
                     )}
                     <span>{b.source}</span>
                     <span
-                      className={`px-1.5 py-0.5 rounded text-[11px] font-mono font-bold ${
-                        isActive ? 'bg-black/25 text-white' : 'bg-[#d1c4b0]/50 text-stone-600'
+                      className={`px-1.5 py-0.5 rounded-knopf text-[11px] tabular-nums font-bold ${
+                        isActive ? 'bg-black/25 text-schrift' : 'bg-rahmen text-leise'
                       }`}
                     >
                       +{b.bonus}
@@ -460,22 +442,22 @@ export const RollModal: React.FC<RollModalProps> = ({
         <SituativeBoni boni={situativ.boni} gewaehlt={situativ.gewaehlt} onToggle={situativ.umschalten} />
 
         {modifiersList.length > 0 && (
-          <div className="bg-[#e3d4b9] rounded-xl p-3 mb-3 border border-[#d1c4b0]">
+          <div className="bg-seite rounded-karte p-3 mb-3 border border-rahmen">
             <div className="flex justify-between items-center mb-1.5">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#1B365D] fantasy-font flex items-center gap-1.5">
-                <Zap size={14} className="text-[#C5A059]" /> Aktive Zustände & Wunden
+              <span className="text-xs font-bold uppercase tracking-wider text-schrift fantasy-font flex items-center gap-1.5">
+                <Zap size={14} className="text-gold" /> Aktive Zustände & Wunden
               </span>
               <span
-                className={`text-xs font-bold font-mono px-2 py-0.5 rounded-md border ${
+                className={`text-xs font-bold tabular-nums px-2 py-0.5 rounded-knopf border ${
                   modifiersList.some((m) => (m.source === 'wound' || m.id === 'wound_penalty') && m.active) || conditionMalusTotal < 0
-                    ? 'bg-red-700 text-white border-red-800'
-                    : 'bg-[#1B365D] text-white border-[#10233f]'
+                    ? 'bg-schaden-grund text-schrift border-schaden'
+                    : 'bg-erhoeht text-schrift border-rahmen'
                 }`}
               >
                 Abzug: {conditionMalusTotal >= 0 ? `+${conditionMalusTotal}` : conditionMalusTotal}
               </span>
             </div>
-            <p className="text-xs text-stone-600 mb-2 leading-relaxed">
+            <p className="text-xs text-leise mb-2 leading-relaxed">
               Automatisch vorausgewählt. Klicke auf einen Zustand, um ihn für diese Probe abzuwählen:
             </p>
             <div className="flex flex-wrap gap-1.5">
@@ -488,33 +470,33 @@ export const RollModal: React.FC<RollModalProps> = ({
                     type="button"
                     onClick={() => toggleModifier(m.id)}
                     title={`${m.description || m.label} (Klicken zum ${m.active ? 'Abwählen' : 'Aktivieren'})`}
-                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all border shadow-2xs cursor-pointer ${
+                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-knopf text-xs font-bold transition-all border shadow-2xs cursor-pointer ${
                       m.active
                         ? isWound
-                          ? 'bg-red-700 text-white border-red-800 shadow-xs hover:bg-red-800 active:scale-98'
+                          ? 'bg-schaden-grund text-schrift border-schaden hover:bg-schaden-grund active:scale-98'
                           : isBehinderung
-                            ? 'bg-[#8B263E] text-white border-[#A8324E] shadow-xs hover:bg-[#782035] active:scale-98'
-                            : 'bg-[#1B365D] text-white border-[#10233f] shadow-xs hover:bg-[#254a80] active:scale-98'
-                        : 'bg-white/90 text-stone-600 border-[#d1c4b0] line-through hover:opacity-100'
+                            ? 'bg-schaden text-schrift border-schaden hover:bg-schaden active:scale-98'
+                            : 'bg-erhoeht text-schrift border-rahmen hover:bg-rahmen active:scale-98'
+                        : 'bg-flaeche text-leise border-rahmen line-through hover:opacity-100'
                     }`}
                   >
                     {m.active ? (
                       <Check
                         size={12}
                         strokeWidth={3}
-                        className={`shrink-0 ${isWound || isBehinderung ? 'text-[#f3e5cf]' : 'text-[#C5A059]'}`}
+                        className={`shrink-0 ${isWound || isBehinderung ? 'text-schrift' : 'text-gold'}`}
                       />
                     ) : (
-                      <X size={12} strokeWidth={3} className="shrink-0 text-stone-500" />
+                      <X size={12} strokeWidth={3} className="shrink-0 text-leise" />
                     )}
                     <span>{m.label}</span>
                     <span
-                      className={`px-1.5 py-0.5 rounded text-[11px] font-mono font-bold ${
+                      className={`px-1.5 py-0.5 rounded-knopf text-[11px] tabular-nums font-bold ${
                         m.active
                           ? isWound || isBehinderung
-                            ? 'bg-black/25 text-white'
-                            : 'bg-white/20 text-white'
-                          : 'bg-[#d1c4b0]/50 text-stone-600'
+                            ? 'bg-black/25 text-schrift'
+                            : 'bg-flaeche text-schrift'
+                          : 'bg-rahmen text-leise'
                       }`}
                     >
                       {m.malus > 0 ? `+${m.malus}` : m.malus}
@@ -529,7 +511,7 @@ export const RollModal: React.FC<RollModalProps> = ({
         {/* Situativer Zusatz-Modifier + Schwierigkeit */}
         <div className="flex gap-3 mb-4">
           <div className="flex-1">
-            <label className="block text-xs uppercase text-gray-500 font-bold mb-1">
+            <label className="block text-xs uppercase text-leise font-bold mb-1">
               Situativer Zusatz-Mod.
             </label>
             <input
@@ -541,11 +523,11 @@ export const RollModal: React.FC<RollModalProps> = ({
                 const n = parseInt(e.target.value, 10);
                 setExtraModifier(isNaN(n) ? 0 : n);
               }}
-              className="w-full bg-white border-2 border-[#d1c4b0] rounded px-3 py-1.5 text-[#1B365D] font-bold focus:outline-none focus:border-[#1B365D]"
+              className="w-full bg-flaeche border border-rahmen rounded-knopf px-3 py-1.5 text-schrift font-bold focus:outline-none focus:border-rahmen"
             />
           </div>
           <div className="flex-1">
-            <label className="block text-xs uppercase text-gray-500 font-bold mb-1">
+            <label className="block text-xs uppercase text-leise font-bold mb-1">
               Schwierigkeit (optional)
             </label>
             <input
@@ -558,14 +540,14 @@ export const RollModal: React.FC<RollModalProps> = ({
                 const n = parseInt(e.target.value, 10);
                 setSchwierigkeit(isNaN(n) ? null : n);
               }}
-              className="w-full bg-white border-2 border-[#d1c4b0] rounded px-3 py-1.5 text-[#1B365D] font-bold focus:outline-none focus:border-[#1B365D]"
+              className="w-full bg-flaeche border border-rahmen rounded-knopf px-3 py-1.5 text-schrift font-bold focus:outline-none focus:border-rahmen"
             />
           </div>
         </div>
 
         {/* Roll type selection */}
         <div className="mb-4">
-          <label className="block text-xs uppercase text-gray-500 font-bold mb-2">Wurfart</label>
+          <label className="block text-xs uppercase text-leise font-bold mb-2">Wurfart</label>
           <div className="flex gap-2">
             {([
               { key: 'standard', label: 'Standard' },
@@ -576,17 +558,17 @@ export const RollModal: React.FC<RollModalProps> = ({
                 key={key}
                 type="button"
                 onClick={() => setRollType(key)}
-                className={`flex-1 py-2 text-sm font-bold rounded-lg border transition-all ${
+                className={`flex-1 py-2 text-sm font-bold rounded-knopf border transition-all ${
                   rollType === key
-                    ? 'bg-[#1B365D] text-[#f3e5cf] border-[#10233f] shadow-xs'
-                    : 'bg-white text-[#1B365D] border-[#d1c4b0] hover:bg-[#f3e5cf]'
+                    ? 'bg-erhoeht text-schrift border-rahmen '
+                    : 'bg-flaeche text-schrift border-rahmen hover:bg-rahmen'
                 }`}
               >
                 {label}
               </button>
             ))}
           </div>
-          <p className="text-xs text-stone-500 mt-1">
+          <p className="text-xs text-leise mt-1">
             {rollType === 'standard' && '2W10 addieren. ≤3 = Patzer, ≥19 = Triumph.'}
             {rollType === 'safe' && '2W10, nur höchster zählt. Kein Patzer/Triumph.'}
             {rollType === 'risk' && '4W10, niedrigste 2 prüfen (Patzer?), sonst höchste 2 addieren.'}
@@ -595,21 +577,16 @@ export const RollModal: React.FC<RollModalProps> = ({
         </div>
 
         {/* Roll button */}
-        <button
-          type="button"
-          onClick={handleRoll}
-          disabled={isRolling}
-          className="w-full bg-[#1B365D] hover:bg-[#2a4f7e] disabled:opacity-60 text-white font-bold py-3 rounded-lg text-lg transition-all mb-4 shadow border border-[#10233f] flex items-center justify-center gap-2 fantasy-font tracking-wide"
-        >
-          <DiceIcon size={20} fill="white" stroke="#C5A059" /> Würfeln!
-        </button>
+        <Knopf art="primaer" onClick={handleRoll} disabled={isRolling} className="w-full text-base">
+          <DiceIcon size={20} stroke="currentColor" /> Würfeln!
+        </Knopf>
 
         {/* Dice rolling animation */}
         {isRolling && (
           <div className="flex justify-center gap-4 mb-4">
             {Array.from({ length: diceCount }).map((_, i) => (
               <div key={i} className="dice-roll">
-                <DiceIcon size={48} fill="#1B365D" stroke="#C5A059" />
+                <DiceIcon size={48} />
               </div>
             ))}
           </div>
@@ -617,15 +594,15 @@ export const RollModal: React.FC<RollModalProps> = ({
 
         {/* Result */}
         {!isRolling && result && total !== null && (
-          <div className="bg-white rounded-xl border-2 border-[#C5A059] p-4 text-center space-y-2">
+          <div className="bg-flaeche rounded-karte border border-gold p-4 text-center space-y-2">
             {result.isFumble && (
-              <div className="roll-patzer-banner font-bold py-2.5 px-4 rounded-lg text-lg shadow-md fantasy-font tracking-wide flex items-center justify-center gap-2">
+              <div className="roll-patzer-banner font-bold py-2.5 px-4 rounded-knopf text-lg fantasy-font tracking-wide flex items-center justify-center gap-2">
                 <span>💀</span>
                 <span className="tracking-widest font-black">PATZER!</span>
               </div>
             )}
             {result.isCrit && !result.isFumble && (
-              <div className="roll-triumph-banner font-bold py-2.5 px-4 rounded-lg text-lg shadow-md fantasy-font tracking-wide flex items-center justify-center gap-2">
+              <div className="roll-triumph-banner font-bold py-2.5 px-4 rounded-knopf text-lg fantasy-font tracking-wide flex items-center justify-center gap-2">
                 <span>⭐</span>
                 <span className="tracking-widest font-black">TRIUMPH!</span>
               </div>
@@ -639,25 +616,25 @@ export const RollModal: React.FC<RollModalProps> = ({
                 />
               ))}
             </div>
-            <div className="text-sm font-medium text-stone-600 dark:text-stone-300">
-              <span className="font-semibold text-stone-700 dark:text-stone-200">{baseValue}</span> (Basis) +{' '}
-              <span className="font-semibold text-stone-700 dark:text-stone-200">{result.result}</span> (Wurf){' '}
+            <div className="text-sm font-medium text-leise dark:text-schrift">
+              <span className="font-semibold text-schrift dark:text-schrift">{baseValue}</span> (Basis) +{' '}
+              <span className="font-semibold text-schrift dark:text-schrift">{result.result}</span> (Wurf){' '}
               {effectiveModifier !== 0 ? (
-                <span className={effectiveModifier < 0 ? 'text-[#ff6b81] dark:text-[#ff8ba7] font-bold font-mono' : 'text-emerald-600 dark:text-emerald-400 font-bold font-mono'}>
+                <span className={effectiveModifier < 0 ? 'text-schaden dark:text-schaden font-bold tabular-nums' : 'text-unverletzt dark:text-unverletzt font-bold tabular-nums'}>
                   {effectiveModifier >= 0 ? `+ ${effectiveModifier}` : `− ${Math.abs(effectiveModifier)}`} (Mod.)
                 </span>
               ) : ''}
             </div>
-            <div className="text-5xl font-black font-mono text-[#1B365D] dark:text-[#F2EFE6] tracking-tight py-1">{total}</div>
+            <div className="text-5xl font-black tabular-nums text-schrift dark:text-schrift tracking-tight py-1">{total}</div>
 
             {/* Splitterpunkt einsetzen (GRW Splittermond) */}
             {onSpendSplitterPoint && (
-            <div className="mt-3 pt-3 border-t border-[#e3d4b9] bg-[#faf6ee] -mx-4 -mb-2 p-3 rounded-b-xl border-b border-[#d1c4b0]">
+            <div className="mt-3 pt-3 border-t border-rahmen bg-erhoeht -mx-4 -mb-2 p-3 rounded-b-karte border-b border-rahmen">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#1B365D] fantasy-font flex items-center gap-1">
-                  <Sparkles size={14} className="text-[#C5A059]" /> Splitterpunkte
+                <span className="text-xs font-bold uppercase tracking-wider text-schrift fantasy-font flex items-center gap-1">
+                  <Sparkles size={14} className="text-gold" /> Splitterpunkte
                 </span>
-                <span className="text-xs font-bold font-mono text-[#1B365D] bg-[#f3e5cf] border border-[#C5A059]/40 px-2 py-0.5 rounded-md">
+                <span className="text-xs font-bold tabular-nums text-schrift bg-erhoeht border border-rahmen px-2 py-0.5 rounded-knopf">
                   Vorrat: {splitterPoints} SP
                 </span>
               </div>
@@ -675,12 +652,12 @@ export const RollModal: React.FC<RollModalProps> = ({
                       ? 'Keine Splitterpunkte mehr verfügbar'
                       : '1 SP einsetzen für +3 auf dieses Würfelergebnis'
                   }
-                  className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-bold transition-all border ${
+                  className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-knopf text-xs font-bold transition-all border ${
                     splinterBonusSpent
-                      ? 'bg-[#f3e5cf] text-[#1B365D] border-[#C5A059] opacity-90 cursor-default'
+                      ? 'bg-erhoeht text-seite border-gold opacity-90 cursor-default'
                       : splitterPoints >= 1
-                      ? 'bg-[#C5A059] hover:bg-[#b58f48] text-[#1B365D] border-[#a07c34] shadow-xs active:scale-98'
-                      : 'bg-stone-100 text-stone-400 border-stone-200 cursor-not-allowed dark-theme-slot-inactive'
+                      ? 'bg-gold hover:bg-gold-hell text-seite border-erschoepft active:scale-98'
+                      : 'bg-seite text-seite border-rahmen cursor-not-allowed dark-theme-slot-inactive'
                   }`}
                 >
                   <Sparkles size={14} />
@@ -697,10 +674,10 @@ export const RollModal: React.FC<RollModalProps> = ({
                       ? 'Keine Splitterpunkte mehr verfügbar'
                       : '1 SP einsetzen um den Wurf komplett neu zu würfeln'
                   }
-                  className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-bold transition-all border ${
+                  className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-knopf text-xs font-bold transition-all border ${
                     splitterPoints >= 1
-                      ? 'bg-[#1B365D] hover:bg-[#2a4f7e] text-white border-[#10233f] shadow-xs active:scale-98'
-                      : 'bg-stone-100 text-stone-400 border-stone-200 cursor-not-allowed dark-theme-slot-inactive'
+                      ? 'bg-erhoeht hover:bg-rahmen text-schrift border-rahmen active:scale-98'
+                      : 'bg-seite text-leise border-rahmen cursor-not-allowed dark-theme-slot-inactive'
                   }`}
                 >
                   <RotateCw size={14} />
@@ -712,24 +689,24 @@ export const RollModal: React.FC<RollModalProps> = ({
 
             {/* EG block – only when Schwierigkeit was provided */}
             {egResult && (
-              <div className="mt-3 pt-3 border-t border-[#e3d4b9] space-y-1">
-                <div className="text-3xl font-bold text-[#1B365D]">
+              <div className="mt-3 pt-3 border-t border-rahmen space-y-1">
+                <div className="text-3xl font-bold text-schrift">
                   EG: {egResult.eg >= 0 ? '+' : ''}{egResult.eg}
                 </div>
-                <div className="inline-block rounded-lg px-3 py-1 text-sm font-bold bg-[#f3e5cf] text-[#1B365D] border border-[#C5A059]/50 shadow-2xs">
+                <div className="inline-block rounded-knopf px-3 py-1 text-sm font-bold bg-erhoeht text-schrift border border-gold shadow-2xs">
                   {egResult.qualitaetEmoji} {egResult.qualitaet}
                 </div>
                 {egResult.hasFumbleModifier && (
-                  <div className="text-xs text-red-600 font-medium">
+                  <div className="text-xs text-schaden font-medium">
                     Patzer: −3 EG, max. −1 EG
                   </div>
                 )}
                 {egResult.hasCritModifier && (
-                  <div className="text-xs text-[#C5A059] font-medium">
+                  <div className="text-xs text-gold font-medium">
                     Triumph: +3 EG
                   </div>
                 )}
-                <div className="text-xs text-stone-500 font-medium">
+                <div className="text-xs text-leise font-medium">
                   Differenz: {egResult.differenz >= 0 ? '+' : ''}{egResult.differenz} (Schwierigkeit {schwierigkeit})
                 </div>
               </div>
@@ -739,14 +716,14 @@ export const RollModal: React.FC<RollModalProps> = ({
             {probeOutcomeLabels && schwierigkeit !== null ? (
               total >= schwierigkeit ? (
                 <div className="mt-2 space-y-2">
-                  <div className="bg-[#f3e5cf] border-2 border-emerald-700/60 rounded-lg px-4 py-2 text-emerald-900 font-bold text-sm shadow-xs">
+                  <div className="bg-erhoeht border border-unverletzt rounded-knopf px-4 py-2 text-unverletzt font-bold text-sm ">
                     ✅ {probeOutcomeLabels.success}
                   </div>
                   {onSuccess && successLabel && (
                     <button
                       type="button"
                       onClick={() => { onSuccess(); onClose(); }}
-                      className="w-full bg-[#1B365D] hover:bg-[#2a4f7e] text-white font-bold py-2 px-4 rounded-lg border border-[#10233f] shadow-xs transition-all"
+                      className="w-full bg-erhoeht hover:bg-rahmen text-schrift font-bold py-2 px-4 rounded-knopf border border-rahmen transition-all"
                     >
                       {successLabel}
                     </button>
@@ -754,14 +731,14 @@ export const RollModal: React.FC<RollModalProps> = ({
                 </div>
               ) : (
                 <div className="mt-2 space-y-2">
-                  <div className="bg-[#f3e5cf] border-2 border-red-600 rounded-lg px-4 py-2 text-red-800 font-bold text-sm shadow-xs">
+                  <div className="bg-erhoeht border border-schaden rounded-knopf px-4 py-2 text-schaden font-bold text-sm ">
                     ❌ {probeOutcomeLabels.failure}
                   </div>
                   {onFailure && (
                     <button
                       type="button"
                       onClick={() => { onFailure(); onClose(); }}
-                      className="w-full bg-red-700 hover:bg-red-800 text-white font-bold py-2 px-4 rounded-lg border border-red-900 shadow-xs transition-all"
+                      className="w-full bg-schaden-grund hover:bg-schaden-grund text-schrift font-bold py-2 px-4 rounded-knopf border border-schaden transition-all"
                     >
                       Bewusstlos setzen & schließen
                     </button>
@@ -773,7 +750,7 @@ export const RollModal: React.FC<RollModalProps> = ({
                 <button
                   type="button"
                   onClick={() => { onSuccess(); onClose(); }}
-                  className="mt-2 bg-[#1B365D] hover:bg-[#2a4f7e] text-white font-bold py-2 px-6 rounded-lg border border-[#10233f] shadow-xs transition-all"
+                  className="mt-2 bg-erhoeht hover:bg-rahmen text-schrift font-bold py-2 px-6 rounded-knopf border border-rahmen transition-all"
                 >
                   {successLabel}
                 </button>
@@ -781,9 +758,7 @@ export const RollModal: React.FC<RollModalProps> = ({
             )}
           </div>
         )}
-        </div>
-      </div>
-    </div>
+    </Dialog>
   );
 };
 

@@ -45,9 +45,9 @@ export function kreaturZuordnung(ressourcen: number[], tiere: number[]): boolean
 }
 
 const Status: React.FC<{ e: Ergebnis; text?: string }> = ({ e, text }) => (
-  e === true ? <Check size={13} className="text-green-700 shrink-0" aria-label="Voraussetzung erfüllt" />
-    : e === false ? <span title={text ? `Voraussetzung: ${text}` : undefined}><AlertTriangle size={13} className="text-amber-700 shrink-0" aria-label="Voraussetzung nicht erfüllt" /></span>
-      : <span title={text ? `Spielleitung: ${text}` : undefined}><HelpCircle size={13} className="text-gray-500 shrink-0" aria-label="Entscheidung der Spielleitung" /></span>
+  e === true ? <Check size={13} className="text-unverletzt shrink-0" aria-label="Voraussetzung erfüllt" />
+    : e === false ? <span title={text ? `Voraussetzung: ${text}` : undefined}><AlertTriangle size={13} className="text-erschoepft shrink-0" aria-label="Voraussetzung nicht erfüllt" /></span>
+      : <span title={text ? `Spielleitung: ${text}` : undefined}><HelpCircle size={13} className="text-leise shrink-0" aria-label="Entscheidung der Spielleitung" /></span>
 );
 
 const TierEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; f: Fuehrer; liste: AbrichtungsInfo[] }> = ({ k, b, index, f, liste }) => {
@@ -79,22 +79,22 @@ const TierEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; f: Fuehre
   const gruppen = [...new Set(liste.map(a => a.gruppe))];
 
   return (
-    <li className="border border-[#d1c4b0] rounded-lg p-2 bg-white">
+    <li className="border border-rahmen rounded-knopf p-2 bg-flaeche">
       {spiel.modale}
       <div className="flex items-center justify-between gap-2 flex-wrap">
-        <button type="button" className="flex items-center gap-1 text-sm font-bold text-[#1B365D] cursor-pointer" onClick={() => setOffen(o => !o)} aria-expanded={offen}>
+        <button type="button" className="flex items-center gap-1 text-sm font-bold text-schrift cursor-pointer" onClick={() => setOffen(o => !o)} aria-expanded={offen}>
           {offen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}{b.rufname ? `${b.rufname} (${b.name})` : b.name}
         </button>
-        <span className="flex items-center gap-2 text-xs text-gray-500 flex-wrap">
+        <span className="flex items-center gap-2 text-xs text-leise flex-wrap">
           <VitalKurz spiel={spiel} daten={daten} />
-          {reittier && <span className="px-1.5 rounded bg-[#ebdcc3] text-[#1B365D] font-bold">Reittier</span>}
-          {b.vertrauter && <span className="px-1.5 rounded bg-[#ebdcc3] text-[#1B365D] font-bold">Vertrauter</span>}
+          {reittier && <span className="px-1.5 rounded-knopf bg-erhoeht text-schrift font-bold">Reittier</span>}
+          {b.vertrauter && <span className="px-1.5 rounded-knopf bg-erhoeht text-schrift font-bold">Vertrauter</span>}
           {b.kreatur ? `Kreatur ${b.kreatur}` : 'ohne Ressource'}
-          {liste.length > 0 && <span className={verbraucht > pot.gesamt ? 'text-red-700 font-bold' : ''}>Potenzial {verbraucht}/{pot.gesamt}</span>}
-          {!e && <span className="text-amber-700">nicht im Katalog (Buch nicht geladen?)</span>}
-          {b.kreatur !== undefined && b.kreatur > 0 && st !== null && st > b.kreatur && <span className="text-amber-700">braucht Kreatur {st}</span>}
+          {liste.length > 0 && <span className={verbraucht > pot.gesamt ? 'text-schaden font-bold' : ''}>Potenzial {verbraucht}/{pot.gesamt}</span>}
+          {!e && <span className="text-erschoepft">nicht im Katalog (Buch nicht geladen?)</span>}
+          {b.kreatur !== undefined && b.kreatur > 0 && st !== null && st > b.kreatur && <span className="text-erschoepft">braucht Kreatur {st}</span>}
           <button type="button" aria-label={`${b.name} entfernen`} onClick={() => dispatch({ type: 'BEGLEITER_ENTFERNEN', payload: { index } })}
-            className="p-1 rounded hover:bg-black/5 hover:text-red-700 cursor-pointer"><Trash2 size={14} /></button>
+            className="p-1 rounded-knopf hover:bg-black/5 hover:text-schaden cursor-pointer"><Trash2 size={14} /></button>
         </span>
       </div>
 
@@ -122,34 +122,34 @@ const TierEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; f: Fuehre
           </div>
 
           {w && <BegleiterVitals spiel={spiel} daten={daten} />}
-          {e ? (w ? <Werte w={w} aktionen={spiel.aktionen} /> : <p className="text-xs text-gray-600">Keine Werte im Katalog.</p>) : null}
+          {e ? (w ? <Werte w={w} aktionen={spiel.aktionen} /> : <p className="text-xs text-leise">Keine Werte im Katalog.</p>) : null}
 
           <div>
-            <h4 className="text-xs font-bold text-[#1B365D] mb-1">Abrichtungen</h4>
+            <h4 className="text-xs font-bold text-gold-hell mb-1">Abrichtungen</h4>
             {liste.length === 0 ? (
-              <p className="text-xs text-gray-600">Abrichtungen und Potenzial stehen im Buchpaket „Bestienmeister“ (Einstellungen → Regelpakete).</p>
+              <p className="text-xs text-leise">Abrichtungen und Potenzial stehen im Buchpaket „Bestienmeister“ (Einstellungen → Regelpakete).</p>
             ) : (
               <>
-                <p className="text-xs text-gray-600 mb-1">
+                <p className="text-xs text-leise mb-1">
                   Potenzial {pot.gesamt} = {pot.posten.map(p => `${p.text} ${p.wert}`).join(' + ')}; verbraucht {verbraucht} (Bestienmeister S. 15).
-                  {verbraucht > pot.gesamt && <strong className="block text-red-700">Mehr Abrichtungen, als das Potenzial erlaubt.</strong>}
+                  {verbraucht > pot.gesamt && <strong className="block text-schaden">Mehr Abrichtungen, als das Potenzial erlaubt.</strong>}
                 </p>
                 {gewaehlt.length > 0 && (
                   <ul className="text-xs space-y-1 mb-2">
                     {gewaehlt.map((id, i) => {
                       const a = info.get(id);
                       return (
-                        <li key={`${id}-${i}`} className="border-l-2 border-[#C5A059] pl-2">
+                        <li key={`${id}-${i}`} className="border-l-2 border-gold pl-2">
                           <div className="flex items-center gap-1">
                             <Status e={pruefung[i]} text={a?.voraussetzung?.text} />
-                            <button type="button" className="font-bold text-[#2C1810] cursor-pointer text-left" onClick={() => setText(t => ({ ...t, [i]: !t[i] }))}>
+                            <button type="button" className="font-bold text-schrift cursor-pointer text-left" onClick={() => setText(t => ({ ...t, [i]: !t[i] }))}>
                               {a?.name ?? k.get(id)?.name ?? id}
                             </button>
-                            <span className="text-gray-500">{a ? `${a.grundausbildung ? 'Grundausbildung, ' : ''}${a.kosten} P.` : 'nicht im Katalog'}</span>
+                            <span className="text-leise">{a ? `${a.grundausbildung ? 'Grundausbildung, ' : ''}${a.kosten} P.` : 'nicht im Katalog'}</span>
                             <button type="button" aria-label={`Abrichtung ${a?.name ?? id} entfernen`} onClick={() => aendern({ abrichtungen: gewaehlt.filter((_, j) => j !== i) })}
-                              className="ml-auto p-0.5 rounded hover:bg-black/5 hover:text-red-700 cursor-pointer"><X size={12} /></button>
+                              className="ml-auto p-0.5 rounded-knopf hover:bg-black/5 hover:text-schaden cursor-pointer"><X size={12} /></button>
                           </div>
-                          {text[i] && a && <p className="text-gray-700 mt-0.5">{a.beschreibung}{a.voraussetzung ? <span className="block text-gray-500">Voraussetzung: {a.voraussetzung.text}</span> : null}</p>}
+                          {text[i] && a && <p className="text-schrift mt-0.5">{a.beschreibung}{a.voraussetzung ? <span className="block text-leise">Voraussetzung: {a.voraussetzung.text}</span> : null}</p>}
                         </li>
                       );
                     })}
@@ -175,15 +175,15 @@ const TierEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; f: Fuehre
                 {wahl && (() => {
                   const x = angebot.find(y => y.a.id === wahl); if (!x) return null;
                   return (
-                    <p className="text-xs text-gray-700 mt-1">
+                    <p className="text-xs text-schrift mt-1">
                       {x.a.beschreibung}
-                      {x.a.voraussetzung && <span className={`block ${x.ergebnis === false ? 'text-amber-700' : 'text-gray-500'}`}>
+                      {x.a.voraussetzung && <span className={`block ${x.ergebnis === false ? 'text-erschoepft' : 'text-leise'}`}>
                         Voraussetzung: {x.a.voraussetzung.text}{x.ergebnis === false ? ' – nicht erfüllt' : x.ergebnis === 'offen' ? ' – Entscheidung der Spielleitung' : ''}
                       </span>}
                     </p>
                   );
                 })()}
-                <p className="text-[11px] text-gray-500 mt-1">Boni aus Abrichtungen sind im Wertekasten noch nicht eingerechnet.</p>
+                <p className="text-[11px] text-leise mt-1">Boni aus Abrichtungen sind im Wertekasten noch nicht eingerechnet.</p>
               </>
             )}
           </div>
@@ -221,15 +221,15 @@ export const TierAbschnitt: React.FC<{ k: Katalog }> = ({ k }) => {
   return (
     <section className={karte} data-testid="begleiter-tiere">
       <div className="flex items-center gap-2 mb-2">
-        <PawPrint size={18} className="text-[#1B365D]" />
-        <h3 className="font-bold text-base text-[#1B365D]">Tiere</h3>
+        <PawPrint size={18} className="text-schrift" />
+        <h3 className="font-bold text-base text-gold-hell">Tiere</h3>
       </div>
-      <p className="text-xs text-gray-600 mb-3">
+      <p className="text-xs text-leise mb-3">
         Ressource Kreatur: {f.kreatur.length ? f.kreatur.join(', ') : 'keine'} – ein Tiergefährte je Ressource, höchstens mit „Kreatur N“ (GRW S. 78).
         Reittiere und gekaufte Tiere brauchen keine Ressource.
-        {!zuordnungOk && <strong className="block text-amber-700">Die Tiere nutzen mehr oder höhere Ressourcen Kreatur, als der Charakter hat.</strong>}
-        {vertraute > 1 && <strong className="block text-amber-700">Mehr als ein Vertrauter.</strong>}
-        {vertraute > 0 && !f.tiervertrauter && <strong className="block text-amber-700">Vertrauter ohne die Stärke Tiervertrauter.</strong>}
+        {!zuordnungOk && <strong className="block text-erschoepft">Die Tiere nutzen mehr oder höhere Ressourcen Kreatur, als der Charakter hat.</strong>}
+        {vertraute > 1 && <strong className="block text-erschoepft">Mehr als ein Vertrauter.</strong>}
+        {vertraute > 0 && !f.tiervertrauter && <strong className="block text-erschoepft">Vertrauter ohne die Stärke Tiervertrauter.</strong>}
       </p>
 
       {eigene.length > 0 && (

@@ -145,11 +145,15 @@ Fehlt einer, wird er dort ergänzt – nicht in der Ansicht nachgebaut.
 | `Rollbereich` | Bereich mit eigenem Scrollbalken | – |
 | `Dialog` | Fenster über der Ansicht: Titelzeile mit goldener Linie, Inhalt, Fußzeile mit Aktionen | `schmal`, `mittel`, `breit` |
 
-### Übergang
+### Stand der Umstellung
 
-Die alten Ansichten tragen noch fest eingetragene Farbwerte. `src/fundament/uebergang.css` biegt sie auf das dunkle CI um.
-Diese Datei ist eine Altlast: Mit jeder umgestellten Ansicht wird sie kleiner, am Ende wird sie gelöscht. Dort wird nichts
-Neues eingetragen. Der Stand steht in `src/fundament/altlasten.json` (`farbwerte`, je Datei).
+Alle Ansichten verwenden die benannten Werte; fest eingetragene Farbwerte gibt es nur noch in `fundament.css`. Die frühere
+Übergangsdatei ist gelöscht. Gemeinsame Klassen, die keine Bausteine sind (Grundstil der Seite, Protokollkarten,
+Würfelbanner, Druck), stehen in `src/fundament/klassen.css` – ebenfalls ohne eigene Farbwerte.
+
+Noch nicht überall erreicht: Die Bausteine (`Dialog`, `Knopf`, `Karte` …) trägt bisher nur der Würfeldialog. Die übrigen
+Ansichten haben die Farben, Rundungen und Schriften des CI, bauen ihre Knöpfe und Dialograhmen aber noch selbst. Wer eine
+Ansicht anfasst, stellt sie dabei auf die Bausteine um (Mindesthöhe 44 Pixel, eine goldene Hauptaktion).
 
 ## 4. Arbeitsweise
 

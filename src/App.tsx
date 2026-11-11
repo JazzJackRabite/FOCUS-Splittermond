@@ -46,10 +46,10 @@ const HeaderUndoButton: React.FC = () => {
       type="button"
       onClick={handleUndo}
       disabled={!canUndo}
-      className={`p-2 rounded transition flex items-center justify-center font-bold shadow-sm border ${
+      className={`p-2 rounded-knopf transition flex items-center justify-center font-bold border ${
         canUndo
-          ? 'bg-[#0f2340] border-[#C5A059] text-[#f3e5cf] hover:bg-[#C5A059] hover:text-[#1B365D] cursor-pointer active:scale-95'
-          : 'bg-[#0f2340]/40 border-[#C5A059]/30 text-[#f3e5cf]/40 cursor-not-allowed'
+          ? 'bg-erhoeht border-gold text-schrift hover:bg-rahmen hover:text-gold-hell cursor-pointer active:scale-95'
+          : 'bg-flaeche border-rahmen text-leise cursor-not-allowed'
       }`}
       title={
         canUndoPlay
@@ -160,29 +160,28 @@ const App: React.FC = () => {
           duration: 3500,
           style: {
             zIndex: 99999,
-            background: '#1B365D',
-            color: '#f3e5cf',
-            border: '1px solid #C5A059',
-            boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5)',
+            background: 'var(--color-erhoeht)',
+            color: 'var(--color-schrift)',
+            border: '1px solid var(--color-gold)',
             fontWeight: '500',
           },
           success: {
             iconTheme: {
-              primary: '#C5A059',
-              secondary: '#1B365D',
+              primary: 'var(--color-gold)',
+              secondary: 'var(--color-seite)',
             },
           },
           error: {
             iconTheme: {
-              primary: '#ef4444',
-              secondary: '#f3e5cf',
+              primary: 'var(--color-schaden)',
+              secondary: 'var(--color-schrift)',
             },
           },
         }}
       />
 
       <PlaySessionProvider>
-        <div className="relative z-0 paper-bg rounded-lg min-h-[90vh] flex flex-col shadow-2xl pb-20 w-full">
+        <div className="relative z-0 paper-bg rounded-knopf min-h-[90vh] flex flex-col shadow-2xl pb-20 w-full">
           {/* Confirm Dialog */}
           {confirmDialog && (
             <ConfirmDialog
@@ -194,22 +193,22 @@ const App: React.FC = () => {
           )}
 
           {/* Floating XP Counter */}
-          <div className="fixed bottom-3 right-3 sm:bottom-4 sm:right-4 bg-[#1B365D] text-white px-3.5 py-1.5 sm:px-6 sm:py-3 rounded-full shadow-2xl z-50 flex flex-col items-center no-print border border-[#C5A059]/40 backdrop-blur-xs select-none">
-            <div className="text-[9px] sm:text-[10px] uppercase tracking-wider text-[#C5A059] font-bold leading-tight">Verfügbar</div>
-            <div className={`text-sm sm:text-xl font-bold leading-tight ${xpAvailable < 0 ? 'text-red-400' : 'text-white'}`}>
+          <div className="fixed bottom-3 right-3 sm:bottom-4 sm:right-4 bg-erhoeht text-schrift px-3.5 py-1.5 sm:px-6 sm:py-3 rounded-full shadow-2xl z-50 flex flex-col items-center no-print border border-rahmen select-none">
+            <div className="text-[11px] sm:text-[11px] uppercase tracking-wider text-gold font-bold leading-tight">Verfügbar</div>
+            <div className={`text-sm sm:text-xl font-bold leading-tight ${xpAvailable < 0 ? 'text-schaden' : 'text-schrift'}`}>
               {xpAvailable} EP
             </div>
           </div>
 
           {/* HEADER */}
-          <div className="bg-[#1B365D] text-[#f3e5cf] p-3 sm:p-4 border-b-6 sm:border-b-8 border-[#C5A059] shadow-lg relative z-10 no-print w-full">
+          <div className="bg-flaeche text-schrift px-4 sm:px-6 pt-4 pb-3 relative z-10 no-print w-full">
             <div className="flex items-center justify-between gap-3 lg:gap-4">
               {/* 1. Branding */}
               <div className="shrink-0">
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-widest text-[#f3e5cf] drop-shadow-lg leading-none">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-widest text-gold leading-none">
                   FOCUS
                 </h1>
-                <p className="text-[11px] sm:text-xs text-[#C5A059] italic tracking-wide leading-tight mt-1">
+                <p className="text-[11px] sm:text-xs text-leise tracking-wide leading-tight mt-1">
                   Freier Online Charaktereditor:<br />
                   Universum Splittermond v.1.2
                 </p>
@@ -219,7 +218,7 @@ const App: React.FC = () => {
               <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                 <button
                   onClick={() => setShowProfileModal(true)}
-                  className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded transition bg-[#0f2340] border border-[#C5A059] text-[#f3e5cf] hover:bg-[#C5A059] hover:text-[#1B365D] flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-bold shadow-sm cursor-pointer"
+                  className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-knopf transition bg-erhoeht border border-gold text-schrift hover:bg-rahmen hover:text-gold-hell flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-bold cursor-pointer"
                   title="Helden-Profile & Vorlagen"
                 >
                   <Users size={17} />
@@ -230,7 +229,7 @@ const App: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowThemeModal(true)}
-                  className="p-1.5 sm:p-2 rounded transition bg-[#0f2340] border border-[#C5A059] text-[#f3e5cf] hover:bg-[#C5A059] hover:text-[#1B365D] flex items-center justify-center font-bold shadow-sm cursor-pointer"
+                  className="p-1.5 sm:p-2 rounded-knopf transition bg-erhoeht border border-gold text-schrift hover:bg-rahmen hover:text-gold-hell flex items-center justify-center font-bold cursor-pointer"
                   title="Menü & Einstellungen"
                   aria-label="Menü & Einstellungen"
                 >
@@ -264,7 +263,7 @@ const App: React.FC = () => {
           )}
 
           {/* TABS */}
-          <div className="sticky top-0 z-30 flex bg-[#e3d4b9] border-b border-[#d1c4b0] no-print shadow-md w-full backdrop-blur-xs overflow-x-auto">
+          <div className="sticky top-0 z-30 flex bg-flaeche border-b border-rahmen no-print w-full overflow-x-auto px-2 sm:px-4">
             <button
               onClick={() => {
                 if (mode === 'creation' || mode === 'xp') return;
@@ -274,10 +273,10 @@ const App: React.FC = () => {
                   dispatch({ type: 'SET_MODE', payload: 'creation' });
                 }
               }}
-              className={`flex-1 min-w-[85px] min-h-[40px] py-2 sm:py-2.5 md:py-3 px-1.5 sm:px-3 text-center font-bold uppercase tracking-normal sm:tracking-wider md:tracking-widest text-[11px] sm:text-xs md:text-sm transition-all flex items-center justify-center select-none ${
+              className={`flex-1 min-w-[85px] min-h-11 py-2 sm:py-2.5 md:py-3 font-titel px-1.5 sm:px-3 text-center font-bold uppercase tracking-normal sm:tracking-wider md:tracking-widest text-[11px] sm:text-xs md:text-sm transition-all flex items-center justify-center select-none ${
                 mode === 'creation' || mode === 'xp'
-                  ? 'bg-[#faf4e6] text-[#1B365D] border-b-2 sm:border-b-0 sm:border-t-4 border-[#1B365D] shadow-xs'
-                  : 'text-gray-700 hover:bg-[#ebdcc3]'
+                  ? 'text-gold border-b-2 border-gold'
+                  : 'text-leise border-b-2 border-transparent hover:text-schrift'
               }`}
             >
               <span>Charakter</span>
@@ -286,10 +285,10 @@ const App: React.FC = () => {
             <button
               onClick={() => handleTabClick('play')}
               disabled={!isAdvancementUnlocked}
-              className={`flex-1 min-w-[85px] min-h-[40px] py-2 sm:py-2.5 md:py-3 px-1.5 sm:px-3 text-center font-bold uppercase tracking-normal sm:tracking-wider md:tracking-widest text-[11px] sm:text-xs md:text-sm transition-all flex items-center justify-center select-none ${
+              className={`flex-1 min-w-[85px] min-h-11 py-2 sm:py-2.5 md:py-3 font-titel px-1.5 sm:px-3 text-center font-bold uppercase tracking-normal sm:tracking-wider md:tracking-widest text-[11px] sm:text-xs md:text-sm transition-all flex items-center justify-center select-none ${
                 mode === 'play'
-                  ? 'bg-[#faf4e6] text-[#1B365D] border-b-2 sm:border-b-0 sm:border-t-4 border-[#1B365D] shadow-xs'
-                  : 'text-gray-700 hover:bg-[#ebdcc3]'
+                  ? 'text-gold border-b-2 border-gold'
+                  : 'text-leise border-b-2 border-transparent hover:text-schrift'
               } ${!isAdvancementUnlocked ? 'opacity-50 cursor-not-allowed' : ''}`}
               title={!isAdvancementUnlocked ? 'Erst verfügbar wenn Erschaffung abgeschlossen' : ''}
             >
@@ -299,10 +298,10 @@ const App: React.FC = () => {
             <button
               onClick={() => handleTabClick('combat')}
               disabled={!isAdvancementUnlocked}
-              className={`flex-1 min-w-[105px] min-h-[40px] py-2 sm:py-2.5 md:py-3 px-1.5 sm:px-3 text-center font-bold uppercase tracking-normal sm:tracking-wider md:tracking-widest text-[11px] sm:text-xs md:text-sm transition-all flex items-center justify-center select-none ${
+              className={`flex-1 min-w-[105px] min-h-11 py-2 sm:py-2.5 md:py-3 font-titel px-1.5 sm:px-3 text-center font-bold uppercase tracking-normal sm:tracking-wider md:tracking-widest text-[11px] sm:text-xs md:text-sm transition-all flex items-center justify-center select-none ${
                 mode === 'combat'
-                  ? 'bg-[#faf4e6] text-[#1B365D] border-b-2 sm:border-b-0 sm:border-t-4 border-[#1B365D] shadow-xs'
-                  : 'text-gray-700 hover:bg-[#ebdcc3]'
+                  ? 'text-gold border-b-2 border-gold'
+                  : 'text-leise border-b-2 border-transparent hover:text-schrift'
               } ${!isAdvancementUnlocked ? 'opacity-50 cursor-not-allowed' : ''}`}
               title={!isAdvancementUnlocked ? 'Erst verfügbar wenn Erschaffung abgeschlossen' : ''}
             >
@@ -312,10 +311,10 @@ const App: React.FC = () => {
             <button
               onClick={() => handleTabClick('inventory')}
               disabled={!isAdvancementUnlocked}
-              className={`flex-1 min-w-[85px] min-h-[40px] py-2 sm:py-2.5 md:py-3 px-1.5 sm:px-3 text-center font-bold uppercase tracking-normal sm:tracking-wider md:tracking-widest text-[11px] sm:text-xs md:text-sm transition-all flex items-center justify-center select-none ${
+              className={`flex-1 min-w-[85px] min-h-11 py-2 sm:py-2.5 md:py-3 font-titel px-1.5 sm:px-3 text-center font-bold uppercase tracking-normal sm:tracking-wider md:tracking-widest text-[11px] sm:text-xs md:text-sm transition-all flex items-center justify-center select-none ${
                 mode === 'inventory'
-                  ? 'bg-[#faf4e6] text-[#1B365D] border-b-2 sm:border-b-0 sm:border-t-4 border-[#1B365D] shadow-xs'
-                  : 'text-gray-700 hover:bg-[#ebdcc3]'
+                  ? 'text-gold border-b-2 border-gold'
+                  : 'text-leise border-b-2 border-transparent hover:text-schrift'
               } ${!isAdvancementUnlocked ? 'opacity-50 cursor-not-allowed' : ''}`}
               title={!isAdvancementUnlocked ? 'Erst verfügbar wenn Erschaffung abgeschlossen' : ''}
             >
@@ -325,10 +324,10 @@ const App: React.FC = () => {
             <button
               onClick={() => handleTabClick('begleiter')}
               disabled={!isAdvancementUnlocked}
-              className={`flex-1 min-w-[85px] min-h-[40px] py-2 sm:py-2.5 md:py-3 px-1.5 sm:px-3 text-center font-bold uppercase tracking-normal sm:tracking-wider md:tracking-widest text-[11px] sm:text-xs md:text-sm transition-all flex items-center justify-center select-none ${
+              className={`flex-1 min-w-[85px] min-h-11 py-2 sm:py-2.5 md:py-3 font-titel px-1.5 sm:px-3 text-center font-bold uppercase tracking-normal sm:tracking-wider md:tracking-widest text-[11px] sm:text-xs md:text-sm transition-all flex items-center justify-center select-none ${
                 mode === 'begleiter'
-                  ? 'bg-[#faf4e6] text-[#1B365D] border-b-2 sm:border-b-0 sm:border-t-4 border-[#1B365D] shadow-xs'
-                  : 'text-gray-700 hover:bg-[#ebdcc3]'
+                  ? 'text-gold border-b-2 border-gold'
+                  : 'text-leise border-b-2 border-transparent hover:text-schrift'
               } ${!isAdvancementUnlocked ? 'opacity-50 cursor-not-allowed' : ''}`}
               title={!isAdvancementUnlocked ? 'Erst verfügbar wenn Erschaffung abgeschlossen' : ''}
             >

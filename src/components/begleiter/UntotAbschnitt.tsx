@@ -17,11 +17,11 @@ const Stufer: React.FC<{ label: string; wert: number; setzen: (n: number) => voi
   <div className="flex items-center gap-1">
     <span className="min-w-[7rem]">{label}</span>
     <button type="button" aria-label={`${label} senken`} disabled={wert <= 0} onClick={() => setzen(wert - 1)}
-      className="p-0.5 rounded border border-[#d1c4b0] disabled:opacity-40 cursor-pointer"><Minus size={10} /></button>
+      className="p-0.5 rounded-knopf border border-rahmen disabled:opacity-40 cursor-pointer"><Minus size={10} /></button>
     <span className="w-5 text-center font-bold">+{wert}</span>
     <button type="button" aria-label={`${label} steigern`} onClick={() => setzen(wert + 1)}
-      className="p-0.5 rounded border border-[#d1c4b0] cursor-pointer"><Plus size={10} /></button>
-    <span className="text-gray-500">{kosten}</span>
+      className="p-0.5 rounded-knopf border border-rahmen cursor-pointer"><Plus size={10} /></button>
+    <span className="text-leise">{kosten}</span>
   </div>
 );
 
@@ -47,20 +47,20 @@ const UntotEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; n: Nekro
   const fertigkeitsListe = [ANGRIFF, ...[...vorhanden].filter((x): x is string => !!x && x !== ANGRIFF)];
 
   return (
-    <li className="border border-[#d1c4b0] rounded-lg p-2 bg-white">
+    <li className="border border-rahmen rounded-knopf p-2 bg-flaeche">
       {spiel.modale}
       <div className="flex items-center justify-between gap-2 flex-wrap">
-        <button type="button" className="flex items-center gap-1 text-sm font-bold text-[#1B365D] cursor-pointer" onClick={() => setOffen(o => !o)} aria-expanded={offen}>
+        <button type="button" className="flex items-center gap-1 text-sm font-bold text-schrift cursor-pointer" onClick={() => setOffen(o => !o)} aria-expanded={offen}>
           {offen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}{titel}
         </button>
-        <span className="flex items-center gap-2 text-xs text-gray-500 flex-wrap">
+        <span className="flex items-center gap-2 text-xs text-leise flex-wrap">
           <VitalKurz spiel={spiel} daten={daten} />
           {u.erhebung && <span>{u.erhebung.zauber.name}</span>}
-          {u.abnormitaet && <span className="px-1.5 rounded bg-[#ebdcc3] text-[#1B365D] font-bold">{u.abnormitaet.name}</span>}
-          <span className={u.epVerbraucht > u.epGesamt ? 'text-red-700 font-bold' : ''}>EP {u.epVerbraucht}/{u.epGesamt}</span>
-          {u.hinweise.length > 0 && <span className="text-amber-700 flex items-center gap-0.5" title={u.hinweise.join('\n')}><AlertTriangle size={12} />{u.hinweise.length}</span>}
+          {u.abnormitaet && <span className="px-1.5 rounded-knopf bg-erhoeht text-schrift font-bold">{u.abnormitaet.name}</span>}
+          <span className={u.epVerbraucht > u.epGesamt ? 'text-schaden font-bold' : ''}>EP {u.epVerbraucht}/{u.epGesamt}</span>
+          {u.hinweise.length > 0 && <span className="text-erschoepft flex items-center gap-0.5" title={u.hinweise.join('\n')}><AlertTriangle size={12} />{u.hinweise.length}</span>}
           <button type="button" aria-label={`${titel} entfernen`} onClick={() => dispatch({ type: 'BEGLEITER_ENTFERNEN', payload: { index } })}
-            className="p-1 rounded hover:bg-black/5 hover:text-red-700 cursor-pointer"><Trash2 size={14} /></button>
+            className="p-1 rounded-knopf hover:bg-black/5 hover:text-schaden cursor-pointer"><Trash2 size={14} /></button>
         </span>
       </div>
 
@@ -81,7 +81,7 @@ const UntotEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; n: Nekro
               </select>
             </label>
           </div>
-          <p className="text-gray-700">
+          <p className="text-schrift">
             {u.erhebung ? <>{u.erhebung.zauber.name} (Grad {u.erhebung.grad}): je Verstärkung {u.erhebung.epJeVerstaerkung} EP{n.nekromant ? ', beliebig oft (Nekromant)' : ', einmal (mehrfach mit Nekromant)'}. </> : null}
             Neue Punkte je Fertigkeit höchstens {u.grenze}. Verstand 0 (frisch erhoben); nur einfache Befehle, ab Verstand 1 auch komplexere (S. 182).
             {u.abnormitaet && <span className="block mt-1">{u.abnormitaet.name}: {u.abnormitaet.daten.beschreibung}</span>}
@@ -91,7 +91,7 @@ const UntotEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; n: Nekro
           {wk ? <Werte w={wk} aktionen={spiel.aktionen} /> : null}
 
           <div>
-            <h4 className="font-bold text-[#1B365D] mb-1">Steigerung (von 0 an)</h4>
+            <h4 className="font-bold text-gold-hell mb-1">Steigerung (von 0 an)</h4>
             <div className="grid sm:grid-cols-2 gap-x-6 gap-y-1">
               {ATTRIBUT_KURZ.map(a => (
                 <Stufer key={a} label={a} wert={st.attribute?.[a] ?? 0} setzen={v => setzeA(a, v)} kosten={`${attributKosten(st.attribute?.[a] ?? 0)} EP`} />
@@ -111,12 +111,12 @@ const UntotEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; n: Nekro
               <button type="button" disabled={!fWahl} className={knopf} onClick={() => { setzeF(fWahl, 1); setFWahl(''); }}><Plus size={12} />Steigern</button>
             </div>
             {u.freieMeisterschaften.length > 0 && (
-              <p className="text-gray-700 mt-1">Freie Meisterschaften: {u.freieMeisterschaften.map(m => `${m.fertigkeit} (Schwelle ${m.schwelle})`).join(', ')} – in der Notiz festhalten.</p>
+              <p className="text-schrift mt-1">Freie Meisterschaften: {u.freieMeisterschaften.map(m => `${m.fertigkeit} (Schwelle ${m.schwelle})`).join(', ')} – in der Notiz festhalten.</p>
             )}
-            <p className="text-gray-500 mt-1">Fertigkeitspunkte 1–6 je 3 EP, 7–9 je 5 EP …; Attribute 10, 15, … EP. Keine Magieschulen, kein Arkane Kunde / Geschichte und Mythen.</p>
+            <p className="text-leise mt-1">Fertigkeitspunkte 1–6 je 3 EP, 7–9 je 5 EP …; Attribute 10, 15, … EP. Keine Magieschulen, kein Arkane Kunde / Geschichte und Mythen.</p>
           </div>
 
-          {u.hinweise.length > 0 && <ul className="text-amber-700 list-disc pl-4">{u.hinweise.map((h, i) => <li key={i}>{h}</li>)}</ul>}
+          {u.hinweise.length > 0 && <ul className="text-erschoepft list-disc pl-4">{u.hinweise.map((h, i) => <li key={i}>{h}</li>)}</ul>}
 
           <label className="flex flex-col gap-0.5">Notiz
             <textarea value={b.notiz ?? ''} onChange={ev => aendern({ notiz: ev.target.value || undefined })} rows={2} className={`${auswahl} w-full`} />
@@ -146,10 +146,10 @@ export const UntotAbschnitt: React.FC<{ k: Katalog }> = ({ k }) => {
   return (
     <section className={karte} data-testid="begleiter-untote">
       <div className="flex items-center gap-2 mb-2">
-        <Skull size={18} className="text-[#1B365D]" />
-        <h3 className="font-bold text-base text-[#1B365D]">Erhobene Untote</h3>
+        <Skull size={18} className="text-schrift" />
+        <h3 className="font-bold text-base text-gold-hell">Erhobene Untote</h3>
       </div>
-      <p className="text-xs text-gray-600 mb-3">
+      <p className="text-xs text-leise mb-3">
         Der Erhebungszauber bestimmt den Wertesatz; Steigerungen mit den EP aus seiner Verstärkung (Die Magie S. 182–184).
         {!liste.some(x => x.zauber.quelle.paket === 'magie') && ' Weitere Zauber und Abnormitäten im Buchpaket „Die Magie“.'}
       </p>

@@ -219,19 +219,19 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/75 backdrop-blur-xs flex items-center justify-center z-50 p-3 sm:p-4 overflow-y-auto">
-      <div className="bg-[#141b27] border-2 border-[#C5A059] rounded-xl shadow-2xl max-w-lg w-full max-h-[92vh] flex flex-col text-[#F2EFE6] overflow-hidden my-auto">
+    <div className="fixed inset-0 bg-black/75 flex items-center justify-center z-50 p-3 sm:p-4 overflow-y-auto">
+      <div className="bg-flaeche border border-rahmen rounded-karte shadow-2xl max-w-lg w-full max-h-[92vh] flex flex-col text-schrift overflow-hidden my-auto">
         {/* Header */}
-        <div className="px-4 sm:px-5 py-3.5 border-b border-[#C5A059]/60 bg-[#0e141f] flex items-center justify-between shrink-0">
+        <div className="px-4 sm:px-5 py-3.5 border-b border-gold bg-seite flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-full bg-red-950/80 border border-red-500/50 flex items-center justify-center text-red-400">
+            <div className="w-8 h-8 rounded-full bg-schaden-grund border border-schaden flex items-center justify-center text-schaden">
               <Flame size={18} />
             </div>
             <div>
-              <h3 className="fantasy-font text-lg sm:text-xl text-white font-bold leading-tight">
+              <h3 className="fantasy-font text-lg sm:text-xl text-gold-hell font-bold leading-tight">
                 {begleiter ? `${begleiter}: Schaden erleiden` : 'Schaden erleiden'}
               </h3>
-              <p className="text-[11px] text-[#C5A059] leading-tight">
+              <p className="text-[11px] text-gold leading-tight">
                 Grundregelwerk (GRW S. 172–173 &amp; S. 81)
               </p>
             </div>
@@ -239,7 +239,7 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="text-stone-400 hover:text-white p-1 rounded-md transition-colors cursor-pointer"
+            className="text-leise hover:text-schrift p-1 rounded-knopf transition-colors cursor-pointer"
             title="Schließen"
           >
             <X size={20} />
@@ -249,22 +249,22 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
         {/* Scrollable Body */}
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 custom-scrollbar">
           {/* 1. Eingehender Schaden (Brutto) */}
-          <div className="bg-[#182333] border border-[#2b3a50] rounded-lg p-3 sm:p-3.5 space-y-2.5">
-            <label className="block text-xs font-bold text-[#C5A059] uppercase tracking-wider">
+          <div className="bg-seite border border-rahmen rounded-knopf p-3 sm:p-3.5 space-y-2.5">
+            <label className="block text-xs font-bold text-gold uppercase tracking-wider">
               1. Eingehender Schaden (Brutto)
             </label>
             <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => setRawDamage((d) => Math.max(0, d - 5))}
-                className="px-2.5 py-1.5 rounded bg-[#223147] hover:bg-[#2d405b] text-xs font-bold text-stone-300 border border-[#374c69] cursor-pointer"
+                className="px-2.5 py-1.5 rounded-knopf bg-erhoeht hover:bg-rahmen text-xs font-bold text-schrift border border-rahmen cursor-pointer"
               >
                 -5
               </button>
               <button
                 type="button"
                 onClick={() => setRawDamage((d) => Math.max(0, d - 1))}
-                className="w-8 h-8 rounded bg-[#223147] hover:bg-[#2d405b] flex items-center justify-center font-bold text-stone-200 border border-[#374c69] cursor-pointer"
+                className="w-8 h-8 rounded-knopf bg-erhoeht hover:bg-rahmen flex items-center justify-center font-bold text-schrift border border-rahmen cursor-pointer"
               >
                 <Minus size={14} />
               </button>
@@ -277,28 +277,28 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
                   value={rawDamage}
                   onFocus={(e) => e.target.select()}
                   onChange={(e) => setRawDamage(Math.max(0, parseInt(e.target.value, 10) || 0))}
-                  className="w-full text-center bg-[#0e141f] border border-[#C5A059]/60 rounded-lg py-1.5 text-2xl font-mono font-bold text-white focus:outline-none focus:border-[#C5A059]"
+                  className="w-full text-center bg-seite border border-gold rounded-knopf py-1.5 text-2xl tabular-nums font-bold text-schrift focus:outline-none focus:border-gold"
                 />
               </div>
 
               <button
                 type="button"
                 onClick={() => setRawDamage((d) => d + 1)}
-                className="w-8 h-8 rounded bg-[#223147] hover:bg-[#2d405b] flex items-center justify-center font-bold text-stone-200 border border-[#374c69] cursor-pointer"
+                className="w-8 h-8 rounded-knopf bg-erhoeht hover:bg-rahmen flex items-center justify-center font-bold text-schrift border border-rahmen cursor-pointer"
               >
                 <Plus size={14} />
               </button>
               <button
                 type="button"
                 onClick={() => setRawDamage((d) => d + 5)}
-                className="px-2.5 py-1.5 rounded bg-[#223147] hover:bg-[#2d405b] text-xs font-bold text-stone-300 border border-[#374c69] cursor-pointer"
+                className="px-2.5 py-1.5 rounded-knopf bg-erhoeht hover:bg-rahmen text-xs font-bold text-schrift border border-rahmen cursor-pointer"
               >
                 +5
               </button>
               <button
                 type="button"
                 onClick={() => setRawDamage((d) => d + 10)}
-                className="px-2.5 py-1.5 rounded bg-[#223147] hover:bg-[#2d405b] text-xs font-bold text-stone-300 border border-[#374c69] cursor-pointer"
+                className="px-2.5 py-1.5 rounded-knopf bg-erhoeht hover:bg-rahmen text-xs font-bold text-schrift border border-rahmen cursor-pointer"
               >
                 +10
               </button>
@@ -306,8 +306,8 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
           </div>
 
           {/* 2. Schadenstyp (GRW S. 172–173) */}
-          <div className="bg-[#182333] border border-[#2b3a50] rounded-lg p-3 sm:p-3.5 space-y-2">
-            <label className="block text-xs font-bold text-[#C5A059] uppercase tracking-wider">
+          <div className="bg-seite border border-rahmen rounded-knopf p-3 sm:p-3.5 space-y-2">
+            <label className="block text-xs font-bold text-gold uppercase tracking-wider">
               2. Schadenstyp (GRW S. 172–173)
             </label>
             <div className="grid grid-cols-3 gap-2">
@@ -315,90 +315,90 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
               <button
                 type="button"
                 onClick={() => setDamageKind('consumed')}
-                className={`p-2 rounded-lg border text-left transition-all cursor-pointer ${
+                className={`p-2 rounded-knopf border text-left transition-all cursor-pointer ${
                   damageKind === 'consumed'
-                    ? 'bg-[#3b1919] border-red-500 shadow-md text-white'
-                    : 'bg-[#141b27] border-[#2c3a4f] text-stone-300 hover:bg-[#1a2436]'
+                    ? 'bg-schaden-grund border-schaden text-schrift'
+                    : 'bg-seite border-rahmen text-schrift hover:bg-seite'
                 }`}
               >
                 <div className="flex items-center justify-between mb-0.5">
                   <span className="font-bold text-xs">Echter Schaden</span>
-                  <span className="text-red-400 font-bold font-mono text-xs">■</span>
+                  <span className="text-schaden font-bold tabular-nums text-xs">■</span>
                 </div>
-                <div className="text-[10px] text-stone-400 leading-tight">Wunden, Stürze, Waffen</div>
+                <div className="text-[11px] text-leise leading-tight">Wunden, Stürze, Waffen</div>
               </button>
 
               {/* Betäubungsschaden */}
               <button
                 type="button"
                 onClick={() => setDamageKind('exhausted')}
-                className={`p-2 rounded-lg border text-left transition-all cursor-pointer ${
+                className={`p-2 rounded-knopf border text-left transition-all cursor-pointer ${
                   damageKind === 'exhausted'
-                    ? 'bg-[#3d2c14] border-amber-500 shadow-md text-white'
-                    : 'bg-[#141b27] border-[#2c3a4f] text-stone-300 hover:bg-[#1a2436]'
+                    ? 'bg-erschoepft-grund border-erschoepft text-schrift'
+                    : 'bg-seite border-rahmen text-schrift hover:bg-seite'
                 }`}
               >
                 <div className="flex items-center justify-between mb-0.5">
                   <span className="font-bold text-xs">Betäubung</span>
-                  <span className="text-amber-400 font-bold font-mono text-xs">/</span>
+                  <span className="text-gold font-bold tabular-nums text-xs">/</span>
                 </div>
-                <div className="text-[10px] text-stone-400 leading-tight">Stumpfe Hiebe, Schock</div>
+                <div className="text-[11px] text-leise leading-tight">Stumpfe Hiebe, Schock</div>
               </button>
 
               {/* Kanalisierter Schaden */}
               <button
                 type="button"
                 onClick={() => setDamageKind('channeled')}
-                className={`p-2 rounded-lg border text-left transition-all cursor-pointer ${
+                className={`p-2 rounded-knopf border text-left transition-all cursor-pointer ${
                   damageKind === 'channeled'
-                    ? 'bg-[#182942] border-blue-500 shadow-md text-white'
-                    : 'bg-[#141b27] border-[#2c3a4f] text-stone-300 hover:bg-[#1a2436]'
+                    ? 'bg-flaeche border-kanalisiert text-schrift'
+                    : 'bg-seite border-rahmen text-schrift hover:bg-seite'
                 }`}
               >
                 <div className="flex items-center justify-between mb-0.5">
                   <span className="font-bold text-xs">Kanalisiert</span>
-                  <span className="text-blue-400 font-bold font-mono text-xs">X</span>
+                  <span className="text-kanalisiert font-bold tabular-nums text-xs">X</span>
                 </div>
-                <div className="text-[10px] text-stone-400 leading-tight">Magische Bindung</div>
+                <div className="text-[11px] text-leise leading-tight">Magische Bindung</div>
               </button>
             </div>
           </div>
 
           {/* 3. Schadensreduktion (SR / Panzerung) */}
-          <div className="bg-[#182333] border border-[#2b3a50] rounded-lg p-3 sm:p-3.5 space-y-2">
+          <div className="bg-seite border border-rahmen rounded-knopf p-3 sm:p-3.5 space-y-2">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-[#C5A059] uppercase tracking-wider flex items-center gap-1.5 cursor-pointer">
+              <label className="text-xs font-bold text-gold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={applySR}
                   onChange={(e) => setApplySR(e.target.checked)}
-                  className="rounded text-[#C5A059] focus:ring-0 cursor-pointer w-4 h-4"
+                  className="rounded-knopf text-gold focus:ring-0 cursor-pointer w-4 h-4"
                 />
-                <Shield size={14} className="text-amber-400" />
+                <Shield size={14} className="text-gold" />
                 <span>3. Schadensreduktion (SR) anwenden</span>
               </label>
               {applySR && (
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[11px] text-stone-400 font-semibold">Effektive SR:</span>
+                  <span className="text-[11px] text-leise font-semibold">Effektive SR:</span>
                   <input
                     type="number"
                     min={0}
                     max={20}
                     value={effectiveSR}
                     onChange={(e) => setEffectiveSR(Math.max(0, parseInt(e.target.value, 10) || 0))}
-                    className="w-12 bg-[#0e141f] border border-[#2e3b52] rounded px-1.5 py-0.5 text-center text-xs font-mono font-bold text-white focus:outline-none focus:border-[#C5A059]"
+                    className="w-12 bg-seite border border-rahmen rounded-knopf px-1.5 py-0.5 text-center text-xs tabular-nums font-bold text-schrift focus:outline-none focus:border-gold"
                   />
                 </div>
               )}
             </div>
 
             {applySR && (
-              <div className="text-[11px] text-stone-400 flex items-center justify-between bg-[#111926] px-2.5 py-1.5 rounded border border-[#26354a]">
+              <div className="text-[11px] text-leise flex items-center justify-between bg-seite px-2.5 py-1.5 rounded-knopf border border-rahmen">
                 <span>
-                  {begleiter ? 'SR' : 'Basis-SR des Helden'}: <strong className="text-white">{derivedSR}</strong>
+                  {begleiter ? 'SR' : 'Basis-SR des Helden'}: <strong className="text-schrift">{derivedSR}</strong>
                 </span>
-                <span className="text-stone-300">
-                  {rawDamage} Brutto − {effectiveSR} SR = <strong className="text-[#C5A059]">{damageAfterSR} Schaden</strong>
+                <span className="text-schrift">
+                  {rawDamage} Brutto − {effectiveSR} SR = <strong className="text-gold">{damageAfterSR} Schaden</strong>
                 </span>
               </div>
             )}
@@ -406,11 +406,11 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
 
           {!begleiter && (<>
           {/* 4. Splitterpunkt: Schaden um 5 reduzieren (GRW S. 81) */}
-          <div className="bg-[#182333] border border-[#2b3a50] rounded-lg p-3 sm:p-3.5 space-y-2">
+          <div className="bg-seite border border-rahmen rounded-knopf p-3 sm:p-3.5 space-y-2">
             <div className="flex items-center justify-between">
               <label
                 className={`text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 ${
-                  currentSplitterPoints > 0 ? 'text-[#C5A059] cursor-pointer' : 'text-stone-500 cursor-not-allowed'
+                  currentSplitterPoints > 0 ? 'text-gold cursor-pointer' : 'text-leise cursor-not-allowed'
                 }`}
               >
                 <input
@@ -418,16 +418,16 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
                   disabled={currentSplitterPoints <= 0}
                   checked={useSplitter && currentSplitterPoints > 0}
                   onChange={(e) => setUseSplitter(e.target.checked)}
-                  className="rounded text-[#C5A059] focus:ring-0 cursor-pointer w-4 h-4 disabled:opacity-40"
+                  className="rounded-knopf text-gold focus:ring-0 cursor-pointer w-4 h-4 disabled:opacity-40"
                 />
-                <Sparkles size={14} className={currentSplitterPoints > 0 ? 'text-[#C5A059]' : 'text-stone-500'} />
+                <Sparkles size={14} className={currentSplitterPoints > 0 ? 'text-gold' : 'text-leise'} />
                 <span>4. Splitterpunkt: Schaden um 5 reduzieren</span>
               </label>
               <span
-                className={`text-[11px] font-bold px-2 py-0.5 rounded border ${
+                className={`text-[11px] font-bold px-2 py-0.5 rounded-knopf border ${
                   currentSplitterPoints > 0
-                    ? 'bg-[#223147] text-[#C5A059] border-[#C5A059]/50'
-                    : 'bg-red-950/60 text-red-400 border-red-500/30'
+                    ? 'bg-erhoeht text-gold border-gold'
+                    : 'bg-schaden-grund text-schaden border-schaden'
                 }`}
               >
                 {currentSplitterPoints} SP verfügbar
@@ -435,9 +435,9 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
             </div>
 
             {useSplitter && currentSplitterPoints > 0 && (
-              <div className="text-[11px] text-stone-300 bg-[#1e2a3c] px-2.5 py-1.5 rounded border border-[#C5A059]/40 flex items-center justify-between">
+              <div className="text-[11px] text-schrift bg-flaeche px-2.5 py-1.5 rounded-knopf border border-rahmen flex items-center justify-between">
                 <span>GRW S. 81: Schaden aus einer Quelle um 5 Punkte reduzieren (1 SP)</span>
-                <span className="text-[#C5A059] font-bold">
+                <span className="text-gold font-bold">
                   {damageAfterSR} → {finalDamage} Schaden (−{Math.min(5, damageAfterSR)})
                 </span>
               </div>
@@ -446,22 +446,22 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
 
           {/* 5. Temporäre Lebenspunkte */}
           {activeTempHP > 0 && (
-            <div className="bg-[#102724] border border-teal-500/40 rounded-lg p-2.5 text-xs text-teal-200 flex items-center justify-between">
+            <div className="bg-temporaer-grund border border-temporaer rounded-knopf p-2.5 text-xs text-temporaer flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Heart size={14} className="text-teal-400" />
+                <Heart size={14} className="text-temporaer" />
                 <span>
                   Temporäre LP aktiv: <strong>{activeTempHP} Temp LP</strong>
                 </span>
               </div>
-              <span className="text-[11px] text-teal-300">
+              <span className="text-[11px] text-temporaer">
                 {absorbedByTemp > 0 ? `${absorbedByTemp} absorbieren den Schaden` : 'Kein Schaden erreicht Temp LP'}
               </span>
             </div>
           )}
 
           {/* 6. Zustände hinzufügen (GRW S. 168–169) */}
-          <div className="bg-[#182333] border border-[#2b3a50] rounded-lg p-3 sm:p-3.5 space-y-2.5">
-            <label className="block text-xs font-bold text-[#C5A059] uppercase tracking-wider">
+          <div className="bg-seite border border-rahmen rounded-knopf p-3 sm:p-3.5 space-y-2.5">
+            <label className="block text-xs font-bold text-gold uppercase tracking-wider">
               5. Zustände durch den Treffer (GRW S. 168–169)
             </label>
 
@@ -474,10 +474,10 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
                 return (
                   <div
                     key={cond.key}
-                    className={`rounded-lg border p-2 transition-all flex flex-col justify-between ${
+                    className={`rounded-knopf border p-2 transition-all flex flex-col justify-between ${
                       isActive
-                        ? 'bg-[#2b1f1a] border-amber-500/80 text-white'
-                        : 'bg-[#141b27] border-[#2c3a4f] text-stone-300'
+                        ? 'bg-erschoepft-grund border-gold text-schrift'
+                        : 'bg-seite border-rahmen text-schrift'
                     }`}
                   >
                     <label className="flex items-center gap-1.5 cursor-pointer select-none">
@@ -485,24 +485,24 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
                         type="checkbox"
                         checked={isActive}
                         onChange={() => handleToggleCommonCondition(cond.key)}
-                        className="rounded text-amber-500 focus:ring-0 cursor-pointer w-3.5 h-3.5"
+                        className="rounded-knopf text-gold focus:ring-0 cursor-pointer w-3.5 h-3.5"
                       />
                       <span className="text-xs font-bold truncate">{cond.key}</span>
                     </label>
 
                     {cond.hasLevel && isActive && (
-                      <div className="mt-1.5 pt-1.5 border-t border-[#3f2f25] flex items-center justify-between">
-                        <span className="text-[10px] text-stone-400">Stufe:</span>
+                      <div className="mt-1.5 pt-1.5 border-t border-erschoepft flex items-center justify-between">
+                        <span className="text-[11px] text-leise">Stufe:</span>
                         <div className="flex items-center gap-1">
                           {[1, 2, ...(cond.maxLevel && cond.maxLevel >= 3 ? [3] : [])].map((lvl) => (
                             <button
                               key={lvl}
                               type="button"
                               onClick={() => handleLevelChange(cond.key, lvl)}
-                              className={`w-5 h-5 rounded text-[11px] font-bold flex items-center justify-center cursor-pointer transition-colors ${
+                              className={`w-5 h-5 rounded-knopf text-[11px] font-bold flex items-center justify-center cursor-pointer transition-colors ${
                                 level === lvl
-                                  ? 'bg-[#C5A059] text-[#1B365D]'
-                                  : 'bg-[#1e2a3c] text-stone-300 hover:bg-[#2a394f]'
+                                  ? 'bg-gold text-seite'
+                                  : 'bg-flaeche text-seite hover:bg-erhoeht'
                               }`}
                             >
                               {lvl}
@@ -517,11 +517,11 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
             </div>
 
             {/* Additional condition dropdown */}
-            <div className="pt-2 border-t border-[#2b3a50] flex items-center gap-2">
+            <div className="pt-2 border-t border-rahmen flex items-center gap-2">
               <select
                 value={extraCondition}
                 onChange={(e) => setExtraCondition(e.target.value)}
-                className="bg-[#141b27] border border-[#2e3b52] rounded-md px-2 py-1 text-xs text-[#F2EFE6] font-medium focus:outline-none focus:border-[#C5A059] flex-1 min-w-[120px]"
+                className="bg-seite border border-rahmen rounded-knopf px-2 py-1 text-xs text-schrift font-medium focus:outline-none focus:border-gold flex-1 min-w-[120px]"
               >
                 {ALL_CONDITIONS.map((cond) => (
                   <option key={cond} value={cond}>
@@ -537,14 +537,14 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
                   max={6}
                   value={extraLevel}
                   onChange={(e) => setExtraLevel(Math.max(1, parseInt(e.target.value, 10) || 1))}
-                  className="w-12 bg-[#141b27] border border-[#2e3b52] rounded-md px-1.5 py-1 text-center text-xs font-mono font-bold text-white focus:outline-none focus:border-[#C5A059]"
+                  className="w-12 bg-seite border border-rahmen rounded-knopf px-1.5 py-1 text-center text-xs tabular-nums font-bold text-schrift focus:outline-none focus:border-gold"
                 />
               )}
 
               <button
                 type="button"
                 onClick={handleAddExtraCondition}
-                className="px-2.5 py-1 rounded bg-[#223147] hover:bg-[#2d405b] text-xs font-bold text-stone-200 border border-[#374c69] cursor-pointer shrink-0"
+                className="px-2.5 py-1 rounded-knopf bg-erhoeht hover:bg-rahmen text-xs font-bold text-schrift border border-rahmen cursor-pointer shrink-0"
               >
                 + Zustand
               </button>
@@ -556,7 +556,7 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
                 {extraConditionsList.map((item, idx) => (
                   <span
                     key={`${item.key}-${idx}`}
-                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-950/70 border border-amber-500/50 text-[11px] text-amber-200"
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-erschoepft-grund border border-gold text-[11px] text-gold-hell"
                   >
                     <span>
                       {item.key}
@@ -565,7 +565,7 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
                     <button
                       type="button"
                       onClick={() => handleRemoveExtraCondition(idx)}
-                      className="text-stone-400 hover:text-white cursor-pointer ml-0.5"
+                      className="text-leise hover:text-schrift cursor-pointer ml-0.5"
                     >
                       ×
                     </button>
@@ -577,23 +577,23 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
           </>)}
 
           {/* 7. Wundstufen-Vorschau (GRW S. 172) */}
-          <div className="bg-[#111824] border border-[#2c3d54] rounded-lg p-3 space-y-1.5">
+          <div className="bg-seite border border-rahmen rounded-knopf p-3 space-y-1.5">
             <div className="flex items-center justify-between text-xs">
-              <span className="text-stone-400 font-semibold">Wundstufen-Vorschau:</span>
+              <span className="text-leise font-semibold">Wundstufen-Vorschau:</span>
               <div className="flex items-center gap-1.5 font-bold">
-                <span className="text-stone-300">{woundPreview.curName}</span>
-                <span className="text-stone-500">→</span>
-                <span className={woundPreview.isWoundIncreased ? 'text-red-400' : 'text-stone-200'}>
+                <span className="text-schrift">{woundPreview.curName}</span>
+                <span className="text-leise">→</span>
+                <span className={woundPreview.isWoundIncreased ? 'text-schaden' : 'text-schrift'}>
                   {woundPreview.nextName}
                 </span>
               </div>
             </div>
 
-            <div className="flex items-center justify-between text-[11px] pt-1 border-t border-[#1e2a3c]">
-              <span className="text-stone-400">Wundabzug auf alle Proben:</span>
+            <div className="flex items-center justify-between text-[11px] pt-1 border-t border-rahmen">
+              <span className="text-leise">Wundabzug auf alle Proben:</span>
               <span
-                className={`font-mono font-bold ${
-                  woundPreview.nextPenalty < 0 ? 'text-red-400' : 'text-stone-300'
+                className={`tabular-nums font-bold ${
+                  woundPreview.nextPenalty < 0 ? 'text-schaden' : 'text-schrift'
                 }`}
               >
                 {woundPreview.nextPenalty}
@@ -601,8 +601,8 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
             </div>
 
             {woundPreview.isDying && (
-              <div className="mt-1 bg-red-950/70 border border-red-500/60 rounded px-2.5 py-1 text-xs text-red-200 flex items-center gap-1.5">
-                <AlertTriangle size={14} className="text-red-400 shrink-0" />
+              <div className="mt-1 bg-schaden-grund border border-schaden rounded-knopf px-2.5 py-1 text-xs text-schaden flex items-center gap-1.5">
+                <AlertTriangle size={14} className="text-schaden shrink-0" />
                 <span className="font-bold">
                   Achtung: Todgeweiht oder alle Lebenspunkte aufgebraucht (Sterbend / Bewusstlos)!
                 </span>
@@ -612,7 +612,7 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
 
           {/* 8. Schadensquelle / Notiz */}
           <div>
-            <label className="block text-[11px] font-bold text-stone-400 uppercase tracking-wide mb-1">
+            <label className="block text-[11px] font-bold text-leise uppercase tracking-wide mb-1">
               Schadensquelle / Notiz (optional)
             </label>
             <input
@@ -620,17 +620,17 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
               placeholder="z. B. Ork-Krieger Kriegsaxt, Sturz aus 5m, Feuerfalle"
               value={damageNote}
               onChange={(e) => setDamageNote(e.target.value)}
-              className="w-full bg-[#0e141f] border border-[#2b3a50] rounded-lg px-2.5 py-1.5 text-xs text-white placeholder-stone-500 focus:outline-none focus:border-[#C5A059]"
+              className="w-full bg-seite border border-rahmen rounded-knopf px-2.5 py-1.5 text-xs text-schrift placeholder-leise focus:outline-none focus:border-gold"
             />
           </div>
         </form>
 
         {/* Footer Actions */}
-        <div className="px-4 sm:px-5 py-3 border-t border-[#C5A059]/40 bg-[#0e141f] flex items-center justify-between gap-3 shrink-0">
+        <div className="px-4 sm:px-5 py-3 border-t border-rahmen bg-seite flex items-center justify-between gap-3 shrink-0">
           <button
             type="button"
             onClick={onClose}
-            className="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-stone-300 hover:bg-[#1a2436] transition-colors cursor-pointer"
+            className="px-3.5 py-1.5 rounded-knopf text-xs font-semibold text-schrift hover:bg-seite transition-colors cursor-pointer"
           >
             Abbrechen
           </button>
@@ -638,7 +638,7 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
           <button
             type="button"
             onClick={() => handleSubmit()}
-            className="px-5 py-2 rounded-lg text-xs sm:text-sm font-bold bg-[#C5A059] text-[#1B365D] hover:bg-[#d6b16a] transition-colors shadow-md cursor-pointer flex items-center gap-1.5"
+            className="px-5 py-2 rounded-knopf text-xs sm:text-sm font-bold bg-gold text-seite hover:bg-gold-hell transition-colors cursor-pointer flex items-center gap-1.5"
           >
             <Check size={16} />
             <span>

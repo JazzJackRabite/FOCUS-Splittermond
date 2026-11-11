@@ -151,12 +151,12 @@ export const RestSection: React.FC<RestSectionProps> = ({
   const ruhephaseDuration = hasSegenMondkraft ? '3 Stunden' : '6 Stunden';
 
   return (
-    <div id="rest-section-container" className="bg-white bg-opacity-70 rounded-xl border border-[#d1c4b0] shadow-sm p-4 sm:p-5 space-y-3.5">
+    <div id="rest-section-container" className="bg-flaeche bg-opacity-70 rounded-karte border border-rahmen p-4 sm:p-5 space-y-3.5">
       {/* Section Header */}
-      <div className="flex items-center justify-between border-b border-[#C5A059]/40 pb-2">
+      <div className="flex items-center justify-between border-b border-rahmen pb-2">
         <div className="flex items-center gap-2">
           <span className="text-xl">🏕️</span>
-          <h3 className="font-bold text-lg sm:text-xl fantasy-font text-[#1B365D]">
+          <h3 className="font-bold text-lg sm:text-xl fantasy-font text-gold-hell">
             Regeneration &amp; Pausen
           </h3>
         </div>
@@ -167,26 +167,26 @@ export const RestSection: React.FC<RestSectionProps> = ({
         {/* ── CARD 1: ☀️ VERSCHNAUFPAUSE ── */}
         <div
           id="verschnaufpause-card"
-          className="rounded-xl border border-[#d1c4b0] bg-[#faf6ee] p-4 flex flex-col justify-between shadow-xs hover:border-[#C5A059] transition-all relative"
+          className="rounded-karte border border-rahmen bg-erhoeht p-4 flex flex-col justify-between hover:border-gold transition-all relative"
         >
           <div className="space-y-2">
             {/* Top row: Title + Duration */}
             <div className="flex items-start justify-between gap-2">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-lg bg-[#f3e5cf] text-[#1B365D] border border-[#C5A059]/40 shadow-2xs">
-                  <Sun size={18} className="text-[#C5A059]" />
+                <div className="p-2 rounded-knopf bg-erhoeht text-schrift border border-rahmen shadow-2xs">
+                  <Sun size={18} className="text-gold" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-base text-[#1B365D] fantasy-font">
+                  <h4 className="font-bold text-base text-gold-hell fantasy-font">
                     Verschnaufpause
                   </h4>
                   <div className="flex items-center gap-1.5 text-xs mt-0.5">
-                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[#f3e5cf] text-[#1B365D] font-mono font-bold text-xs border border-[#C5A059]/30">
-                      <Clock size={12} className="text-[#C5A059] shrink-0" />
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-knopf bg-erhoeht text-schrift tabular-nums font-bold text-xs border border-rahmen">
+                      <Clock size={12} className="text-gold shrink-0" />
                       <span>{vpDuration}</span>
                     </span>
                     {hasSegenMondkraft && (
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#C5A059]/20 text-[#1B365D] font-bold border border-[#C5A059]/40">
+                      <span className="text-[11px] px-1.5 py-0.5 rounded-knopf bg-rahmen text-schrift font-bold border border-rahmen">
                         Mondsegen
                       </span>
                     )}
@@ -196,27 +196,27 @@ export const RestSection: React.FC<RestSectionProps> = ({
 
               {/* Status Badge when customized */}
               {!isVpDefault && (
-                <span className="text-[11px] px-2 py-0.5 rounded-full font-bold bg-[#1B365D] text-[#C5A059] border border-[#C5A059]/40 shadow-2xs">
+                <span className="text-[11px] px-2 py-0.5 rounded-full font-bold bg-erhoeht text-gold border border-rahmen shadow-2xs">
                   Angepasst
                 </span>
               )}
             </div>
 
             {/* Effect in 1 sentence */}
-            <p className="text-xs text-gray-700 leading-relaxed min-h-[36px]">
+            <p className="text-xs text-schrift leading-relaxed min-h-[36px]">
               Heilt Betäubungsschaden &amp; erschöpften Fokus, baut 1 Stufe Erschöpfung ab.
             </p>
           </div>
 
           {/* Action Row */}
-          <div className="pt-3 mt-2 border-t border-[#e3d4b9] flex flex-col gap-2">
+          <div className="pt-3 mt-2 border-t border-rahmen flex flex-col gap-2">
             <button
               id="btn-execute-verschnaufpause"
               type="button"
               onClick={handleExecuteVerschnaufpause}
-              className="w-full min-h-[42px] px-4 py-2 rounded-lg bg-[#1B365D] hover:bg-[#2a4f7e] active:scale-[0.99] text-white font-bold text-sm shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer select-none border border-[#1B365D]"
+              className="w-full min-h-[42px] px-4 py-2 rounded-knopf bg-erhoeht hover:bg-rahmen active:scale-[0.99] text-schrift font-bold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer select-none border border-gold"
             >
-              <Sun size={17} className="text-[#C5A059]" />
+              <Sun size={17} className="text-gold" />
               <span>Verschnaufpause durchführen</span>
             </button>
 
@@ -224,9 +224,9 @@ export const RestSection: React.FC<RestSectionProps> = ({
               <button
                 type="button"
                 onClick={() => setActiveModal('verschnaufpause')}
-                className="text-gray-600 hover:text-[#1B365D] flex items-center gap-1 font-medium transition-colors hover:underline cursor-pointer py-1"
+                className="text-leise hover:text-gold-hell flex items-center gap-1 font-medium transition-colors hover:underline cursor-pointer py-1"
               >
-                <Settings size={13} className="text-[#C5A059]" />
+                <Settings size={13} className="text-gold" />
                 <span>Optionen anpassen</span>
               </button>
 
@@ -234,7 +234,7 @@ export const RestSection: React.FC<RestSectionProps> = ({
                 <button
                   type="button"
                   onClick={resetVpToDefault}
-                  className="text-[#8B263E] hover:text-[#6a1c2f] flex items-center gap-1 font-bold text-[11px] hover:underline cursor-pointer py-1"
+                  className="text-schaden hover:text-schaden flex items-center gap-1 font-bold text-[11px] hover:underline cursor-pointer py-1"
                   title="Auf berechnete Regelwerte zurücksetzen"
                 >
                   <RotateCcw size={12} />
@@ -248,26 +248,26 @@ export const RestSection: React.FC<RestSectionProps> = ({
         {/* ── CARD 2: 🌙 RUHEPHASE ── */}
         <div
           id="ruhephase-card"
-          className="rounded-xl border border-[#d1c4b0] bg-[#faf6ee] p-4 flex flex-col justify-between shadow-xs hover:border-[#C5A059] transition-all relative"
+          className="rounded-karte border border-rahmen bg-erhoeht p-4 flex flex-col justify-between hover:border-gold transition-all relative"
         >
           <div className="space-y-2">
             {/* Top row: Title + Duration */}
             <div className="flex items-start justify-between gap-2">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-lg bg-[#f3e5cf] text-[#1B365D] border border-[#C5A059]/40 shadow-2xs">
-                  <Moon size={18} className="text-[#1B365D]" />
+                <div className="p-2 rounded-knopf bg-erhoeht text-schrift border border-rahmen shadow-2xs">
+                  <Moon size={18} className="text-schrift" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-base text-[#1B365D] fantasy-font">
+                  <h4 className="font-bold text-base text-gold-hell fantasy-font">
                     Ruhephase
                   </h4>
                   <div className="flex items-center gap-1.5 text-xs mt-0.5">
-                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[#f3e5cf] text-[#1B365D] font-mono font-bold text-xs border border-[#C5A059]/30">
-                      <Clock size={12} className="text-[#C5A059] shrink-0" />
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-knopf bg-erhoeht text-schrift tabular-nums font-bold text-xs border border-rahmen">
+                      <Clock size={12} className="text-gold shrink-0" />
                       <span>{ruhephaseDuration}</span>
                     </span>
                     {hasSegenMondkraft && (
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#C5A059]/20 text-[#1B365D] font-bold border border-[#C5A059]/40">
+                      <span className="text-[11px] px-1.5 py-0.5 rounded-knopf bg-rahmen text-schrift font-bold border border-rahmen">
                         Mondsegen
                       </span>
                     )}
@@ -278,31 +278,31 @@ export const RestSection: React.FC<RestSectionProps> = ({
               {/* Status or preview badges */}
               <div className="flex items-center gap-1.5">
                 {!isRuhephaseDefault && (
-                  <span className="text-[11px] px-2 py-0.5 rounded-full font-bold bg-[#1B365D] text-[#C5A059] border border-[#C5A059]/40 shadow-2xs">
+                  <span className="text-[11px] px-2 py-0.5 rounded-full font-bold bg-erhoeht text-gold border border-rahmen shadow-2xs">
                     Angepasst
                   </span>
                 )}
-                <span className="text-xs font-bold font-mono px-2 py-0.5 rounded-md bg-[#f3e5cf] text-[#1B365D] border border-[#C5A059]/40 shadow-2xs">
+                <span className="text-xs font-bold tabular-nums px-2 py-0.5 rounded-knopf bg-erhoeht text-schrift border border-rahmen shadow-2xs">
                   +{customLP} LP · +{customFO} FO
                 </span>
               </div>
             </div>
 
             {/* Effect in 1 sentence */}
-            <p className="text-xs text-gray-700 leading-relaxed min-h-[36px]">
+            <p className="text-xs text-schrift leading-relaxed min-h-[36px]">
               Heilt zusätzlich echten Schaden &amp; verzehrten Fokus, baut Erschöpfung komplett ab.
             </p>
           </div>
 
           {/* Action Row */}
-          <div className="pt-3 mt-2 border-t border-[#e3d4b9] flex flex-col gap-2">
+          <div className="pt-3 mt-2 border-t border-rahmen flex flex-col gap-2">
             <button
               id="btn-execute-ruhephase"
               type="button"
               onClick={handleExecuteRuhephase}
-              className="w-full min-h-[42px] px-4 py-2 rounded-lg bg-[#1B365D] hover:bg-[#2a4f7e] active:scale-[0.99] text-white font-bold text-sm shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer select-none border border-[#1B365D]"
+              className="w-full min-h-[42px] px-4 py-2 rounded-knopf bg-erhoeht hover:bg-rahmen active:scale-[0.99] text-schrift font-bold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer select-none border border-gold"
             >
-              <Moon size={17} className="text-[#C5A059]" />
+              <Moon size={17} className="text-gold" />
               <span>Ruhephase durchführen</span>
             </button>
 
@@ -310,9 +310,9 @@ export const RestSection: React.FC<RestSectionProps> = ({
               <button
                 type="button"
                 onClick={() => setActiveModal('ruhephase')}
-                className="text-gray-600 hover:text-[#1B365D] flex items-center gap-1 font-medium transition-colors hover:underline cursor-pointer py-1"
+                className="text-leise hover:text-gold-hell flex items-center gap-1 font-medium transition-colors hover:underline cursor-pointer py-1"
               >
-                <Settings size={13} className="text-[#C5A059]" />
+                <Settings size={13} className="text-gold" />
                 <span>Optionen anpassen</span>
               </button>
 
@@ -320,7 +320,7 @@ export const RestSection: React.FC<RestSectionProps> = ({
                 <button
                   type="button"
                   onClick={resetRuhephaseToDefault}
-                  className="text-[#8B263E] hover:text-[#6a1c2f] flex items-center gap-1 font-bold text-[11px] hover:underline cursor-pointer py-1"
+                  className="text-schaden hover:text-schaden flex items-center gap-1 font-bold text-[11px] hover:underline cursor-pointer py-1"
                   title="Auf berechnete Regelwerte zurücksetzen"
                 >
                   <RotateCcw size={12} />
@@ -338,23 +338,23 @@ export const RestSection: React.FC<RestSectionProps> = ({
       {activeModal && (
         <div
           id="rest-options-modal-backdrop"
-          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 animate-in fade-in duration-150"
           onClick={(e) => {
             if (e.target === e.currentTarget) setActiveModal(null);
           }}
         >
           <div
             id="rest-options-modal-card"
-            className="bg-[#faf6ee] dark-theme-panel text-[#1B365D] w-full max-w-lg rounded-2xl shadow-2xl border-2 border-[#C5A059] overflow-hidden flex flex-col max-h-[92vh] animate-in zoom-in-95 duration-150"
+            className="bg-flaeche text-schrift w-full max-w-lg rounded-karte shadow-2xl border border-rahmen overflow-hidden flex flex-col max-h-[92vh] animate-in zoom-in-95 duration-150"
           >
             {/* Modal Header */}
-            <div className="bg-gradient-to-r from-[#1B365D] via-[#2A4D7F] to-[#1B365D] text-white p-4 flex items-center justify-between border-b border-[#C5A059]">
+            <div className="bg-erhoeht text-schrift p-4 flex items-center justify-between border-b border-gold">
               <div className="flex items-center gap-2.5">
-                <div className="p-1.5 rounded-lg bg-white/15 border border-white/20">
+                <div className="p-1.5 rounded-knopf bg-rahmen border border-rahmen">
                   {activeModal === 'verschnaufpause' ? (
-                    <Sun size={20} className="text-[#C5A059]" />
+                    <Sun size={20} className="text-gold" />
                   ) : (
-                    <Moon size={20} className="text-[#C5A059]" />
+                    <Moon size={20} className="text-gold" />
                   )}
                 </div>
                 <div>
@@ -363,7 +363,7 @@ export const RestSection: React.FC<RestSectionProps> = ({
                       ? 'Optionen: Verschnaufpause'
                       : 'Optionen: Ruhephase'}
                   </h4>
-                  <span className="text-xs text-white/80">
+                  <span className="text-xs text-schrift">
                     {activeModal === 'verschnaufpause'
                       ? `Verschnaufpause (${vpDuration})`
                       : `Ruhephase (${ruhephaseDuration})`}
@@ -373,7 +373,7 @@ export const RestSection: React.FC<RestSectionProps> = ({
               <button
                 type="button"
                 onClick={() => setActiveModal(null)}
-                className="p-1.5 rounded-lg text-white/80 hover:text-white hover:bg-white/15 transition-colors cursor-pointer"
+                className="p-1.5 rounded-knopf text-schrift hover:text-schrift hover:bg-rahmen transition-colors cursor-pointer"
                 title="Schließen"
               >
                 <X size={20} />
@@ -385,31 +385,31 @@ export const RestSection: React.FC<RestSectionProps> = ({
               {activeModal === 'verschnaufpause' ? (
                 <>
                   {/* Rule Reference Info */}
-                  <div className="bg-[#f3e5cf] border border-[#C5A059]/40 rounded-lg p-3 space-y-1.5 text-xs text-[#1B365D]">
-                    <div className="flex items-center justify-between font-bold text-[#1B365D]">
+                  <div className="bg-erhoeht border border-rahmen rounded-knopf p-3 space-y-1.5 text-xs text-schrift">
+                    <div className="flex items-center justify-between font-bold text-schrift">
                       <span>Regel-Grundlage:</span>
-                      <span className="font-normal text-[11px] text-[#1B365D]/80">Splittermond GRW S. 160</span>
+                      <span className="font-normal text-[11px] text-leise">Splittermond GRW S. 160</span>
                     </div>
                     <p className="leading-relaxed">
                       Dauer: <strong>{vpDuration}</strong> ununterbrochene Rast. Heilt allen Betäubungsschaden, stellt erschöpften Fokus wieder her und baut 1 Stufe <em>Erschöpft</em> ab.
                     </p>
 
                     {(hasSegenMondkraft || hasMeditation || hasDickschaedel) && (
-                      <div className="pt-2 border-t border-[#C5A059]/30 space-y-1">
-                        <span className="font-semibold text-[#1B365D] block text-[11px]">Aktive Besonderheiten:</span>
+                      <div className="pt-2 border-t border-rahmen space-y-1">
+                        <span className="font-semibold text-schrift block text-[11px]">Aktive Besonderheiten:</span>
                         <div className="flex flex-wrap gap-1.5">
                           {hasSegenMondkraft && (
-                            <span className="px-2 py-0.5 rounded bg-[#C5A059]/20 text-[#1B365D] font-bold border border-[#C5A059]/40 text-[11px]">
+                            <span className="px-2 py-0.5 rounded-knopf bg-rahmen text-schrift font-bold border border-rahmen text-[11px]">
                               Mondsegen: 15 Min statt 30 Min
                             </span>
                           )}
                           {hasMeditation && (
-                            <span className="px-2 py-0.5 rounded bg-blue-100 text-blue-900 border border-blue-200 text-[11px] font-semibold">
+                            <span className="px-2 py-0.5 rounded-knopf bg-kanalisiert-grund text-kanalisiert border border-kanalisiert text-[11px] font-semibold">
                               Meditation (T1): Fokus in 10 Min
                             </span>
                           )}
                           {hasDickschaedel && (
-                            <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-900 border border-emerald-200 text-[11px] font-semibold">
+                            <span className="px-2 py-0.5 rounded-knopf bg-unverletzt-grund text-unverletzt border border-unverletzt text-[11px] font-semibold">
                               Dickschädel (T1): Erschöpfung in 15 Min
                             </span>
                           )}
@@ -421,31 +421,31 @@ export const RestSection: React.FC<RestSectionProps> = ({
                   {/* Options Settings */}
                   <div className="space-y-3">
                     {/* Betäubungsschaden */}
-                    <div className="bg-white rounded-lg border border-stone-200 p-3 space-y-2 shadow-2xs">
+                    <div className="bg-flaeche rounded-knopf border border-rahmen p-3 space-y-2 shadow-2xs">
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-stone-900 flex items-center gap-1.5">
-                          <Heart size={15} className="text-red-600" />
+                        <span className="font-bold text-schrift flex items-center gap-1.5">
+                          <Heart size={15} className="text-schaden" />
                           <span>Betäubungsschaden (LP)</span>
                         </span>
-                        <label className="flex items-center gap-1.5 text-xs text-stone-700 cursor-pointer select-none font-semibold">
+                        <label className="flex items-center gap-1.5 text-xs text-schrift cursor-pointer select-none font-semibold">
                           <input
                             type="checkbox"
                             checked={vpHealAllStun}
                             onChange={(e) => setVpHealAllStun(e.target.checked)}
-                            className="rounded border-stone-300 text-emerald-600 focus:ring-emerald-500"
+                            className="rounded-knopf border-rahmen text-unverletzt focus:ring-unverletzt"
                           />
                           <span>Komplett heilen</span>
                         </label>
                       </div>
 
                       {!vpHealAllStun && (
-                        <div className="flex items-center justify-between pt-1 border-t border-stone-100">
-                          <span className="text-xs text-stone-600">Maximal zu heilende LP:</span>
-                          <div className="flex items-center rounded-lg border border-stone-300 bg-stone-50 overflow-hidden h-7">
+                        <div className="flex items-center justify-between pt-1 border-t border-rahmen">
+                          <span className="text-xs text-leise">Maximal zu heilende LP:</span>
+                          <div className="flex items-center rounded-knopf border border-rahmen bg-erhoeht overflow-hidden h-7">
                             <button
                               type="button"
                               onClick={() => setVpStunAmount((prev) => Math.max(0, prev - 1))}
-                              className="w-7 h-full hover:bg-stone-200 text-stone-800 font-bold flex items-center justify-center transition-colors"
+                              className="w-7 h-full hover:bg-rahmen text-schrift font-bold flex items-center justify-center transition-colors"
                             >
                               −
                             </button>
@@ -456,19 +456,19 @@ export const RestSection: React.FC<RestSectionProps> = ({
                               value={vpStunAmount}
                               onFocus={(e) => e.target.select()}
                               onChange={(e) => setVpStunAmount(Math.max(0, parseInt(e.target.value, 10) || 0))}
-                              className="w-12 h-full text-center font-bold text-xs text-stone-900 bg-transparent border-0 outline-none"
+                              className="w-12 h-full text-center font-bold text-xs text-schrift bg-transparent border-0 outline-none"
                             />
                             <button
                               type="button"
                               onClick={() => setVpStunAmount((prev) => prev + 1)}
-                              className="w-7 h-full hover:bg-stone-200 text-stone-800 font-bold flex items-center justify-center transition-colors"
+                              className="w-7 h-full hover:bg-rahmen text-schrift font-bold flex items-center justify-center transition-colors"
                             >
                               +
                             </button>
                           </div>
                         </div>
                       )}
-                      <p className="text-[11px] text-stone-500">
+                      <p className="text-[11px] text-leise">
                         {vpHealAllStun
                           ? 'Entfernt sämtlichen Betäubungsschaden (Gelb ✕ / Blau /) aus der Schadensleiste.'
                           : `Heilt maximal ${vpStunAmount} Punkte Betäubungsschaden.`}
@@ -476,31 +476,31 @@ export const RestSection: React.FC<RestSectionProps> = ({
                     </div>
 
                     {/* Erschöpfter Fokus */}
-                    <div className="bg-white rounded-lg border border-stone-200 p-3 space-y-2 shadow-2xs">
+                    <div className="bg-flaeche rounded-knopf border border-rahmen p-3 space-y-2 shadow-2xs">
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-stone-900 flex items-center gap-1.5">
-                          <Sparkles size={15} className="text-indigo-600" />
+                        <span className="font-bold text-schrift flex items-center gap-1.5">
+                          <Sparkles size={15} className="text-kanalisiert" />
                           <span>Erschöpfter Fokus (FO)</span>
                         </span>
-                        <label className="flex items-center gap-1.5 text-xs text-stone-700 cursor-pointer select-none font-semibold">
+                        <label className="flex items-center gap-1.5 text-xs text-schrift cursor-pointer select-none font-semibold">
                           <input
                             type="checkbox"
                             checked={vpHealAllFocus}
                             onChange={(e) => setVpHealAllFocus(e.target.checked)}
-                            className="rounded border-stone-300 text-emerald-600 focus:ring-emerald-500"
+                            className="rounded-knopf border-rahmen text-unverletzt focus:ring-unverletzt"
                           />
                           <span>Komplett heilen</span>
                         </label>
                       </div>
 
                       {!vpHealAllFocus && (
-                        <div className="flex items-center justify-between pt-1 border-t border-stone-100">
-                          <span className="text-xs text-stone-600">Maximal zu heilender FO:</span>
-                          <div className="flex items-center rounded-lg border border-stone-300 bg-stone-50 overflow-hidden h-7">
+                        <div className="flex items-center justify-between pt-1 border-t border-rahmen">
+                          <span className="text-xs text-leise">Maximal zu heilender FO:</span>
+                          <div className="flex items-center rounded-knopf border border-rahmen bg-erhoeht overflow-hidden h-7">
                             <button
                               type="button"
                               onClick={() => setVpFocusAmount((prev) => Math.max(0, prev - 1))}
-                              className="w-7 h-full hover:bg-stone-200 text-stone-800 font-bold flex items-center justify-center transition-colors"
+                              className="w-7 h-full hover:bg-rahmen text-schrift font-bold flex items-center justify-center transition-colors"
                             >
                               −
                             </button>
@@ -511,19 +511,19 @@ export const RestSection: React.FC<RestSectionProps> = ({
                               value={vpFocusAmount}
                               onFocus={(e) => e.target.select()}
                               onChange={(e) => setVpFocusAmount(Math.max(0, parseInt(e.target.value, 10) || 0))}
-                              className="w-12 h-full text-center font-bold text-xs text-stone-900 bg-transparent border-0 outline-none"
+                              className="w-12 h-full text-center font-bold text-xs text-schrift bg-transparent border-0 outline-none"
                             />
                             <button
                               type="button"
                               onClick={() => setVpFocusAmount((prev) => prev + 1)}
-                              className="w-7 h-full hover:bg-stone-200 text-stone-800 font-bold flex items-center justify-center transition-colors"
+                              className="w-7 h-full hover:bg-rahmen text-schrift font-bold flex items-center justify-center transition-colors"
                             >
                               +
                             </button>
                           </div>
                         </div>
                       )}
-                      <p className="text-[11px] text-stone-500">
+                      <p className="text-[11px] text-leise">
                         {vpHealAllFocus
                           ? 'Stellt sämtlichen erschöpften Fokus wieder her & beendet kanalisierte Zauber.'
                           : `Stellt maximal ${vpFocusAmount} Punkte erschöpften Fokus wieder her.`}
@@ -531,14 +531,14 @@ export const RestSection: React.FC<RestSectionProps> = ({
                     </div>
 
                     {/* Erschöpfung & Zustände */}
-                    <div className="bg-white rounded-lg border border-stone-200 p-3 space-y-2.5 shadow-2xs">
+                    <div className="bg-flaeche rounded-knopf border border-rahmen p-3 space-y-2.5 shadow-2xs">
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-stone-900 text-xs">Erschöpfung abbauen:</span>
-                        <div className="flex items-center rounded-lg border border-stone-300 bg-stone-50 overflow-hidden h-7">
+                        <span className="font-bold text-schrift text-xs">Erschöpfung abbauen:</span>
+                        <div className="flex items-center rounded-knopf border border-rahmen bg-erhoeht overflow-hidden h-7">
                           <button
                             type="button"
                             onClick={() => setVpExhaustReduction((prev) => Math.max(0, prev - 1))}
-                            className="w-7 h-full hover:bg-stone-200 text-stone-800 font-bold flex items-center justify-center transition-colors"
+                            className="w-7 h-full hover:bg-rahmen text-schrift font-bold flex items-center justify-center transition-colors"
                           >
                             −
                           </button>
@@ -549,25 +549,25 @@ export const RestSection: React.FC<RestSectionProps> = ({
                             value={vpExhaustReduction}
                             onFocus={(e) => e.target.select()}
                             onChange={(e) => setVpExhaustReduction(Math.max(0, parseInt(e.target.value, 10) || 0))}
-                            className="w-12 h-full text-center font-bold text-xs text-stone-900 bg-transparent border-0 outline-none"
+                            className="w-12 h-full text-center font-bold text-xs text-schrift bg-transparent border-0 outline-none"
                           />
                           <button
                             type="button"
                             onClick={() => setVpExhaustReduction((prev) => prev + 1)}
-                            className="w-7 h-full hover:bg-stone-200 text-stone-800 font-bold flex items-center justify-center transition-colors"
+                            className="w-7 h-full hover:bg-rahmen text-schrift font-bold flex items-center justify-center transition-colors"
                           >
                             +
                           </button>
                         </div>
                       </div>
 
-                      <div className="pt-2 border-t border-stone-100">
-                        <label className="flex items-center gap-2 text-xs text-stone-800 cursor-pointer select-none font-semibold">
+                      <div className="pt-2 border-t border-rahmen">
+                        <label className="flex items-center gap-2 text-xs text-schrift cursor-pointer select-none font-semibold">
                           <input
                             type="checkbox"
                             checked={vpRemoveConditions}
                             onChange={(e) => setVpRemoveConditions(e.target.checked)}
-                            className="rounded border-stone-300 text-emerald-600 focus:ring-emerald-500"
+                            className="rounded-knopf border-rahmen text-unverletzt focus:ring-unverletzt"
                           />
                           <span>Zustände <em>Glaubenskrise</em> &amp; <em>Lahm</em> aufheben</span>
                         </label>
@@ -578,25 +578,25 @@ export const RestSection: React.FC<RestSectionProps> = ({
               ) : (
                 <>
                   {/* Ruhephase Calculation & Traits */}
-                  <div className="bg-[#f3e5cf] border border-[#C5A059]/40 rounded-lg p-3 space-y-2 text-xs text-[#1B365D]">
-                    <div className="flex items-center justify-between font-bold text-[#1B365D]">
+                  <div className="bg-erhoeht border border-rahmen rounded-knopf p-3 space-y-2 text-xs text-schrift">
+                    <div className="flex items-center justify-between font-bold text-schrift">
                       <span>Berechnungsgrundlage (Regel-Standard):</span>
-                      <span className="font-normal text-[11px] text-[#1B365D]/80">Splittermond GRW S. 160</span>
+                      <span className="font-normal text-[11px] text-leise">Splittermond GRW S. 160</span>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-1">
-                      <div className="p-2 rounded bg-white border border-[#d1c4b0]">
-                        <div className="font-bold text-[#8B263E]">❤️ Lebenspunkte (LP):</div>
-                        <div className="font-mono text-[11px] mt-0.5 text-gray-800">
+                      <div className="p-2 rounded-knopf bg-flaeche border border-rahmen">
+                        <div className="font-bold text-schaden">❤️ Lebenspunkte (LP):</div>
+                        <div className="tabular-nums text-[11px] mt-0.5 text-schrift">
                           {hasDahinsiechen
                             ? '0 LP (Dahinsiechen)'
                             : `KON (${kon}) × ${lpMultiplier}${hasSchnellAufBeinen ? ' + 1' : ''}${hasGesunderGeist ? ' + 1' : ''} = ${calculatedLPDefault} LP`}
                         </div>
                       </div>
 
-                      <div className="p-2 rounded bg-white border border-[#d1c4b0]">
-                        <div className="font-bold text-[#1B365D]">✨ Fokuspool (FO):</div>
-                        <div className="font-mono text-[11px] mt-0.5 text-gray-800">
+                      <div className="p-2 rounded-knopf bg-flaeche border border-rahmen">
+                        <div className="font-bold text-schrift">✨ Fokuspool (FO):</div>
+                        <div className="tabular-nums text-[11px] mt-0.5 text-schrift">
                           {`WIL (${wil}) × ${foMultiplier} = ${calculatedFODefault} FO`}
                         </div>
                       </div>
@@ -604,31 +604,31 @@ export const RestSection: React.FC<RestSectionProps> = ({
 
                     {/* Active Modifiers info */}
                     {(hasErhoehteLPRegen || hasErhoehteFORegen || hasSchnellAufBeinen || hasGesunderGeist || hasDahinsiechen) && (
-                      <div className="pt-2 border-t border-[#C5A059]/30 space-y-1">
-                        <span className="font-semibold text-[#1B365D] block text-[11px]">Berücksichtigte Modifikatoren:</span>
+                      <div className="pt-2 border-t border-rahmen space-y-1">
+                        <span className="font-semibold text-schrift block text-[11px]">Berücksichtigte Modifikatoren:</span>
                         <div className="flex flex-wrap gap-1.5 text-[11px]">
                           {hasErhoehteLPRegen && (
-                            <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-900 font-semibold border border-emerald-200">
+                            <span className="px-2 py-0.5 rounded-knopf bg-unverletzt-grund text-unverletzt font-semibold border border-unverletzt">
                               Stärke: Erhöhte Lebensregeneration (×3)
                             </span>
                           )}
                           {hasErhoehteFORegen && (
-                            <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-900 font-semibold border border-emerald-200">
+                            <span className="px-2 py-0.5 rounded-knopf bg-unverletzt-grund text-unverletzt font-semibold border border-unverletzt">
                               Stärke: Erhöhte Fokusregeneration (×3)
                             </span>
                           )}
                           {hasSchnellAufBeinen && (
-                            <span className="px-2 py-0.5 rounded bg-blue-100 text-blue-900 font-semibold border border-blue-200">
+                            <span className="px-2 py-0.5 rounded-knopf bg-kanalisiert-grund text-kanalisiert font-semibold border border-kanalisiert">
                               Meisterschaft: Schnell wieder auf den Beinen (+1 LP)
                             </span>
                           )}
                           {hasGesunderGeist && (
-                            <span className="px-2 py-0.5 rounded bg-blue-100 text-blue-900 font-semibold border border-blue-200">
+                            <span className="px-2 py-0.5 rounded-knopf bg-kanalisiert-grund text-kanalisiert font-semibold border border-kanalisiert">
                               Meisterschaft: Gesunder Geist in gesundem Körper (+1 LP)
                             </span>
                           )}
                           {hasDahinsiechen && (
-                            <span className="px-2 py-0.5 rounded bg-red-100 text-red-900 font-semibold border border-red-200">
+                            <span className="px-2 py-0.5 rounded-knopf bg-schaden-grund text-schaden font-semibold border border-schaden">
                               Schwäche: Dahinsiechen (keine LP-Regeneration)
                             </span>
                           )}
@@ -640,22 +640,22 @@ export const RestSection: React.FC<RestSectionProps> = ({
                   {/* Manual Value Inputs */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {/* LP Input */}
-                    <div className="bg-white rounded-lg border border-[#d1c4b0] p-3 space-y-2 shadow-2xs">
+                    <div className="bg-flaeche rounded-knopf border border-rahmen p-3 space-y-2 shadow-2xs">
                       <div className="flex items-center justify-between">
-                        <label className="font-bold text-[#1B365D] text-xs flex items-center gap-1">
-                          <Heart size={14} className="text-[#C5A059]" />
+                        <label className="font-bold text-schrift text-xs flex items-center gap-1">
+                          <Heart size={14} className="text-gold" />
                           <span>Zu heilende LP:</span>
                         </label>
-                        <span className="text-[11px] text-stone-500 font-medium">
+                        <span className="text-[11px] text-leise font-medium">
                           Std: {calculatedLPDefault}
                         </span>
                       </div>
 
-                      <div className="flex items-center rounded-lg border border-[#d1c4b0] bg-white overflow-hidden h-9">
+                      <div className="flex items-center rounded-knopf border border-rahmen bg-flaeche overflow-hidden h-9">
                         <button
                           type="button"
                           onClick={() => setCustomLP((prev) => Math.max(0, prev - 1))}
-                          className="w-9 h-full hover:bg-[#ebdcc4] text-[#1B365D] font-bold flex items-center justify-center transition-colors cursor-pointer"
+                          className="w-9 h-full hover:bg-rahmen text-schrift font-bold flex items-center justify-center transition-colors cursor-pointer"
                         >
                           −
                         </button>
@@ -666,38 +666,38 @@ export const RestSection: React.FC<RestSectionProps> = ({
                           value={customLP}
                           onFocus={(e) => e.target.select()}
                           onChange={(e) => setCustomLP(Math.max(0, parseInt(e.target.value, 10) || 0))}
-                          className="flex-1 h-full text-center font-bold text-sm text-[#1B365D] bg-transparent border-0 outline-none font-mono"
+                          className="flex-1 h-full text-center font-bold text-sm text-schrift bg-transparent border-0 outline-none tabular-nums"
                         />
                         <button
                           type="button"
                           onClick={() => setCustomLP((prev) => prev + 1)}
-                          className="w-9 h-full hover:bg-[#ebdcc4] text-[#1B365D] font-bold flex items-center justify-center transition-colors cursor-pointer"
+                          className="w-9 h-full hover:bg-rahmen text-schrift font-bold flex items-center justify-center transition-colors cursor-pointer"
                         >
                           +
                         </button>
                       </div>
-                      <p className="text-[11px] text-stone-500">
+                      <p className="text-[11px] text-leise">
                         Heilt echten Schaden (Verzehrt ■ / Schrägstrich).
                       </p>
                     </div>
 
                     {/* FO Input */}
-                    <div className="bg-white rounded-lg border border-[#d1c4b0] p-3 space-y-2 shadow-2xs">
+                    <div className="bg-flaeche rounded-knopf border border-rahmen p-3 space-y-2 shadow-2xs">
                       <div className="flex items-center justify-between">
-                        <label className="font-bold text-[#1B365D] text-xs flex items-center gap-1">
-                          <Sparkles size={14} className="text-[#1B365D]" />
+                        <label className="font-bold text-schrift text-xs flex items-center gap-1">
+                          <Sparkles size={14} className="text-schrift" />
                           <span>Zu heilender FO:</span>
                         </label>
-                        <span className="text-[11px] text-stone-500 font-medium">
+                        <span className="text-[11px] text-leise font-medium">
                           Std: {calculatedFODefault}
                         </span>
                       </div>
 
-                      <div className="flex items-center rounded-lg border-2 border-[#1B365D]/30 bg-[#1B365D]/5 overflow-hidden h-9">
+                      <div className="flex items-center rounded-knopf border border-rahmen bg-flaeche overflow-hidden h-9">
                         <button
                           type="button"
                           onClick={() => setCustomFO((prev) => Math.max(0, prev - 1))}
-                          className="w-9 h-full hover:bg-[#1B365D]/15 text-[#1B365D] font-bold flex items-center justify-center transition-colors cursor-pointer"
+                          className="w-9 h-full hover:bg-flaeche text-schrift font-bold flex items-center justify-center transition-colors cursor-pointer"
                         >
                           −
                         </button>
@@ -708,17 +708,17 @@ export const RestSection: React.FC<RestSectionProps> = ({
                           value={customFO}
                           onFocus={(e) => e.target.select()}
                           onChange={(e) => setCustomFO(Math.max(0, parseInt(e.target.value, 10) || 0))}
-                          className="flex-1 h-full text-center font-bold text-sm text-[#1B365D] bg-transparent border-0 outline-none font-mono"
+                          className="flex-1 h-full text-center font-bold text-sm text-schrift bg-transparent border-0 outline-none tabular-nums"
                         />
                         <button
                           type="button"
                           onClick={() => setCustomFO((prev) => prev + 1)}
-                          className="w-9 h-full hover:bg-[#1B365D]/15 text-[#1B365D] font-bold flex items-center justify-center transition-colors cursor-pointer"
+                          className="w-9 h-full hover:bg-flaeche text-schrift font-bold flex items-center justify-center transition-colors cursor-pointer"
                         >
                           +
                         </button>
                       </div>
-                      <p className="text-[11px] text-stone-500">
+                      <p className="text-[11px] text-leise">
                         Regeneriert verzehrten Fokus.
                       </p>
                     </div>
@@ -728,14 +728,14 @@ export const RestSection: React.FC<RestSectionProps> = ({
             </div>
 
             {/* Modal Footer */}
-            <div className="p-3.5 sm:p-4 bg-[#f3e9db] border-t border-[#d1c4b0] flex flex-wrap items-center justify-between gap-2.5">
+            <div className="p-3.5 sm:p-4 bg-erhoeht border-t border-rahmen flex flex-wrap items-center justify-between gap-2.5">
               {/* Reset to standard button (only if modified) */}
               <div>
                 {activeModal === 'verschnaufpause' && !isVpDefault && (
                   <button
                     type="button"
                     onClick={resetVpToDefault}
-                    className="text-[#8B263E] hover:text-[#6a1c2f] flex items-center gap-1.5 font-bold text-xs hover:underline cursor-pointer py-1"
+                    className="text-schaden hover:text-schaden flex items-center gap-1.5 font-bold text-xs hover:underline cursor-pointer py-1"
                   >
                     <RotateCcw size={13} />
                     <span>Standardwerte wiederherstellen</span>
@@ -746,7 +746,7 @@ export const RestSection: React.FC<RestSectionProps> = ({
                   <button
                     type="button"
                     onClick={resetRuhephaseToDefault}
-                    className="text-[#8B263E] hover:text-[#6a1c2f] flex items-center gap-1.5 font-bold text-xs hover:underline cursor-pointer py-1"
+                    className="text-schaden hover:text-schaden flex items-center gap-1.5 font-bold text-xs hover:underline cursor-pointer py-1"
                   >
                     <RotateCcw size={13} />
                     <span>Standardwerte wiederherstellen</span>
@@ -759,7 +759,7 @@ export const RestSection: React.FC<RestSectionProps> = ({
                 <button
                   type="button"
                   onClick={() => setActiveModal(null)}
-                  className="px-3.5 py-2 rounded-lg border border-[#d1c4b0] bg-white hover:bg-[#ebdcc4] text-[#1B365D] font-bold text-xs transition-colors cursor-pointer"
+                  className="px-3.5 py-2 rounded-knopf border border-rahmen bg-flaeche hover:bg-rahmen text-schrift font-bold text-xs transition-colors cursor-pointer"
                 >
                   Übernehmen &amp; Schließen
                 </button>
@@ -768,18 +768,18 @@ export const RestSection: React.FC<RestSectionProps> = ({
                   <button
                     type="button"
                     onClick={handleExecuteVerschnaufpause}
-                    className="px-4 py-2 rounded-lg bg-[#1B365D] hover:bg-[#2a4f7e] text-white font-bold text-xs shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer border border-[#10233f]"
+                    className="px-4 py-2 rounded-knopf bg-erhoeht hover:bg-rahmen text-schrift font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer border border-rahmen"
                   >
-                    <Sun size={14} className="text-[#C5A059]" />
+                    <Sun size={14} className="text-gold" />
                     <span>Jetzt durchführen</span>
                   </button>
                 ) : (
                   <button
                     type="button"
                     onClick={handleExecuteRuhephase}
-                    className="px-4 py-2 rounded-lg bg-[#1B365D] hover:bg-[#2a4f7e] text-white font-bold text-xs shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer border border-[#10233f]"
+                    className="px-4 py-2 rounded-knopf bg-erhoeht hover:bg-rahmen text-schrift font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer border border-rahmen"
                   >
-                    <Moon size={14} className="text-[#C5A059]" />
+                    <Moon size={14} className="text-gold" />
                     <span>Jetzt durchführen</span>
                   </button>
                 )}

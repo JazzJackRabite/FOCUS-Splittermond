@@ -183,55 +183,55 @@ export const BegleiterVitals: React.FC<{ spiel: ReturnType<typeof useBegleiterSp
     const s = z.schaden ?? 0; const bt = z.betaeubung ?? 0; const kn = z.kanalisiert ?? 0;
     kaestchen.push(i < s ? 's' : i < s + bt ? 'b' : i < s + bt + kn ? 'k' : '');
   }
-  const farbe = { s: 'bg-red-700 border-red-800', b: 'bg-amber-400 border-amber-600', k: 'bg-sky-500 border-sky-700', '': 'bg-white border-[#d1c4b0]' };
+  const farbe = { s: 'bg-schaden-grund border-schaden', b: 'bg-erschoepft border-erschoepft', k: 'bg-kanalisiert border-kanalisiert', '': 'bg-flaeche border-rahmen' };
 
   return (
-    <div className="border border-[#d1c4b0] rounded-lg p-2 space-y-2 bg-[#faf4e6]" data-testid="begleiter-vitals">
+    <div className="border border-rahmen rounded-knopf p-2 space-y-2 bg-erhoeht" data-testid="begleiter-vitals">
       {daten.lp > 0 && (
         <div>
           <div className="flex items-center gap-2 flex-wrap">
-            <Heart size={14} className="text-red-700" />
+            <Heart size={14} className="text-schaden" />
             <strong>LP {lage.frei}/{lage.gesamt}</strong>
-            <span className={lage.ausser ? 'text-red-700 font-bold' : 'text-gray-700'}>{lage.stufenName}</span>
-            {lage.wundabzug !== 0 && <span className="text-red-700 font-bold">Wundabzug {lage.wundabzug}</span>}
-            <span className="text-gray-500">{daten.lp} je Stufe, {lage.stufen.length} Stufen{stufenQuelle ? ` (${stufenQuelle})` : ''}</span>
+            <span className={lage.ausser ? 'text-schaden font-bold' : 'text-schrift'}>{lage.stufenName}</span>
+            {lage.wundabzug !== 0 && <span className="text-schaden font-bold">Wundabzug {lage.wundabzug}</span>}
+            <span className="text-leise">{daten.lp} je Stufe, {lage.stufen.length} Stufen{stufenQuelle ? ` (${stufenQuelle})` : ''}</span>
           </div>
           <div className="flex flex-wrap gap-1 mt-1" aria-label="Lebenspunkte">
             {lage.stufen.map((st, si) => (
               <div key={si} className="flex flex-col items-start">
-                <span className="text-[9px] text-gray-500">{st.name}{st.wundabzug ? ` (${st.wundabzug})` : ''}</span>
+                <span className="text-[11px] text-leise">{st.name}{st.wundabzug ? ` (${st.wundabzug})` : ''}</span>
                 <div className="flex gap-0.5">
-                  {kaestchen.slice(si * daten.lp, (si + 1) * daten.lp).map((x, i) => <span key={i} className={`w-3 h-3 rounded-sm border ${farbe[x]}`} />)}
+                  {kaestchen.slice(si * daten.lp, (si + 1) * daten.lp).map((x, i) => <span key={i} className={`w-3 h-3 rounded-knopf border ${farbe[x]}`} />)}
                 </div>
               </div>
             ))}
           </div>
           <div className="flex flex-wrap gap-1 items-center mt-1">
-            <button type="button" className="px-2 py-0.5 rounded bg-red-700 text-white font-bold cursor-pointer flex items-center gap-1"
+            <button type="button" className="px-2 py-0.5 rounded-knopf bg-schaden-grund text-schrift font-bold cursor-pointer flex items-center gap-1"
               onClick={spiel.schadenModal}><HeartCrack size={11} />Schaden erleiden</button>
-            <button type="button" className="px-2 py-0.5 rounded bg-green-700 text-white font-bold cursor-pointer flex items-center gap-1 disabled:opacity-40" disabled={!lage.verloren}
+            <button type="button" className="px-2 py-0.5 rounded-knopf bg-unverletzt-grund text-schrift font-bold cursor-pointer flex items-center gap-1 disabled:opacity-40" disabled={!lage.verloren}
               onClick={spiel.heilenModal}><HeartPulse size={11} />Heilen</button>
-            {immun && <span className="text-gray-500">immun gegen Betäubungsschaden</span>}
+            {immun && <span className="text-leise">immun gegen Betäubungsschaden</span>}
           </div>
         </div>
       )}
       {daten.fo > 0 && (
         <div>
           <div className="flex items-center gap-2 flex-wrap">
-            <Sparkles size={14} className="text-[#1B365D]" />
+            <Sparkles size={14} className="text-schrift" />
             <strong>Fokus {frei}/{daten.fo}</strong>
-            <span className="text-gray-600">erschöpft {f.erschoepft ?? 0}, kanalisiert {f.kanalisiert ?? 0}, verzehrt {f.verzehrt ?? 0}</span>
+            <span className="text-leise">erschöpft {f.erschoepft ?? 0}, kanalisiert {f.kanalisiert ?? 0}, verzehrt {f.verzehrt ?? 0}</span>
           </div>
           <div className="flex flex-wrap gap-1 items-center mt-1">
             <input type="number" min={1} value={foMenge} onChange={e => setFoMenge(Number(e.target.value) || 1)} className={`${auswahl} w-14`} aria-label="Menge Fokus" />
             {([['erschoepft', 'erschöpfen'], ['kanalisiert', 'kanalisieren'], ['verzehrt', 'verzehren']] as const).map(([feld, text]) => (
-              <button key={feld} type="button" className="px-2 py-0.5 rounded border border-[#1B365D] text-[#1B365D] font-bold cursor-pointer disabled:opacity-40" disabled={frei <= 0}
+              <button key={feld} type="button" className="px-2 py-0.5 rounded-knopf border border-gold text-schrift font-bold cursor-pointer disabled:opacity-40" disabled={frei <= 0}
                 onClick={() => { const m = Math.min(frei, Math.max(1, foMenge)); aendern({ ...z, fokus: { ...f, [feld]: (f[feld] ?? 0) + m } }, `${m} Fokus ${text === 'erschöpfen' ? 'erschöpft' : text === 'kanalisieren' ? 'kanalisiert' : 'verzehrt'}`, 'focus', `−${m} FO`); }}>
                 {text}
               </button>
             ))}
             {(f.kanalisiert ?? 0) > 0 && (
-              <button type="button" className="px-2 py-0.5 rounded border border-[#1B365D] text-[#1B365D] cursor-pointer"
+              <button type="button" className="px-2 py-0.5 rounded-knopf border border-gold text-schrift cursor-pointer"
                 onClick={() => aendern({ ...z, fokus: { ...f, kanalisiert: 0, erschoepft: (f.erschoepft ?? 0) + (f.kanalisiert ?? 0) } }, 'Kanalisierung beendet', 'focus', 'K → erschöpft')}>
                 Kanalisierung beenden
               </button>
@@ -240,9 +240,9 @@ export const BegleiterVitals: React.FC<{ spiel: ReturnType<typeof useBegleiterSp
         </div>
       )}
       <div className="flex flex-wrap gap-1">
-        <button type="button" className="px-2 py-0.5 rounded border border-[#C5A059] cursor-pointer flex items-center gap-1" title="Betäubungsschaden und erschöpfter Fokus erholen sich"
+        <button type="button" className="px-2 py-0.5 rounded-knopf border border-gold cursor-pointer flex items-center gap-1" title="Betäubungsschaden und erschöpfter Fokus erholen sich"
           onClick={() => aendern({ ...z, betaeubung: 0, fokus: { ...f, erschoepft: 0 } }, 'Verschnaufpause', 'heal', 'Pause')}><Coffee size={11} />Verschnaufpause</button>
-        <button type="button" className="px-2 py-0.5 rounded border border-[#C5A059] cursor-pointer flex items-center gap-1"
+        <button type="button" className="px-2 py-0.5 rounded-knopf border border-gold cursor-pointer flex items-center gap-1"
           onClick={() => aendern({}, 'Werte zurückgesetzt (voll)', 'heal', 'voll')}><RotateCcw size={11} />Alles zurücksetzen</button>
       </div>
     </div>
@@ -260,7 +260,7 @@ export const VitalKurz: React.FC<{ spiel: ReturnType<typeof useBegleiterSpiel>; 
   if (!daten.lp) return null;
   const { lage } = spiel;
   return (
-    <span className={`font-bold ${lage.ausser ? 'text-red-700' : lage.wundabzug ? 'text-amber-700' : 'text-[#1B365D]'}`} title={lage.stufenName}>
+    <span className={`font-bold ${lage.ausser ? 'text-schaden' : lage.wundabzug ? 'text-erschoepft' : 'text-schrift'}`} title={lage.stufenName}>
       ♥ {lage.frei}/{lage.gesamt}{daten.fo ? ` · FO ${fokusFrei(daten.fo, spiel.zustand)}/${daten.fo}` : ''}
     </span>
   );

@@ -51,7 +51,7 @@ const ModulAuswahl: React.FC<{ art: Art; k: Katalog }> = ({ art, k }) => {
         <span>{gr.text}:</span>
         <select value={wert} disabled={eingetragen} aria-label={gr.text}
           onChange={e => waehle({ [feld]: { ...(zustand?.wahl?.[feld] ?? {}), [String(gr.index)]: e.target.value } })}
-          className="border border-[#d1c4b0] rounded px-1 py-0.5 text-xs bg-white text-[#2C1810]">
+          className="border border-rahmen rounded-knopf px-1 py-0.5 text-xs bg-flaeche text-schrift">
           <option value="">– wählen –</option>
           {(gr.restVon !== undefined ? (g?.[feld][gr.restVon].optionen.filter(o => o.id).map(o => ({ id: o.id!, text: o.text })) ?? []) : opts).map(o => <option key={o.id} value={o.id}>{o.text}</option>)}
         </select>
@@ -61,16 +61,16 @@ const ModulAuswahl: React.FC<{ art: Art; k: Katalog }> = ({ art, k }) => {
 
   return (
     <div className="space-y-2">
-      <label className="block text-xs uppercase text-gray-500 font-bold">{TITEL[art]}</label>
+      <label className="block text-xs uppercase text-leise font-bold">{TITEL[art]}</label>
       <select value={zustand?.modul ?? ''} disabled={eingetragen} aria-label={TITEL[art]}
         onChange={e => setze(e.target.value ? { modul: e.target.value } : null)}
-        className="w-full border-2 border-[#d1c4b0] rounded px-2 py-1 text-sm bg-white text-[#2C1810] disabled:bg-gray-100">
+        className="w-full border border-rahmen rounded-knopf px-2 py-1 text-sm bg-flaeche text-schrift disabled:bg-erhoeht">
         <option value="">Frei verteilen</option>
         {module.map(m => <option key={m.id} value={m.id}>{m.name}{m.quelle.paket !== 'grw' ? ` (${k.pakete[m.quelle.paket]?.kuerzel ?? m.quelle.paket})` : ''}</option>)}
       </select>
-      {!zustand?.modul && <p className="text-xs text-gray-600">{FREI[art]}</p>}
+      {!zustand?.modul && <p className="text-xs text-leise">{FREI[art]}</p>}
       {g && (
-        <div className="text-xs text-gray-700 bg-[#fdfbf7] border border-dashed border-gray-300 rounded p-2 space-y-1">
+        <div className="text-xs text-schrift bg-erhoeht border border-dashed border-rahmen rounded-knopf p-2 space-y-1">
           <ul className="list-disc list-inside space-y-0.5">
             {g.fertigkeiten.map(gr => gruppe('fertigkeiten', gr))}
             {g.ressourcen.map(gr => gruppe('ressourcen', gr))}
@@ -80,7 +80,7 @@ const ModulAuswahl: React.FC<{ art: Art; k: Katalog }> = ({ art, k }) => {
               <span>Stärke:</span>
               {g.staerken.length === 1 ? <strong>{g.staerken[0].text}</strong> : (
                 <select value={zustand?.wahl?.staerke ?? ''} disabled={eingetragen} aria-label="Stärke des Moduls" onChange={e => waehle({ staerke: e.target.value })}
-                  className="border border-[#d1c4b0] rounded px-1 py-0.5 text-xs bg-white text-[#2C1810]">
+                  className="border border-rahmen rounded-knopf px-1 py-0.5 text-xs bg-flaeche text-schrift">
                   <option value="">– wählen –</option>
                   {g.staerken.filter(o => o.id).map(o => <option key={o.id} value={o.id}>{o.text}</option>)}
                 </select>
@@ -93,7 +93,7 @@ const ModulAuswahl: React.FC<{ art: Art; k: Katalog }> = ({ art, k }) => {
               {g.meisterschaften.length === 1 ? <strong>{g.meisterschaften[0].text}</strong> : (
                 <select value={zustand?.wahl?.meisterschaft ?? ''} disabled={eingetragen} aria-label="Meisterschaft des Moduls"
                   onChange={e => waehle({ meisterschaft: e.target.value === '' ? undefined : Number(e.target.value) })}
-                  className="border border-[#d1c4b0] rounded px-1 py-0.5 text-xs bg-white text-[#2C1810]">
+                  className="border border-rahmen rounded-knopf px-1 py-0.5 text-xs bg-flaeche text-schrift">
                   <option value="">– wählen –</option>
                   {g.meisterschaften.map((o, i) => <option key={i} value={i}>{o.text}</option>)}
                 </select>
@@ -104,15 +104,15 @@ const ModulAuswahl: React.FC<{ art: Art; k: Katalog }> = ({ art, k }) => {
           <div className="pt-1">
             {eingetragen ? (
               <button type="button" onClick={() => dispatch({ type: 'ERSCHAFFUNG_MODUL_AUSTRAGEN', payload: { art } })}
-                className="px-2 py-1 rounded border border-gray-400 bg-white text-gray-700 hover:bg-gray-50 cursor-pointer">Werte wieder austragen</button>
+                className="px-2 py-1 rounded-knopf border border-rahmen bg-flaeche text-schrift hover:bg-rahmen cursor-pointer">Werte wieder austragen</button>
             ) : (
               <button type="button" disabled={!ergebnis || ergebnis.fehlend.length > 0 || state.mode !== 'creation'} onClick={eintragen}
-                className="px-2 py-1 rounded border border-[#C5A059] bg-[#1B365D] text-[#f3e5cf] hover:bg-[#C5A059] hover:text-[#1B365D] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-2 py-1 rounded-knopf border border-gold bg-erhoeht text-schrift hover:bg-rahmen hover:text-gold-hell cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 title={ergebnis?.fehlend.length ? `Noch wählen: ${ergebnis.fehlend.join(', ')}` : undefined}>
                 Modulwerte eintragen
               </button>
             )}
-            {!eingetragen && ergebnis && ergebnis.fehlend.length > 0 && <span className="ml-2 text-amber-700">Noch wählen: {ergebnis.fehlend.join(', ')}</span>}
+            {!eingetragen && ergebnis && ergebnis.fehlend.length > 0 && <span className="ml-2 text-erschoepft">Noch wählen: {ergebnis.fehlend.join(', ')}</span>}
           </div>
         </div>
       )}
@@ -129,24 +129,24 @@ export const ErschaffungRegelwerk: React.FC = () => {
   const fehler = pruefung?.befunde.filter(b => b[0] === 'fehler') ?? [];
   const sl = pruefung?.befunde.filter(b => b[0] === 'spielleiter') ?? [];
   return (
-    <div className="bg-white bg-opacity-60 p-5 rounded border border-[#d1c4b0] shadow-sm relative" data-testid="erschaffung-regelwerk">
-      <h3 className="font-bold text-xl mb-4 border-b border-[#C5A059] pb-2 fantasy-font text-[#1B365D]">Kultur & Abstammung</h3>
+    <div className="bg-flaeche bg-opacity-60 p-5 rounded-knopf border border-rahmen relative" data-testid="erschaffung-regelwerk">
+      <h3 className="font-bold text-xl mb-4 border-b border-gold pb-2 fantasy-font text-gold-hell">Kultur & Abstammung</h3>
       <div className="space-y-4">
         <ModulAuswahl art="kultur" k={katalog} />
         <ModulAuswahl art="abstammung" k={katalog} />
-        <p className="text-xs text-gray-600">
+        <p className="text-xs text-leise">
           Ausbildung (Schritt 5) und Schritt 7 verteilst du wie bisher frei; die Prüfung ordnet die übrigen Punkte den Schritten zu.
         </p>
       </div>
-      <div className="mt-4 border-t border-[#d1c4b0] pt-3" aria-live="polite">
-        <h4 className="font-bold text-sm text-[#1B365D] mb-2">Regelprüfung der Erschaffung (GRW S. 22–30)</h4>
+      <div className="mt-4 border-t border-rahmen pt-3" aria-live="polite">
+        <h4 className="font-bold text-sm text-gold-hell mb-2">Regelprüfung der Erschaffung (GRW S. 22–30)</h4>
         {pruefung && fehler.length === 0 && sl.length === 0 && (
-          <p className="text-sm text-green-800 flex items-center gap-2"><CheckCircle2 size={16} /> Alle Schritte stimmen.</p>
+          <p className="text-sm text-unverletzt flex items-center gap-2"><CheckCircle2 size={16} /> Alle Schritte stimmen.</p>
         )}
         <ul className="space-y-1 text-xs">
-          {fehler.map(([, t]) => <li key={t} className="flex gap-1.5 text-red-800"><XCircle size={14} className="shrink-0 mt-0.5" />{t}</li>)}
-          {sl.map(([, t]) => <li key={t} className="flex gap-1.5 text-amber-800"><AlertTriangle size={14} className="shrink-0 mt-0.5" />{t}</li>)}
-          {(pruefung?.hinweise ?? []).map(t => <li key={t} className="flex gap-1.5 text-gray-600"><Info size={14} className="shrink-0 mt-0.5" />{t}</li>)}
+          {fehler.map(([, t]) => <li key={t} className="flex gap-1.5 text-schaden"><XCircle size={14} className="shrink-0 mt-0.5" />{t}</li>)}
+          {sl.map(([, t]) => <li key={t} className="flex gap-1.5 text-erschoepft"><AlertTriangle size={14} className="shrink-0 mt-0.5" />{t}</li>)}
+          {(pruefung?.hinweise ?? []).map(t => <li key={t} className="flex gap-1.5 text-leise"><Info size={14} className="shrink-0 mt-0.5" />{t}</li>)}
         </ul>
       </div>
     </div>

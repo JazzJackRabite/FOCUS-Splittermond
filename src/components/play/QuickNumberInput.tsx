@@ -177,7 +177,7 @@ export const QuickNumberInput: React.FC<QuickNumberInputProps> = ({
         onClick={handleInputClick}
         onDoubleClick={handleOpenPad}
         title={label ? `${label} (Klick zum Auswählen/Tippen, Doppelklick für Ziffernfeld)` : 'Klick zum Auswählen/Tippen'}
-        className={`w-10 h-full text-center font-bold text-sm bg-transparent border-0 outline-none select-all cursor-pointer text-[#1B365D] dark:text-[#F5F2EA] ${inputClassName}`}
+        className={`w-10 h-full text-center font-bold text-sm bg-transparent border-0 outline-none select-all cursor-pointer text-schrift dark:text-schrift ${inputClassName}`}
       />
 
       {/* Touch / Quick-Pad Toggle Icon Button (only visible on mobile or hover) */}
@@ -189,10 +189,10 @@ export const QuickNumberInput: React.FC<QuickNumberInputProps> = ({
           setIsOpen((prev) => !prev);
         }}
         disabled={disabled}
-        className="no-print opacity-60 hover:opacity-100 p-0.5 text-[#1B365D] dark:text-[#C5A059] transition-opacity shrink-0 -ml-1 text-[11px]"
+        className="no-print opacity-60 hover:opacity-100 p-0.5 text-schrift dark:text-gold transition-opacity shrink-0 -ml-1 text-[11px]"
         title="Zahleneingabe-Pop-up öffnen"
       >
-        <span className="text-[10px] leading-none">▾</span>
+        <span className="text-[11px] leading-none">▾</span>
       </button>
 
       {/* ── Touch / Quick Keypad Modal / Popover ── */}
@@ -206,42 +206,42 @@ export const QuickNumberInput: React.FC<QuickNumberInputProps> = ({
 
           <div
             ref={popoverRef}
-            className="fixed sm:absolute sm:top-full sm:left-1/2 sm:-translate-x-1/2 mt-1 z-50 bg-[#fbf8f2] border-2 border-[#C5A059] rounded-2xl shadow-2xl p-3.5 w-[280px] max-w-[90vw] text-[#1B365D] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 sm:translate-y-0 animate-in fade-in zoom-in-95 duration-150"
+            className="fixed sm:absolute sm:top-full sm:left-1/2 sm:-translate-x-1/2 mt-1 z-50 bg-erhoeht border border-gold rounded-karte shadow-2xl p-3.5 w-[280px] max-w-[90vw] text-schrift top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 sm:translate-y-0 animate-in fade-in zoom-in-95 duration-150"
           >
             {/* Header */}
-            <div className="flex justify-between items-center pb-2 mb-2 border-b border-[#C5A059]/30">
-              <span className="font-bold text-xs fantasy-font text-[#1B365D] flex items-center gap-1.5">
-                <Sparkles size={13} className="text-[#C5A059]" />
+            <div className="flex justify-between items-center pb-2 mb-2 border-b border-rahmen">
+              <span className="font-bold text-xs fantasy-font text-schrift flex items-center gap-1.5">
+                <Sparkles size={13} className="text-gold" />
                 {label || 'Zahl auswählen'}
               </span>
               <button
                 onClick={() => setIsOpen(false)}
-                className="text-stone-400 hover:text-[#8B263E] p-1 rounded-md hover:bg-black/5 cursor-pointer"
+                className="text-leise hover:text-schaden p-1 rounded-knopf hover:bg-black/5 cursor-pointer"
               >
                 <X size={14} />
               </button>
             </div>
 
             {/* Current Value Preview Display */}
-            <div className="flex items-center justify-between bg-white border border-[#C5A059]/50 rounded-xl px-3 py-2 mb-3 shadow-inner">
+            <div className="flex items-center justify-between bg-flaeche border border-gold rounded-karte px-3 py-2 mb-3 ">
               <div className="flex items-center gap-1">
                 <button
                   type="button"
                   onClick={() => handlePadAdjust(-5)}
-                  className="px-1.5 py-0.5 text-[11px] font-bold rounded-md bg-[#ebdcc4] hover:bg-[#e0cfb4] text-[#1B365D] border border-[#d1c4b0] active:scale-95 cursor-pointer"
+                  className="px-1.5 py-0.5 text-[11px] font-bold rounded-knopf bg-erhoeht hover:bg-rahmen text-schrift border border-rahmen active:scale-95 cursor-pointer"
                 >
                   -5
                 </button>
                 <button
                   type="button"
                   onClick={() => handlePadAdjust(-1)}
-                  className="px-2 py-0.5 text-xs font-bold rounded-md bg-[#ebdcc4] hover:bg-[#e0cfb4] text-[#1B365D] border border-[#d1c4b0] active:scale-95 cursor-pointer"
+                  className="px-2 py-0.5 text-xs font-bold rounded-knopf bg-erhoeht hover:bg-rahmen text-schrift border border-rahmen active:scale-95 cursor-pointer"
                 >
                   -1
                 </button>
               </div>
 
-              <span className="font-bold text-2xl text-[#1B365D] font-mono px-2">
+              <span className="font-bold text-2xl text-schrift tabular-nums px-2">
                 {padValue || effectiveMin}
               </span>
 
@@ -249,14 +249,14 @@ export const QuickNumberInput: React.FC<QuickNumberInputProps> = ({
                 <button
                   type="button"
                   onClick={() => handlePadAdjust(1)}
-                  className="px-2 py-0.5 text-xs font-bold rounded-md bg-[#ebdcc4] hover:bg-[#e0cfb4] text-[#1B365D] border border-[#d1c4b0] active:scale-95 cursor-pointer"
+                  className="px-2 py-0.5 text-xs font-bold rounded-knopf bg-erhoeht hover:bg-rahmen text-schrift border border-rahmen active:scale-95 cursor-pointer"
                 >
                   +1
                 </button>
                 <button
                   type="button"
                   onClick={() => handlePadAdjust(5)}
-                  className="px-1.5 py-0.5 text-[11px] font-bold rounded-md bg-[#ebdcc4] hover:bg-[#e0cfb4] text-[#1B365D] border border-[#d1c4b0] active:scale-95 cursor-pointer"
+                  className="px-1.5 py-0.5 text-[11px] font-bold rounded-knopf bg-erhoeht hover:bg-rahmen text-schrift border border-rahmen active:scale-95 cursor-pointer"
                 >
                   +5
                 </button>
@@ -265,7 +265,7 @@ export const QuickNumberInput: React.FC<QuickNumberInputProps> = ({
 
             {/* Quick Presets Chips */}
             <div className="mb-3">
-              <div className="text-[10px] uppercase font-bold text-stone-500 mb-1 tracking-wider">
+              <div className="text-[11px] uppercase font-bold text-leise mb-1 tracking-wider">
                 Schnellwahl
               </div>
               <div className="grid grid-cols-6 gap-1">
@@ -274,10 +274,10 @@ export const QuickNumberInput: React.FC<QuickNumberInputProps> = ({
                     key={num}
                     type="button"
                     onClick={() => handlePadPreset(num)}
-                    className={`py-1 rounded-md text-xs font-bold transition-all border cursor-pointer ${
+                    className={`py-1 rounded-knopf text-xs font-bold transition-all border cursor-pointer ${
                       parseInt(padValue, 10) === num
-                        ? 'bg-[#1B365D] text-white border-[#10233f] shadow-xs'
-                        : 'bg-white hover:bg-[#f3e5cf] text-[#1B365D] border-[#d1c4b0]'
+                        ? 'bg-erhoeht text-schrift border-rahmen '
+                        : 'bg-flaeche hover:bg-rahmen text-schrift border-rahmen'
                     }`}
                   >
                     {num}
@@ -293,7 +293,7 @@ export const QuickNumberInput: React.FC<QuickNumberInputProps> = ({
                   key={digit}
                   type="button"
                   onClick={() => handlePadDigit(digit.toString())}
-                  className="h-9 rounded-lg bg-white border border-[#d1c4b0] hover:bg-[#f3e5cf] active:bg-[#ebdcc4] font-bold text-sm text-[#1B365D] shadow-2xs active:scale-95 transition-all flex items-center justify-center cursor-pointer"
+                  className="h-9 rounded-knopf bg-flaeche border border-rahmen hover:bg-rahmen active:bg-erhoeht font-bold text-sm text-schrift shadow-2xs active:scale-95 transition-all flex items-center justify-center cursor-pointer"
                 >
                   {digit}
                 </button>
@@ -301,7 +301,7 @@ export const QuickNumberInput: React.FC<QuickNumberInputProps> = ({
               <button
                 type="button"
                 onClick={handlePadClear}
-                className="h-9 rounded-lg bg-stone-100 border border-[#d1c4b0] hover:bg-stone-200 active:bg-stone-300 font-bold text-xs text-[#1B365D] shadow-2xs active:scale-95 transition-all flex items-center justify-center cursor-pointer"
+                className="h-9 rounded-knopf bg-seite border border-rahmen hover:bg-rahmen active:bg-erhoeht font-bold text-xs text-schrift shadow-2xs active:scale-95 transition-all flex items-center justify-center cursor-pointer"
                 title="Löschen"
               >
                 C
@@ -309,14 +309,14 @@ export const QuickNumberInput: React.FC<QuickNumberInputProps> = ({
               <button
                 type="button"
                 onClick={() => handlePadDigit('0')}
-                className="h-9 rounded-lg bg-white border border-[#d1c4b0] hover:bg-[#f3e5cf] active:bg-[#ebdcc4] font-bold text-sm text-[#1B365D] shadow-2xs active:scale-95 transition-all flex items-center justify-center cursor-pointer"
+                className="h-9 rounded-knopf bg-flaeche border border-rahmen hover:bg-rahmen active:bg-erhoeht font-bold text-sm text-schrift shadow-2xs active:scale-95 transition-all flex items-center justify-center cursor-pointer"
               >
                 0
               </button>
               <button
                 type="button"
                 onClick={handlePadBackspace}
-                className="h-9 rounded-lg bg-[#ebdcc4] border border-[#d1c4b0] hover:bg-[#e0cfb4] active:bg-[#d6c2a2] font-bold text-xs text-[#1B365D] shadow-2xs active:scale-95 transition-all flex items-center justify-center cursor-pointer"
+                className="h-9 rounded-knopf bg-erhoeht border border-rahmen hover:bg-rahmen active:bg-erhoeht font-bold text-xs text-schrift shadow-2xs active:scale-95 transition-all flex items-center justify-center cursor-pointer"
                 title="Letzte Ziffer löschen"
               >
                 <Delete size={14} />
@@ -327,9 +327,9 @@ export const QuickNumberInput: React.FC<QuickNumberInputProps> = ({
             <button
               type="button"
               onClick={handleApplyPad}
-              className="w-full py-2 bg-[#1B365D] hover:bg-[#2a4f7e] text-white font-bold text-xs rounded-xl shadow-xs border border-[#10233f] transition-all flex items-center justify-center gap-1.5 active:scale-[0.99] cursor-pointer"
+              className="w-full py-2 bg-erhoeht hover:bg-rahmen text-schrift font-bold text-xs rounded-karte border border-rahmen transition-all flex items-center justify-center gap-1.5 active:scale-[0.99] cursor-pointer"
             >
-              <Check size={14} className="text-[#C5A059]" />
+              <Check size={14} className="text-gold" />
               <span>Übernehmen</span>
             </button>
           </div>

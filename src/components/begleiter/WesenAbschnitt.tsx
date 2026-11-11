@@ -10,7 +10,7 @@ import type { Begleiter } from '../../types';
 const Dienste: React.FC<{ k: Katalog; wesen: string }> = ({ k, wesen }) => {
   const { state } = useCharacter();
   const liste = useMemo(() => diensteFuer(k, wesen, state.masteries), [k, wesen, state.masteries]);
-  if (!liste.length) return <p className="text-xs text-gray-600">Keine Dienste verfügbar (Paket „Die Magie“ geladen?).</p>;
+  if (!liste.length) return <p className="text-xs text-leise">Keine Dienste verfügbar (Paket „Die Magie“ geladen?).</p>;
   const art = { basis: 'Basisdienst', immer: 'immer verfügbar', erweitert: 'Erweiterter Dienst' } as const;
   return (
     <ul className="text-xs space-y-0.5">
@@ -26,24 +26,24 @@ const WesenEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number }> = ({ k
   const daten = spielDaten(b, w);
   const spiel = useBegleiterSpiel(b, index, daten);
   return (
-    <li className="border border-[#d1c4b0] rounded-lg p-2 bg-white">
+    <li className="border border-rahmen rounded-knopf p-2 bg-flaeche">
       {spiel.modale}
       <div className="flex items-center justify-between gap-2">
-        <button type="button" className="flex items-center gap-1 text-sm font-bold text-[#1B365D] cursor-pointer" onClick={() => setOffen(o => !o)} aria-expanded={offen}>
+        <button type="button" className="flex items-center gap-1 text-sm font-bold text-schrift cursor-pointer" onClick={() => setOffen(o => !o)} aria-expanded={offen}>
           {offen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}{b.name}
         </button>
-        <span className="flex items-center gap-2 text-xs text-gray-500">
+        <span className="flex items-center gap-2 text-xs text-leise">
           <VitalKurz spiel={spiel} daten={daten} />
           Stufe {e?.daten.beschwoerbares_wesen_stufe ?? '?'}
-          {!e && <span className="text-amber-700">nicht im Katalog (Buch nicht geladen?)</span>}
+          {!e && <span className="text-erschoepft">nicht im Katalog (Buch nicht geladen?)</span>}
           <button type="button" aria-label={`${b.name} entfernen`} onClick={() => dispatch({ type: 'BEGLEITER_ENTFERNEN', payload: { index } })}
-            className="p-1 rounded hover:bg-black/5 hover:text-red-700 cursor-pointer"><Trash2 size={14} /></button>
+            className="p-1 rounded-knopf hover:bg-black/5 hover:text-schaden cursor-pointer"><Trash2 size={14} /></button>
         </span>
       </div>
       {offen && e && (
         <div className="mt-2 space-y-2 text-xs">
           <BegleiterVitals spiel={spiel} daten={daten} />
-          {w ? <Werte w={w} aktionen={spiel.aktionen} /> : <p className="text-xs text-gray-600">Keine Werte im Katalog ({e.daten.quelle_text ?? 'anderes Werk'}).</p>}
+          {w ? <Werte w={w} aktionen={spiel.aktionen} /> : <p className="text-xs text-leise">Keine Werte im Katalog ({e.daten.quelle_text ?? 'anderes Werk'}).</p>}
           <div><strong className="text-xs">Dienste:</strong><Dienste k={k} wesen={b.id} /></div>
         </div>
       )}
@@ -61,11 +61,11 @@ export const WesenAbschnitt: React.FC<{ k: Katalog }> = ({ k }) => {
   return (
     <section className={karte} data-testid="begleiter-wesen">
       <div className="flex items-center gap-2 mb-2">
-        <Sparkles size={18} className="text-[#C5A059]" />
-        <h3 className="font-bold text-base text-[#1B365D]">Beschworene Wesen</h3>
+        <Sparkles size={18} className="text-gold" />
+        <h3 className="font-bold text-base text-gold-hell">Beschworene Wesen</h3>
       </div>
       {!wesen.length && !liste.length && (
-        <p className="text-xs text-gray-600">Beschwörbare Wesen und ihre Dienste stehen im Buchpaket „Die Magie“ (Einstellungen → Regelpakete).</p>
+        <p className="text-xs text-leise">Beschwörbare Wesen und ihre Dienste stehen im Buchpaket „Die Magie“ (Einstellungen → Regelpakete).</p>
       )}
       {liste.length > 0 && (
         <ul className="space-y-2 mb-3">

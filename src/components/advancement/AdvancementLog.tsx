@@ -141,40 +141,40 @@ export const AdvancementLog: React.FC<AdvancementLogProps> = ({
   const getCategoryIcon = (category: AdvancementLogEntry['category']) => {
     switch (category) {
       case 'xp':
-        return <Sparkles size={14} className="text-emerald-600" />;
+        return <Sparkles size={14} className="text-unverletzt" />;
       case 'attr':
-        return <TrendingUp size={14} className="text-amber-600" />;
+        return <TrendingUp size={14} className="text-erschoepft" />;
       case 'skill':
-        return <Award size={14} className="text-blue-600" />;
+        return <Award size={14} className="text-kanalisiert" />;
       case 'mastery':
-        return <Shield size={14} className="text-indigo-600" />;
+        return <Shield size={14} className="text-kanalisiert" />;
       case 'spell':
-        return <Zap size={14} className="text-[#C5A059]" />;
+        return <Zap size={14} className="text-gold" />;
       case 'strength':
       case 'resource':
-        return <Layers size={14} className="text-teal-600" />;
+        return <Layers size={14} className="text-temporaer" />;
       default:
-        return <FileText size={14} className="text-gray-600" />;
+        return <FileText size={14} className="text-leise" />;
     }
   };
 
   const getCategoryBadgeClass = (category: AdvancementLogEntry['category']) => {
     switch (category) {
       case 'xp':
-        return 'bg-emerald-50 text-emerald-800 border-emerald-300';
+        return 'bg-unverletzt-grund text-unverletzt border-unverletzt';
       case 'attr':
-        return 'bg-amber-50 text-amber-900 border-amber-300';
+        return 'bg-erschoepft-grund text-erschoepft border-erschoepft';
       case 'skill':
-        return 'bg-blue-50 text-blue-900 border-blue-300';
+        return 'bg-kanalisiert-grund text-kanalisiert border-kanalisiert';
       case 'mastery':
-        return 'bg-indigo-50 text-indigo-900 border-indigo-300';
+        return 'bg-kanalisiert-grund text-kanalisiert border-kanalisiert';
       case 'spell':
-        return 'bg-[#f3e5cf] text-[#1B365D] border-[#C5A059]/40';
+        return 'bg-erhoeht text-schrift border-rahmen';
       case 'strength':
       case 'resource':
-        return 'bg-teal-50 text-teal-900 border-teal-300';
+        return 'bg-temporaer-grund text-temporaer border-temporaer';
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-300';
+        return 'bg-erhoeht text-schrift border-rahmen';
     }
   };
 
@@ -208,22 +208,22 @@ export const AdvancementLog: React.FC<AdvancementLogProps> = ({
   return (
     <div
       id="advancement-protocol-section"
-      className="bg-white bg-opacity-60 rounded-xl border border-[#d1c4b0] shadow-sm p-4 text-[#1B365D] mt-6 no-print"
+      className="bg-flaeche bg-opacity-60 rounded-karte border border-rahmen p-4 text-schrift mt-6 no-print"
     >
       {/* Header */}
-      <div className="flex flex-wrap justify-between items-center border-b border-[#C5A059] pb-3 mb-4 gap-2">
+      <div className="flex flex-wrap justify-between items-center border-b border-gold pb-3 mb-4 gap-2">
         <div className="flex items-center gap-2.5">
-          <div className="p-1.5 bg-[#f3e5cf] rounded-lg border border-[#C5A059]/40 text-[#1B365D]">
-            <History size={20} className="text-[#1B365D]" />
+          <div className="p-1.5 bg-erhoeht rounded-knopf border border-rahmen text-schrift">
+            <History size={20} className="text-schrift" />
           </div>
           <div>
-            <h3 className="font-bold text-lg fantasy-font leading-tight text-[#1B365D] flex items-center gap-2">
+            <h3 className="font-bold text-lg fantasy-font leading-tight text-gold-hell flex items-center gap-2">
               Protokoll: Steigerungen &amp; Erfahrungspunkte
-              <span className="text-xs font-sans font-medium text-[#1B365D] bg-[#f3e5cf] px-2 py-0.5 rounded-full border border-[#C5A059]/30">
+              <span className="text-xs font-medium text-schrift bg-erhoeht px-2 py-0.5 rounded-full border border-rahmen">
                 {entries.length} Einträge
               </span>
             </h3>
-            <p className="text-xs text-gray-600">
+            <p className="text-xs text-leise">
               Lückenlose Aufzeichnung aller EP-Gutschriften, Attributs-, Fertigkeits- und Meisterschaftssteigerungen
             </p>
           </div>
@@ -234,10 +234,10 @@ export const AdvancementLog: React.FC<AdvancementLogProps> = ({
             <button
               onClick={onUndo}
               disabled={!canUndo}
-              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold transition border ${
+              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-knopf text-xs font-bold transition border ${
                 canUndo
-                  ? 'bg-[#1B365D] text-[#f3e5cf] hover:bg-[#2c4b7a] border-[#C5A059] cursor-pointer shadow-xs active:scale-95'
-                  : 'bg-[#e3d4b9]/40 text-gray-400 border-[#d1c4b0] cursor-not-allowed opacity-60'
+                  ? 'bg-erhoeht text-schrift hover:bg-rahmen border-gold cursor-pointer active:scale-95'
+                  : 'bg-rahmen text-leise border-rahmen cursor-not-allowed opacity-60'
               }`}
               title={
                 canUndo
@@ -250,14 +250,14 @@ export const AdvancementLog: React.FC<AdvancementLogProps> = ({
           )}
           <button
             onClick={() => setShowXpModal(true)}
-            className="flex items-center gap-1 px-2.5 py-1.5 bg-[#1B365D] text-[#f3e5cf] hover:bg-[#2c4b7a] border border-[#C5A059] rounded-lg text-xs font-bold transition shadow-xs cursor-pointer"
+            className="flex items-center gap-1 px-2.5 py-1.5 bg-erhoeht text-schrift hover:bg-rahmen border border-gold rounded-knopf text-xs font-bold transition cursor-pointer"
             title="Erfahrungspunkte gutschreiben"
           >
             <Plus size={14} /> EP hinzufügen
           </button>
           <button
             onClick={() => setShowAddNoteModal(true)}
-            className="flex items-center gap-1 px-2.5 py-1.5 bg-[#1B365D] text-[#f3e5cf] hover:bg-[#2c4b7a] border border-[#C5A059] rounded-lg text-xs font-bold transition cursor-pointer"
+            className="flex items-center gap-1 px-2.5 py-1.5 bg-erhoeht text-schrift hover:bg-rahmen border border-gold rounded-knopf text-xs font-bold transition cursor-pointer"
             title="Notiz ins Protokoll eintragen"
           >
             <FileText size={14} /> Notiz
@@ -265,15 +265,15 @@ export const AdvancementLog: React.FC<AdvancementLogProps> = ({
           {entries.length > 0 && (
             <button
               onClick={handleCopyLog}
-              className="p-1.5 rounded text-gray-600 hover:text-[#1B365D] hover:bg-[#e3d4b9]/30 transition-colors"
+              className="p-1.5 rounded-knopf text-leise hover:text-gold-hell hover:bg-rahmen transition-colors"
               title="Protokoll in Zwischenablage kopieren"
             >
-              {copied ? <Check size={16} className="text-emerald-600" /> : <Copy size={16} />}
+              {copied ? <Check size={16} className="text-unverletzt" /> : <Copy size={16} />}
             </button>
           )}
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="p-1.5 rounded text-gray-600 hover:text-[#1B365D] hover:bg-[#e3d4b9]/30 transition-colors"
+            className="p-1.5 rounded-knopf text-leise hover:text-gold-hell hover:bg-rahmen transition-colors"
             title={isExpanded ? 'Einklappen' : 'Ausklappen'}
           >
             {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
@@ -284,28 +284,28 @@ export const AdvancementLog: React.FC<AdvancementLogProps> = ({
       {isExpanded && (
         <div className="space-y-4">
           {/* Summary Strip */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-[#faf4e6] p-3 rounded-lg border border-[#e3d4b9] text-xs">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-erhoeht p-3 rounded-knopf border border-rahmen text-xs">
             <div className="flex flex-col">
-              <span className="text-gray-500 font-medium">Gesamt-EP:</span>
-              <span className="font-bold text-sm text-[#1B365D]">{xpTotal} EP</span>
+              <span className="text-leise font-medium">Gesamt-EP:</span>
+              <span className="font-bold text-sm text-schrift">{xpTotal} EP</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-gray-500 font-medium">Ausgegeben:</span>
-              <span className="font-bold text-sm text-amber-800">{xpSpent} EP</span>
+              <span className="text-leise font-medium">Ausgegeben:</span>
+              <span className="font-bold text-sm text-erschoepft">{xpSpent} EP</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-gray-500 font-medium">Verfügbar:</span>
+              <span className="text-leise font-medium">Verfügbar:</span>
               <span
                 className={`font-bold text-sm ${
-                  xpAvailable < 0 ? 'text-red-600' : 'text-emerald-700'
+                  xpAvailable < 0 ? 'text-schaden' : 'text-unverletzt'
                 }`}
               >
                 {xpAvailable} EP
               </span>
             </div>
             <div className="flex flex-col">
-              <span className="text-gray-500 font-medium">Aktivitäten:</span>
-              <span className="font-bold text-sm text-gray-700">{entries.length} Einträge</span>
+              <span className="text-leise font-medium">Aktivitäten:</span>
+              <span className="font-bold text-sm text-schrift">{entries.length} Einträge</span>
             </div>
           </div>
 
@@ -330,8 +330,8 @@ export const AdvancementLog: React.FC<AdvancementLogProps> = ({
                   onClick={() => setFilterCategory(cat.id)}
                   className={`px-2.5 py-1 text-xs rounded-full font-medium transition-all ${
                     filterCategory === cat.id
-                      ? 'bg-[#1B365D] text-[#f3e5cf] shadow-xs'
-                      : 'bg-[#f3e5cf] text-[#1B365D] hover:bg-[#e3d4b9] border border-[#C5A059]/30'
+                      ? 'bg-erhoeht text-schrift '
+                      : 'bg-erhoeht text-schrift hover:bg-rahmen border border-rahmen'
                   }`}
                 >
                   {cat.label}
@@ -343,28 +343,28 @@ export const AdvancementLog: React.FC<AdvancementLogProps> = ({
             <div className="relative min-w-[200px]">
               <Search
                 size={14}
-                className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400"
+                className="absolute left-2.5 top-1/2 -translate-y-1/2 text-leise"
               />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Protokoll durchsuchen..."
-                className="w-full pl-8 pr-3 py-1 bg-white border border-[#d1c4b0] rounded-lg text-xs text-[#1B365D] placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-[#C5A059]"
+                className="w-full pl-8 pr-3 py-1 bg-flaeche border border-rahmen rounded-knopf text-xs text-schrift placeholder-leise focus:outline-none focus:ring-1 focus:ring-gold"
               />
             </div>
           </div>
 
           {/* Entries list */}
           {filteredEntries.length === 0 ? (
-            <div className="text-center py-8 px-4 bg-[#faf4e6] rounded-lg border border-dashed border-[#d1c4b0]">
-              <History size={32} className="mx-auto text-gray-400 mb-2 opacity-60" />
-              <p className="text-sm font-semibold text-gray-600">
+            <div className="text-center py-8 px-4 bg-erhoeht rounded-knopf border border-dashed border-rahmen">
+              <History size={32} className="mx-auto text-leise mb-2 opacity-60" />
+              <p className="text-sm font-semibold text-leise">
                 {entries.length === 0
                   ? 'Noch keine Steigerungen oder EP-Buchungen protokolliert.'
                   : 'Keine Einträge für die aktuelle Filterung gefunden.'}
               </p>
-              <p className="text-xs text-gray-500 max-w-md mx-auto mt-1">
+              <p className="text-xs text-leise max-w-md mx-auto mt-1">
                 {entries.length === 0
                   ? 'Alle künftigen Steigerungen von Fertigkeiten, Attributen, Meisterschaften, Zaubern oder EP-Änderungen erscheinen automatisch hier.'
                   : 'Passe die Filter an oder setze den Suchbegriff zurück.'}
@@ -372,7 +372,7 @@ export const AdvancementLog: React.FC<AdvancementLogProps> = ({
               {entries.length === 0 && (
                 <button
                   onClick={() => setShowXpModal(true)}
-                  className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1B365D] text-[#f3e5cf] hover:bg-[#2c4b7a] rounded-lg text-xs font-bold transition shadow-xs cursor-pointer"
+                  className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 bg-erhoeht text-schrift hover:bg-rahmen rounded-knopf text-xs font-bold transition cursor-pointer"
                 >
                   <Sparkles size={14} /> Erste EP gutschreiben
                 </button>
@@ -387,28 +387,28 @@ export const AdvancementLog: React.FC<AdvancementLogProps> = ({
                 return (
                   <div
                     key={entry.id}
-                    className="flex items-start justify-between gap-2 p-2.5 rounded-lg bg-[#faf4e6] border border-[#e3d4b9] hover:bg-[#f3e5cf] transition-colors"
+                    className="flex items-start justify-between gap-2 p-2.5 rounded-knopf bg-erhoeht border border-rahmen hover:bg-rahmen transition-colors"
                   >
                     <div className="flex items-start gap-2.5 flex-1 min-w-0">
                       <div className="mt-0.5 shrink-0">{getCategoryIcon(entry.category)}</div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-1.5 flex-wrap">
                           <span
-                            className={`text-[10px] uppercase font-bold px-1.5 py-0.5 rounded border leading-none ${getCategoryBadgeClass(
+                            className={`text-[11px] uppercase font-bold px-1.5 py-0.5 rounded-knopf border leading-none ${getCategoryBadgeClass(
                               entry.category,
                             )}`}
                           >
                             {getCategoryLabel(entry.category)}
                           </span>
-                          <span className="text-xs font-bold text-[#1B365D] truncate">
+                          <span className="text-xs font-bold text-schrift truncate">
                             {entry.title}
                           </span>
-                          <span className="text-[10px] text-gray-400 ml-auto shrink-0">
+                          <span className="text-[11px] text-leise ml-auto shrink-0">
                             {entry.timestamp}
                           </span>
                         </div>
                         {entry.detail && (
-                          <p className="text-xs text-gray-600 mt-0.5 line-clamp-2">
+                          <p className="text-xs text-leise mt-0.5 line-clamp-2">
                             {entry.detail}
                           </p>
                         )}
@@ -418,12 +418,12 @@ export const AdvancementLog: React.FC<AdvancementLogProps> = ({
                     <div className="flex items-center gap-2 shrink-0">
                       {entry.xpDelta !== undefined && entry.xpDelta !== 0 && (
                         <div
-                          className={`text-xs font-bold px-2 py-0.5 rounded border ${
+                          className={`text-xs font-bold px-2 py-0.5 rounded-knopf border ${
                             isPositiveXp
-                              ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
+                              ? 'bg-unverletzt-grund text-unverletzt border-unverletzt'
                               : isNegativeXp
-                              ? 'bg-amber-100 text-amber-900 border-amber-300'
-                              : 'bg-gray-100 text-gray-700 border-gray-300'
+                              ? 'bg-erschoepft-grund text-erschoepft border-erschoepft'
+                              : 'bg-erhoeht text-schrift border-rahmen'
                           }`}
                         >
                           {isPositiveXp ? `+${entry.xpDelta}` : entry.xpDelta} EP
@@ -434,7 +434,7 @@ export const AdvancementLog: React.FC<AdvancementLogProps> = ({
                           onDeleteLogEntry(entry.id);
                           toast.success('Eintrag gelöscht');
                         }}
-                        className="text-[#8B263E]/60 hover:text-[#8B263E] font-bold text-lg px-2 no-print shrink-0 cursor-pointer transition-colors"
+                        className="text-schaden hover:text-schaden font-bold text-lg px-2 no-print shrink-0 cursor-pointer transition-colors"
                         title="Löschen"
                       >
                         ×
@@ -447,21 +447,21 @@ export const AdvancementLog: React.FC<AdvancementLogProps> = ({
           )}
 
           {/* Bottom Protocol Action Bar */}
-          <div className="pt-3 border-t border-[#e3d4b9] flex flex-wrap items-center justify-between gap-3 bg-[#faf4e6] p-2.5 rounded-lg border border-[#e3d4b9] no-print">
-            <div className="text-xs text-gray-600 flex items-center gap-2 sm:gap-3 flex-wrap">
+          <div className="pt-3 border-t border-rahmen flex flex-wrap items-center justify-between gap-3 bg-erhoeht p-2.5 rounded-knopf border border-rahmen no-print">
+            <div className="text-xs text-leise flex items-center gap-2 sm:gap-3 flex-wrap">
               <span>
-                Gesamt-EP: <strong className="text-[#1B365D] font-bold">{xpTotal} EP</strong>
+                Gesamt-EP: <strong className="text-schrift font-bold">{xpTotal} EP</strong>
               </span>
-              <span className="text-gray-300">•</span>
+              <span className="text-schrift">•</span>
               <span>
-                Ausgegeben: <strong className="text-amber-800 font-bold">{xpSpent} EP</strong>
+                Ausgegeben: <strong className="text-erschoepft font-bold">{xpSpent} EP</strong>
               </span>
-              <span className="text-gray-300">•</span>
+              <span className="text-schrift">•</span>
               <span>
                 Verfügbar:{' '}
                 <strong
                   className={`font-bold ${
-                    xpAvailable < 0 ? 'text-red-600' : 'text-emerald-700'
+                    xpAvailable < 0 ? 'text-schaden' : 'text-unverletzt'
                   }`}
                 >
                   {xpAvailable} EP
@@ -472,10 +472,10 @@ export const AdvancementLog: React.FC<AdvancementLogProps> = ({
               <button
                 type="button"
                 onClick={() => setShowEditTotalXpModal(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1B365D] text-[#f3e5cf] hover:bg-[#2c4b7a] border border-[#C5A059] rounded-lg text-xs font-bold transition shadow-xs cursor-pointer"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-erhoeht text-schrift hover:bg-rahmen border border-gold rounded-knopf text-xs font-bold transition cursor-pointer"
                 title="Gesamt-EP mit Kommentar und Protokolleintrag korrigieren"
               >
-                <Edit3 size={14} className="text-[#C5A059]" />
+                <Edit3 size={14} className="text-gold" />
                 <span>Gesamt EP editieren</span>
               </button>
             </div>
@@ -509,17 +509,17 @@ export const AdvancementLog: React.FC<AdvancementLogProps> = ({
 
       {/* Add Custom Note Modal */}
       {showAddNoteModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-          <div id="advancement-log-note-dialog" className="bg-[#faf4e6] dark-theme-panel p-5 sm:p-6 rounded-xl border-2 border-[#C5A059] shadow-2xl max-w-md w-full">
-            <div className="flex items-center gap-2 border-b border-[#C5A059] pb-3 mb-4">
-              <FileText className="w-5 h-5 text-[#C5A059]" />
-              <h3 className="fantasy-font text-xl text-[#1B365D]">
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div id="advancement-log-note-dialog" className="bg-flaeche p-5 sm:p-6 rounded-karte border border-rahmen shadow-2xl max-w-md w-full">
+            <div className="flex items-center gap-2 border-b border-gold pb-3 mb-4">
+              <FileText className="w-5 h-5 text-gold" />
+              <h3 className="fantasy-font text-xl text-gold-hell">
                 Notiz zum Protokoll hinzufügen
               </h3>
             </div>
             <form onSubmit={handleAddCustomNote} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wide">
+                <label className="block text-xs font-bold text-leise mb-1 uppercase tracking-wide">
                   Titel / Ereignis
                 </label>
                 <input
@@ -527,13 +527,13 @@ export const AdvancementLog: React.FC<AdvancementLogProps> = ({
                   value={noteTitle}
                   onChange={(e) => setNoteTitle(e.target.value)}
                   placeholder="z. B. Spielrunde vom 12.05., Lehrmeister besucht"
-                  className="w-full bg-white border border-[#d1c4b0] rounded-lg p-2.5 text-sm text-[#2C1810] focus:outline-none focus:ring-2 focus:ring-[#C5A059]"
+                  className="w-full bg-flaeche border border-rahmen rounded-knopf p-2.5 text-sm text-schrift focus:outline-none focus:ring-2 focus:ring-gold"
                   autoFocus
                   required
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wide">
+                <label className="block text-xs font-bold text-leise mb-1 uppercase tracking-wide">
                   Details / Beschreibung (optional)
                 </label>
                 <textarea
@@ -541,21 +541,21 @@ export const AdvancementLog: React.FC<AdvancementLogProps> = ({
                   onChange={(e) => setNoteDetail(e.target.value)}
                   placeholder="Weitere Details zum Geschehen oder zu Absprachen mit der Spielleitung..."
                   rows={3}
-                  className="w-full bg-white border border-[#d1c4b0] rounded-lg p-2.5 text-sm text-[#2C1810] focus:outline-none focus:ring-2 focus:ring-[#C5A059]"
+                  className="w-full bg-flaeche border border-rahmen rounded-knopf p-2.5 text-sm text-schrift focus:outline-none focus:ring-2 focus:ring-gold"
                 />
               </div>
-              <div className="flex justify-end space-x-2 pt-2 border-t border-[#d1c4b0]">
+              <div className="flex justify-end space-x-2 pt-2 border-t border-rahmen">
                 <button
                   type="button"
                   onClick={() => setShowAddNoteModal(false)}
-                  className="px-4 py-2 text-[#1B365D] hover:bg-[#ebdcc4] rounded-lg text-sm font-semibold transition cursor-pointer"
+                  className="px-4 py-2 text-schrift hover:bg-rahmen rounded-knopf text-sm font-semibold transition cursor-pointer"
                 >
                   Abbrechen
                 </button>
                 <button
                   type="submit"
                   disabled={!noteTitle.trim()}
-                  className="px-5 py-2 bg-[#1B365D] hover:bg-[#2a4f7e] text-white rounded-lg font-bold text-sm shadow-xs border border-[#10233f] disabled:opacity-50 transition cursor-pointer"
+                  className="px-5 py-2 bg-erhoeht hover:bg-rahmen text-schrift rounded-knopf font-bold text-sm border border-rahmen disabled:opacity-50 transition cursor-pointer"
                 >
                   Eintragen
                 </button>

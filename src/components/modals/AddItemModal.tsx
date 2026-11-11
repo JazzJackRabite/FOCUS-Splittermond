@@ -242,13 +242,13 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-3 sm:p-4">
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-3 sm:p-4">
       <div
         id="add-item-modal-dialog"
-        className="bg-[#faf4e6] dark-theme-panel rounded-xl border-2 border-[#C5A059] shadow-2xl max-w-md w-full max-h-[90vh] flex flex-col overflow-hidden"
+        className="bg-flaeche rounded-karte border border-rahmen shadow-2xl max-w-md w-full max-h-[90vh] flex flex-col overflow-hidden"
       >
-        <div className="px-5 py-4 border-b border-[#C5A059] shrink-0">
-          <h3 className="fantasy-font text-xl text-[#1B365D]">
+        <div className="px-5 py-4 border-b border-gold shrink-0">
+          <h3 className="fantasy-font text-xl text-gold-hell">
             {title} hinzufügen
           </h3>
         </div>
@@ -256,8 +256,8 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({
         <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-4 custom-scrollbar modal-body-scroll">
           <div>
             <div className="flex justify-between items-center mb-1">
-              <label className="block text-xs uppercase text-gray-500 font-semibold">Auswahl &amp; Suche</label>
-              <span className="text-[11px] text-gray-500 font-medium">
+              <label className="block text-xs uppercase text-leise font-semibold">Auswahl &amp; Suche</label>
+              <span className="text-[11px] text-leise font-medium">
                 {filteredItems.length} {filteredItems.length === 1 ? 'Eintrag' : 'Einträge'}
               </span>
             </div>
@@ -267,13 +267,13 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="🔍 Filtern / Suchen..."
-                className="w-full p-2 pr-8 border border-[#d1c4b0] rounded-lg bg-white text-xs text-[#2C1810] focus:ring-1 focus:ring-[#1B365D] focus:border-[#1B365D] outline-none"
+                className="w-full p-2 pr-8 border border-rahmen rounded-knopf bg-flaeche text-xs text-schrift focus:ring-1 focus:ring-rahmen focus:border-rahmen outline-none"
               />
               {search && (
                 <button
                   type="button"
                   onClick={() => setSearch('')}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#8B263E] text-xs font-bold w-5 h-5 flex items-center justify-center rounded-md hover:bg-black/5 cursor-pointer"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-leise hover:text-schaden text-xs font-bold w-5 h-5 flex items-center justify-center rounded-knopf hover:bg-black/5 cursor-pointer"
                   title="Suche leeren"
                 >
                   ✕
@@ -292,7 +292,7 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({
                 setLevel(1);
                 setDesc('');
               }}
-              className="w-full p-2 border border-[#d1c4b0] rounded-lg bg-white text-[#2C1810] text-sm focus:ring-1 focus:ring-[#1B365D] focus:border-[#1B365D] outline-none"
+              className="w-full p-2 border border-rahmen rounded-knopf bg-flaeche text-schrift text-sm focus:ring-1 focus:ring-rahmen focus:border-rahmen outline-none"
             >
               {filteredItems.map((i) => {
                 const name = i.name;
@@ -325,27 +325,27 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({
           </div>
 
           {selectedName === 'custom' && (
-            <div className="space-y-2 bg-white/80 p-3 rounded-lg border border-[#C5A059] shadow-xs">
+            <div className="space-y-2 bg-flaeche p-3 rounded-knopf border border-gold ">
               <div>
-                <label className="block text-xs uppercase text-gray-600 font-semibold mb-1">
+                <label className="block text-xs uppercase text-leise font-semibold mb-1">
                   Eigene Bezeichnung *
                 </label>
                 <input
                   type="text"
                   value={custom}
                   onChange={(e) => setCustom(e.target.value)}
-                  className="w-full p-2 border border-[#d1c4b0] rounded-lg bg-white text-[#2C1810] text-sm"
+                  className="w-full p-2 border border-rahmen rounded-knopf bg-flaeche text-schrift text-sm"
                   placeholder="Name"
                   autoFocus
                 />
               </div>
               <div>
-                <label className="block text-xs uppercase text-gray-600 font-semibold mb-1">Quelle</label>
+                <label className="block text-xs uppercase text-leise font-semibold mb-1">Quelle</label>
                 <input
                   type="text"
                   value={customSource}
                   onChange={(e) => setCustomSource(e.target.value)}
-                  className="w-full p-2 border border-[#d1c4b0] rounded-lg bg-white text-[#2C1810] text-sm"
+                  className="w-full p-2 border border-rahmen rounded-knopf bg-flaeche text-schrift text-sm"
                   placeholder="z.B. Eigen, Erweiterungsband..."
                 />
               </div>
@@ -354,8 +354,8 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({
 
           {isLanguage && mode === 'creation' && !isLanguageLimitReached && (
             <div
-              className={`p-2.5 rounded-lg border border-[#d1c4b0] transition-all ${
-                hasFreeMotherTongue ? 'bg-stone-100 opacity-70 dark-theme-slot-inactive' : 'bg-white dark-theme-slot-active'
+              className={`p-2.5 rounded-knopf border border-rahmen transition-all ${
+                hasFreeMotherTongue ? 'bg-seite opacity-70 dark-theme-slot-inactive' : 'bg-flaeche dark-theme-slot-active'
               }`}
             >
               <label
@@ -368,32 +368,32 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({
                   checked={isMotherTongue}
                   onChange={(e) => setIsMotherTongue(e.target.checked)}
                   disabled={hasFreeMotherTongue}
-                  className="w-4 h-4 text-[#1B365D]"
+                  className="w-4 h-4 text-schrift"
                 />
                 <span
                   className={`font-bold text-sm ${
-                    hasFreeMotherTongue ? 'text-stone-500' : 'text-[#1B365D]'
+                    hasFreeMotherTongue ? 'text-leise' : 'text-schrift'
                   }`}
                 >
                   Ist Muttersprache (Gratis){' '}
                   {hasFreeMotherTongue ? '- Bereits vergeben' : ''}
                 </span>
               </label>
-              <div className="text-xs text-stone-500 mt-1 ml-6">
+              <div className="text-xs text-leise mt-1 ml-6">
                 Jeder Held erhält Basargnomisch und eine Muttersprache gratis.
               </div>
             </div>
           )}
 
           <div>
-            <label className="block text-xs uppercase text-gray-500 mb-1">
+            <label className="block text-xs uppercase text-leise mb-1">
               Beschreibung / Notiz
             </label>
             <input
               type="text"
               value={desc}
               onChange={(e) => setDesc(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded bg-white text-[#2C1810]"
+              className="w-full p-2 border border-rahmen rounded-knopf bg-flaeche text-schrift"
               placeholder={
                 (currentItemData as StrengthData | ResourceData)?.desc ||
                 (type === 'weakness' && WEAKNESS_DESCRIPTIONS[selectedName]) ||
@@ -405,7 +405,7 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({
               (currentItemData as StrengthData | ResourceData)?.desc ||
                 (type === 'weakness' && WEAKNESS_DESCRIPTIONS[selectedName])
             ) && (
-              <div className="text-[10px] text-gray-500 mt-1">
+              <div className="text-[11px] text-leise mt-1">
                 {(isStrength ? 'Regel: ' : '') +
                   ((currentItemData as StrengthData | ResourceData)?.desc ||
                     WEAKNESS_DESCRIPTIONS[selectedName] ||
@@ -415,13 +415,13 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({
           </div>
 
           {type !== 'weakness' && type !== 'language' && (
-            <div className="flex justify-between items-center bg-white p-2 rounded border border-gray-200">
+            <div className="flex justify-between items-center bg-flaeche p-2 rounded-knopf border border-rahmen">
               <div>
-                <label className="block text-xs uppercase text-gray-500 mb-1">Stufe / Wert</label>
+                <label className="block text-xs uppercase text-leise mb-1">Stufe / Wert</label>
                 <div className="flex items-center space-x-3">
                   <button
                     onClick={() => setLevel(Math.max(1, level - 1))}
-                    className="w-8 h-8 rounded bg-gray-300 font-bold hover:bg-gray-400 shrink-0"
+                    className="w-8 h-8 rounded-knopf bg-erhoeht font-bold hover:bg-rahmen shrink-0"
                   >
                     -
                   </button>
@@ -429,19 +429,19 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({
                     type="number"
                     value={level}
                     readOnly
-                    className="w-12 text-center font-bold p-1 border-none bg-transparent text-[#2C1810]"
+                    className="w-12 text-center font-bold p-1 border-none bg-transparent text-schrift"
                   />
                   <button
                     onClick={() => setLevel(Math.min(maxLevel, level + 1))}
-                    className="w-8 h-8 rounded bg-gray-300 font-bold hover:bg-gray-400 shrink-0"
+                    className="w-8 h-8 rounded-knopf bg-erhoeht font-bold hover:bg-rahmen shrink-0"
                   >
                     +
                   </button>
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-xs uppercase text-gray-500">Kosten</div>
-                <div className={`font-bold ${isAffordable ? 'text-[#C5A059]' : 'text-red-500'}`}>
+                <div className="text-xs uppercase text-leise">Kosten</div>
+                <div className={`font-bold ${isAffordable ? 'text-gold' : 'text-schaden'}`}>
                   {mode === 'creation'
                     ? `${level * pointCost} Pkt`
                     : `${currentCost} EP`}
@@ -452,9 +452,9 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({
 
           {isLanguage && !isMotherTongue && mode !== 'creation' && (
             <div className="text-right">
-              <div className="text-xs uppercase text-stone-500 font-semibold">Kosten</div>
+              <div className="text-xs uppercase text-leise font-semibold">Kosten</div>
               <div
-                className={`font-bold font-mono ${isAffordable ? 'text-[#C5A059]' : 'text-[#8B263E]'}`}
+                className={`font-bold tabular-nums ${isAffordable ? 'text-gold' : 'text-schaden'}`}
               >
                 5 EP
               </div>
@@ -462,34 +462,34 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({
           )}
 
           {type !== 'weakness' && type !== 'language' && (
-            <div className="text-xs text-stone-500 font-medium text-center">Max. Stufe: {maxLevel}</div>
+            <div className="text-xs text-leise font-medium text-center">Max. Stufe: {maxLevel}</div>
           )}
 
           {!isAffordable && type !== 'weakness' && (
-            <div className="text-xs text-[#8B263E] font-bold text-center border border-[#8B263E]/40 bg-[#f3e5cf] p-1.5 rounded-lg shadow-2xs">
+            <div className="text-xs text-schaden font-bold text-center border border-magie bg-erhoeht p-1.5 rounded-knopf shadow-2xs">
               Nicht genügend {mode === 'creation' ? 'Punkte' : 'EP'} verfügbar! (Rest:{' '}
               {budget})
             </div>
           )}
 
           {isLanguageLimitReached && (
-            <div className="text-xs text-[#8B263E] font-bold text-center border border-[#8B263E]/40 bg-[#f3e5cf] p-2 rounded-lg shadow-2xs">
+            <div className="text-xs text-schaden font-bold text-center border border-magie bg-erhoeht p-2 rounded-knopf shadow-2xs">
               Bei der Erschaffung sind nur Basargnomisch und eine Muttersprache erlaubt.
             </div>
           )}
         </div>
 
-        <div className="px-5 py-3.5 border-t border-[#C5A059]/40 bg-black/5 flex justify-end space-x-2 shrink-0">
+        <div className="px-5 py-3.5 border-t border-rahmen bg-black/5 flex justify-end space-x-2 shrink-0">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-[#1B365D] hover:bg-[#ebdcc4] rounded-lg font-semibold text-sm transition-colors cursor-pointer shrink-0"
+            className="px-4 py-2 text-schrift hover:bg-rahmen rounded-knopf font-semibold text-sm transition-colors cursor-pointer shrink-0"
           >
             Abbrechen
           </button>
           <button
             onClick={handleAdd}
             disabled={(!isAffordable && !hausregeln) || !isSelectionValid || isLanguageLimitReached}
-            className="px-5 py-2 bg-[#1B365D] hover:bg-[#2a4f7e] text-white rounded-lg font-bold text-sm shadow-xs border border-[#10233f] disabled:opacity-50 disabled:cursor-not-allowed transition-all cursor-pointer shrink-0"
+            className="px-5 py-2 bg-erhoeht hover:bg-rahmen text-schrift rounded-knopf font-bold text-sm border border-rahmen disabled:opacity-50 disabled:cursor-not-allowed transition-all cursor-pointer shrink-0"
           >
             Hinzufügen
           </button>

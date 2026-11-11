@@ -155,7 +155,7 @@ export const Dialog: React.FC<DialogProps> = ({ titel, untertitel, onSchliessen,
             <h2 id={titelId} className="m-0 font-titel font-bold text-lg tracking-[0.06em] text-schrift">{titel}</h2>
             {untertitel && <div className="text-xs text-leise">{untertitel}</div>}
           </div>
-          <Knopf nurSymbol aria-label="Schließen" onClick={onSchliessen}><X size={16} aria-hidden="true" /></Knopf>
+          <Knopf nurSymbol aria-label="Schließen" title="Schließen" onClick={onSchliessen}><X size={16} aria-hidden="true" /></Knopf>
         </div>
         <div className="p-5 overflow-y-auto flex flex-col gap-3.5">{children}</div>
         {fuss && <div className="flex flex-wrap justify-end gap-2.5 px-5 py-4 border-t border-rahmen">{fuss}</div>}

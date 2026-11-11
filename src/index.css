@@ -5,5 +5,5 @@
 /* Gestaltung: benannte Werte und Scrollbalken (siehe FUNDAMENT.md) */
 @import "./fundament/fundament.css";
 
-/* Altlast: biegt die fest eingetragenen Farbwerte der alten Ansichten auf das dunkle CI um; schrumpft mit der Umstellung */
-@import "./fundament/uebergang.css";
+/* Gemeinsame Klassen: Grundstil, Protokollkarten, Druck */
+@import "./fundament/klassen.css";

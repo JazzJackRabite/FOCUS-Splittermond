@@ -308,22 +308,22 @@ export function CreationView() {
           />
 
           {/* Character Info */}
-          <div className="bg-white bg-opacity-60 p-5 rounded border border-[#d1c4b0] shadow-sm relative">
-            <h3 className="font-bold text-xl mb-4 border-b border-[#C5A059] pb-2 fantasy-font text-[#1B365D]">Charakter</h3>
+          <div className="bg-flaeche bg-opacity-60 p-5 rounded-knopf border border-rahmen relative">
+            <h3 className="font-bold text-xl mb-4 border-b border-gold pb-2 fantasy-font text-gold-hell">Charakter</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-xs uppercase text-gray-500 font-bold mb-1">Name</label>
+                <label className="block text-xs uppercase text-leise font-bold mb-1">Name</label>
                 <input
                   type="text" value={name} onChange={(e) => dispatch({ type: 'SET_NAME', payload: e.target.value })}
                   disabled={mode !== 'creation'}
-                  className={`w-full border-2 border-[#d1c4b0] rounded px-2 focus:outline-none focus:border-[#1B365D] font-serif font-bold text-2xl py-1 text-[#2C1810] ${
-                    mode !== 'creation' ? 'bg-gray-100 text-gray-600 cursor-not-allowed' : 'bg-white'
+                  className={`w-full border border-rahmen rounded-knopf px-2 focus:outline-none focus:border-rahmen font-bold text-2xl py-1 text-schrift ${
+                    mode !== 'creation' ? 'bg-erhoeht text-leise cursor-not-allowed' : 'bg-flaeche'
                   }`}
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs uppercase text-gray-500 mb-1 font-bold">Heimatregion</label>
+                  <label className="block text-xs uppercase text-leise mb-1 font-bold">Heimatregion</label>
                   <select
                     value={homeRegion}
                     onChange={(e) => {
@@ -335,8 +335,8 @@ export function CreationView() {
                       }
                       dispatch({ type: 'SET_HOME_REGION', payload: newRegion });
                     }}
-                    className={`w-full border-2 border-[#d1c4b0] rounded px-2 focus:outline-none focus:border-[#1B365D] text-sm text-[#2C1810] py-1 ${
-                      mode !== 'creation' ? 'bg-gray-100 text-gray-600 cursor-not-allowed' : 'bg-white'
+                    className={`w-full border border-rahmen rounded-knopf px-2 focus:outline-none focus:border-rahmen text-sm text-schrift py-1 ${
+                      mode !== 'creation' ? 'bg-erhoeht text-leise cursor-not-allowed' : 'bg-flaeche'
                     }`}
                     disabled={mode !== 'creation'}
                   >
@@ -345,12 +345,12 @@ export function CreationView() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs uppercase text-gray-500 mb-1 font-bold">Mondzeichen</label>
+                  <label className="block text-xs uppercase text-leise mb-1 font-bold">Mondzeichen</label>
                   <select
                     value={moonSign}
                     onChange={(e) => dispatch({ type: 'SET_MOON_SIGN', payload: e.target.value })}
-                    className={`w-full border-2 border-[#d1c4b0] rounded px-2 focus:outline-none focus:border-[#1B365D] text-sm text-[#2C1810] py-1 ${
-                      mode !== 'creation' ? 'bg-gray-100 text-gray-600 cursor-not-allowed' : 'bg-white'
+                    className={`w-full border border-rahmen rounded-knopf px-2 focus:outline-none focus:border-rahmen text-sm text-schrift py-1 ${
+                      mode !== 'creation' ? 'bg-erhoeht text-leise cursor-not-allowed' : 'bg-flaeche'
                     }`}
                     disabled={mode !== 'creation'}
                   >
@@ -361,21 +361,21 @@ export function CreationView() {
               </div>
 
               <div>
-                <label className="block text-xs uppercase text-gray-500 font-bold mb-2">Rasse</label>
+                <label className="block text-xs uppercase text-leise font-bold mb-2">Rasse</label>
                 <div className={`flex flex-wrap gap-2 ${mode !== 'creation' ? 'opacity-50 pointer-events-none' : ''}`}>
                   {Object.keys(RACES).map((r) => (
                     <button
                       key={r} onClick={() => handleRaceChange(r)}
                       disabled={mode !== 'creation'}
-                      className={`px-3 py-1 text-sm rounded shadow-sm transition-all ${race === r ? 'bg-[#1B365D] text-white ring-2 ring-[#C5A059] ring-offset-1' : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'}`}
+                      className={`px-3 py-1 text-sm rounded-knopf transition-all ${race === r ? 'bg-erhoeht text-schrift ring-2 ring-gold ring-offset-1' : 'bg-flaeche text-schrift border border-rahmen hover:bg-rahmen'}`}
                     >{r}</button>
                   ))}
                 </div>
               </div>
             </div>
 
-            <div className="mt-6 bg-[#fdfbf7] p-3 rounded border border-dashed border-gray-400 text-sm text-gray-700">
-              <div className="flex justify-between mb-2 border-b border-gray-200 pb-1">
+            <div className="mt-6 bg-erhoeht p-3 rounded-knopf border border-dashed border-rahmen text-sm text-schrift">
+              <div className="flex justify-between mb-2 border-b border-rahmen pb-1">
                 <span><strong>GK:</strong> {raceData.gk}</span>
                 <span>
                   <strong>Mods:</strong>{' '}
@@ -383,7 +383,7 @@ export function CreationView() {
                 </span>
               </div>
               <div className={`mb-2 ${mode !== 'creation' ? 'opacity-50 pointer-events-none' : ''}`}>
-                <strong className="block mb-1 text-[#1B365D]">Wählbare Boni: {raceData.freeMods}</strong>
+                <strong className="block mb-1 text-schrift">Wählbare Boni: {raceData.freeMods}</strong>
                 <div className="flex flex-wrap gap-1">
                   {Object.keys(ATTRIBUTES).map((attr) => {
                     const isSelected = raceBonusAttrs.includes(attr);
@@ -392,14 +392,14 @@ export function CreationView() {
                       <button
                         key={attr} onClick={() => toggleRaceBonus(attr)}
                         disabled={mode !== 'creation'}
-                        className={`text-[10px] px-2 py-1 border rounded uppercase font-bold ${isSelected ? 'bg-[#1B365D] text-white border-[#1B365D]' : 'bg-white text-gray-500 border-gray-300 hover:bg-gray-100'}`}
+                        className={`text-[11px] px-2 py-1 border rounded-knopf uppercase font-bold ${isSelected ? 'bg-erhoeht text-schrift border-gold' : 'bg-flaeche text-leise border-rahmen hover:bg-rahmen'}`}
                       >{attr}</button>
                     );
                   })}
                 </div>
               </div>
               <div>
-                <strong className="block mb-1 text-[#1B365D]">Stärken:</strong>
+                <strong className="block mb-1 text-schrift">Stärken:</strong>
                 <ul className="list-disc list-inside text-xs pl-1">
                   {raceData.strengths.map((s) => <li key={s}>{s.replace(/ \(1\)$/, '')}</li>)}
                 </ul>
@@ -411,9 +411,9 @@ export function CreationView() {
           <ErschaffungRegelwerk />
 
           {/* Attributes */}
-          <div className="bg-white bg-opacity-60 p-4 sm:p-5 rounded border border-[#d1c4b0] shadow-sm relative overflow-hidden">
-            <div className="flex justify-between items-center border-b border-[#C5A059] pb-2 mb-4">
-              <h3 className="font-bold text-xl fantasy-font text-[#1B365D]">Attribute</h3>
+          <div className="bg-flaeche bg-opacity-60 p-4 sm:p-5 rounded-knopf border border-rahmen relative overflow-hidden">
+            <div className="flex justify-between items-center border-b border-gold pb-2 mb-4">
+              <h3 className="font-bold text-xl fantasy-font text-gold-hell">Attribute</h3>
               <PointDisplay current={creationUsage.attr} max={18} label="Punkte" mode={mode} />
             </div>
             <div className="space-y-1">
@@ -442,8 +442,8 @@ export function CreationView() {
           </div>
 
           {/* Derived Stats */}
-          <div className="bg-white bg-opacity-60 p-5 rounded border border-[#d1c4b0] shadow-sm relative print:break-inside-avoid">
-            <h3 className="font-bold text-xl mb-4 border-b border-[#C5A059] pb-2 fantasy-font text-[#1B365D]">Abgeleitete Werte</h3>
+          <div className="bg-flaeche bg-opacity-60 p-5 rounded-knopf border border-rahmen relative print:break-inside-avoid">
+            <h3 className="font-bold text-xl mb-4 border-b border-gold pb-2 fantasy-font text-gold-hell">Abgeleitete Werte</h3>
             <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
               <StatDisplay label="GSW" value={derived.GSW} subLabel="Geschw." />
               <StatDisplay label="INI" value={derived.INI} subLabel="Initiative" />
@@ -471,9 +471,9 @@ export function CreationView() {
         {/* RIGHT COLUMN */}
         <div className="lg:col-span-7 space-y-8">
           {/* Skills */}
-          <div className="bg-white bg-opacity-60 p-5 rounded border border-[#d1c4b0] shadow-sm relative">
-            <div className="flex justify-between items-center border-b border-[#C5A059] pb-2 mb-4 flex-wrap gap-2">
-              <h3 className="font-bold text-xl fantasy-font text-[#1B365D]">Fertigkeiten</h3>
+          <div className="bg-flaeche bg-opacity-60 p-5 rounded-knopf border border-rahmen relative">
+            <div className="flex justify-between items-center border-b border-gold pb-2 mb-4 flex-wrap gap-2">
+              <h3 className="font-bold text-xl fantasy-font text-gold-hell">Fertigkeiten</h3>
               <div className="flex items-center gap-4">
                 <PointDisplay current={creationUsage.skill} max={55} label="Punkte" mode={mode} />
                 <div className="flex gap-1 no-print items-center">
@@ -488,10 +488,10 @@ export function CreationView() {
                       <button
                         key={cat.k}
                         onClick={() => setSkillFilter(cat.k === 'ALL' ? null : (skillFilter === cat.k ? null : cat.k))}
-                        className={`px-2.5 py-1 text-xs rounded-md shadow-xs transition-all font-bold cursor-pointer ${
+                        className={`px-2.5 py-1 text-xs rounded-knopf transition-all font-bold cursor-pointer ${
                           isSelected
-                            ? 'bg-[#1B365D] text-[#FBEFCE] border border-[#C5A059] ring-1 ring-[#C5A059]'
-                            : 'bg-[#1E2536] text-[#A3A096] border border-[#3A4258] hover:text-[#F5F2EA] hover:bg-[#283247]'
+                            ? 'bg-erhoeht text-schrift border border-gold ring-1 ring-gold'
+                            : 'bg-seite text-leise border border-rahmen hover:text-schrift hover:bg-erhoeht'
                         }`}
                       >
                         {cat.l}
@@ -499,7 +499,7 @@ export function CreationView() {
                     );
                   })}
                   {hasExpandedSkills && (
-                    <button onClick={collapseAllSkills} className="text-gray-400 hover:text-[#F5F2EA] px-1 py-1 ml-1 cursor-pointer transition-colors" title="Alle einklappen">
+                    <button onClick={collapseAllSkills} className="text-leise hover:text-schrift px-1 py-1 ml-1 cursor-pointer transition-colors" title="Alle einklappen">
                       <ChevronsDownUp size={16} />
                     </button>
                   )}
@@ -547,20 +547,20 @@ export function CreationView() {
 
           {/* Strengths & Weaknesses */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-            <div className="bg-white bg-opacity-60 p-5 rounded border border-[#d1c4b0] shadow-sm relative flex flex-col">
-              <div className="flex justify-between items-center border-b border-[#C5A059] pb-2 mb-2">
-                <h3 className="font-bold text-lg fantasy-font text-[#1B365D] truncate min-w-0">Stärken</h3>
-                <button onClick={() => setShowStrengthModal(true)} className="text-xs bg-[#1B365D] hover:bg-[#254572] border border-[#C5A059]/50 px-2.5 py-1 rounded-md no-print font-bold text-[#FBEFCE] shrink-0 ml-2 transition-colors cursor-pointer shadow-xs">+ Hinzufügen</button>
+            <div className="bg-flaeche bg-opacity-60 p-5 rounded-knopf border border-rahmen relative flex flex-col">
+              <div className="flex justify-between items-center border-b border-gold pb-2 mb-2">
+                <h3 className="font-bold text-lg fantasy-font text-gold-hell truncate min-w-0">Stärken</h3>
+                <button onClick={() => setShowStrengthModal(true)} className="text-xs bg-erhoeht hover:bg-rahmen border border-gold px-2.5 py-1 rounded-knopf no-print font-bold text-schrift shrink-0 ml-2 transition-colors cursor-pointer ">+ Hinzufügen</button>
               </div>
               <PointDisplay current={creationUsage.strength} max={creationUsage.strengthLimit} label="Erstellung" mode={mode} />
               <div className="flex-grow">
                 <ItemList items={strengthsList} onDelete={(idx) => removeListEntry('strength', idx)} typeLabel="Stärken" showCosts xpMultiplier={7} mode={mode} />
               </div>
             </div>
-            <div className="bg-white bg-opacity-60 p-5 rounded border border-[#d1c4b0] shadow-sm relative flex flex-col">
-              <div className="flex justify-between items-center border-b border-[#C5A059] pb-2 mb-2">
-                <h3 className="font-bold text-lg fantasy-font text-[#1B365D] truncate min-w-0">Schwächen</h3>
-                <button onClick={() => setShowWeaknessModal(true)} className="text-xs bg-[#1B365D] hover:bg-[#254572] border border-[#C5A059]/50 px-2.5 py-1 rounded-md no-print font-bold text-[#FBEFCE] shrink-0 ml-2 transition-colors cursor-pointer shadow-xs">+ Hinzufügen</button>
+            <div className="bg-flaeche bg-opacity-60 p-5 rounded-knopf border border-rahmen relative flex flex-col">
+              <div className="flex justify-between items-center border-b border-gold pb-2 mb-2">
+                <h3 className="font-bold text-lg fantasy-font text-gold-hell truncate min-w-0">Schwächen</h3>
+                <button onClick={() => setShowWeaknessModal(true)} className="text-xs bg-erhoeht hover:bg-rahmen border border-gold px-2.5 py-1 rounded-knopf no-print font-bold text-schrift shrink-0 ml-2 transition-colors cursor-pointer ">+ Hinzufügen</button>
               </div>
               <div className="flex-grow">
                 <ItemList items={weaknessesList} onDelete={(idx) => removeListEntry('weakness', idx)} typeLabel="Schwächen" showCosts={false} mode={mode} />
@@ -570,20 +570,20 @@ export function CreationView() {
 
           {/* Resources & Languages */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-            <div className="bg-white bg-opacity-60 p-5 rounded border border-[#d1c4b0] shadow-sm relative flex flex-col">
-              <div className="flex justify-between items-center border-b border-[#C5A059] pb-2 mb-2">
-                <h3 className="font-bold text-lg fantasy-font text-[#1B365D] truncate min-w-0">Ressourcen</h3>
-                <button onClick={() => setShowResourceModal(true)} className="text-xs bg-[#1B365D] hover:bg-[#254572] border border-[#C5A059]/50 px-2.5 py-1 rounded-md no-print font-bold text-[#FBEFCE] shrink-0 ml-2 transition-colors cursor-pointer shadow-xs">+ Hinzufügen</button>
+            <div className="bg-flaeche bg-opacity-60 p-5 rounded-knopf border border-rahmen relative flex flex-col">
+              <div className="flex justify-between items-center border-b border-gold pb-2 mb-2">
+                <h3 className="font-bold text-lg fantasy-font text-gold-hell truncate min-w-0">Ressourcen</h3>
+                <button onClick={() => setShowResourceModal(true)} className="text-xs bg-erhoeht hover:bg-rahmen border border-gold px-2.5 py-1 rounded-knopf no-print font-bold text-schrift shrink-0 ml-2 transition-colors cursor-pointer ">+ Hinzufügen</button>
               </div>
               <PointDisplay current={creationUsage.resource} max={creationUsage.resourceLimit} label="Erstellung" mode={mode} />
               <div className="flex-grow">
                 <ItemList items={resourcesList} onDelete={(idx) => removeListEntry('resource', idx)} typeLabel="Ressourcen" showCosts xpMultiplier={7} mode={mode} />
               </div>
             </div>
-            <div className="bg-white bg-opacity-60 p-5 rounded border border-[#d1c4b0] shadow-sm relative flex flex-col">
-              <div className="flex justify-between items-center border-b border-[#C5A059] pb-2 mb-2">
-                <h3 className="font-bold text-lg fantasy-font text-[#1B365D] truncate min-w-0">Sprachen</h3>
-                <button onClick={() => setShowLanguageModal(true)} className="text-xs bg-[#1B365D] hover:bg-[#254572] border border-[#C5A059]/50 px-2.5 py-1 rounded-md no-print font-bold text-[#FBEFCE] shrink-0 ml-2 transition-colors cursor-pointer shadow-xs">+ Hinzufügen</button>
+            <div className="bg-flaeche bg-opacity-60 p-5 rounded-knopf border border-rahmen relative flex flex-col">
+              <div className="flex justify-between items-center border-b border-gold pb-2 mb-2">
+                <h3 className="font-bold text-lg fantasy-font text-gold-hell truncate min-w-0">Sprachen</h3>
+                <button onClick={() => setShowLanguageModal(true)} className="text-xs bg-erhoeht hover:bg-rahmen border border-gold px-2.5 py-1 rounded-knopf no-print font-bold text-schrift shrink-0 ml-2 transition-colors cursor-pointer ">+ Hinzufügen</button>
               </div>
               <div className="flex-grow">
                 <ItemList items={languagesList} onDelete={(idx) => removeListEntry('language', idx)} typeLabel="Sprachen" showCosts mode={mode} />
@@ -592,27 +592,27 @@ export function CreationView() {
           </div>
 
           {/* Learned Skills (Masteries + Spells) */}
-          <div className="bg-white bg-opacity-60 p-5 rounded border border-[#d1c4b0] shadow-sm relative">
-            <div className="flex justify-between items-center border-b border-[#C5A059] pb-2 mb-4">
-              <h3 className="font-bold text-xl fantasy-font text-[#1B365D]">Gelernte Fähigkeiten</h3>
+          <div className="bg-flaeche bg-opacity-60 p-5 rounded-knopf border border-rahmen relative">
+            <div className="flex justify-between items-center border-b border-gold pb-2 mb-4">
+              <h3 className="font-bold text-xl fantasy-font text-gold-hell">Gelernte Fähigkeiten</h3>
             </div>
             <div className="space-y-6">
               {groupedMasteries.length > 0 && (
                 <div>
-                  <h4 className="font-bold text-lg text-[#1B365D] border-b border-gray-300 pb-1 mb-2">Meisterschaften</h4>
+                  <h4 className="font-bold text-lg text-gold-hell border-b border-rahmen pb-1 mb-2">Meisterschaften</h4>
                   <div className="space-y-4">
                     {groupedMasteries.map((group, i) => (
-                      <div key={`mgroup-${i}`} className="bg-[#161B26] rounded-lg border border-[#3A4258] overflow-hidden">
-                        <div className="bg-[#1B263B] px-3 py-1 font-bold text-[#FBEFCE] border-b border-[#3A4258] text-sm">{group.skill}</div>
+                      <div key={`mgroup-${i}`} className="bg-seite rounded-knopf border border-rahmen overflow-hidden">
+                        <div className="bg-flaeche px-3 py-1 font-bold text-schrift border-b border-rahmen text-sm">{group.skill}</div>
                         <div className="p-2 space-y-1">
                           {group.items.map((m, idx) => {
                             const canDeleteMastery =
                               mode === 'creation' ||
                               (mode === 'xp' && !m.isCreationBonus && m.source !== 'Erschaffung');
                             return (
-                              <div key={idx} className="flex justify-between items-start text-xs border-b border-gray-100 last:border-0 pb-1 last:pb-0">
+                              <div key={idx} className="flex justify-between items-start text-xs border-b border-rahmen last:border-0 pb-1 last:pb-0">
                                 <div>
-                                  <span className="font-bold text-[#F5F2EA]">
+                                  <span className="font-bold text-schrift">
                                     {m.name} {!/\(S\d+\)/.test(m.name) && `(S${m.tier})`}
                                   </span>
                                   <SourceBadge
@@ -626,10 +626,10 @@ export function CreationView() {
                                     }}
                                   />
                                 </div>
-                                <div className="text-gray-400 no-print flex items-center gap-2">
+                                <div className="text-leise no-print flex items-center gap-2">
                                   <span>{m.cost} EP</span>
                                   {canDeleteMastery && (
-                                    <button onClick={() => removeMasteryById(m.skill ?? '', m.id)} className="text-red-400 hover:text-red-700 font-bold px-1" title="Entfernen">×</button>
+                                    <button onClick={() => removeMasteryById(m.skill ?? '', m.id)} className="text-schaden hover:text-schaden font-bold px-1" title="Entfernen">×</button>
                                   )}
                                 </div>
                               </div>
@@ -644,11 +644,11 @@ export function CreationView() {
 
               {groupedSpells.length > 0 && (
                 <div>
-                  <h4 className="font-bold text-lg text-[#1B365D] border-b border-gray-300 pb-1 mb-2">Zauber</h4>
+                  <h4 className="font-bold text-lg text-gold-hell border-b border-rahmen pb-1 mb-2">Zauber</h4>
                   <div className="space-y-4">
                     {groupedSpells.map((group, i) => (
-                      <div key={`sgroup-${i}`} className="bg-[#161B26] rounded-lg border border-[#3A4258] overflow-hidden">
-                        <div className="bg-[#1B263B] px-3 py-1 font-bold text-[#8FB3D5] border-b border-[#3A4258] text-sm">{group.skill}</div>
+                      <div key={`sgroup-${i}`} className="bg-seite rounded-knopf border border-rahmen overflow-hidden">
+                        <div className="bg-flaeche px-3 py-1 font-bold text-kanalisiert border-b border-rahmen text-sm">{group.skill}</div>
                         <div className="p-2 space-y-1">
                           {group.items.map((s, idx) => {
                             const canDeleteSpell = mode === 'creation' || s.sourceMode === 'xp';
@@ -658,15 +658,15 @@ export function CreationView() {
                                   ? s.xpCost
                                   : (typeof s.cost === 'number' ? s.cost : (s.grade === 0 ? 1 : s.grade * 3)));
                             return (
-                              <div key={idx} className="flex justify-between items-start text-xs border-b border-gray-100 last:border-0 pb-1 last:pb-0">
+                              <div key={idx} className="flex justify-between items-start text-xs border-b border-rahmen last:border-0 pb-1 last:pb-0">
                                 <div>
-                                  <span className="font-bold text-[#8FB3D5]">{s.name} (Grad {s.grade})</span>
+                                  <span className="font-bold text-kanalisiert">{s.name} (Grad {s.grade})</span>
                                   <SourceBadge source={s.source} page={s.page} tooltipData={{ title: s.name, description: s.description }} />
                                 </div>
-                                <div className="text-gray-400 no-print flex items-center gap-2">
+                                <div className="text-leise no-print flex items-center gap-2">
                                   <span title={s.isFree ? 'Gratis-Zauber (0 EP)' : `${spellEpCost} EP`}>{spellEpCost} EP</span>
                                   {canDeleteSpell && (
-                                    <button onClick={() => removeSpellByObj(s)} className="text-red-400 hover:text-red-700 font-bold px-1" title="Entfernen">×</button>
+                                    <button onClick={() => removeSpellByObj(s)} className="text-schaden hover:text-schaden font-bold px-1" title="Entfernen">×</button>
                                   )}
                                 </div>
                               </div>

@@ -17,7 +17,7 @@ const DiceIcon: React.FC<DiceIconProps> = ({
   className,
   size = 20,
   fill = 'currentColor',
-  stroke = '#C5A059',
+  stroke = 'var(--color-gold)',
 }) => {
   const height = Math.round(size * (VIEWBOX_HEIGHT / VIEWBOX_WIDTH));
   return (

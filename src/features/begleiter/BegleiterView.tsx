@@ -12,7 +12,7 @@ export const BegleiterView: React.FC = () => {
   return (
     <div className="max-w-5xl mx-auto p-3 sm:p-4 space-y-4" data-testid="begleiter">
       {!k ? (
-        <p className="text-sm text-gray-700">Die Regelpakete werden geladen …</p>
+        <p className="text-sm text-schrift">Die Regelpakete werden geladen …</p>
       ) : (
         <>
           <TierAbschnitt k={k} />

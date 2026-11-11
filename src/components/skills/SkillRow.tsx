@@ -91,19 +91,19 @@ export const SkillRow: React.FC<SkillRowProps> = ({
   };
 
   const containerClasses = isOpen
-    ? `rounded-lg mb-2 border shadow-lg transition-all ${
+    ? `rounded-knopf mb-2 border transition-all ${
         isMagic
-          ? 'bg-[#141C2B] border-[#8FB3D5]/60 border-l-4 border-l-[#8FB3D5]'
-          : 'bg-[#141C2B] border-[#C5A059]/60 border-l-4 border-l-[#C5A059]'
+          ? 'bg-seite border-kanalisiert border-l-4 border-l-kanalisiert'
+          : 'bg-seite border-gold border-l-4 border-l-gold'
       }`
     : val > 0
-    ? `rounded-lg mb-1 border transition-colors ${
+    ? `rounded-knopf mb-1 border transition-colors ${
         isMagic
-          ? 'bg-[#161F2E]/80 border-[#3A4258] border-l-2 border-l-[#8FB3D5]/80 hover:border-[#8FB3D5]'
-          : 'bg-[#161F2E]/70 border-[#3A4258] hover:border-[#C5A059]/50'
+          ? 'bg-seite border-rahmen border-l-2 border-l-kanalisiert hover:border-kanalisiert'
+          : 'bg-seite border-rahmen hover:border-gold'
       }`
-    : `rounded-lg mb-1 border transition-colors border-transparent hover:border-[#3A4258]/60 hover:bg-[#161F2E]/40 ${
-        isMagic ? 'border-l-2 border-l-[#8FB3D5]/40' : ''
+    : `rounded-knopf mb-1 border transition-colors border-transparent hover:border-rahmen hover:bg-seite ${
+        isMagic ? 'border-l-2 border-l-rahmen' : ''
       }`;
 
   return (
@@ -115,7 +115,7 @@ export const SkillRow: React.FC<SkillRowProps> = ({
         >
           <span
             className={`text-xs mr-2 transition-transform duration-150 ${
-              isOpen ? 'rotate-90 text-[#C5A059]' : 'text-gray-400 group-hover:text-gray-200'
+              isOpen ? 'rotate-90 text-gold' : 'text-leise group-hover:text-schrift'
             }`}
           >
             ▶
@@ -123,17 +123,17 @@ export const SkillRow: React.FC<SkillRowProps> = ({
           <span
             className={`text-sm md:text-base truncate transition-colors ${
               isOpen
-                ? 'text-[#FBEFCE] font-bold'
+                ? 'text-schrift font-bold'
                 : val > 0
-                ? 'text-[#F5F2EA] font-semibold'
-                : 'text-[#94A3B8] group-hover:text-[#CBD5E1]'
+                ? 'text-schrift font-semibold'
+                : 'text-leise group-hover:text-schrift'
             }`}
           >
             {name}
           </span>
           {freeSlots > 0 && (
             <span
-              className="ml-2 text-[10px] font-mono font-bold px-2 py-0.5 rounded-full shrink-0 shadow-2xs border bg-[#1B365D] text-[#C5A059] border-[#C5A059]/60 badge-free-mastery"
+              className="ml-2 text-[11px] tabular-nums font-bold px-2 py-0.5 rounded-full shrink-0 shadow-2xs border bg-erhoeht text-gold border-gold badge-free-mastery"
               title={`Verfügbare Gratis-Meisterschaften: ${freeSlots}`}
             >
               {freeSlots}
@@ -141,21 +141,21 @@ export const SkillRow: React.FC<SkillRowProps> = ({
           )}
           {freeSpellSlotsCount > 0 && isMagic && (
             <span
-              className="ml-2 text-[10px] font-mono font-bold px-2 py-0.5 rounded-full shrink-0 shadow-2xs border bg-[#1B365D] text-[#8FB3D5] border-[#8FB3D5]/60 badge-free-spell"
+              className="ml-2 text-[11px] tabular-nums font-bold px-2 py-0.5 rounded-full shrink-0 shadow-2xs border bg-erhoeht text-kanalisiert border-kanalisiert badge-free-spell"
               title={`Verfügbare Gratis-Zauber: ${freeSpellSlotsCount}`}
             >
               {freeSpellSlotsCount}
             </span>
           )}
         </div>
-        <div className="w-1/4 md:w-1/6 text-center text-sm font-serif text-gray-400 print:text-black shrink-0 md:mb-0">
+        <div className="w-1/4 md:w-1/6 text-center text-sm text-leise print:text-black shrink-0 md:mb-0">
           {totalValue !== null ? (
             <span title={tooltipText} className="cursor-help inline-flex items-center gap-1">
-              <span className="text-xs text-[#C5A059] font-mono">∑</span>
-              <span className="font-bold text-[#F5F2EA]">{totalValue}</span>
+              <span className="text-xs text-gold tabular-nums">∑</span>
+              <span className="font-bold text-schrift">{totalValue}</span>
             </span>
           ) : (
-            <span className="text-[10px] italic text-[#94A3B8]">Waffe</span>
+            <span className="text-[11px] italic text-leise">Waffe</span>
           )}
         </div>
         <div className="w-full md:w-1/3 flex justify-end items-center space-x-1 md:space-x-2 no-print mt-1 md:mt-0">
@@ -163,15 +163,15 @@ export const SkillRow: React.FC<SkillRowProps> = ({
             <button
               onClick={onDecrease}
               disabled={!canDecrease}
-              className="w-8 h-8 sm:w-7 sm:h-7 flex items-center justify-center rounded-md border border-[#3A4258] bg-[#1E2536] text-[#F5F2EA] hover:bg-[#2A3449] hover:border-[#C5A059]/50 active:scale-95 disabled:opacity-20 disabled:pointer-events-none shrink-0 font-bold text-sm touch-manipulation transition-all cursor-pointer shadow-xs"
+              className="w-8 h-8 sm:w-7 sm:h-7 flex items-center justify-center rounded-knopf border border-rahmen bg-seite text-schrift hover:bg-erhoeht hover:border-gold active:scale-95 disabled:opacity-20 disabled:pointer-events-none shrink-0 font-bold text-sm touch-manipulation transition-all cursor-pointer "
               title="Verringern"
               aria-label={`${name} verringern`}
             >
               -
             </button>
             <span
-              className={`w-8 md:w-6 text-center font-bold font-mono text-sm ${
-                val > 0 ? 'text-[#C5A059]' : 'text-[#64748B]'
+              className={`w-8 md:w-6 text-center font-bold tabular-nums text-sm ${
+                val > 0 ? 'text-gold' : 'text-leise'
               }`}
             >
               {val}
@@ -179,14 +179,14 @@ export const SkillRow: React.FC<SkillRowProps> = ({
             <button
               onClick={onIncrease}
               disabled={!canIncrease}
-              className="w-8 h-8 sm:w-7 sm:h-7 flex items-center justify-center rounded-md border border-[#3A4258] bg-[#1E2536] text-[#F5F2EA] hover:bg-[#2A3449] hover:border-[#C5A059]/50 active:scale-95 disabled:opacity-20 disabled:pointer-events-none shrink-0 font-bold text-sm touch-manipulation transition-all cursor-pointer shadow-xs"
+              className="w-8 h-8 sm:w-7 sm:h-7 flex items-center justify-center rounded-knopf border border-rahmen bg-seite text-schrift hover:bg-erhoeht hover:border-gold active:scale-95 disabled:opacity-20 disabled:pointer-events-none shrink-0 font-bold text-sm touch-manipulation transition-all cursor-pointer "
               title="Erhöhen"
               aria-label={`${name} erhöhen`}
             >
               +
             </button>
           </div>
-          <span className="w-12 md:w-10 text-[10px] text-right text-[#C5A059] font-bold shrink-0">
+          <span className="w-12 md:w-10 text-[11px] text-right text-gold font-bold shrink-0">
             {cost > 0 ? `${cost} EP` : ''}
           </span>
         </div>
@@ -196,10 +196,10 @@ export const SkillRow: React.FC<SkillRowProps> = ({
       </div>
 
       {isOpen && (
-        <div className="px-3 md:px-6 pb-3 pt-2 text-sm skill-details border-t border-[#3A4258]/60 space-y-2.5">
-          <div className="text-[11px] uppercase tracking-wider font-bold border-b border-[#3A4258] pb-1.5 flex justify-between items-center text-[#C5A059]">
+        <div className="px-3 md:px-6 pb-3 pt-2 text-sm skill-details border-t border-rahmen space-y-2.5">
+          <div className="text-[11px] uppercase tracking-wider font-bold border-b border-rahmen pb-1.5 flex justify-between items-center text-gold">
             <span>Optionen</span>
-            <span className="no-print hidden md:inline text-[11px] font-normal text-[#94A3B8]">
+            <span className="no-print hidden md:inline text-[11px] font-normal text-leise">
               {val < 6
                 ? 'Meisterschaften ab Wert 6'
                 : val < 9
@@ -212,14 +212,14 @@ export const SkillRow: React.FC<SkillRowProps> = ({
             </span>
           </div>
           {val >= grossmeisterAb() && (
-            <div className="text-xs rounded border border-[#C5A059]/60 bg-[#C5A059]/10 text-[#C5A059] px-2 py-1" data-testid="grossmeister">
+            <div className="text-xs rounded-knopf border border-gold bg-erhoeht text-gold px-2 py-1" data-testid="grossmeister">
               <strong>Großmeister</strong>: bei jeder Probe in {name} ein zusätzlicher W10 (zählt nicht für Patzer, GRW S. 92). Wird beim Würfeln automatisch berücksichtigt.
             </div>
           )}
           {(val >= 6 || (creationMode && creationBudget > 0 && val >= 1)) && (
             <button
               onClick={onAddMastery}
-              className="text-xs bg-[#1B365D] hover:bg-[#254572] active:scale-[0.98] px-3 py-2 md:py-1.5 rounded-md w-full text-center no-print border border-[#C5A059]/50 text-[#FBEFCE] font-bold touch-manipulation transition-colors cursor-pointer shadow-xs"
+              className="text-xs bg-erhoeht hover:bg-rahmen active:scale-[0.98] px-3 py-2 md:py-1.5 rounded-knopf w-full text-center no-print border border-gold text-schrift font-bold touch-manipulation transition-colors cursor-pointer "
             >
               + Meisterschaft hinzufügen
             </button>
@@ -227,7 +227,7 @@ export const SkillRow: React.FC<SkillRowProps> = ({
           {isMagic && val >= 1 && (
             <button
               onClick={onAddSpell}
-              className="text-xs bg-[#1A2E4C] hover:bg-[#223C63] active:scale-[0.98] px-3 py-2 md:py-1.5 rounded-md w-full text-center no-print border border-[#8FB3D5]/60 text-[#8FB3D5] hover:text-white font-bold touch-manipulation transition-colors cursor-pointer shadow-xs"
+              className="text-xs bg-erhoeht hover:bg-rahmen active:scale-[0.98] px-3 py-2 md:py-1.5 rounded-knopf w-full text-center no-print border border-kanalisiert text-kanalisiert hover:text-schrift font-bold touch-manipulation transition-colors cursor-pointer "
             >
               + Zauber hinzufügen
             </button>
@@ -235,7 +235,7 @@ export const SkillRow: React.FC<SkillRowProps> = ({
 
           {sortedMasteries.length > 0 && (
             <div className="mt-3 space-y-1.5">
-              <div className="text-[10px] uppercase text-[#C5A059] font-bold tracking-wider">
+              <div className="text-[11px] uppercase text-gold font-bold tracking-wider">
                 Meisterschaften
               </div>
               {sortedMasteries.map((m, idx) => {
@@ -248,13 +248,13 @@ export const SkillRow: React.FC<SkillRowProps> = ({
                 return (
                   <div
                     key={m.id || idx}
-                    className="flex justify-between items-center bg-[#101522] p-2 rounded-md border border-[#3A4258] hover:border-[#C5A059]/40 text-xs transition-colors"
+                    className="flex justify-between items-center bg-seite p-2 rounded-knopf border border-rahmen hover:border-rahmen text-xs transition-colors"
                   >
                     <div className="flex flex-col">
-                      <span className="font-bold text-[#FBEFCE]">
+                      <span className="font-bold text-schrift">
                         {m.name}
                         {!/\(S\d+\)/.test(m.name) && (
-                          <span className="font-normal text-[#94A3B8] ml-1">(S{m.tier})</span>
+                          <span className="font-normal text-leise ml-1">(S{m.tier})</span>
                         )}
                       </span>
                       <SourceBadge
@@ -268,7 +268,7 @@ export const SkillRow: React.FC<SkillRowProps> = ({
                         onClick={() =>
                           onRemoveMasteryById ? onRemoveMasteryById(m.id) : onRemoveMastery(idx)
                         }
-                        className="text-red-400/80 hover:text-red-300 font-bold px-2 text-base min-h-[28px] min-w-[28px] flex items-center justify-center cursor-pointer transition-colors"
+                        className="text-schaden hover:text-schaden font-bold px-2 text-base min-h-[28px] min-w-[28px] flex items-center justify-center cursor-pointer transition-colors"
                         title="Löschen"
                       >
                         ×
@@ -282,7 +282,7 @@ export const SkillRow: React.FC<SkillRowProps> = ({
 
           {sortedSpells.length > 0 && (
             <div className="mt-3 space-y-1.5">
-              <div className="text-[10px] uppercase text-[#8FB3D5] font-bold tracking-wider">
+              <div className="text-[11px] uppercase text-kanalisiert font-bold tracking-wider">
                 Zauber
               </div>
               {sortedSpells.map((s, idx) => {
@@ -302,12 +302,12 @@ export const SkillRow: React.FC<SkillRowProps> = ({
                 return (
                   <div
                     key={idx}
-                    className="flex justify-between items-center bg-[#101522] p-2 rounded-md border border-[#3A4258] hover:border-[#8FB3D5]/40 text-xs transition-colors"
+                    className="flex justify-between items-center bg-seite p-2 rounded-knopf border border-rahmen hover:border-rahmen text-xs transition-colors"
                   >
                     <div className="flex flex-col">
-                      <span className="font-bold text-[#8FB3D5]">
+                      <span className="font-bold text-kanalisiert">
                         {s.name}{' '}
-                        <span className="font-normal text-[#94A3B8]">(Grad {s.grade})</span>
+                        <span className="font-normal text-leise">(Grad {s.grade})</span>
                       </span>
                       <SourceBadge
                         source={s.source}
@@ -318,7 +318,7 @@ export const SkillRow: React.FC<SkillRowProps> = ({
                     {canRemoveSpell && (
                       <button
                         onClick={() => onRemoveSpell(s)}
-                        className="text-red-400/80 hover:text-red-300 font-bold px-2 text-base min-h-[28px] min-w-[28px] flex items-center justify-center cursor-pointer transition-colors"
+                        className="text-schaden hover:text-schaden font-bold px-2 text-base min-h-[28px] min-w-[28px] flex items-center justify-center cursor-pointer transition-colors"
                         title="Löschen"
                       >
                         ×

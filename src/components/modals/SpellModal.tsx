@@ -113,16 +113,16 @@ export const SpellModal: React.FC<SpellModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-3 sm:p-4">
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-3 sm:p-4">
       <div
         id="spell-modal-dialog"
-        className="bg-[#faf4e6] dark-theme-panel rounded-xl border-2 border-[#C5A059] shadow-2xl max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden"
+        className="bg-flaeche rounded-karte border border-rahmen shadow-2xl max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden"
       >
-        <div className="px-5 py-4 border-b border-[#C5A059] shrink-0">
-          <h3 className="fantasy-font text-xl text-[#1B365D] tracking-wide uppercase">
+        <div className="px-5 py-4 border-b border-gold shrink-0">
+          <h3 className="fantasy-font text-xl text-gold-hell tracking-wide uppercase">
             Zauber hinzufügen
           </h3>
-          <div className="text-xs text-stone-600 mt-0.5">
+          <div className="text-xs text-leise mt-0.5">
             für {schoolName || 'Zauber'}
           </div>
         </div>
@@ -130,10 +130,10 @@ export const SpellModal: React.FC<SpellModalProps> = ({
         <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-4 custom-scrollbar modal-body-scroll">
           <div>
             <div className="flex justify-between items-center mb-1">
-              <label className="block text-xs uppercase text-gray-500 font-semibold tracking-wider">
+              <label className="block text-xs uppercase text-leise font-semibold tracking-wider">
                 Auswahl &amp; Suche
               </label>
-              <span className="text-[11px] text-gray-500 font-medium">
+              <span className="text-[11px] text-leise font-medium">
                 {filteredSpells.length} Treffer
               </span>
             </div>
@@ -143,13 +143,13 @@ export const SpellModal: React.FC<SpellModalProps> = ({
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="🔍 Zauber filtern..."
-                className="w-full p-2 pr-8 border border-[#d1c4b0] rounded-lg bg-white text-xs text-[#2C1810] focus:ring-1 focus:ring-[#1B365D] focus:border-[#1B365D] outline-none"
+                className="w-full p-2 pr-8 border border-rahmen rounded-knopf bg-flaeche text-xs text-schrift focus:ring-1 focus:ring-rahmen focus:border-rahmen outline-none"
               />
               {search && (
                 <button
                   type="button"
                   onClick={() => setSearch('')}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#8B263E] text-xs font-bold w-5 h-5 flex items-center justify-center rounded-md hover:bg-black/5 cursor-pointer"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-leise hover:text-schaden text-xs font-bold w-5 h-5 flex items-center justify-center rounded-knopf hover:bg-black/5 cursor-pointer"
                   title="Suche leeren"
                 >
                   ✕
@@ -159,7 +159,7 @@ export const SpellModal: React.FC<SpellModalProps> = ({
             <select
               value={selectedSpellName}
               onChange={(e) => setSelectedSpellName(e.target.value)}
-              className="w-full p-2 border border-[#d1c4b0] rounded-lg bg-white text-[#2C1810] text-sm focus:ring-1 focus:ring-[#1B365D] focus:border-[#1B365D] outline-none"
+              className="w-full p-2 border border-rahmen rounded-knopf bg-flaeche text-schrift text-sm focus:ring-1 focus:ring-rahmen focus:border-rahmen outline-none"
             >
               {filteredSpells.map((s, idx) => (
                 <option key={`${s.school || ''}-${s.name}-${s.grade}-${idx}`} value={s.name}>
@@ -171,24 +171,24 @@ export const SpellModal: React.FC<SpellModalProps> = ({
           </div>
 
           {isCustom && (
-            <div className="space-y-2 bg-white/80 p-3 rounded-lg border border-[#C5A059] shadow-xs">
+            <div className="space-y-2 bg-flaeche p-3 rounded-knopf border border-gold ">
               <div>
-                <label className="block text-xs uppercase text-gray-600 font-semibold mb-1">Name *</label>
+                <label className="block text-xs uppercase text-leise font-semibold mb-1">Name *</label>
                 <input
                   type="text"
                   value={customName}
                   onChange={(e) => setCustomName(e.target.value)}
-                  className="w-full p-2 border border-[#d1c4b0] rounded-lg bg-white text-[#2C1810] text-sm"
+                  className="w-full p-2 border border-rahmen rounded-knopf bg-flaeche text-schrift text-sm"
                   placeholder="Zaubername"
                   autoFocus
                 />
               </div>
               <div>
-                <label className="block text-xs uppercase text-gray-600 font-semibold mb-1">Grad</label>
+                <label className="block text-xs uppercase text-leise font-semibold mb-1">Grad</label>
                 <select
                   value={customGrade}
                   onChange={(e) => setCustomGrade(parseInt(e.target.value))}
-                  className="w-full p-2 border border-[#d1c4b0] rounded-lg bg-white text-[#2C1810] text-sm"
+                  className="w-full p-2 border border-rahmen rounded-knopf bg-flaeche text-schrift text-sm"
                 >
                   {[0, 1, 2, 3, 4, 5].map((g) => (
                     <option key={g} value={g}>
@@ -198,24 +198,24 @@ export const SpellModal: React.FC<SpellModalProps> = ({
                 </select>
               </div>
               <div>
-                <label className="block text-xs uppercase text-gray-600 font-semibold mb-1">
+                <label className="block text-xs uppercase text-leise font-semibold mb-1">
                   Beschreibung
                 </label>
                 <input
                   type="text"
                   value={customDesc}
                   onChange={(e) => setCustomDesc(e.target.value)}
-                  className="w-full p-2 border border-[#d1c4b0] rounded-lg bg-white text-[#2C1810] text-sm"
+                  className="w-full p-2 border border-rahmen rounded-knopf bg-flaeche text-schrift text-sm"
                   placeholder="Kurzbeschreibung"
                 />
               </div>
               <div>
-                <label className="block text-xs uppercase text-gray-600 font-semibold mb-1">Quelle</label>
+                <label className="block text-xs uppercase text-leise font-semibold mb-1">Quelle</label>
                 <input
                   type="text"
                   value={customSource}
                   onChange={(e) => setCustomSource(e.target.value)}
-                  className="w-full p-2 border border-[#d1c4b0] rounded-lg bg-white text-[#2C1810] text-sm"
+                  className="w-full p-2 border border-rahmen rounded-knopf bg-flaeche text-schrift text-sm"
                   placeholder="z.B. Eigen, Erweiterungsband..."
                 />
               </div>
@@ -225,33 +225,33 @@ export const SpellModal: React.FC<SpellModalProps> = ({
           {!isCustom && selectedSpell && (() => {
             const mods = parseSpellPermissibleModifications(selectedSpell.description, selectedSpell.name);
             return (
-              <div className="bg-white/80 p-2.5 rounded-lg border border-[#d1c4b0] text-xs space-y-1 dark-theme-slot-inactive">
+              <div className="bg-flaeche p-2.5 rounded-knopf border border-rahmen text-xs space-y-1 dark-theme-slot-inactive">
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Schule:</span>
-                  <span className="font-bold text-[#1B365D]">{selectedSpell.school || schoolName}</span>
+                  <span className="text-leise">Schule:</span>
+                  <span className="font-bold text-schrift">{selectedSpell.school || schoolName}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Grad:</span>
-                  <span className="font-bold text-[#1B365D]">{selectedSpell.grade}</span>
+                  <span className="text-leise">Grad:</span>
+                  <span className="font-bold text-schrift">{selectedSpell.grade}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Fokus-Kosten:</span>
-                  <span className="font-medium text-[#2C1810]">{String(selectedSpell.cost)}</span>
+                  <span className="text-leise">Fokus-Kosten:</span>
+                  <span className="font-medium text-schrift">{String(selectedSpell.cost)}</span>
                 </div>
                 {selectedSpell.page && (
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Seite:</span>
-                    <span className="font-medium text-[#2C1810]">GRW S. {selectedSpell.page}</span>
+                    <span className="text-leise">Seite:</span>
+                    <span className="font-medium text-schrift">GRW S. {selectedSpell.page}</span>
                   </div>
                 )}
                 {mods.allowedNames.length > 0 && (
-                  <div className="pt-1.5 border-t border-gray-200 mt-1">
-                    <span className="text-gray-500 font-semibold block mb-1">Zulässige Modifikationen:</span>
+                  <div className="pt-1.5 border-t border-rahmen mt-1">
+                    <span className="text-leise font-semibold block mb-1">Zulässige Modifikationen:</span>
                     <div className="flex flex-wrap gap-1">
                       {mods.allowedNames.map((modName) => (
                         <span
                           key={modName}
-                          className="px-1.5 py-0.5 bg-[#f3e5cf] text-[#1B365D] border border-[#C5A059]/40 rounded text-[10px] font-semibold"
+                          className="px-1.5 py-0.5 bg-erhoeht text-schrift border border-rahmen rounded-knopf text-[11px] font-semibold"
                         >
                           {modName}
                         </span>
@@ -260,7 +260,7 @@ export const SpellModal: React.FC<SpellModalProps> = ({
                   </div>
                 )}
                 {selectedSpell.description && (
-                  <div className="text-gray-600 italic pt-1 border-t border-gray-200 mt-1 whitespace-pre-line">
+                  <div className="text-leise italic pt-1 border-t border-rahmen mt-1 whitespace-pre-line">
                     {selectedSpell.description}
                   </div>
                 )}
@@ -271,10 +271,10 @@ export const SpellModal: React.FC<SpellModalProps> = ({
           {/* Free spell slot */}
           <div
             id="spell-modal-free-slot"
-            className={`p-3 rounded-lg border transition-all ${
+            className={`p-3 rounded-knopf border transition-all ${
               canBeFree
-                ? 'bg-[#f3e5cf]/60 border-[#C5A059]/50 dark-theme-slot-active'
-                : 'bg-stone-100 border-[#d1c4b0] dark-theme-slot-inactive'
+                ? 'bg-erhoeht border-gold dark-theme-slot-active'
+                : 'bg-seite border-rahmen dark-theme-slot-inactive'
             }`}
           >
             <label
@@ -287,44 +287,44 @@ export const SpellModal: React.FC<SpellModalProps> = ({
                 checked={isFree}
                 onChange={(e) => setIsFree(e.target.checked)}
                 disabled={!canBeFree}
-                className="w-4 h-4 text-[#1B365D] accent-[#C5A059] rounded"
+                className="w-4 h-4 text-schrift accent-gold rounded-knopf"
               />
-              <span className="font-bold text-[#1B365D]">Gratis-Slot nutzen</span>
+              <span className="font-bold text-schrift">Gratis-Slot nutzen</span>
             </label>
             {!canBeFree && selectedSpell && (
-              <div className="text-xs text-[#8B263E] font-medium mt-1 ml-6">
+              <div className="text-xs text-schaden font-medium mt-1 ml-6">
                 Kein passender Gratis-Slot für {selectedSpell.school || schoolName} (Grad{' '}
                 {selectedSpell.grade}) verfügbar.
               </div>
             )}
           </div>
 
-          <div className="flex justify-between items-baseline border-t border-[#d1c4b0] pt-3">
-            <span className="text-xs uppercase text-stone-500 font-semibold tracking-wider">Kosten:</span>
+          <div className="flex justify-between items-baseline border-t border-rahmen pt-3">
+            <span className="text-xs uppercase text-leise font-semibold tracking-wider">Kosten:</span>
             <span
-              className={`font-bold font-mono text-lg ${isAffordable ? 'text-[#C5A059]' : 'text-[#8B263E]'}`}
+              className={`font-bold tabular-nums text-lg ${isAffordable ? 'text-gold' : 'text-schaden'}`}
             >
               {finalCost} EP
             </span>
           </div>
           {!isAffordable && selectedSpell && (
-            <div className="text-xs text-[#8B263E] font-bold text-center border border-[#8B263E]/40 bg-[#f3e5cf] p-1.5 rounded-lg shadow-2xs">
+            <div className="text-xs text-schaden font-bold text-center border border-magie bg-erhoeht p-1.5 rounded-knopf shadow-2xs">
               Nicht genügend EP verfügbar!
             </div>
           )}
         </div>
 
-        <div className="px-5 py-3.5 border-t border-[#C5A059]/40 bg-black/5 flex justify-end space-x-2 shrink-0">
+        <div className="px-5 py-3.5 border-t border-rahmen bg-black/5 flex justify-end space-x-2 shrink-0">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-[#1B365D] hover:bg-[#ebdcc4] rounded-lg font-semibold text-sm transition-colors cursor-pointer shrink-0"
+            className="px-4 py-2 text-schrift hover:bg-rahmen rounded-knopf font-semibold text-sm transition-colors cursor-pointer shrink-0"
           >
             Abbrechen
           </button>
           <button
             onClick={handleAdd}
             disabled={(!isAffordable && !hausregeln) || !isValid}
-            className="px-5 py-2 bg-[#1B365D] hover:bg-[#2a4f7e] text-white rounded-lg font-bold text-sm shadow-xs border border-[#C5A059]/60 disabled:opacity-50 disabled:cursor-not-allowed shrink-0 transition-all cursor-pointer"
+            className="px-5 py-2 bg-erhoeht hover:bg-rahmen text-schrift rounded-knopf font-bold text-sm border border-gold disabled:opacity-50 disabled:cursor-not-allowed shrink-0 transition-all cursor-pointer"
           >
             Hinzufügen
           </button>

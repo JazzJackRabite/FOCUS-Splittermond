@@ -27,7 +27,7 @@ export const ItemList: React.FC<ItemListProps> = ({
 }) => {
   if (items.length === 0) {
     return (
-      <div className="text-gray-400 text-sm italic p-2">Keine {typeLabel} gewählt</div>
+      <div className="text-leise text-sm italic p-2">Keine {typeLabel} gewählt</div>
     );
   }
   return (
@@ -62,13 +62,13 @@ export const ItemList: React.FC<ItemListProps> = ({
         return (
           <div
             key={idx}
-            className="flex justify-between items-start bg-[#161B26] p-2.5 rounded-lg border border-[#3A4258] hover:border-[#C5A059]/40 transition-colors"
+            className="flex justify-between items-start bg-seite p-2.5 rounded-knopf border border-rahmen hover:border-rahmen transition-colors"
           >
             <div>
               <div className="flex items-center flex-wrap gap-2">
-                <span className="font-bold text-[#F5F2EA]">{item.name}</span>
+                <span className="font-bold text-schrift">{item.name}</span>
                 {item.level && item.level > 1 ? (
-                  <span className="bg-[#1B365D] border border-[#C5A059]/40 px-2 py-0.5 rounded text-[10px] font-bold text-[#FBEFCE] uppercase tracking-wider">
+                  <span className="bg-erhoeht border border-rahmen px-2 py-0.5 rounded-knopf text-[11px] font-bold text-schrift uppercase tracking-wider">
                     Stufe {item.level}
                   </span>
                 ) : null}
@@ -80,17 +80,17 @@ export const ItemList: React.FC<ItemListProps> = ({
               </div>
 
               {showCosts && (
-                <div className="text-[10px] text-gray-400 mt-1">
+                <div className="text-[11px] text-leise mt-1">
                   {item.isRacial ? (
-                    <span className="text-emerald-400 font-bold">Gratis: Rasse</span>
+                    <span className="text-unverletzt font-bold">Gratis: Rasse</span>
                   ) : item.pointCost === 0 ? (
-                    <span className="text-emerald-400 font-bold">Gratis: Heimat</span>
+                    <span className="text-unverletzt font-bold">Gratis: Heimat</span>
                   ) : item.source === 'creation' ? (
-                    <span className="text-[#C5A059] font-bold">
+                    <span className="text-gold font-bold">
                       {creationCost} Pkt (Erstellung)
                     </span>
                   ) : item.isFree ? (
-                    <span className="text-emerald-400 font-bold">Gratis</span>
+                    <span className="text-unverletzt font-bold">Gratis</span>
                   ) : (
                     <span>
                       Kosten: {xpCost} EP
@@ -102,7 +102,7 @@ export const ItemList: React.FC<ItemListProps> = ({
             {canDelete && (
               <button
                 onClick={() => onDelete(idx)}
-                className="text-red-400/70 hover:text-red-300 font-bold text-lg px-2 no-print shrink-0 cursor-pointer transition-colors"
+                className="text-schaden hover:text-schaden font-bold text-lg px-2 no-print shrink-0 cursor-pointer transition-colors"
                 title="Entfernen"
               >
                 ×

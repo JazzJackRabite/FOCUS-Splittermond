@@ -27,22 +27,22 @@ const BausteinGruppe: React.FC<{ k: Katalog; art: string; b: Begleiter; aendern:
   const namen = new Set(alle.map(i => k.get(i)?.name));
   return (
     <div>
-      <h4 className="font-bold text-[#1B365D] mb-1">{ART_TEXT[art] ?? art}</h4>
-      {info && <p className="text-gray-600 mb-1">{info}</p>}
-      {art === 'Instruktion' && <p className="text-gray-600 mb-1">Immer: {IMMER_INSTRUKTIONEN.join(', ')}.</p>}
+      <h4 className="font-bold text-gold-hell mb-1">{ART_TEXT[art] ?? art}</h4>
+      {info && <p className="text-leise mb-1">{info}</p>}
+      {art === 'Instruktion' && <p className="text-leise mb-1">Immer: {IMMER_INSTRUKTIONEN.join(', ')}.</p>}
       {meine.length > 0 && (
         <ul className="space-y-0.5 mb-1">
           {meine.map(({ id, i }) => {
             const e = k.get(id)!;
             return (
-              <li key={`${id}-${i}`} className="border-l-2 border-[#C5A059] pl-2">
+              <li key={`${id}-${i}`} className="border-l-2 border-gold pl-2">
                 <div className="flex items-center gap-1">
                   <button type="button" className="font-bold text-left cursor-pointer" onClick={() => setOffen(o => ({ ...o, [i]: !o[i] }))}>{e.name}</button>
-                  {e.daten.stufe_merkmal_golem && <span className="text-gray-500">Golem {e.daten.stufe_merkmal_golem}</span>}
+                  {e.daten.stufe_merkmal_golem && <span className="text-leise">Golem {e.daten.stufe_merkmal_golem}</span>}
                   <button type="button" aria-label={`${e.name} entfernen`} onClick={() => aendern({ bausteine: alle.filter((_, j) => j !== i) })}
-                    className="ml-auto p-0.5 rounded hover:bg-black/5 hover:text-red-700 cursor-pointer"><X size={11} /></button>
+                    className="ml-auto p-0.5 rounded-knopf hover:bg-black/5 hover:text-schaden cursor-pointer"><X size={11} /></button>
                 </div>
-                {offen[i] && <p className="text-gray-700">{e.daten.beschreibung}</p>}
+                {offen[i] && <p className="text-schrift">{e.daten.beschreibung}</p>}
               </li>
             );
           })}
@@ -59,7 +59,7 @@ const BausteinGruppe: React.FC<{ k: Katalog; art: string; b: Begleiter; aendern:
         </select>
         <button type="button" disabled={!wahl} className={knopf} onClick={() => { aendern({ bausteine: [...alle, wahl] }); setWahl(''); }}><Plus size={12} />Hinzufügen</button>
       </div>
-      {wahl && <p className="text-gray-700 mt-1">{k.get(wahl)?.daten.beschreibung}</p>}
+      {wahl && <p className="text-schrift mt-1">{k.get(wahl)?.daten.beschreibung}</p>}
     </div>
   );
 };
@@ -82,21 +82,21 @@ const GolemEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; besitzer
   if (b.golemRessource && !besitzer.golemPunkte.some(p => p >= g.stufe)) hinweise.push(`Ressource Golem ${g.stufe} nötig (1 Punkt je Stufe)`);
 
   return (
-    <li className="border border-[#d1c4b0] rounded-lg p-2 bg-white">
+    <li className="border border-rahmen rounded-knopf p-2 bg-flaeche">
       {spiel.modale}
       <div className="flex items-center justify-between gap-2 flex-wrap">
-        <button type="button" className="flex items-center gap-1 text-sm font-bold text-[#1B365D] cursor-pointer" onClick={() => setOffen(o => !o)} aria-expanded={offen}>
+        <button type="button" className="flex items-center gap-1 text-sm font-bold text-schrift cursor-pointer" onClick={() => setOffen(o => !o)} aria-expanded={offen}>
           {offen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}{titel}
         </button>
-        <span className="flex items-center gap-2 text-xs text-gray-500 flex-wrap">
+        <span className="flex items-center gap-2 text-xs text-leise flex-wrap">
           <VitalKurz spiel={spiel} daten={daten} />
-          <span className="px-1.5 rounded bg-[#ebdcc3] text-[#1B365D] font-bold">Golem {g.stufe}</span>
+          <span className="px-1.5 rounded-knopf bg-erhoeht text-schrift font-bold">Golem {g.stufe}</span>
           {b.material && <span>{k.get(b.material)?.name}</span>}
           <span>{b.golemRessource ? 'Ressource Golem' : `${g.preis} L`}</span>
-          {hinweise.length > 0 && <span className="text-amber-700 flex items-center gap-0.5" title={hinweise.join('\n')}><AlertTriangle size={12} />{hinweise.length}</span>}
-          {!g.korpus && <span className="text-amber-700">nicht im Katalog („Die Magie“ geladen?)</span>}
+          {hinweise.length > 0 && <span className="text-erschoepft flex items-center gap-0.5" title={hinweise.join('\n')}><AlertTriangle size={12} />{hinweise.length}</span>}
+          {!g.korpus && <span className="text-erschoepft">nicht im Katalog („Die Magie“ geladen?)</span>}
           <button type="button" aria-label={`${titel} entfernen`} onClick={() => dispatch({ type: 'BEGLEITER_ENTFERNEN', payload: { index } })}
-            className="p-1 rounded hover:bg-black/5 hover:text-red-700 cursor-pointer"><Trash2 size={14} /></button>
+            className="p-1 rounded-knopf hover:bg-black/5 hover:text-schaden cursor-pointer"><Trash2 size={14} /></button>
         </span>
       </div>
 
@@ -118,7 +118,7 @@ const GolemEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; besitzer
             </label>
           </div>
 
-          <p className="text-gray-700">
+          <p className="text-schrift">
             <strong>Stufe Golem {g.stufe}</strong> = {g.stufePosten.map(p => `${p.text} ${p.wert}`).join(' + ')}.{' '}
             {g.animierung ? <>Kleiner Ritus: <strong>{g.animierung.name}</strong>{kennt ? ' (bekannt)' : ''}. </> : 'Kein Animierungszauber für diese Stufe. '}
             Konstruktion: Handwerk/Edelhandwerk gegen {g.konstruktion.schwierigkeit}, {g.konstruktion.fortschritt} Fortschrittspunkte
@@ -141,7 +141,7 @@ const GolemEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; besitzer
 
           {g.sonderausstattungPlaetze > 0 && (
             <div>
-              <h4 className="font-bold text-[#1B365D] mb-1">Sonderausstattung (eine je zwei Stufen)</h4>
+              <h4 className="font-bold text-gold-hell mb-1">Sonderausstattung (eine je zwei Stufen)</h4>
               <div className="flex flex-wrap gap-2">
                 {Array.from({ length: g.sonderausstattungPlaetze }, (_, i) => (
                   <select key={i} value={b.sonderausstattung?.[i] ?? ''} aria-label={`Sonderausstattung ${i + 1}`} className={auswahl}
@@ -160,13 +160,13 @@ const GolemEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; besitzer
 
           {g.feinschliff.length > 0 && (
             <div>
-              <h4 className="font-bold text-[#1B365D] mb-1">Feinschliff (Schritt 5, Spielleitung)</h4>
-              <ul className="list-disc pl-4 text-gray-700">{g.feinschliff.map((t, i) => <li key={i}>{t}</li>)}</ul>
-              <p className="text-gray-600">Freie Fertigkeitspunkte nur auf allgemeine Fertigkeiten, die der Golem besitzt; freie Meisterschaften bis Schwelle {g.meisterschaftSchwelle}.</p>
+              <h4 className="font-bold text-gold-hell mb-1">Feinschliff (Schritt 5, Spielleitung)</h4>
+              <ul className="list-disc pl-4 text-schrift">{g.feinschliff.map((t, i) => <li key={i}>{t}</li>)}</ul>
+              <p className="text-leise">Freie Fertigkeitspunkte nur auf allgemeine Fertigkeiten, die der Golem besitzt; freie Meisterschaften bis Schwelle {g.meisterschaftSchwelle}.</p>
             </div>
           )}
 
-          {hinweise.length > 0 && <ul className="text-amber-700 list-disc pl-4">{hinweise.map((h, i) => <li key={i}>{h}</li>)}</ul>}
+          {hinweise.length > 0 && <ul className="text-erschoepft list-disc pl-4">{hinweise.map((h, i) => <li key={i}>{h}</li>)}</ul>}
 
           <label className="flex flex-col gap-0.5">Notiz
             <textarea value={b.notiz ?? ''} onChange={ev => aendern({ notiz: ev.target.value || undefined })} rows={2} className={`${auswahl} w-full`} />
@@ -192,14 +192,14 @@ export const GolemAbschnitt: React.FC<{ k: Katalog }> = ({ k }) => {
   return (
     <section className={karte} data-testid="begleiter-golems">
       <div className="flex items-center gap-2 mb-2">
-        <Bot size={18} className="text-[#1B365D]" />
-        <h3 className="font-bold text-base text-[#1B365D]">Golems</h3>
+        <Bot size={18} className="text-schrift" />
+        <h3 className="font-bold text-base text-gold-hell">Golems</h3>
       </div>
       {liste.length === 0 ? (
-        <p className="text-xs text-gray-600">Der Golem-Baukasten steht im Buchpaket „Die Magie“ (Einstellungen → Regelpakete).</p>
+        <p className="text-xs text-leise">Der Golem-Baukasten steht im Buchpaket „Die Magie“ (Einstellungen → Regelpakete).</p>
       ) : (
         <>
-          <p className="text-xs text-gray-600 mb-3">
+          <p className="text-xs text-leise mb-3">
             Baukasten nach Die Magie S. 205–207: Korpus, Material, Zusätzliche Fähigkeiten, Rollen, Feinschliff. Gekauft oder selbst gebaut
             (Kleiner Ritus mit Animierungszauber) oder dauerhaft über die Ressource Golem (1 Punkt je Stufe).
             {besitzer.golemPunkte.length > 0 && <> Ressource Golem: {besitzer.golemPunkte.join(', ')}.</>}

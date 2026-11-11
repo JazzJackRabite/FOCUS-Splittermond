@@ -272,26 +272,26 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center z-50 p-3 sm:p-4">
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-3 sm:p-4">
       <div
         id="mastery-modal-dialog"
-        className="bg-[#141C2B] text-[#F5F2EA] rounded-2xl border-2 border-[#C5A059] shadow-2xl max-w-lg w-full max-h-[92vh] flex flex-col overflow-hidden"
+        className="bg-flaeche text-schrift rounded-karte border border-rahmen shadow-2xl max-w-lg w-full max-h-[92vh] flex flex-col overflow-hidden"
       >
-        <div className="px-5 py-4 border-b border-[#C5A059]/60 flex justify-between items-start shrink-0">
+        <div className="px-5 py-4 border-b border-gold flex justify-between items-start shrink-0">
           <div>
-            <h3 className="fantasy-font text-xl text-[#FBEFCE] tracking-wide uppercase">
+            <h3 className="fantasy-font text-xl text-gold-hell tracking-wide uppercase">
               Meisterschaft hinzufügen
             </h3>
-            <div className="text-xs text-[#94A3B8] mt-0.5">
-              für <span className="font-semibold text-[#F5F2EA]">{skillName}</span> (Fertigkeitspunkte:{' '}
-              <span className="font-bold text-[#C5A059] font-mono">{skillVal}</span>
+            <div className="text-xs text-leise mt-0.5">
+              für <span className="font-semibold text-schrift">{skillName}</span> (Fertigkeitspunkte:{' '}
+              <span className="font-bold text-gold tabular-nums">{skillVal}</span>
               {creationMode ? ' – Erstellung' : ` – Max Schwelle: S${maxTier}`})
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="text-gray-400 hover:text-white text-lg font-bold w-7 h-7 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
+            className="text-leise hover:text-schrift text-lg font-bold w-7 h-7 flex items-center justify-center rounded-knopf hover:bg-rahmen transition-colors cursor-pointer"
             title="Schließen"
           >
             ✕
@@ -302,20 +302,20 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
           {/* Search & Filter bar */}
           <div>
             <div className="flex justify-between items-center mb-1">
-              <label className="block text-[11px] uppercase text-[#C5A059] font-bold tracking-wider">
+              <label className="block text-[11px] uppercase text-gold font-bold tracking-wider">
                 Auswahl &amp; Suche
               </label>
               <div className="flex items-center gap-3">
-                <label className="flex items-center gap-1.5 text-[11px] text-[#94A3B8] cursor-pointer hover:text-gray-200">
+                <label className="flex items-center gap-1.5 text-[11px] text-leise cursor-pointer hover:text-schrift">
                   <input
                     type="checkbox"
                     checked={onlyAvailable}
                     onChange={(e) => setOnlyAvailable(e.target.checked)}
-                    className="rounded border-[#3A4258] bg-[#1E2536] text-[#C5A059] focus:ring-0 w-3.5 h-3.5 cursor-pointer"
+                    className="rounded-knopf border-rahmen bg-seite text-gold focus:ring-0 w-3.5 h-3.5 cursor-pointer"
                   />
                   <span>Nur erlernbare ({filteredMasteries.filter((m) => masteryCheckMap.get(m.name)?.canLearn).length})</span>
                 </label>
-                <span className="text-[11px] text-[#94A3B8]">
+                <span className="text-[11px] text-leise">
                   {searchedMasteries.length} Treffer
                 </span>
               </div>
@@ -327,13 +327,13 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="🔍 Nach Name, Manöver oder Voraussetzung filtern..."
-                className="w-full p-2 pr-8 border border-[#3A4258] rounded-lg bg-[#1E2536] text-[#F5F2EA] text-xs focus:ring-1 focus:ring-[#C5A059] focus:border-[#C5A059] outline-none"
+                className="w-full p-2 pr-8 border border-rahmen rounded-knopf bg-seite text-schrift text-xs focus:ring-1 focus:ring-gold focus:border-gold outline-none"
               />
               {search && (
                 <button
                   type="button"
                   onClick={() => setSearch('')}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-md hover:bg-white/10 cursor-pointer"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-leise hover:text-schrift text-xs font-bold w-5 h-5 flex items-center justify-center rounded-knopf hover:bg-rahmen cursor-pointer"
                   title="Suche leeren"
                 >
                   ✕
@@ -342,11 +342,11 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
             </div>
 
             <div className="flex justify-between items-center mb-1">
-              <label className="block text-[11px] uppercase text-[#94A3B8] font-bold">
+              <label className="block text-[11px] uppercase text-leise font-bold">
                 Meisterschaft wählen
               </label>
               {searchedMasteries.some((m) => m.manoever) && (
-                <span className="text-[10px] text-[#C5A059] font-medium" title="Manöver sind aktive Kampftechniken, die bei einem Angriff/einer Aktion angesagt werden">
+                <span className="text-[11px] text-gold font-medium" title="Manöver sind aktive Kampftechniken, die bei einem Angriff/einer Aktion angesagt werden">
                   [M] = Manöver (aktive Kampfaktion)
                 </span>
               )}
@@ -364,7 +364,7 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
                   setTier(mTier);
                 }
               }}
-              className="w-full p-2.5 border border-[#3A4258] rounded-lg bg-[#1E2536] text-[#F5F2EA] text-xs sm:text-sm focus:ring-1 focus:ring-[#C5A059] focus:border-[#C5A059] outline-none"
+              className="w-full p-2.5 border border-rahmen rounded-knopf bg-seite text-schrift text-xs sm:text-sm focus:ring-1 focus:ring-gold focus:border-gold outline-none"
             >
               {searchedMasteries.map((m) => {
                 const isTaken = existingMasteries.some((em) => em.name === m.name);
@@ -401,29 +401,29 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
 
           {/* Custom mastery input */}
           {selectedName === 'custom' && (
-            <div className="space-y-2 bg-[#101522] p-3 rounded-lg border border-[#C5A059]/60 shadow-xs">
+            <div className="space-y-2 bg-seite p-3 rounded-knopf border border-gold ">
               <div>
-                <label className="block text-[11px] uppercase text-[#C5A059] font-bold mb-1">
+                <label className="block text-[11px] uppercase text-gold font-bold mb-1">
                   Eigener Name *
                 </label>
                 <input
                   type="text"
                   value={customName}
                   onChange={(e) => setCustomName(e.target.value)}
-                  className="w-full p-2 border border-[#3A4258] rounded-lg bg-[#1E2536] text-[#F5F2EA] text-xs"
+                  className="w-full p-2 border border-rahmen rounded-knopf bg-seite text-schrift text-xs"
                   placeholder="z.B. Waffenmeister (S2)"
                   autoFocus
                 />
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-[11px] uppercase text-[#94A3B8] font-bold mb-1">
+                  <label className="block text-[11px] uppercase text-leise font-bold mb-1">
                     Schwelle
                   </label>
                   <select
                     value={tier}
                     onChange={(e) => setTier(parseInt(e.target.value, 10))}
-                    className="w-full p-2 border border-[#3A4258] rounded-lg bg-[#1E2536] text-[#F5F2EA] text-xs"
+                    className="w-full p-2 border border-rahmen rounded-knopf bg-seite text-schrift text-xs"
                   >
                     {[1, 2, 3, 4].map((t) => {
                       const reqVal = getRequiredSkillValue(t);
@@ -437,14 +437,14 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[11px] uppercase text-[#94A3B8] font-bold mb-1">
+                  <label className="block text-[11px] uppercase text-leise font-bold mb-1">
                     Quelle
                   </label>
                   <input
                     type="text"
                     value={customSource}
                     onChange={(e) => setCustomSource(e.target.value)}
-                    className="w-full p-2 border border-[#3A4258] rounded-lg bg-[#1E2536] text-[#F5F2EA] text-xs"
+                    className="w-full p-2 border border-rahmen rounded-knopf bg-seite text-schrift text-xs"
                     placeholder="z.B. Eigen, Erw."
                   />
                 </div>
@@ -454,14 +454,14 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
 
           {/* Details & Requirement Status for Selected Mastery */}
           {!isCustom && selectedEntry && (
-            <div className="bg-[#101522] p-3 rounded-lg border border-[#3A4258] text-xs space-y-2">
+            <div className="bg-seite p-3 rounded-knopf border border-rahmen text-xs space-y-2">
               <div className="flex flex-wrap items-center justify-between gap-1">
-                <span className="text-[#94A3B8] font-medium">Schwellenvoraussetzung:</span>
+                <span className="text-leise font-medium">Schwellenvoraussetzung:</span>
                 <span
-                  className={`font-bold font-mono px-2 py-0.5 rounded text-[11px] flex items-center gap-1 ${
+                  className={`font-bold tabular-nums px-2 py-0.5 rounded-knopf text-[11px] flex items-center gap-1 ${
                     currentValidation?.thresholdMet
-                      ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-700/60'
-                      : 'bg-amber-950/80 text-amber-300 border border-amber-700/60'
+                      ? 'bg-unverletzt-grund text-unverletzt border border-unverletzt'
+                      : 'bg-erschoepft-grund text-gold-hell border border-erschoepft'
                   }`}
                 >
                   {currentValidation?.thresholdMet ? '✓' : '✕'} Schwelle {tier} (FP ≥{' '}
@@ -470,22 +470,22 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
               </div>
 
               {selectedEntry.manoever && (
-                <div className="flex items-center gap-2 py-1 px-2 rounded bg-amber-500/10 border border-amber-500/30 text-amber-200">
-                  <span className="font-bold text-[10px] uppercase tracking-wider bg-amber-500/20 px-1.5 py-0.5 rounded text-amber-300 shrink-0">
+                <div className="flex items-center gap-2 py-1 px-2 rounded-knopf bg-erschoepft-grund border border-erschoepft text-gold-hell">
+                  <span className="font-bold text-[11px] uppercase tracking-wider bg-erschoepft-grund px-1.5 py-0.5 rounded-knopf text-gold-hell shrink-0">
                     ⚔️ Manöver
                   </span>
-                  <span className="text-[11px] text-amber-100/90 leading-tight">
+                  <span className="text-[11px] text-gold-hell leading-tight">
                     Aktive Kampftechnik: Muss vor einem Angriff oder einer Aktion angesagt werden (pro Aktion ist maximal 1 Manöver erlaubt).
                   </span>
                 </div>
               )}
 
               {selectedEntry.prerequisiteText && (
-                <div className="flex flex-col sm:flex-row sm:justify-between items-start gap-1 pt-1.5 border-t border-[#3A4258]/60">
-                  <span className="text-[#94A3B8] shrink-0 font-medium">Voraussetzungen:</span>
+                <div className="flex flex-col sm:flex-row sm:justify-between items-start gap-1 pt-1.5 border-t border-rahmen">
+                  <span className="text-leise shrink-0 font-medium">Voraussetzungen:</span>
                   <span
                     className={`font-semibold text-right flex items-center gap-1 ${
-                      currentValidation?.prerequisitesMet ? 'text-emerald-400' : 'text-amber-400'
+                      currentValidation?.prerequisitesMet ? 'text-unverletzt' : 'text-gold'
                     }`}
                   >
                     <span>{currentValidation?.prerequisitesMet ? '✓ Erfüllt:' : '⚠ Fehlend:'}</span>
@@ -496,22 +496,22 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
 
               {/* Warning box if mastery cannot be learned */}
               {currentValidation && !currentValidation.canLearn && (
-                <div className="p-2.5 rounded-lg bg-amber-950/50 border border-amber-500/50 text-amber-200 text-xs mt-1.5 space-y-1">
+                <div className="p-2.5 rounded-knopf bg-erschoepft-grund border border-gold text-gold-hell text-xs mt-1.5 space-y-1">
                   {!currentValidation.thresholdMet && (
                     <div className="flex items-start gap-1.5">
-                      <span className="text-amber-400 font-bold shrink-0">✕ Schwelle:</span>
+                      <span className="text-gold font-bold shrink-0">✕ Schwelle:</span>
                       <span>{currentValidation.thresholdReason}</span>
                     </div>
                   )}
                   {!currentValidation.prerequisitesMet && (
                     <div className="flex items-start gap-1.5">
-                      <span className="text-amber-400 font-bold shrink-0">✕ Voraussetzung:</span>
+                      <span className="text-gold font-bold shrink-0">✕ Voraussetzung:</span>
                       <span>{currentValidation.prerequisiteReason}</span>
                     </div>
                   )}
                   {freiTrotzVoraussetzung(selectedEntry.name) && (
                     <div className="flex items-start gap-1.5" data-testid="frei-trotz-voraussetzung">
-                      <span className="text-amber-400 font-bold shrink-0">ℹ</span>
+                      <span className="text-gold font-bold shrink-0">ℹ</span>
                       <span>Auf dieser Schwelle ist keine Meisterschaft erfüllbar. Als <strong>freie Meisterschaft</strong> darfst du sie trotzdem wählen; nutzbar ist sie erst, wenn die Voraussetzung erfüllt ist (GRW S. 92).</span>
                     </div>
                   )}
@@ -519,14 +519,14 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
               )}
 
               {selectedEntry.page && (
-                <div className="flex justify-between text-[11px] text-[#94A3B8] pt-1 border-t border-[#3A4258]/40">
+                <div className="flex justify-between text-[11px] text-leise pt-1 border-t border-rahmen">
                   <span>Regelwerk-Nachweis:</span>
-                  <span className="font-mono text-[#F5F2EA]">GRW S. {selectedEntry.page}</span>
+                  <span className="tabular-nums text-schrift">GRW S. {selectedEntry.page}</span>
                 </div>
               )}
 
               {selectedEntry.desc && (
-                <div className="text-gray-300 italic pt-1.5 border-t border-[#3A4258]/60 leading-relaxed text-[11px] sm:text-xs">
+                <div className="text-schrift italic pt-1.5 border-t border-rahmen leading-relaxed text-[11px] sm:text-xs">
                   {selectedEntry.desc}
                 </div>
               )}
@@ -536,10 +536,10 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
           {/* Free mastery slot */}
           <div
             id="mastery-modal-free-slot"
-            className={`p-3 rounded-lg border transition-all ${
+            className={`p-3 rounded-knopf border transition-all ${
               canBeFreeRank
-                ? 'bg-[#1B365D]/30 border-[#C5A059]/60 dark-theme-slot-active'
-                : 'bg-[#161B26] border-[#3A4258] dark-theme-slot-inactive'
+                ? 'bg-flaeche border-gold dark-theme-slot-active'
+                : 'bg-seite border-rahmen dark-theme-slot-inactive'
             }`}
           >
             <label
@@ -552,12 +552,12 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
                 checked={isFree}
                 onChange={(e) => handleFreeChange(e.target.checked)}
                 disabled={!canBeFreeRank}
-                className="w-4 h-4 text-[#C5A059] accent-[#C5A059] rounded cursor-pointer"
+                className="w-4 h-4 text-gold accent-gold rounded-knopf cursor-pointer"
               />
-              <span className="font-bold text-[#FBEFCE]">Gratis-Slot nutzen</span>
+              <span className="font-bold text-schrift">Gratis-Slot nutzen</span>
             </label>
             {!canBeFreeRank && (
-              <div className="text-xs text-amber-400 font-medium mt-1 ml-6">
+              <div className="text-xs text-gold font-medium mt-1 ml-6">
                 Kein passender Gratis-Slot für Schwelle {tier} verfügbar.
               </div>
             )}
@@ -567,10 +567,10 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
           {creationMode && (
             <div
               id="mastery-modal-creation-slot"
-              className={`p-3 rounded-lg border transition-all ${
+              className={`p-3 rounded-knopf border transition-all ${
                 canBeCreationBonus
-                  ? 'bg-[#1B365D]/30 border-[#C5A059]/60 dark-theme-slot-active'
-                  : 'bg-[#161B26] border-[#3A4258] dark-theme-slot-inactive'
+                  ? 'bg-flaeche border-gold dark-theme-slot-active'
+                  : 'bg-seite border-rahmen dark-theme-slot-inactive'
               }`}
             >
               <label
@@ -583,16 +583,16 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
                   checked={isCreationBonus}
                   onChange={(e) => handleCreationBonusChange(e.target.checked)}
                   disabled={!canBeCreationBonus}
-                  className="w-4 h-4 text-[#C5A059] accent-[#C5A059] rounded cursor-pointer"
+                  className="w-4 h-4 text-gold accent-gold rounded-knopf cursor-pointer"
                 />
-                <span className="font-bold text-[#FBEFCE]">Als Start-Meisterschaft wählen (Schwelle 1)</span>
+                <span className="font-bold text-schrift">Als Start-Meisterschaft wählen (Schwelle 1)</span>
               </label>
               {canBeCreationBonus ? (
-                <div className="text-xs text-[#8FB3D5] font-medium mt-1 ml-6">
+                <div className="text-xs text-kanalisiert font-medium mt-1 ml-6">
                   Verfügbar ({creationBudget} übrig).
                 </div>
               ) : (
-                <div className="text-xs text-amber-400 font-medium mt-1 ml-6">
+                <div className="text-xs text-gold font-medium mt-1 ml-6">
                   {tier > 1
                     ? 'Start-Meisterschaften können nur für Schwelle 1 vergeben werden.'
                     : 'Keine Start-Meisterschaften mehr verfügbar.'}
@@ -603,31 +603,31 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
 
           {/* Optional user note */}
           <div>
-            <label className="block text-[11px] uppercase text-[#94A3B8] font-bold tracking-wider mb-1">
+            <label className="block text-[11px] uppercase text-leise font-bold tracking-wider mb-1">
               Zusatztext / Spezialisierung (optional)
             </label>
             <input
               type="text"
               value={userNote}
               onChange={(e) => setUserNote(e.target.value)}
-              className="w-full p-2 border border-[#3A4258] rounded-lg bg-[#1E2536] text-[#F5F2EA] text-xs sm:text-sm focus:ring-1 focus:ring-[#C5A059] focus:border-[#C5A059] outline-none"
+              className="w-full p-2 border border-rahmen rounded-knopf bg-seite text-schrift text-xs sm:text-sm focus:ring-1 focus:ring-gold focus:border-gold outline-none"
               placeholder="z.B. Sinn: Gehör, Spezifikation..."
             />
           </div>
 
           {/* Cost display */}
-          <div className="flex justify-between items-baseline border-t border-[#3A4258] pt-3">
-            <span className="text-xs uppercase text-[#94A3B8] font-bold tracking-wider">Kosten:</span>
-            <span className="font-bold text-[#C5A059] font-mono text-lg">{cost} EP</span>
+          <div className="flex justify-between items-baseline border-t border-rahmen pt-3">
+            <span className="text-xs uppercase text-leise font-bold tracking-wider">Kosten:</span>
+            <span className="font-bold text-gold tabular-nums text-lg">{cost} EP</span>
           </div>
         </div>
 
         {/* Action buttons */}
-        <div className="px-5 py-3.5 border-t border-[#3A4258]/60 bg-black/20 flex justify-end space-x-2 shrink-0">
+        <div className="px-5 py-3.5 border-t border-rahmen bg-black/20 flex justify-end space-x-2 shrink-0">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 bg-[#1E2536] hover:bg-[#2A3449] text-[#94A3B8] hover:text-[#F5F2EA] rounded-lg font-semibold text-xs sm:text-sm transition-colors cursor-pointer border border-[#3A4258]"
+            className="px-4 py-2 bg-seite hover:bg-erhoeht text-leise hover:text-schrift rounded-knopf font-semibold text-xs sm:text-sm transition-colors cursor-pointer border border-rahmen"
           >
             Abbrechen
           </button>
@@ -635,7 +635,7 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
             type="button"
             onClick={handleAdd}
             disabled={isSelectionInvalid || (!selectedName && !customName)}
-            className="px-5 py-2 bg-[#1B365D] hover:bg-[#254572] text-[#FBEFCE] rounded-lg font-bold text-xs sm:text-sm shadow-xs border border-[#C5A059]/60 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
+            className="px-5 py-2 bg-erhoeht hover:bg-rahmen text-schrift rounded-knopf font-bold text-xs sm:text-sm border border-gold disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
             title={
               currentValidation && !currentValidation.canLearn
                 ? `${currentValidation.thresholdReason || ''} ${currentValidation.prerequisiteReason || ''}`.trim()

@@ -35,28 +35,28 @@ export const SituativeBoni: React.FC<{
   if (!boni.length) return null;
   const verrechenbar = boni.filter(b => b.wert !== null);
   const hinweise = boni.filter(b => b.wert === null);
-  const rahmen = dunkel ? 'bg-[#0f1722] border-[#263547] text-stone-300' : 'bg-[#e3d4b9] border-[#d1c4b0] text-[#2C1810]';
-  const titel = dunkel ? 'text-[#C5A059]' : 'text-[#1B365D]';
+  const rahmen = dunkel ? 'bg-seite border-rahmen text-schrift' : 'bg-seite border-rahmen text-schrift';
+  const titel = dunkel ? 'text-gold' : 'text-schrift';
   return (
-    <div className={`rounded-xl p-3 mb-3 border ${rahmen}`} data-testid="situative-boni">
+    <div className={`rounded-karte p-3 mb-3 border ${rahmen}`} data-testid="situative-boni">
       <div className={`text-xs font-bold uppercase tracking-wider fantasy-font flex items-center gap-1.5 mb-1 ${titel}`}>
-        <Sparkles size={14} className="text-[#C5A059]" /> Stärken & Meisterschaften
+        <Sparkles size={14} className="text-gold" /> Stärken & Meisterschaften
       </div>
       {verrechenbar.length > 0 && (
         <>
-          <p className={`text-xs mb-2 ${dunkel ? 'text-stone-400' : 'text-stone-600'}`}>Gilt nur in bestimmten Lagen – anklicken, wenn sie zutrifft:</p>
+          <p className={`text-xs mb-2 ${dunkel ? 'text-leise' : 'text-leise'}`}>Gilt nur in bestimmten Lagen – anklicken, wenn sie zutrifft:</p>
           <div className="flex flex-wrap gap-1.5">
             {verrechenbar.map(b => {
               const an = gewaehlt.has(b.id);
               return (
                 <button key={b.id} type="button" onClick={() => onToggle(b.id)} aria-pressed={an} title={b.beleg}
-                  className={`text-left px-2.5 py-1 rounded-lg text-xs border transition-all cursor-pointer ${an
-                    ? 'bg-[#2F5D3A] text-white border-[#244a2e] font-bold'
-                    : dunkel ? 'bg-[#15202e] text-stone-300 border-[#2b3a4f] hover:bg-[#1a293f]' : 'bg-white/90 text-stone-700 border-[#d1c4b0] hover:bg-white'}`}>
-                  <span className="font-mono font-bold mr-1">{vorzeichen(b.wert!)}</span>
+                  className={`text-left px-2.5 py-1 rounded-knopf text-xs border transition-all cursor-pointer ${an
+                    ? 'bg-unverletzt-grund text-schrift border-unverletzt font-bold'
+                    : dunkel ? 'bg-seite text-schrift border-rahmen hover:bg-flaeche' : 'bg-flaeche text-schrift border-rahmen hover:bg-rahmen'}`}>
+                  <span className="tabular-nums font-bold mr-1">{vorzeichen(b.wert!)}</span>
                   <span className="font-semibold">{b.quelle}</span>
-                  {b.bedingung && <span className={an ? 'text-white/80' : 'opacity-75'}> – {b.bedingung}</span>}
-                  {!b.bedingung && <span className={an ? 'text-white/80' : 'opacity-75'}> – {b.text}</span>}
+                  {b.bedingung && <span className={an ? 'text-schrift' : 'opacity-75'}> – {b.bedingung}</span>}
+                  {!b.bedingung && <span className={an ? 'text-schrift' : 'opacity-75'}> – {b.text}</span>}
                 </button>
               );
             })}
@@ -64,7 +64,7 @@ export const SituativeBoni: React.FC<{
         </>
       )}
       {hinweise.length > 0 && (
-        <ul className={`mt-2 text-xs space-y-0.5 ${dunkel ? 'text-stone-400' : 'text-stone-600'}`}>
+        <ul className={`mt-2 text-xs space-y-0.5 ${dunkel ? 'text-leise' : 'text-leise'}`}>
           {hinweise.map(b => (
             <li key={b.id} title={b.beleg}><strong>{b.quelle}:</strong> {b.text}{b.bedingung ? ` – ${b.bedingung}` : ''}</li>
           ))}
@@ -114,24 +114,24 @@ export const ZauberAnpassungen: React.FC<{
   }, {}));
   const hinweise = anpassungen.filter(a => a.art === 'hinweis');
   return (
-    <div className="rounded-xl p-3 border bg-[#e3d4b9] border-[#d1c4b0] text-[#2C1810]" data-testid="zauber-anpassungen">
-      <div className="text-xs font-bold uppercase tracking-wider fantasy-font flex items-center gap-1.5 mb-1 text-[#1B365D]">
-        <Sparkles size={14} className="text-[#C5A059]" /> Kosten & Zauberdauer aus Meisterschaften
+    <div className="rounded-karte p-3 border bg-seite border-rahmen text-schrift" data-testid="zauber-anpassungen">
+      <div className="text-xs font-bold uppercase tracking-wider fantasy-font flex items-center gap-1.5 mb-1 text-schrift">
+        <Sparkles size={14} className="text-gold" /> Kosten & Zauberdauer aus Meisterschaften
       </div>
       {waehlbar.length > 0 && (
         <>
-          <p className="text-xs mb-2 text-stone-600">Anklicken, wenn die Meisterschaft für diesen Zauber gilt bzw. genutzt wird – wird in Kosten und Zauberdauer eingerechnet:</p>
+          <p className="text-xs mb-2 text-leise">Anklicken, wenn die Meisterschaft für diesen Zauber gilt bzw. genutzt wird – wird in Kosten und Zauberdauer eingerechnet:</p>
           <div className="flex flex-wrap gap-1.5">
             {waehlbar.map(a => {
               const an = gewaehlt.has(a.id);
               return (
                 <button key={a.id} type="button" onClick={() => onToggle(a.id)} aria-pressed={an} title={a.beleg}
-                  className={`text-left px-2.5 py-1 rounded-lg text-xs border transition-all cursor-pointer ${an
-                    ? 'bg-[#2F5D3A] text-white border-[#244a2e] font-bold'
-                    : 'bg-white/90 text-stone-700 border-[#d1c4b0] hover:bg-white'}`}>
-                  <span className="font-mono font-bold mr-1">{a.texte.join(', ')}</span>
+                  className={`text-left px-2.5 py-1 rounded-knopf text-xs border transition-all cursor-pointer ${an
+                    ? 'bg-unverletzt-grund text-schrift border-unverletzt font-bold'
+                    : 'bg-flaeche text-schrift border-rahmen hover:bg-rahmen'}`}>
+                  <span className="tabular-nums font-bold mr-1">{a.texte.join(', ')}</span>
                   <span className="font-semibold">{a.quelle}</span>
-                  {a.bedingungen.length > 0 && <span className={an ? 'text-white/80' : 'opacity-75'}> – {a.bedingungen.join('; ')}</span>}
+                  {a.bedingungen.length > 0 && <span className={an ? 'text-schrift' : 'opacity-75'}> – {a.bedingungen.join('; ')}</span>}
                 </button>
               );
             })}
@@ -139,7 +139,7 @@ export const ZauberAnpassungen: React.FC<{
         </>
       )}
       {hinweise.length > 0 && (
-        <ul className="mt-2 text-xs space-y-0.5 text-stone-600">
+        <ul className="mt-2 text-xs space-y-0.5 text-leise">
           {hinweise.map((a, i) => (
             <li key={`${a.id}-${i}`} title={a.beleg}><strong>{a.quelle}:</strong> {a.text}{a.bedingung ? ` – ${a.bedingung}` : ''}</li>
           ))}

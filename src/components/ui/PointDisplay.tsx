@@ -12,9 +12,9 @@ export const PointDisplay: React.FC<PointDisplayProps> = ({ current, max, label,
   if (mode === 'xp') return null;
   const isComplete = current === max;
   return (
-    <div className="text-[10px] uppercase tracking-wider font-bold text-right mt-1">
+    <div className="text-[11px] uppercase tracking-wider font-bold text-right mt-1">
       {label}:{' '}
-      <span className={isComplete ? 'text-green-600' : 'text-red-600'}>
+      <span className={isComplete ? 'text-unverletzt' : 'text-schaden'}>
         {current} / {max}
       </span>
     </div>

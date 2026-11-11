@@ -167,25 +167,25 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ onClose, onSelectPro
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4">
-      <div id="profile-modal-dialog" className="bg-[#faf4e6] dark-theme-panel border-2 border-[#C5A059] rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+    <div className="fixed inset-0 z-50 bg-black bg-opacity-60 flex items-center justify-center p-4">
+      <div id="profile-modal-dialog" className="bg-flaeche border border-rahmen rounded-karte shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="bg-[#1B365D] text-[#f3e5cf] p-4 flex justify-between items-center border-b-2 border-[#C5A059]">
+        <div className="bg-erhoeht text-schrift p-4 flex justify-between items-center border-b-2 border-gold">
           <div className="flex items-center gap-2">
-            <User className="text-[#C5A059]" size={24} />
+            <User className="text-gold" size={24} />
             <h2 className="text-xl font-bold fantasy-font">Charakter-Profile & Vorlagen</h2>
           </div>
-          <button onClick={onClose} className="hover:text-white transition-colors">
+          <button onClick={onClose} className="hover:text-schrift transition-colors">
             <X size={20} />
           </button>
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex border-b border-[#d1c4b0] bg-[#e3d4b9]">
+        <div className="flex border-b border-rahmen bg-seite">
           <button
             onClick={() => setTab('profiles')}
             className={`flex-1 py-3 text-center font-bold text-sm uppercase tracking-wider transition-all ${
-              tab === 'profiles' ? 'bg-[#faf4e6] text-[#1B365D] border-b-2 border-[#1B365D]' : 'text-gray-600 hover:bg-[#ebdcc3]'
+              tab === 'profiles' ? 'bg-erhoeht text-schrift border-b-2 border-gold' : 'text-leise hover:bg-rahmen'
             }`}
           >
             Meine Charaktere ({profiles.length})
@@ -193,10 +193,10 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ onClose, onSelectPro
           <button
             onClick={() => setTab('presets')}
             className={`flex-1 py-3 text-center font-bold text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-1 ${
-              tab === 'presets' ? 'bg-[#faf4e6] text-[#1B365D] border-b-2 border-[#1B365D]' : 'text-gray-600 hover:bg-[#ebdcc3]'
+              tab === 'presets' ? 'bg-erhoeht text-schrift border-b-2 border-gold' : 'text-leise hover:bg-rahmen'
             }`}
           >
-            <Sparkles size={16} className="text-[#C5A059]" /> Archetypen & Vorlagen
+            <Sparkles size={16} className="text-gold" /> Archetypen & Vorlagen
           </button>
         </div>
 
@@ -205,12 +205,12 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ onClose, onSelectPro
           {tab === 'profiles' && (
             <>
               <div className="flex flex-wrap justify-between items-center gap-2 mb-2">
-                <p className="text-xs text-gray-600">
+                <p className="text-xs text-leise">
                   Verwalte mehrere Splittermond-Helden und wechsle jederzeit nahtlos zwischen ihnen.
                 </p>
                 <div className="flex items-center gap-2">
                   <label
-                    className="bg-[#C5A059] hover:bg-[#b58f48] text-[#1B365D] text-xs font-bold px-3 py-1.5 rounded-lg border border-[#a07c34] flex items-center gap-1.5 cursor-pointer transition-all shadow-xs"
+                    className="bg-gold hover:bg-gold-hell text-seite text-xs font-bold px-3 py-1.5 rounded-knopf border border-erschoepft flex items-center gap-1.5 cursor-pointer transition-all "
                     title="Charakter aus JSON-Datei importieren"
                   >
                     <input
@@ -223,7 +223,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ onClose, onSelectPro
                   </label>
                   <button
                     onClick={handleCreateNewProfile}
-                    className="bg-[#1B365D] hover:bg-[#2a4f7e] text-white text-xs font-bold px-3 py-1.5 rounded-lg border border-[#10233f] flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
+                    className="bg-erhoeht hover:bg-rahmen text-schrift text-xs font-bold px-3 py-1.5 rounded-knopf border border-rahmen flex items-center gap-1.5 transition-all cursor-pointer"
                   >
                     <Plus size={14} /> Neuer Charakter
                   </button>
@@ -236,16 +236,16 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ onClose, onSelectPro
                   return (
                     <div
                       key={p.id}
-                      className={`p-3 rounded-lg border flex items-center justify-between transition-all ${
+                      className={`p-3 rounded-knopf border flex items-center justify-between transition-all ${
                         isActive
-                          ? 'bg-[#1B365D] text-white border-[#C5A059] shadow-md'
-                          : 'bg-white hover:bg-[#f3e5cf] border-[#d1c4b0] text-[#1B365D]'
+                          ? 'bg-erhoeht text-schrift border-gold '
+                          : 'bg-flaeche hover:bg-rahmen border-rahmen text-schrift'
                       }`}
                     >
                       <div className="flex items-center gap-3 cursor-pointer flex-1" onClick={() => handleSwitchProfile(p.id)}>
                         <div
                           className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm border ${
-                            isActive ? 'bg-[#C5A059] text-[#1B365D] border-white' : 'bg-[#1B365D] text-white border-[#C5A059]'
+                            isActive ? 'bg-gold text-seite border-rahmen' : 'bg-erhoeht text-seite border-gold'
                           }`}
                         >
                           {p.name.charAt(0).toUpperCase()}
@@ -253,9 +253,9 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ onClose, onSelectPro
                         <div>
                           <div className="font-bold text-base flex items-center gap-2">
                             {p.name}
-                            {isActive && <span className="bg-[#C5A059] text-[#1B365D] text-[10px] font-extrabold px-2 py-0.5 rounded-full">Aktiv</span>}
+                            {isActive && <span className="bg-gold text-seite text-[11px] font-extrabold px-2 py-0.5 rounded-full">Aktiv</span>}
                           </div>
-                          <div className={`text-xs ${isActive ? 'text-gray-300' : 'text-gray-500'}`}>
+                          <div className={`text-xs ${isActive ? 'text-schrift' : 'text-leise'}`}>
                             Rasse: {p.race || 'Mensch'}
                           </div>
                         </div>
@@ -265,7 +265,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ onClose, onSelectPro
                         {!isActive && (
                           <button
                             onClick={() => handleSwitchProfile(p.id)}
-                            className="bg-[#C5A059] hover:bg-[#b58f48] text-[#1B365D] p-2 rounded-lg text-xs font-bold flex items-center gap-1 border border-[#a07c34] cursor-pointer shadow-2xs"
+                            className="bg-gold hover:bg-gold-hell text-seite p-2 rounded-knopf text-xs font-bold flex items-center gap-1 border border-erschoepft cursor-pointer shadow-2xs"
                             title="Zu diesem Profil wechseln"
                           >
                             <Check size={14} /> Laden
@@ -273,21 +273,21 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ onClose, onSelectPro
                         )}
                         <button
                           onClick={() => handleGenerateProfilePDF(p.id)}
-                          className={`p-2 rounded-lg hover:bg-[#ebdcc4] transition-colors cursor-pointer ${isActive ? 'hover:text-[#1B365D] text-gray-200' : 'text-[#1B365D]'}`}
+                          className={`p-2 rounded-knopf hover:bg-rahmen transition-colors cursor-pointer ${isActive ? 'hover:text-gold-hell text-schrift' : 'text-schrift'}`}
                           title="PDF-Charakterbogen generieren"
                         >
                           <BookOpenText size={16} />
                         </button>
                         <button
                           onClick={() => handleExportProfile(p.id, p.name)}
-                          className={`p-2 rounded-lg hover:bg-[#ebdcc4] transition-colors cursor-pointer ${isActive ? 'hover:text-[#1B365D] text-gray-200' : 'text-[#1B365D]'}`}
+                          className={`p-2 rounded-knopf hover:bg-rahmen transition-colors cursor-pointer ${isActive ? 'hover:text-gold-hell text-schrift' : 'text-schrift'}`}
                           title="Charakter (JSON) exportieren"
                         >
                           <Download size={16} />
                         </button>
                         <button
                           onClick={() => handleDuplicateProfile(p.id)}
-                          className={`p-2 rounded-lg hover:bg-[#ebdcc4] transition-colors cursor-pointer ${isActive ? 'hover:text-[#1B365D] text-gray-200' : 'text-[#1B365D]'}`}
+                          className={`p-2 rounded-knopf hover:bg-rahmen transition-colors cursor-pointer ${isActive ? 'hover:text-gold-hell text-schrift' : 'text-schrift'}`}
                           title="Duplizieren"
                         >
                           <Copy size={16} />
@@ -295,8 +295,8 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ onClose, onSelectPro
                         {profiles.length > 1 && (
                           <button
                             onClick={() => handleDeleteProfile(p.id)}
-                            className={`p-2 rounded-lg hover:bg-[#8B263E] hover:text-white transition-colors cursor-pointer ${
-                              isActive ? 'text-red-300' : 'text-[#8B263E]'
+                            className={`p-2 rounded-knopf hover:bg-schaden hover:text-schrift transition-colors cursor-pointer ${
+                              isActive ? 'text-schaden' : 'text-schaden'
                             }`}
                             title="Löschen"
                           >
@@ -313,37 +313,37 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ onClose, onSelectPro
 
           {tab === 'presets' && (
             <div className="space-y-4">
-              <p className="text-xs text-gray-600">
+              <p className="text-xs text-leise">
                 Wähle eine fertige Heldenvorlage als Basis für deinen neuen Charakter aus:
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {CHARACTER_PRESETS.map((preset) => (
                   <div
                     key={preset.id}
-                    className="p-4 rounded-xl border border-[#C5A059] bg-white hover:shadow-md transition-all flex flex-col justify-between"
+                    className="p-4 rounded-karte border border-gold bg-flaeche transition-all flex flex-col justify-between"
                   >
                     <div>
-                      <div className="font-bold text-[#1B365D] flex justify-between items-start">
+                      <div className="font-bold text-schrift flex justify-between items-start">
                         <div>
                           <div className="text-base leading-tight font-extrabold">{preset.name}</div>
-                          <div className="text-xs text-[#C5A059] font-bold">{preset.title}</div>
+                          <div className="text-xs text-gold font-bold">{preset.title}</div>
                         </div>
-                        <span className="text-xs font-semibold bg-[#e3d4b9] text-[#1B365D] px-2 py-0.5 rounded shrink-0">
+                        <span className="text-xs font-semibold bg-seite text-schrift px-2 py-0.5 rounded-knopf shrink-0">
                           {preset.race}
                         </span>
                       </div>
-                      <p className="text-xs text-gray-600 my-2">{preset.description}</p>
-                      <div className="text-[11px] text-gray-500 space-y-1 bg-[#f8f3e8] p-2 rounded border border-[#e3d4b9]">
+                      <p className="text-xs text-leise my-2">{preset.description}</p>
+                      <div className="text-[11px] text-leise space-y-1 bg-erhoeht p-2 rounded-knopf border border-rahmen">
                         <div><strong>Attribute:</strong> STA {preset.fullState.attrBase.STA}, KON {preset.fullState.attrBase.KON}, BEW {preset.fullState.attrBase.BEW}, INT {preset.fullState.attrBase.INT}, MYS {preset.fullState.attrBase.MYS}</div>
                         <div><strong>Region & Mond:</strong> {preset.homeRegion} ({preset.moonSign})</div>
-                        <div><strong>Status:</strong> <span className="text-green-700 font-bold">Vollständiger Held (Spielbereit)</span></div>
+                        <div><strong>Status:</strong> <span className="text-unverletzt font-bold">Vollständiger Held (Spielbereit)</span></div>
                       </div>
                     </div>
                     <button
                       onClick={() => handleCreateFromPreset(preset)}
-                      className="mt-3 w-full bg-[#1B365D] hover:bg-[#2a4f7e] text-white text-xs font-bold py-2 rounded-lg border border-[#10233f] flex items-center justify-center gap-1 transition-all shadow-xs cursor-pointer"
+                      className="mt-3 w-full bg-erhoeht hover:bg-rahmen text-schrift text-xs font-bold py-2 rounded-knopf border border-rahmen flex items-center justify-center gap-1 transition-all cursor-pointer"
                     >
-                      <Sparkles size={14} className="text-[#C5A059]" /> Als neuen Held laden
+                      <Sparkles size={14} className="text-gold" /> Als neuen Held laden
                     </button>
                   </div>
                 ))}
@@ -353,10 +353,10 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ onClose, onSelectPro
         </div>
 
         {/* Footer */}
-        <div className="p-3 bg-[#e3d4b9] border-t border-[#d1c4b0] flex justify-end no-print">
+        <div className="p-3 bg-seite border-t border-rahmen flex justify-end no-print">
           <button
             onClick={onClose}
-            className="px-5 py-2 bg-[#1B365D] hover:bg-[#2a4f7e] text-white rounded-lg font-bold text-xs shadow-xs border border-[#10233f] transition-all cursor-pointer"
+            className="px-5 py-2 bg-erhoeht hover:bg-rahmen text-schrift rounded-knopf font-bold text-xs border border-rahmen transition-all cursor-pointer"
           >
             Schließen
           </button>
