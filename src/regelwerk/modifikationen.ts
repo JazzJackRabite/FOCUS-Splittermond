@@ -22,6 +22,8 @@ export interface Modifikationen {
   merkmaleWeg: string[];
   /** zusätzliche Waffenmerkmale aller Angriffe */
   waffenmerkmale: string[];
+  /** entfallende Waffenmerkmale („Waffenmerkmal Stumpf entfällt“) */
+  waffenmerkmaleWeg: string[];
   /** „etwaiges Merkmal Zerbrechlich wird zu Schwächlich oder etwaiges Merkmal Schwächlich entfällt“ (sonst LP +1, Magie S. 207) */
   robuster: number;
   /** nicht als feste Zahl lesbare Teile */
@@ -29,7 +31,7 @@ export interface Modifikationen {
 }
 
 export const leer = (): Modifikationen => ({
-  attribute: {}, abgeleitet: {}, hoechstens: {}, angriff: 0, schaden: 0, wgs: 0, fertigkeiten: {}, merkmaleDazu: [], merkmaleWeg: [], waffenmerkmale: [], robuster: 0, rest: [],
+  attribute: {}, abgeleitet: {}, hoechstens: {}, angriff: 0, schaden: 0, wgs: 0, fertigkeiten: {}, merkmaleDazu: [], merkmaleWeg: [], waffenmerkmale: [], waffenmerkmaleWeg: [], robuster: 0, rest: [],
 });
 
 const zahl = (s: string) => Number(s.replace(/[−–]/g, '-').replace('+', ''));
@@ -69,6 +71,8 @@ export function leseModifikationen(k: Katalog, text: string | null | undefined, 
     if (doppel >= 0) m.rest.push(stuecke.splice(doppel).join(', '));
     for (const teil of stuecke) {
       if (/^etwaiges Merkmal Zerbrechlich wird zu Schwächlich/.test(teil)) { m.robuster++; continue; }
+      const wmWeg = teil.match(/^(?:etwaiges )?Waffenmerkmal (.+?) entfällt$/);
+      if (wmWeg) { m.waffenmerkmaleWeg.push(wmWeg[1]); continue; }
       const wm = teil.match(/^(?:zusätzliches |Angriffe erhalten )?Waffenmerkmal (.+)$/);
       if (wm) { m.waffenmerkmale.push(wm[1]); continue; }
       const weg = teil.match(/^(?:etwaiges )?Merkmal (.+?) entfällt$/);
@@ -77,7 +81,8 @@ export function leseModifikationen(k: Katalog, text: string | null | undefined, 
       if (dazu) { m.merkmaleDazu.push(dazu[1]); continue; }
       const w = teil.match(/^([A-Za-zÄÖÜäöüß][A-Za-zÄÖÜäöüß \-]*?) ([+\-−–]\s?\d+)(?: \(maximal (\d+)\))?$/);
       if (!w) { m.rest.push(teil); continue; }
-      const [, name, wertText, max] = w; const v = zahl(wertText.replace(/\s/g, ''));
+      const [, roh, wertText, max] = w; const v = zahl(wertText.replace(/\s/g, ''));
+      const name = roh === 'Initiative' ? 'INI' : roh;
       if (ATTRIBUT_KURZ.includes(name)) plus(m.attribute, name, v);
       else if (ABGELEITET_KURZ.includes(name)) { plus(m.abgeleitet, name, v); if (max) m.hoechstens[name] = Number(max); }
       else if (name === 'Angriff') m.angriff += v;
@@ -101,7 +106,7 @@ export function summe(...liste: Modifikationen[]): Modifikationen {
     for (const [a, v] of Object.entries(m.fertigkeiten)) plus(s.fertigkeiten, a, v);
     for (const [a, v] of Object.entries(m.hoechstens)) s.hoechstens[a] = Math.min(s.hoechstens[a] ?? Infinity, v);
     s.angriff += m.angriff; s.schaden += m.schaden; s.wgs += m.wgs;
-    s.merkmaleDazu.push(...m.merkmaleDazu); s.merkmaleWeg.push(...m.merkmaleWeg); s.waffenmerkmale.push(...m.waffenmerkmale); s.robuster += m.robuster; s.rest.push(...m.rest);
+    s.merkmaleDazu.push(...m.merkmaleDazu); s.merkmaleWeg.push(...m.merkmaleWeg); s.waffenmerkmale.push(...m.waffenmerkmale); s.waffenmerkmaleWeg.push(...m.waffenmerkmaleWeg); s.robuster += m.robuster; s.rest.push(...m.rest);
   }
   return s;
 }
@@ -167,7 +172,11 @@ export function anwenden(k: Katalog, w: Werteblock, m: Modifikationen): Werteblo
   }
   for (const a of ['LP', 'SR', 'GSW']) if (abgeleitet[a] !== undefined) abgeleitet[a] = Math.max(0, abgeleitet[a]);
   const ini = m.abgeleitet.INI ?? 0;
-  const wm = (x: string) => { const l = [x, ...m.waffenmerkmale].filter(y => y && y !== '–' && y !== '−'); return l.length ? l.join(', ') : x; };
+  const wm = (x: string) => {
+    const alt = teile(String(x ?? ''), ',').filter(y => y && y !== '–' && y !== '−' && !m.waffenmerkmaleWeg.some(w => y.replace(/\s*\d+$/, '') === w));
+    const l = [...alt, ...m.waffenmerkmale];
+    return l.length ? l.join(', ') : '–';
+  };
   const waffen = w.waffen.map(x => ({ ...x, wert: x.wert + m.angriff, schaden: schadenPlus(x.schaden, m.schaden), wgs: wgsPlus(x.wgs, m.wgs), ini: iniPlus(x.ini, ini), merkmale: wm(x.merkmale) }));
   const fertigkeiten = w.fertigkeiten.map(f => ({ ...f, wert: f.wert + (f.id ? m.fertigkeiten[f.id] ?? 0 : 0) }));
   for (const [id, v] of Object.entries(m.fertigkeiten)) if (!fertigkeiten.some(f => f.id === id)) fertigkeiten.push({ id, name: k.get(id)?.name ?? id, wert: v });

@@ -115,6 +115,53 @@ export function leseWahlen(rest: string[], quelle: string, quellId: string, schw
   return { wahlen, text, feste };
 }
 
+/**
+ * Getroffene Wahlen des Feinschliffs anwenden (Attribut mit Wirkung auf abgeleitete Werte und Fertigkeiten, Meisterschaft bis
+ * zur erlaubten Schwelle, Fertigkeit neu/erhöht, freie Punkte mit Höchstwert je Fertigkeit). Gemeinsam für Golem und Wesen-Baukasten.
+ */
+export function wahlenAnwenden(
+  k: Katalog, werte: Werteblock, wahlen: GolemWahl[], feste: string[], fs: Record<string, string | Record<string, number>>,
+  verstoss: (text: string, schluessel: string, mass?: number) => void, wer: string,
+): void {
+  const R = k.get(ABGELEITET_ID)?.daten.strukturiert;
+  const kurzName: Record<string, string> = { AUS: 'Ausstrahlung', BEW: 'Beweglichkeit', INT: 'Intuition', KON: 'Konstitution', MYS: 'Mystik', 'STÄ': 'Stärke', VER: 'Verstand', WIL: 'Willenskraft' };
+  const attrVon = (id: string): string[] => (k.get(id)?.daten.attribute ?? []).map((n: string) => Object.keys(kurzName).find(x => kurzName[x] === n)).filter(Boolean);
+  const msNeu: string[] = [...feste];
+  for (const w of wahlen) {
+    const v = fs[w.schluessel];
+    if (v === undefined || v === '') continue;
+    if (w.art === 'attribut' && typeof v === 'string' && w.optionen.includes(v)) {
+      werte.attribute[v] = (werte.attribute[v] ?? 0) + w.bonus;
+      // Attribut wirkt auf abgeleitete Werte (Formeln des GRW) und Fertigkeiten
+      for (const d of R?.werte ?? []) if ('summe' in d && werte.abgeleitet[d.kuerzel] !== undefined)
+        for (const t of d.summe) if ('attribut' in t && t.attribut === kurzName[v]) werte.abgeleitet[d.kuerzel] += (t.faktor ?? 1) * w.bonus;
+      werte.fertigkeiten = werte.fertigkeiten.map(f => (f.id && attrVon(f.id).includes(v) ? { ...f, wert: f.wert + w.bonus } : f));
+    } else if (w.art === 'meisterschaft' && typeof v === 'string') {
+      const e = k.get(v);
+      if (e) {
+        msNeu.push(`${k.get(e.daten.fertigkeit)?.name ?? ''} (${e.name})`);
+        if ((Number(e.daten.schwelle) || 1) > w.schwelle) verstoss(`${e.name}: Schwelle ${e.daten.schwelle} über der erlaubten (${w.schwelle})`, `ms:${w.schluessel}`);
+        if (!werte.fertigkeiten.some(f => f.id === e.daten.fertigkeit)) verstoss(`${e.name}: ${wer[0].toUpperCase()}${wer.slice(1)} besitzt die Fertigkeit nicht`, `msf:${w.schluessel}`);
+      }
+    } else if (w.art === 'fertigkeit' && typeof v === 'string' && k.get(v)) {
+      const f = werte.fertigkeiten.find(x => x.id === v);
+      if (f) f.wert += w.plus;
+      else werte.fertigkeiten.push({ id: v, name: k.get(v)!.name, wert: w.neu + attrVon(v).reduce((s3, a) => s3 + (werte.attribute[a] ?? 0), 0) });
+    } else if (w.art === 'punkte' && typeof v === 'object') {
+      const summeP = Object.values(v).reduce((s3, x) => s3 + (Number(x) || 0), 0);
+      if (summeP > w.anzahl) verstoss(`${w.quelle}: ${summeP} von ${w.anzahl} freien Fertigkeitspunkten verteilt`, `punkte:${w.schluessel}`, summeP - w.anzahl);
+      for (const [id, x] of Object.entries(v)) {
+        const nP = Number(x) || 0; if (!nP) continue;
+        if (nP > w.max) verstoss(`${w.quelle}: höchstens +${w.max} je Fertigkeit`, `max:${w.schluessel}:${id}`, nP - w.max);
+        const f = werte.fertigkeiten.find(y => y.id === id);
+        if (f) f.wert += nP; else verstoss(`${w.quelle}: Punkte nur auf Fertigkeiten, die ${wer} besitzt`, `fremd:${w.schluessel}:${id}`, nP);
+      }
+    }
+  }
+  werte.fertigkeiten.sort((x, y) => x.name.localeCompare(y.name, 'de'));
+  if (msNeu.length) werte.meisterschaften = [werte.meisterschaften, ...msNeu].filter(Boolean).join(', ');
+}
+
 export interface GolemWerte {
   korpus: Eintrag | undefined;
   stufe: number;
@@ -210,45 +257,7 @@ export function golemWerte(k: Katalog, b: Begleiter): GolemWerte {
     werte = anwenden(k, grund, m);
     werte.merkmale = werte.merkmale.map(x => (/^Golem \d+$/.test(x) ? `Golem ${stufe}` : x));
 
-    // getroffene Wahlen anwenden
-    const fs = b.feinschliff ?? {};
-    const R = k.get(ABGELEITET_ID)?.daten.strukturiert;
-    const kurzName: Record<string, string> = { AUS: 'Ausstrahlung', BEW: 'Beweglichkeit', INT: 'Intuition', KON: 'Konstitution', MYS: 'Mystik', 'STÄ': 'Stärke', VER: 'Verstand', WIL: 'Willenskraft' };
-    const attrVon = (id: string): string[] => (k.get(id)?.daten.attribute ?? []).map((n: string) => Object.keys(kurzName).find(x => kurzName[x] === n)).filter(Boolean);
-    const msNeu: string[] = [...feste];
-    for (const w of wahlen) {
-      const v = fs[w.schluessel];
-      if (v === undefined || v === '') continue;
-      if (w.art === 'attribut' && typeof v === 'string' && w.optionen.includes(v)) {
-        werte.attribute[v] = (werte.attribute[v] ?? 0) + w.bonus;
-        // Attribut wirkt auf abgeleitete Werte (Formeln des GRW) und Fertigkeiten
-        for (const d of R?.werte ?? []) if ('summe' in d && werte.abgeleitet[d.kuerzel] !== undefined)
-          for (const t of d.summe) if ('attribut' in t && t.attribut === kurzName[v]) werte.abgeleitet[d.kuerzel] += (t.faktor ?? 1) * w.bonus;
-        werte.fertigkeiten = werte.fertigkeiten.map(f => (f.id && attrVon(f.id).includes(v) ? { ...f, wert: f.wert + w.bonus } : f));
-      } else if (w.art === 'meisterschaft' && typeof v === 'string') {
-        const e = k.get(v);
-        if (e) {
-          msNeu.push(`${k.get(e.daten.fertigkeit)?.name ?? ''} (${e.name})`);
-          if ((Number(e.daten.schwelle) || 1) > w.schwelle) verstoss(`${e.name}: Schwelle ${e.daten.schwelle} über der erlaubten (${w.schwelle})`, `ms:${w.schluessel}`);
-          if (!werte.fertigkeiten.some(f => f.id === e.daten.fertigkeit)) verstoss(`${e.name}: Der Golem besitzt die Fertigkeit nicht`, `msf:${w.schluessel}`);
-        }
-      } else if (w.art === 'fertigkeit' && typeof v === 'string' && k.get(v)) {
-        const f = werte.fertigkeiten.find(x => x.id === v);
-        if (f) f.wert += w.plus;
-        else werte.fertigkeiten.push({ id: v, name: k.get(v)!.name, wert: w.neu + attrVon(v).reduce((s3, a) => s3 + (werte!.attribute[a] ?? 0), 0) });
-      } else if (w.art === 'punkte' && typeof v === 'object') {
-        const summeP = Object.values(v).reduce((s3, x) => s3 + (Number(x) || 0), 0);
-        if (summeP > w.anzahl) verstoss(`${w.quelle}: ${summeP} von ${w.anzahl} freien Fertigkeitspunkten verteilt`, `punkte:${w.schluessel}`, summeP - w.anzahl);
-        for (const [id, x] of Object.entries(v)) {
-          const nP = Number(x) || 0; if (!nP) continue;
-          if (nP > w.max) verstoss(`${w.quelle}: höchstens +${w.max} je Fertigkeit`, `max:${w.schluessel}:${id}`, nP - w.max);
-          const f = werte.fertigkeiten.find(y => y.id === id);
-          if (f) f.wert += nP; else verstoss(`${w.quelle}: Punkte nur auf Fertigkeiten, die der Golem besitzt`, `fremd:${w.schluessel}:${id}`, nP);
-        }
-      }
-    }
-    werte.fertigkeiten.sort((x, y) => x.name.localeCompare(y.name, 'de'));
-    if (msNeu.length) werte.meisterschaften = [werte.meisterschaften, ...msNeu].filter(Boolean).join(', ');
+    wahlenAnwenden(k, werte, wahlen, feste, b.feinschliff ?? {}, verstoss, 'der Golem');
   }
   for (const s2 of sa) if (/^Applikation /.test(s2)) feinschliff.push(`Sonderausstattung: ${s2}`);
 

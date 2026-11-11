@@ -248,6 +248,9 @@ export interface Begleiter {
   meisterschaften?: string[];
   /** Zauber (IDs) */
   zauber?: string[];
+  /** Wesen-Baukasten: gewählte Dienste (IDs) und der Basisdienst */
+  dienste?: string[];
+  basisdienst?: string;
   /** Waffen des Gefolgsmanns (Katalog-IDs) */
   waffen?: string[];
   // ---- Golem (Die Magie S. 197–207); id = Korpus

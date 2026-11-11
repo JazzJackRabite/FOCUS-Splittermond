@@ -494,6 +494,32 @@ Alle Begleiter bleiben im Tab „Begleiter“ (Entscheidung 11.11.2026: kein Ber
   nur Verweise), Regelwerte von Gefolge/Untoten/Golems in `strukturiert`, fehlende Bestiarium-Werte. **Offen (Entscheidung):**
   Baukasten für beschwörbare Wesen und Bestien braucht eine neue Zeile in der Tabelle „Regelquellen“.
 
+## Stand 23 (11.11.2026): Wesen-Baukasten – beschwörbare Wesen und Kreaturen
+
+Entscheidung 11.11.2026: neue Zeile „Begleiter: Wesen-Baukasten“ in FUNDAMENT.md (Regelquellen), vom Projektinhaber freigegeben.
+
+- **Regelmodul `regelwerk/wesenBaukasten.ts`** für beide Baukästen, alles aus den Paketen: Grundwerte der Basis bzw. des
+  Korpus; Stufe des Merkmals Beschwörbares Wesen = `beschwoerbares_wesen_stufe` + `stufe_bonus` (Die Magie S. 193:
+  „zusammengezählt“); Ressource Kreatur = `ressource_kreatur` + `kosten_punkte` (Bestienmeister S. 50). Module mit Kostentext
+  ohne Zahl („speziell“) werden genannt, nicht eingerechnet; Rollen der Kreaturen ohne Kostenangabe kosten nichts (Auslegung von
+  „Basis und Rolle“). Mehrfachwahl aus `mehrfach`, Voraussetzungen aus `voraussetzungen` (Bedingungen mit Träger „wesen“ über
+  `regelwerk/bedingungen.ts`), Dienste aus `moegliche_dienste`, höchste Schwelle/Zaubergrad und Zahl der Dienste aus
+  `strukturiert` der Regel „Schritt 5: Feinschliff“ (Die Magie S. 196).
+- **Werte** über `regelwerk/modifikationen.ts`; neu dort: „Waffenmerkmal X entfällt“ und „Initiative“ als Kürzel für INI.
+  Wahlen (beliebiges Attribut, freie Meisterschaft, Fertigkeit auf 6 oder +3, freie Fertigkeitspunkte) sind bedienbar: Die
+  Auswertung `wahlenAnwenden()` und die Ansicht `Feinschliff.tsx` teilen sich Golem und Wesen-Baukasten (aus `golem.ts` bzw.
+  `GolemAbschnitt.tsx` herausgelöst).
+- **Oberfläche** (`components/begleiter/WesenBaukasten.tsx`): „Eigenes Wesen bauen“ im Abschnitt „Beschworene Wesen“ (Korpus
+  Klein/Mittel/Groß), „Eigene Kreatur bauen“ im Abschnitt „Tiere“ (Basis Agil/Robust/Schnell/Stark). Bausteine je Gruppe,
+  Aufschlüsselung der Stufe, Dienste mit Basisdienst, Feinschliff. Mehrfachwahl und Voraussetzungen sperren
+  (`aenderungGesperrt`, mit Hausregeln Warnung). Gebaute Kreaturen haben Abrichtungen, Potenzial, Lebenspunkte und Würfeln wie
+  andere Tiere. Felder `dienste`, `basisdienst` am Begleiter (Speichern, Laden, Import).
+- **Korrektur:** Die Liste der beschwörbaren Wesen zeigte die drei Korpusse des Baukastens als fertige Wesen (65 statt 62).
+- Tests: `wesenBaukasten.test.tsx` (5). Alle Tests grün mit allen Büchern außer dem bekannten Relikte-Test (ältere Buchpakete in
+  dieser Umgebung).
+- Offen (Datenseite): Regeln zum Zusammenführen doppelter Merkmale (Die Magie S. 196) und Verbesserte Angriffe (S. 196–197)
+  stehen nur als Text im Paket; Zahl der Dienste ist Text („halbe Stufe“), keine Zahl.
+
 ## Google AI Studio
 
 Unverändert eine Vite-/React-App mit `metadata.json` im Wurzelordner; Import über „Import from GitHub“, Hosting über Cloud Run.

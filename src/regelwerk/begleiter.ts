@@ -49,7 +49,8 @@ export interface BeschwoerbaresWesen { id: string; name: string; stufe: number; 
 
 export function beschwoerbareWesen(k: Katalog): BeschwoerbaresWesen[] {
   return Object.values(k.eintraege)
-    .filter(e => e.daten.beschwoerbares_wesen_stufe !== undefined && e.daten.beschwoerbares_wesen_stufe !== null)
+    // ohne die Korpusse des Wesen-Baukastens: die sind Bausteine, keine fertigen Wesen
+    .filter(e => e.typ !== 'wesen_baukasten_basis' && e.daten.beschwoerbares_wesen_stufe !== undefined && e.daten.beschwoerbares_wesen_stufe !== null)
     .map(e => ({ id: e.id, name: e.name, stufe: Number(e.daten.beschwoerbares_wesen_stufe), quelle: k.pakete[e.quelle.paket]?.kuerzel ?? e.quelle.paket, mitWerten: !!wertekasten(e) }))
     .sort((a, b) => a.stufe - b.stufe || a.name.localeCompare(b.name, 'de'));
 }

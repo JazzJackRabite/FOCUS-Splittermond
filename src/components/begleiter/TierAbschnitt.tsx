@@ -13,6 +13,9 @@ import type { Ergebnis } from '../../regelwerk/typen';
 import type { Begleiter } from '../../types';
 import { HELDENGRADE } from '../../data/rules';
 import { Werte, Eintrag, Hinweise, Notiz } from './Wertekasten';
+import { WesenBaukasten } from './WesenBaukasten';
+import { baukastenArt, basen, wesenBaukastenWerte } from '../../regelwerk/wesenBaukasten';
+import { alsWertekasten } from '../../regelwerk/modifikationen';
 import { Abschnittstitel, Auswahl, Eingabe, Karte, Knopf, Marke } from '../../fundament';
 import { BegleiterVitals, VitalKurz, spielDaten, useBegleiterSpiel } from './BegleiterSpiel';
 
@@ -58,7 +61,11 @@ const TierEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; f: Fuehre
   const [offen, setOffen] = useState(false);
   const [wahl, setWahl] = useState('');
   const [text, setText] = useState<Record<number, boolean>>({});
-  const e = k.get(b.id); const w = e ? wertekasten(e) : null; const st = e ? kreaturStufe(e) : null;
+  const e = k.get(b.id);
+  // im Baukasten gebaute Kreatur (Bestienmeister): Werte und Kreatur-Stufe aus den Modulen
+  const bk = e && baukastenArt(e) ? wesenBaukastenWerte(k, b) : null;
+  const w = bk?.werte ? alsWertekasten(bk.werte) : e ? wertekasten(e) : null;
+  const st = bk ? bk.stufe : e ? kreaturStufe(e) : null;
   const aendern = (aenderung: Partial<Begleiter>) => dispatch({ type: 'BEGLEITER_AENDERN', payload: { index, aenderung } });
   const gewaehlt = b.abrichtungen ?? [];
   const pot = potenzial(k, b, f.msIds);
@@ -92,6 +99,8 @@ const TierEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; f: Fuehre
         <span>{b.kreatur ? `Kreatur ${b.kreatur}` : 'ohne Ressource'}</span>
         {liste.length > 0 && <Marke klein ton={verbraucht > pot.gesamt ? 'schaden' : 'neutral'}>Potenzial {verbraucht}/{pot.gesamt}</Marke>}
         {!e && <Marke klein ton="erschoepft">nicht im Katalog (Buch nicht geladen?)</Marke>}
+        {bk && <Marke klein>Baukasten, Kreatur {bk.stufe}</Marke>}
+        {bk && bk.hinweise.length > 0 && <Marke klein ton="erschoepft">{bk.hinweise.length} Hinweis{bk.hinweise.length > 1 ? 'e' : ''}</Marke>}
         {b.kreatur !== undefined && b.kreatur > 0 && st !== null && st > b.kreatur && <Marke klein ton="erschoepft">braucht Kreatur {st}</Marke>}
       </>}>
       <div className="flex flex-wrap gap-3 items-end">
@@ -111,6 +120,7 @@ const TierEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; f: Fuehre
 
       {w && <BegleiterVitals spiel={spiel} daten={daten} />}
       {e ? (w ? <Werte w={w} aktionen={spiel.aktionen} /> : <p className="text-leise">Keine Werte im Katalog.</p>) : null}
+      {bk && <WesenBaukasten k={k} b={b} w={bk} aendern={aendern} />}
 
       <div className="space-y-2">
         <Abschnittstitel als="h3" className="text-[15px]">Abrichtungen</Abschnittstitel>
@@ -184,21 +194,23 @@ const TierEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; f: Fuehre
 export const TierAbschnitt: React.FC<{ k: Katalog }> = ({ k }) => {
   const { state, dispatch } = useCharacter();
   const [wahl, setWahl] = useState('');
+  const [basis, setBasis] = useState('');
   const tiere = useMemo(() => alleTiere(k), [k]);
+  const basisListe = useMemo(() => basen(k, 'kreatur'), [k]);
   const liste = useMemo(() => alleAbrichtungen(k), [k]);
   const f = useFuehrer(k);
   const eigene = (state.begleiter ?? []).map((b, i) => ({ b, i })).filter(x => x.b.art === 'tier');
   const zuordnungOk = kreaturZuordnung(f.kreatur, eigene.map(x => x.b.kreatur ?? 0));
   const vertraute = eigene.filter(x => x.b.vertrauter).length;
 
-  const hinzu = (id: string) => {
+  const hinzu = (id: string, bauen = false) => {
     const e = k.get(id); if (!e) return;
     const st = kreaturStufe(e);
     // freie Ressource Kreatur, die für das Tier reicht (kleinste passende)
     const belegt = [...f.kreatur];
     for (const x of eigene) { const j = belegt.indexOf(x.b.kreatur ?? -1); if (j >= 0) belegt.splice(j, 1); }
     const frei = st !== null ? belegt.filter(x => x >= st).sort((a, b) => a - b)[0] : undefined;
-    dispatch({ type: 'BEGLEITER_HINZU', payload: { id: e.id, art: 'tier', name: e.name, ...(frei ? { kreatur: frei } : {}) } });
+    dispatch({ type: 'BEGLEITER_HINZU', payload: { id: e.id, art: 'tier', name: bauen ? `Eigene Kreatur (${e.name})` : e.name, ...(frei ? { kreatur: frei } : {}), ...(bauen ? { bausteine: [] } : {}) } });
   };
   const hinweise = [
     ...(!zuordnungOk ? ['Die Tiere nutzen mehr oder höhere Ressourcen Kreatur, als der Charakter hat.'] : []),
@@ -235,6 +247,15 @@ export const TierAbschnitt: React.FC<{ k: Katalog }> = ({ k }) => {
         </Auswahl>
         <Knopf art="sekundaer" disabled={!wahl} onClick={() => { hinzu(wahl); setWahl(''); }}><Plus size={14} aria-hidden />Tier hinzufügen</Knopf>
       </div>
+      {basisListe.length > 0 && (
+        <div className="flex flex-wrap gap-2 items-end">
+          <Auswahl beschriftung="Eigene Kreatur bauen: Basis" value={basis} onChange={e => setBasis(e.target.value)}>
+            <option value="">Basis wählen …</option>
+            {basisListe.map(x => <option key={x.id} value={x.id}>{x.name}</option>)}
+          </Auswahl>
+          <Knopf art="sekundaer" disabled={!basis} onClick={() => { hinzu(basis, true); setBasis(''); }}><Plus size={14} aria-hidden />Kreatur bauen</Knopf>
+        </div>
+      )}
     </Karte>
   );
 };

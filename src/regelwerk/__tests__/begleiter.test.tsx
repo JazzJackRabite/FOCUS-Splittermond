@@ -131,7 +131,7 @@ describe.skipIf(!MAGIE || !fs.existsSync(MAGIE))('Beschworene Wesen mit „Die M
   it('Wesen und Dienste: Basisdienste für alle, erweiterte nur mit passender Meisterschaft', () => {
     const { katalog: KM } = erstelleKatalog(b, [buchpaketLesen(fs.readFileSync(MAGIE, 'utf-8'), b.manifest)]);
     const w = beschwoerbareWesen(KM);
-    expect(w.length).toBe(65);
+    expect(w.length).toBe(62); // ohne die drei Korpusse des Wesen-Baukastens (Klein, Mittel, Groß)
     const aschling = w.find(x => x.name === 'Aschling')!;
     const ohne = diensteFuer(KM, aschling.id, {});
     expect(ohne.length).toBeGreaterThan(0);

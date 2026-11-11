@@ -549,6 +549,8 @@ export function validateCharacterImport(data: unknown): Partial<CharacterState> 
         ...(Array.isArray(x.meisterschaften) ? { meisterschaften: texte(x.meisterschaften) } : {}),
         ...(Array.isArray(x.zauber) ? { zauber: texte(x.zauber) } : {}),
         ...(Array.isArray(x.waffen) ? { waffen: texte(x.waffen) } : {}),
+        ...(Array.isArray(x.dienste) ? { dienste: texte(x.dienste) } : {}),
+        ...(typeof x.basisdienst === 'string' ? { basisdienst: x.basisdienst } : {}),
         ...(typeof x.material === 'string' ? { material: x.material } : {}),
         ...(Array.isArray(x.bausteine) ? { bausteine: texte(x.bausteine) } : {}),
         ...(Array.isArray(x.sonderausstattung) ? { sonderausstattung: texte(x.sonderausstattung) } : {}),
