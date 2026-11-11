@@ -85,7 +85,10 @@ Ohne geladenes Regelpaket rechnet der Editor mit diesen eingebauten Werten weite
 ## 3. Gestaltung
 
 Ein dunkles Erscheinungsbild auf Grundlage von Marineblau und Gold: ruhig, warm, für lange Spielabende.
-Das Muster dazu ist das Mockup „FOKUS – Mockup dunkles CD“ (Spielansicht und Bausteine).
+Das Muster dazu ist das Mockup „FOKUS – Mockup dunkles CD“. Im Zweifel gilt, was dort zu sehen ist:
+
+- Spielansicht: [`docs/fundament/mockup-spielansicht.png`](docs/fundament/mockup-spielansicht.png)
+- Bausteine und Farben: [`docs/fundament/mockup-bausteine.png`](docs/fundament/mockup-bausteine.png)
 
 ### Werte
 
