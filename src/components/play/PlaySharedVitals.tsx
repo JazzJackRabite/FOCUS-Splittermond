@@ -1,3 +1,4 @@
+import { Rauten } from '../../fundament';
 import React, { useState, useMemo } from 'react';
 import {
   AlertTriangle,
@@ -1405,23 +1406,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
             </div>
 
             {/* Visual tokens */}
-            <div className="flex flex-wrap gap-1.5 my-2">
-              {Array.from({ length: Math.max(maxSplitter, splitterPoints) }).map((_, idx) => {
-                const isAvailable = idx < splitterPoints;
-                return (
-                  <span
-                    key={idx}
-                    className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs transition-all ${
-                      isAvailable
-                        ? 'bg-gold text-seite border border-erschoepft'
-                        : 'bg-seite text-schrift border border-rahmen'
-                    }`}
-                  >
-                    ★
-                  </span>
-                );
-              })}
-            </div>
+            <Rauten wert={splitterPoints} von={maxSplitter} beschriftung={`${splitterPoints} von ${maxSplitter} Splitterpunkten`} className="my-3" />
           </div>
 
           {/* SP controls */}

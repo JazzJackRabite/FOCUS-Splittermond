@@ -158,6 +158,7 @@ Fehlt einer, wird er dort ergänzt – nicht in der Ansicht nachgebaut.
 | `Eingabe`, `Auswahl` | beschriftete Felder | Beschriftung sichtbar oder verborgen |
 | `Rollbereich` | Bereich mit eigenem Scrollbalken | – |
 | `Dialog` | Fenster über der Ansicht: Titelzeile mit goldener Linie, Inhalt, Fußzeile mit Aktionen | `schmal`, `mittel`, `breit` |
+| `Rauten` | Zählbare Punkte wie Splitterpunkte: gefüllte Raute = vorhanden, nur Rand = verbraucht; mit Beschriftung für Vorleseprogramme | – |
 
 ### Stand der Umstellung
 

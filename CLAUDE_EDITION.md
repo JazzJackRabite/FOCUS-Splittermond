@@ -444,6 +444,7 @@ Dateien aus AI Studio im Repository: `public/assets/aistudio/*.png`, `.aistudio/
   (Kontrast mindestens 4,5 : 1, Tabelle erlaubter Paare) und eine Prüfung, die jede Klassenliste nachrechnet
   (`kontrastBefunde` in `src/fundament/__tests__/pruefen.ts`). 66 Stellen korrigiert: Schrift auf gedämpften Grundtönen
   ist `schrift`, auf Gold `seite`; kräftige Bedeutungsfarben sind keine Textflächen mehr.
+- **Splitterpunkte als Rauten** wie im Mockup (neuer Baustein `Rauten`), statt Sternen in Kreisen.
 
 ## Google AI Studio
 

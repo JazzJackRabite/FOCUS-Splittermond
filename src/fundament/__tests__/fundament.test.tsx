@@ -12,7 +12,7 @@ import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { FARBEN_ERLAUBT, WURZEL, farbtabelle, farbwerte, kontrast, kontrastBefunde, paketzugriffe, regelnamenImCode, regelquellen, regelquellenBefunde } from './pruefen';
-import { Abschnittstitel, Auswahl, Dialog, Eingabe, Karte, Knopf, Marke, Rollbereich } from '..';
+import { Abschnittstitel, Auswahl, Dialog, Eingabe, Karte, Knopf, Marke, Rauten, Rollbereich } from '..';
 
 const ALTLASTEN = path.join(WURZEL, 'src/fundament/altlasten.json');
 
@@ -61,6 +61,12 @@ describe('Fundament: Altlasten dürfen nur weniger werden', () => {
     }
     for (const grund of ['seite', 'flaeche', 'erhoeht']) expect(kontrast(f[grund], f.leise), `leise auf ${grund}`).toBeGreaterThanOrEqual(4.5);
     for (const grund of ['gold', 'gold-hell']) expect(kontrast(f[grund], f.seite), `seite auf ${grund}`).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it('Rauten: gefüllt für vorhandene Punkte, nur Rand für verbrauchte, mit Beschriftung', () => {
+    const { getByRole } = render(<Rauten wert={2} von={3} beschriftung="2 von 3 Splitterpunkten" />);
+    const r = getByRole('img', { name: '2 von 3 Splitterpunkten' });
+    expect([...r.children].map((c) => c.className.includes('bg-gold'))).toEqual([true, true, false]);
   });
 
   it('die Bausteine selbst enthalten keinen Farbwert', () => {

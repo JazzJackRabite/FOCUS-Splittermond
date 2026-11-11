@@ -126,6 +126,16 @@ export const Rollbereich: React.FC<React.HTMLAttributes<HTMLDivElement> & { besc
   <div role="region" aria-label={beschriftung} tabIndex={0} className={zusammen('overflow-y-auto pr-3', className)} {...rest} />
 );
 
+// ---------------------------------------------------------------- Rauten
+/** Zählbare Punkte als Rauten (z. B. Splitterpunkte): gefüllt = vorhanden, nur Rand = verbraucht. */
+export const Rauten: React.FC<{ wert: number; von: number; beschriftung: string; className?: string }> = ({ wert, von, beschriftung, className }) => (
+  <div role="img" aria-label={beschriftung} className={zusammen('flex flex-wrap gap-2.5 px-1 py-1', className)}>
+    {Array.from({ length: Math.max(von, wert) }).map((_, i) => (
+      <span key={i} aria-hidden="true" className={zusammen('w-5 h-5 rotate-45 rounded-[3px] box-border', i < wert ? 'bg-gold' : 'border-2 border-gold')} />
+    ))}
+  </div>
+);
+
 // ---------------------------------------------------------------- Dialog
 export interface DialogProps {
   titel: string;
