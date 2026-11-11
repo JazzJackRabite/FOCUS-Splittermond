@@ -9,7 +9,7 @@
 import type { Katalog } from './katalog';
 import type { Eintrag } from './typen';
 import type { InventoryItem, Relikt, ReliktBaustein, Spell } from '../types';
-import type { AusruestungsItem } from './ausruestung';
+import { alleAusruestung, type AusruestungsItem } from './ausruestung';
 import { aktiverKatalog } from './bruecke';
 
 /** Gegenstandsarten, wie sie daten.baustein.gilt_fuer nennt */
@@ -403,6 +403,32 @@ export function reliktAlsInventar(relikt: Relikt, bausteine: BausteinInfo[], bas
     source: basis?.source ?? 'Eigen',
     page: typeof basis?.page === 'number' && basis.page ? basis.page : undefined,
   };
+}
+
+/** Spielwerte, die ein Relikt am Inventareintrag festlegt */
+const RELIKT_WERTFELDER = ['damage', 'wgs', 'sr', 'handicap', 'tickModifier', 'weight', 'attributes', 'type'] as const;
+
+/**
+ * Inventareinträge von Relikten, deren Spielwerte nicht mehr zu den Regeln passen (z. B. vor Stand 21 gebaut oder
+ * Regelpaket geändert). Liefert die neu berechneten Einträge; Notizen werden nur dann ersetzt, wenn Werte abweichen.
+ */
+export function veralteteReliktEintraege(relikte: Relikt[], inventar: InventoryItem[], bausteine: BausteinInfo[], k: Katalog | null): InventoryItem[] {
+  if (!k || !bausteine.length) return [];
+  const aus = alleAusruestung(k);
+  const raus: InventoryItem[] = [];
+  for (const r of relikte) {
+    const alt = inventar.find(it => it.id === r.inventarId);
+    if (!alt) continue;
+    if (r.bausteine.some(w => !bausteine.some(b => b.id === w.id))) continue; // Paket fehlt: nichts anfassen
+    const basis = r.basisId ? aus.find(i => i.id === r.basisId) ?? null : null;
+    if (r.basisId && !basis) continue;
+    const neu = reliktAlsInventar(r, bausteine, basis, alt, k);
+    const a = alt as unknown as Record<string, unknown>, n = neu as unknown as Record<string, unknown>;
+    const norm = (v: unknown) => (v === undefined || v === null || v === '' ? '' : String(v));
+    // nur Felder, die das Relikt festlegt (nach dem Zusammenführen sind sie gleich, also keine Schleife)
+    if (RELIKT_WERTFELDER.some(f => n[f] !== undefined && norm(a[f]) !== norm(n[f]))) raus.push(neu);
+  }
+  return raus;
 }
 
 const BAUSTEIN_CACHE = new WeakMap<Katalog, BausteinInfo[]>();

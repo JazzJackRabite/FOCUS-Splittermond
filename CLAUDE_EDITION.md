@@ -464,6 +464,10 @@ Dateien aus AI Studio im Repository: `public/assets/aistudio/*.png`, `.aistudio/
   `hoechstens_nach_schadenswuerfel`; vom Paketbau geprüft. `grw.srp.json` neu gebaut, Prüfsuite ohne neue Befunde.
 - Im Browser geprüft: Relikt mit GW-Bonus (GW 15 → 16), Sperre bei überzogener Ressource, Speichern mit Hausregeln,
   Zauber aus Relikt im Zauberdialog mit Arkane Kunde.
+- **Nachtrag:** Relikte, die vor Stand 21 gebaut wurden, standen mit den Grundwerten im Inventar (Waffenschaden und
+  WGS ohne Wirkung). `ReliktAbgleich` (in `App.tsx` eingehängt) trägt die Werte aus den Bausteinen nach, sobald sie vom
+  Inventareintrag abweichen (`veralteteReliktEintraege` in `regelwerk/relikte.ts`). Damit lassen sich die Spielwerte
+  eines Relikts nicht mehr von Hand im Inventar überschreiben; geändert wird es in der Werkstatt.
 - Offen: Wachsen des Relikts und Chronik, beseelte Gegenstände, Schwerpunkt-Bonus bei Proben, Härte (kein Feld im
   Inventar, nur als Text).
 
