@@ -1,3 +1,4 @@
+import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { X } from 'lucide-react';
 
@@ -184,17 +185,11 @@ export const SourceBadge: React.FC<SourceBadgeProps> = ({ source, page, tooltipD
       </div>
       {isOpen && tooltipData && (
         isMobile ? (
-          <div
-            className="fixed inset-0 z-[9999] bg-seite/80 flex items-center justify-center p-4"
-            onClick={() => setIsOpen(false)}
-          >
-            <div
-              className="bg-flaeche border border-rahmen shadow-2xl rounded-karte p-4 w-full max-w-xs relative max-h-[85vh] overflow-y-auto"
-              onClick={(e) => e.stopPropagation()}
-            >
+          <Dialoghintergrund className="z-[9999]" onClick={() => setIsOpen(false)}>
+            <Dialogfenster breite="sm" className="p-4 relative overflow-y-auto" onClick={(e) => e.stopPropagation()}>
               {renderContent()}
-            </div>
-          </div>
+            </Dialogfenster>
+          </Dialoghintergrund>
         ) : (
           <div
             ref={tooltipRef}

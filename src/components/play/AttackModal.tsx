@@ -1,3 +1,4 @@
+import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import React, { useState, useMemo, useEffect, useId, useContext } from 'react';
 import {
   Sword,
@@ -453,13 +454,12 @@ export const AttackModal: React.FC<AttackModalProps> = ({
   };
 
   return (
-    <div
+    <Dialoghintergrund
       role="dialog"
       aria-modal="true"
-      aria-labelledby={modalHeadingId}
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-seite/80 overflow-y-auto animate-fadeIn"
+      aria-labelledby={modalHeadingId} className="animate-fadeIn"
     >
-      <div className="bg-flaeche text-schrift border border-rahmen rounded-karte shadow-2xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden my-auto">
+      <Dialogfenster breite="2xl">
         {/* ── HEADER ── */}
         <div className="p-4 sm:p-5 border-b border-gold flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3 min-w-0">
@@ -1326,8 +1326,8 @@ export const AttackModal: React.FC<AttackModalProps> = ({
             )}
           </div>
         </div>
-      </div>
-    </div>
+      </Dialogfenster>
+    </Dialoghintergrund>
   );
 };
 

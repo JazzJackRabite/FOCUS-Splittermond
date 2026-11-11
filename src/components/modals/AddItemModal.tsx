@@ -1,3 +1,4 @@
+import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import { useHausregeln } from '../../fundament/hausregeln';
 import React, { useState, useEffect, useMemo } from 'react';
 import { RESOURCE_DESCRIPTIONS } from '../../data/resources';
@@ -242,10 +243,9 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-seite/80 flex items-center justify-center z-50 p-3 sm:p-4">
-      <div
-        id="add-item-modal-dialog"
-        className="bg-flaeche rounded-karte border border-rahmen shadow-2xl max-w-md w-full max-h-[90vh] flex flex-col overflow-hidden"
+    <Dialoghintergrund>
+      <Dialogfenster
+        id="add-item-modal-dialog" breite="md"
       >
         <div className="px-5 py-4 border-b border-gold shrink-0">
           <h3 className="fantasy-font text-[17px] font-bold text-gold-hell">
@@ -494,7 +494,7 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({
             Hinzufügen
           </button>
         </div>
-      </div>
-    </div>
+      </Dialogfenster>
+    </Dialoghintergrund>
   );
 };

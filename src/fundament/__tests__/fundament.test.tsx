@@ -69,6 +69,19 @@ describe('Fundament: Altlasten dürfen nur weniger werden', () => {
     expect([...r.children].map((c) => c.className.includes('bg-gold'))).toEqual([true, true, false]);
   });
 
+  it('Dialoge bauen Hintergrund und Fenster nicht selbst, sondern mit den Bausteinen', () => {
+    const eigene: string[] = [];
+    const lauf = (d: string) => {
+      for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+        const p = path.join(d, e.name);
+        if (e.isDirectory()) { if (e.name !== 'fundament' && e.name !== '__tests__') lauf(p); continue; }
+        if (e.name.endsWith('.tsx') && /fixed inset-0[^"`']*bg-seite\/80|bg-seite\/80[^"`']*fixed inset-0/.test(fs.readFileSync(p, 'utf8'))) eigene.push(path.relative(WURZEL, p));
+      }
+    };
+    lauf(path.join(WURZEL, 'src'));
+    expect(eigene, 'Dialoge verwenden Dialoghintergrund und Dialogfenster (oder gleich Dialog) aus src/fundament.').toEqual([]);
+  });
+
   it('die Bausteine selbst enthalten keinen Farbwert', () => {
     expect(ist.farbwerte['src/fundament/bausteine.tsx'] ?? 0).toBe(0);
   });

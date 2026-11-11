@@ -1,3 +1,4 @@
+import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import React, { useEffect } from 'react';
 import { X, Sun, Moon, Heart, Sparkles, Zap, ShieldCheck, CheckCircle2 } from 'lucide-react';
 
@@ -35,16 +36,14 @@ export const RestResultModal: React.FC<RestResultModalProps> = ({ data, onClose 
   const isVp = data.restType === 'verschnaufpause';
 
   return (
-    <div
-      id="rest-result-modal-backdrop"
-      className="fixed inset-0 bg-seite/80 flex items-center justify-center z-50 p-4 animate-in fade-in duration-200"
+    <Dialoghintergrund
+      id="rest-result-modal-backdrop" className="animate-in fade-in duration-200"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div
-        id="rest-result-modal-card"
-        className="bg-flaeche text-schrift w-full max-w-md rounded-karte shadow-2xl border border-rahmen overflow-hidden flex flex-col max-h-[90vh]"
+      <Dialogfenster
+        id="rest-result-modal-card" breite="md"
       >
         {/* Header Banner */}
         <div className="text-schrift p-5 flex items-center justify-between border-b border-gold">
@@ -137,7 +136,7 @@ export const RestResultModal: React.FC<RestResultModalProps> = ({ data, onClose 
             Verstanden
           </button>
         </div>
-      </div>
-    </div>
+      </Dialogfenster>
+    </Dialoghintergrund>
   );
 };

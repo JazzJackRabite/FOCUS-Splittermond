@@ -1,3 +1,4 @@
+import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import React, { useState, useEffect } from 'react';
 import { Sun, Moon, RotateCcw, Settings, Heart, Sparkles, X, Check, Clock } from 'lucide-react';
 import type { ItemEntry, Mastery } from '../../types';
@@ -336,16 +337,14 @@ export const RestSection: React.FC<RestSectionProps> = ({
       {/* OPTIONS MODAL                                                 */}
       {/* ───────────────────────────────────────────────────────────── */}
       {activeModal && (
-        <div
-          id="rest-options-modal-backdrop"
-          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-seite/80 animate-in fade-in duration-150"
+        <Dialoghintergrund
+          id="rest-options-modal-backdrop" className="animate-in fade-in duration-150"
           onClick={(e) => {
             if (e.target === e.currentTarget) setActiveModal(null);
           }}
         >
-          <div
-            id="rest-options-modal-card"
-            className="bg-flaeche text-schrift w-full max-w-lg rounded-karte shadow-2xl border border-rahmen overflow-hidden flex flex-col max-h-[92vh] animate-in zoom-in-95 duration-150"
+          <Dialogfenster
+            id="rest-options-modal-card" breite="lg" className="animate-in zoom-in-95 duration-150"
           >
             {/* Modal Header */}
             <div className="text-schrift p-4 flex items-center justify-between border-b border-gold">
@@ -785,8 +784,8 @@ export const RestSection: React.FC<RestSectionProps> = ({
                 )}
               </div>
             </div>
-          </div>
-        </div>
+          </Dialogfenster>
+        </Dialoghintergrund>
       )}
     </div>
   );

@@ -1,3 +1,4 @@
+import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import React, { useState, useMemo } from 'react';
 import { Flame, Shield, Sparkles, X, Plus, Minus, AlertTriangle, Heart, Check } from 'lucide-react';
 import { ALL_CONDITIONS, CONDITIONS_WITH_LEVELS } from '../../data/rules';
@@ -219,8 +220,8 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-seite/80 flex items-center justify-center z-50 p-3 sm:p-4 overflow-y-auto">
-      <div className="bg-flaeche border border-rahmen rounded-karte shadow-2xl max-w-lg w-full max-h-[92vh] flex flex-col text-schrift overflow-hidden my-auto">
+    <Dialoghintergrund>
+      <Dialogfenster breite="lg">
         {/* Header */}
         <div className="px-4 sm:px-5 py-3.5 border-b border-gold flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
@@ -646,7 +647,7 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
             </span>
           </button>
         </div>
-      </div>
-    </div>
+      </Dialogfenster>
+    </Dialoghintergrund>
   );
 };

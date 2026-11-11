@@ -1,3 +1,4 @@
+import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import React, { useState } from 'react';
 import { User, Plus, Copy, Trash2, Check, Sparkles, X, Upload, Download, BookOpenText } from 'lucide-react';
 import {
@@ -167,8 +168,8 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ onClose, onSelectPro
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-seite/80 flex items-center justify-center p-4">
-      <div id="profile-modal-dialog" className="bg-flaeche border border-rahmen rounded-karte shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+    <Dialoghintergrund>
+      <Dialogfenster id="profile-modal-dialog" breite="2xl">
         {/* Header */}
         <div className="bg-erhoeht text-schrift p-4 flex justify-between items-center border-b-2 border-gold">
           <div className="flex items-center gap-2">
@@ -361,7 +362,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ onClose, onSelectPro
             Schließen
           </button>
         </div>
-      </div>
-    </div>
+      </Dialogfenster>
+    </Dialoghintergrund>
   );
 };

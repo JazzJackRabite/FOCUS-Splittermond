@@ -1,3 +1,4 @@
+import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import { setzeHausregeln, useHausregeln } from '../../fundament/hausregeln';
 import React, { useState, useEffect } from 'react';
 import {
@@ -31,12 +32,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   }, [onClose]);
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-seite/80 overflow-y-auto no-print"
+    <Dialoghintergrund
       onClick={onClose}
     >
-      <div
-        className="bg-flaeche rounded-karte shadow-2xl border border-rahmen max-w-2xl w-full p-4 sm:p-6 relative max-h-[90vh] flex flex-col my-auto overflow-hidden"
+      <Dialogfenster breite="2xl" className="p-4 sm:p-6"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
@@ -189,7 +188,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </button>
         </div>
 
-      </div>
-    </div>
+      </Dialogfenster>
+    </Dialoghintergrund>
   );
 };

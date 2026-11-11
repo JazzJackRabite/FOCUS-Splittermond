@@ -1,3 +1,4 @@
+import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import React, { useState } from 'react';
 import { Plus, Minus, Sparkles } from 'lucide-react';
 
@@ -20,10 +21,9 @@ export const XpAddModal: React.FC<XpAddModalProps> = ({ onClose, onAdd }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-seite/80 flex items-center justify-center z-50 p-3 sm:p-4">
-      <div
-        id="xp-add-modal-dialog"
-        className="bg-flaeche rounded-karte border border-rahmen shadow-2xl max-w-md w-full max-h-[90vh] flex flex-col overflow-hidden"
+    <Dialoghintergrund>
+      <Dialogfenster
+        id="xp-add-modal-dialog" breite="md"
       >
         <div className="px-5 py-4 border-b border-gold flex items-center gap-2 shrink-0">
           <Sparkles className="w-5 h-5 text-gold" />
@@ -120,7 +120,7 @@ export const XpAddModal: React.FC<XpAddModalProps> = ({ onClose, onAdd }) => {
             </button>
           </div>
         </form>
-      </div>
-    </div>
+      </Dialogfenster>
+    </Dialoghintergrund>
   );
 };

@@ -1,3 +1,4 @@
+import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import React, { useState, useMemo } from 'react';
 import {
   History,
@@ -509,8 +510,8 @@ export const AdvancementLog: React.FC<AdvancementLogProps> = ({
 
       {/* Add Custom Note Modal */}
       {showAddNoteModal && (
-        <div className="fixed inset-0 bg-seite/80 flex items-center justify-center z-50 p-4">
-          <div id="advancement-log-note-dialog" className="bg-flaeche p-5 sm:p-6 rounded-karte border border-rahmen shadow-2xl max-w-md w-full">
+        <Dialoghintergrund>
+          <Dialogfenster id="advancement-log-note-dialog" breite="md" className="p-5 sm:p-6">
             <div className="flex items-center gap-2 border-b border-gold pb-3 mb-4">
               <FileText className="w-5 h-5 text-gold" />
               <h3 className="fantasy-font text-[17px] font-bold text-gold-hell">
@@ -561,8 +562,8 @@ export const AdvancementLog: React.FC<AdvancementLogProps> = ({
                 </button>
               </div>
             </form>
-          </div>
-        </div>
+          </Dialogfenster>
+        </Dialoghintergrund>
       )}
     </div>
   );

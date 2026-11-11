@@ -1,3 +1,4 @@
+import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import { useHausregeln } from '../../fundament/hausregeln';
 import React, { useState, useEffect, useMemo } from 'react';
 import {
@@ -272,10 +273,9 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-seite/80 flex items-center justify-center z-50 p-3 sm:p-4">
-      <div
-        id="mastery-modal-dialog"
-        className="bg-flaeche text-schrift rounded-karte border border-rahmen shadow-2xl max-w-lg w-full max-h-[92vh] flex flex-col overflow-hidden"
+    <Dialoghintergrund>
+      <Dialogfenster
+        id="mastery-modal-dialog" breite="lg"
       >
         <div className="px-5 py-4 border-b border-gold flex justify-between items-start shrink-0">
           <div>
@@ -645,7 +645,7 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
             + Hinzufügen
           </button>
         </div>
-      </div>
-    </div>
+      </Dialogfenster>
+    </Dialoghintergrund>
   );
 };

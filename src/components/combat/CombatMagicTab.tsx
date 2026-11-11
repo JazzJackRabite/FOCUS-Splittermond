@@ -1,3 +1,4 @@
+import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import React, { useState, useMemo, useRef, useLayoutEffect } from 'react';
 import {
   Swords,
@@ -1075,8 +1076,8 @@ export const CombatMagicTab: React.FC = () => {
 
       {/* ── MODAL: Waffe hinzufügen ── */}
       {showAddWeaponModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-seite/80 p-4 overflow-y-auto">
-          <div className="bg-flaeche border border-rahmen rounded-karte shadow-2xl max-w-2xl w-full p-5 space-y-4 max-h-[90vh] flex flex-col">
+        <Dialoghintergrund>
+          <Dialogfenster breite="2xl" className="p-5 space-y-4">
             <div className="flex justify-between items-center border-b border-gold pb-2">
               <h3 className="font-bold text-[17px] text-gold-hell fantasy-font flex items-center gap-2">
                 <Swords size={20} className="text-gold" />
@@ -1236,14 +1237,14 @@ export const CombatMagicTab: React.FC = () => {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
+          </Dialogfenster>
+        </Dialoghintergrund>
       )}
 
       {/* ── MODAL: Rüstung oder Schild hinzufügen ── */}
       {showAddArmorModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-seite/80 p-4 overflow-y-auto">
-          <div className="bg-flaeche border border-rahmen rounded-karte shadow-2xl max-w-2xl w-full p-5 space-y-4 max-h-[90vh] flex flex-col">
+        <Dialoghintergrund>
+          <Dialogfenster breite="2xl" className="p-5 space-y-4">
             <div className="flex justify-between items-center border-b border-gold pb-2">
               <h3 className="font-bold text-[17px] text-gold-hell fantasy-font flex items-center gap-2">
                 <Shield size={20} className="text-gold" />
@@ -1454,8 +1455,8 @@ export const CombatMagicTab: React.FC = () => {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
+          </Dialogfenster>
+        </Dialoghintergrund>
       )}
     </div>
   );

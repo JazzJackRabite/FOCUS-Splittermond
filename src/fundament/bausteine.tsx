@@ -147,7 +147,21 @@ export interface DialogProps {
   children: React.ReactNode;
 }
 
-const BREITE = { schmal: 'max-w-md', mittel: 'max-w-xl', breit: 'max-w-3xl' };
+
+/** Abgedunkelter Hintergrund hinter einem Dialog. Alle Dialoge des Editors liegen auf diesem Baustein. */
+export const Dialoghintergrund = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, ...rest }, ref) => (
+  <div ref={ref} className={zusammen('fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-seite/80 overflow-y-auto no-print', className)} {...rest} />
+));
+Dialoghintergrund.displayName = 'Dialoghintergrund';
+
+const FENSTERBREITE = { sm: 'max-w-sm', md: 'max-w-md', lg: 'max-w-lg', xl: 'max-w-xl', '2xl': 'max-w-2xl', '3xl': 'max-w-3xl', '4xl': 'max-w-4xl', '5xl': 'max-w-5xl' };
+export type Fensterbreite = keyof typeof FENSTERBREITE;
+
+/** Das Fenster eines Dialogs: Fläche, Rahmen, Rundung, Höhe und Schatten sind hier festgelegt, nicht im einzelnen Dialog. */
+export const Dialogfenster = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement> & { breite?: Fensterbreite }>(({ breite = 'lg', className, ...rest }, ref) => (
+  <div ref={ref} className={zusammen('w-full max-h-[92vh] my-auto flex flex-col overflow-hidden bg-flaeche text-schrift border border-rahmen rounded-karte shadow-2xl', FENSTERBREITE[breite], className)} {...rest} />
+));
+Dialogfenster.displayName = 'Dialogfenster';
 
 /** Dialog über der Ansicht: Titelzeile mit goldener Linie, rollender Inhalt, Fußzeile mit Aktionen. Schließt mit Escape. */
 export const Dialog: React.FC<DialogProps> = ({ titel, untertitel, onSchliessen, fuss, breite = 'mittel', children }) => {
@@ -158,8 +172,8 @@ export const Dialog: React.FC<DialogProps> = ({ titel, untertitel, onSchliessen,
     return () => document.removeEventListener('keydown', taste);
   }, [onSchliessen]);
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-seite/80" onMouseDown={(e) => { if (e.target === e.currentTarget) onSchliessen(); }}>
-      <div role="dialog" aria-modal="true" aria-labelledby={titelId} className={zusammen('w-full max-h-[90vh] flex flex-col bg-flaeche border border-rahmen rounded-karte overflow-hidden text-schrift font-text text-sm', BREITE[breite])}>
+    <Dialoghintergrund onMouseDown={(e) => { if (e.target === e.currentTarget) onSchliessen(); }}>
+      <Dialogfenster role="dialog" aria-modal="true" aria-labelledby={titelId} breite={({ schmal: 'md', mittel: 'xl', breit: '3xl' } as const)[breite]} className="font-text text-sm">
         <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-gold">
           <div className="min-w-0">
             <h2 id={titelId} className="m-0 font-titel font-bold text-lg tracking-[0.06em] text-schrift">{titel}</h2>
@@ -169,7 +183,7 @@ export const Dialog: React.FC<DialogProps> = ({ titel, untertitel, onSchliessen,
         </div>
         <div className="p-5 overflow-y-auto flex flex-col gap-3.5">{children}</div>
         {fuss && <div className="flex flex-wrap justify-end gap-2.5 px-5 py-4 border-t border-rahmen">{fuss}</div>}
-      </div>
-    </div>
+      </Dialogfenster>
+    </Dialoghintergrund>
   );
 };

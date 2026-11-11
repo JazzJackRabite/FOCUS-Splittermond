@@ -1,3 +1,4 @@
+import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import React, { useState, useMemo } from 'react';
 import {
   Package,
@@ -708,8 +709,8 @@ export const InventoryView: React.FC = () => {
 
       {/* ── MODAL: GEGENSTAND HINZUFÜGEN ── */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-seite/80 p-4 overflow-y-auto">
-          <div className="bg-flaeche border border-rahmen rounded-karte shadow-2xl max-w-2xl w-full p-5 space-y-4 max-h-[90vh] flex flex-col">
+        <Dialoghintergrund>
+          <Dialogfenster breite="2xl" className="p-5 space-y-4">
             <div className="flex justify-between items-center border-b border-gold pb-2">
               <h3 className="font-bold text-[17px] text-gold-hell fantasy-font flex items-center gap-2">
                 <Package size={20} className="text-gold" />
@@ -1014,14 +1015,14 @@ export const InventoryView: React.FC = () => {
                 </div>
               </form>
             )}
-          </div>
-        </div>
+          </Dialogfenster>
+        </Dialoghintergrund>
       )}
 
       {/* ── MODAL: GEGENSTAND BEARBEITEN (INKL. QUELLENVERMERK) ── */}
       {editingItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-seite/80 p-4 overflow-y-auto">
-          <div className="bg-flaeche border border-rahmen rounded-karte shadow-2xl max-w-xl w-full p-5 space-y-4 max-h-[90vh] flex flex-col">
+        <Dialoghintergrund>
+          <Dialogfenster breite="xl" className="p-5 space-y-4">
             <div className="flex justify-between items-center border-b border-gold pb-2">
               <h3 className="font-bold text-[17px] text-gold-hell fantasy-font flex items-center gap-2">
                 <Edit2 size={18} className="text-gold" />
@@ -1322,8 +1323,8 @@ export const InventoryView: React.FC = () => {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
+          </Dialogfenster>
+        </Dialoghintergrund>
       )}
     </div>
   );

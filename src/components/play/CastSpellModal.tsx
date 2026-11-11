@@ -1,3 +1,4 @@
+import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import React, { useState, useEffect, useId, useMemo } from 'react';
 import {
   X,
@@ -576,8 +577,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
   };
 
   return (
-    <div
-      className="fixed inset-0 bg-seite/80 z-50 flex items-center justify-center p-3 md:p-5 overflow-y-auto"
+    <Dialoghintergrund
       role="dialog"
       aria-modal="true"
       aria-labelledby={modalHeadingId}
@@ -585,9 +585,8 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div
-        id="cast-spell-modal-dialog"
-        className="bg-flaeche border border-rahmen rounded-karte shadow-2xl max-w-2xl lg:max-w-3xl w-full flex flex-col overflow-hidden text-erschoepft my-auto max-h-[92vh] sm:max-h-[90vh]"
+      <Dialogfenster
+        id="cast-spell-modal-dialog" breite="2xl" className="lg:max-w-3xl text-erschoepft sm:max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -2152,8 +2151,8 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
             )
           )}
         </div>
-      </div>
-    </div>
+      </Dialogfenster>
+    </Dialoghintergrund>
   );
 };
 export default CastSpellModal;

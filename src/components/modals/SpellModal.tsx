@@ -1,3 +1,4 @@
+import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import { useHausregeln } from '../../fundament/hausregeln';
 import React, { useState, useEffect, useMemo } from 'react';
 import { SPELLS_DB } from '../../data/spells';
@@ -113,10 +114,9 @@ export const SpellModal: React.FC<SpellModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-seite/80 flex items-center justify-center z-50 p-3 sm:p-4">
-      <div
-        id="spell-modal-dialog"
-        className="bg-flaeche rounded-karte border border-rahmen shadow-2xl max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden"
+    <Dialoghintergrund>
+      <Dialogfenster
+        id="spell-modal-dialog" breite="lg"
       >
         <div className="px-5 py-4 border-b border-gold shrink-0">
           <h3 className="fantasy-font text-[17px] font-bold text-gold-hell tracking-wide uppercase">
@@ -329,7 +329,7 @@ export const SpellModal: React.FC<SpellModalProps> = ({
             Hinzufügen
           </button>
         </div>
-      </div>
-    </div>
+      </Dialogfenster>
+    </Dialoghintergrund>
   );
 };

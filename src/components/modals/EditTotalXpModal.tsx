@@ -1,3 +1,4 @@
+import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import React, { useState } from 'react';
 import { Edit3, Plus, Minus, ArrowRight, Info, AlertTriangle } from 'lucide-react';
 
@@ -32,10 +33,9 @@ export const EditTotalXpModal: React.FC<EditTotalXpModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-seite/80 flex items-center justify-center z-50 p-3 sm:p-4">
-      <div
-        id="edit-total-xp-modal-dialog"
-        className="bg-flaeche rounded-karte border border-rahmen shadow-2xl max-w-lg w-full max-h-[92vh] flex flex-col overflow-hidden"
+    <Dialoghintergrund>
+      <Dialogfenster
+        id="edit-total-xp-modal-dialog" breite="lg"
       >
         <div className="px-5 py-4 border-b border-gold flex items-center gap-2 shrink-0">
           <Edit3 className="w-5 h-5 text-gold" />
@@ -190,7 +190,7 @@ export const EditTotalXpModal: React.FC<EditTotalXpModalProps> = ({
           </button>
         </div>
       </form>
-    </div>
-  </div>
+    </Dialogfenster>
+  </Dialoghintergrund>
   );
 };
