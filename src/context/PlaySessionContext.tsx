@@ -851,9 +851,9 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
       {castSpellTarget && (
         <CastSpellModal
           spell={castSpellTarget}
-          schoolSkillTotal={getSkillTotal(castSpellTarget.school) ?? 0}
-          schoolSkillName={castSpellTarget.school}
-          grossmeister={getSkillValue(castSpellTarget.school) >= grossmeisterAb()}
+          schoolSkillTotal={getSkillTotal(castSpellTarget.probeFertigkeit ?? castSpellTarget.school) ?? 0}
+          schoolSkillName={castSpellTarget.probeFertigkeit ?? castSpellTarget.school}
+          grossmeister={getSkillValue(castSpellTarget.probeFertigkeit ?? castSpellTarget.school) >= grossmeisterAb()}
           availableFocus={focusAvailable}
           maxFO={maxFO}
           focusState={focus}

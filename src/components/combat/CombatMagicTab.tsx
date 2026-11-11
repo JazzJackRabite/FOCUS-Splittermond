@@ -20,6 +20,7 @@ import { SKILL_CATEGORIES, SKILL_DATA } from '../../data/rules';
 import { type WeaponItem, type ArmorItem, type ShieldItem } from '../../data/equipment';
 import { alleAusruestung } from '../../regelwerk/ausruestung';
 import { useRegelwerk } from '../../regelwerk/RegelwerkContext';
+import { bausteineAktiv, reliktZauber } from '../../regelwerk/relikte';
 import { getMasteryDetails } from '../../utils/gameResourceManager';
 import {
   getFullSpellInfo,
@@ -180,6 +181,11 @@ const QuickSpellCard: React.FC<QuickSpellCardProps> = ({ spell, session }) => {
 export const CombatMagicTab: React.FC = () => {
   const { state, dispatch, calc } = useCharacter();
   const { katalog } = useRegelwerk();
+  // Zauberverankerungen in Relikten im Besitz (GRW S. 255: Probe auf Arkane Kunde, Relikt in der Hand)
+  const zauberAusRelikten = useMemo(
+    () => reliktZauber(katalog, state.relikte ?? [], state.inventory ?? [], bausteineAktiv(katalog)),
+    [katalog, state.relikte, state.inventory],
+  );
   // Waffen, Rüstungen und Schilde aus GRW und hochgeladenen Regelpaketen
   const ausruestung = useMemo(() => alleAusruestung(katalog), [katalog]);
   const WEAPONS_DATA = useMemo(() => ausruestung.filter((i): i is WeaponItem => i.type === 'weapon'), [ausruestung]);
@@ -936,11 +942,11 @@ export const CombatMagicTab: React.FC = () => {
               </h3>
             </div>
 
-            {spellsList.length === 0 ? (
+            {spellsList.length === 0 && zauberAusRelikten.length === 0 ? (
               <p className="text-xs text-leise italic p-3 text-center bg-erhoeht rounded-knopf border border-rahmen">
                 Noch keine Zauber erlernt. Erlerne Zauber in der Steigerung.
               </p>
-            ) : (
+            ) : spellsList.length === 0 ? null : (
               <div className="space-y-2">
                 {spellsList.map((spell, idx) => (
                   <QuickSpellCard
@@ -949,6 +955,22 @@ export const CombatMagicTab: React.FC = () => {
                     session={session}
                   />
                 ))}
+              </div>
+            )}
+
+            {zauberAusRelikten.length > 0 && (
+              <div className="mt-4" data-testid="zauber-aus-relikten">
+                <div className="text-xs text-leise mb-1.5">
+                  Aus Relikten: Probe auf {zauberAusRelikten[0].spell.probeFertigkeit} gegen die Schwierigkeit des Zaubers, Fokus trägst du selbst; das Relikt muss in der Hand sein (GRW S. 255).
+                </div>
+                <div className="space-y-2">
+                  {zauberAusRelikten.map((z, idx) => (
+                    <div key={`${z.relikt.id}-${z.spell.name}-${idx}`}>
+                      <div className="text-[11px] text-leise mb-0.5">{z.relikt.name}</div>
+                      <QuickSpellCard spell={z.spell} session={session} />
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>

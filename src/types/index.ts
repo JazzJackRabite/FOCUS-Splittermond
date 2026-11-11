@@ -55,6 +55,10 @@ export interface Spell {
   difficulty?: string;
   difficultyType?: 'fest' | 'VTD' | 'GW' | 'KW';
   difficultyValue?: number;
+  /** Probe auf diese Fertigkeit statt auf die Magieschule (Zauberverankerung eines Relikts: Arkane Kunde, GRW S. 255) */
+  probeFertigkeit?: string;
+  /** Name des Relikts, aus dem der Zauber ausgelöst wird */
+  ausRelikt?: string;
 }
 
 export interface ItemEntry {

@@ -22,7 +22,6 @@ Repository `JazzJackRabite/FOKUS-1.0-claudeedition` (Branch `main`; entstanden a
   13 Charaktere, 120 Berechnungen abgeleiteter Werte und 150 Erschaffungen mit den Ergebnissen des Python-Laders.
   Mit allen Büchern lokal: `FOKUS_BUECHER=<Regelpakete/editor/buecher> FOKUS_REFERENZ_VOLL=<referenz_voll.json> npx vitest run src/regelwerk`.
 
-
 ## Stand 2 (05.11.2026): Regeln aus den Daten, Bücher im Editor
 
 - **Abgeleitete Werte nach den Regeldaten** (`regelwerk/bruecke.ts` → `abgeleiteteFuerCharakter`, eingebunden in
@@ -446,12 +445,28 @@ Dateien aus AI Studio im Repository: `public/assets/aistudio/*.png`, `.aistudio/
   ist `schrift`, auf Gold `seite`; kräftige Bedeutungsfarben sind keine Textflächen mehr.
 - **Splitterpunkte als Rauten** wie im Mockup (neuer Baustein `Rauten`), statt Sternen in Kreisen.
 
-## Google AI Studio
+## Stand 21 (11.11.2026): Relikte, Stufe 2 – Werte, Widerstand, Zauberverankerung
 
-Unverändert eine Vite-/React-App mit `metadata.json` im Wurzelordner; Import über „Import from GitHub“, Hosting über Cloud Run.
-Neue Abhängigkeiten gibt es nicht. Die Regelpakete liegen in `public/` und werden zur Laufzeit geladen.
+- **Wertänderungen** der Bausteine wirken jetzt auf den Grundgegenstand: Schaden, WGS (mindestens 1), SR, Behinderung,
+  Tick-Zuschlag, Last (höchstens halbiert) und Merkmale (neu, erhöhen, entfernen). Das Inventar zeigt die geänderten
+  Werte, die Notiz nennt sie („Werte: Schaden 1W6+4 → 1W6+6.“). Höchstwerte von Merkmalen richten sich nach dem
+  Schadenswürfel; Bausteine mit Wahl (z. B. Tick-Zuschlag oder Behinderung) fragen in der Werkstatt nach.
+- **Verbesserter Widerstand (GW/KW)** gilt, solange das Relikt im Inventar ist. Bei mehreren Relikten zählt nur der
+  höchste Bonus (GRW S. 254); eingerechnet in `calculateCharacter`.
+- **Zauberverankerung:** Grad und Zauber werden in der Werkstatt gewählt (Zauber aus dem Katalog). Unter Kampf & Magie
+  erscheint der Abschnitt „Aus Relikten“; der Zauberdialog würfelt auf Arkane Kunde, den Fokus trägt der Charakter
+  (GRW S. 255).
+- **Werkstatt** ganz aus den Bausteinen (`Dialog`, `Knopf`, `Eingabe`, `Auswahl`). Mehr Punkte als die Ressource Relikt
+  oder andere Prüfbefunde sperren das Speichern; mit Hausregeln wird nur gewarnt. Paketzugriffe liegen jetzt in
+  `regelwerk/relikte.ts`, die Altlast für `ReliktKarte.tsx` ist entfernt.
+- **Datenfelder** in `relikt_bausteine.json` (Werkzeuge): `wirkt`, `ausloesung`, `aenderungen_wahl`,
+  `hoechstens_nach_schadenswuerfel`; vom Paketbau geprüft. `grw.srp.json` neu gebaut, Prüfsuite ohne neue Befunde.
+- Im Browser geprüft: Relikt mit GW-Bonus (GW 15 → 16), Sperre bei überzogener Ressource, Speichern mit Hausregeln,
+  Zauber aus Relikt im Zauberdialog mit Arkane Kunde.
+- Offen: Wachsen des Relikts und Chronik, beseelte Gegenstände, Schwerpunkt-Bonus bei Proben, Härte (kein Feld im
+  Inventar, nur als Text).
 
-## Stand 21 (11.11.2026): Begleiter – Bausteine, Zustände, waffenlos, freie Meisterschaften, Golem-Feinschliff
+## Stand 22 (11.11.2026): Begleiter – Bausteine, Zustände, waffenlos, freie Meisterschaften, Golem-Feinschliff
 
 Alle Begleiter bleiben im Tab „Begleiter“ (Entscheidung 11.11.2026: kein Bereich im Tab „Kampf & Magie“).
 
@@ -462,7 +477,7 @@ Alle Begleiter bleiben im Tab „Begleiter“ (Entscheidung 11.11.2026: kein Ber
   als Rahmen, Kurzanzeige LP/FO als Marke.
 - **Paketzugriffe aus den Ansichten entfernt:** Wesen, Untote, Golems und Gefolge fragen `regelwerk/` (`wesenStufe`,
   `abnormitaetText`, `steigerbareFertigkeiten`, `bausteinInfo`, `materialInfo`, `korpusGK`, `kulturModul`, `rasseText`,
-  `anhebbareFertigkeiten`, `zauberAlsSpell` in `bruecke.ts`). Altlast `paketzugriffe` 7 → 2.
+  `anhebbareFertigkeiten`, `zauberAlsSpell` in `bruecke.ts`). Alle fünf Begleiter-Dateien sind aus der Altlast `paketzugriffe` heraus.
 - **Zustände für Begleiter:** dieselbe Zustandsliste wie beim Abenteurer (`CONDITIONS_WITH_LEVELS`/`…_WITHOUT_LEVELS`, Abzüge über
   `getConditionMalus`), je Begleiter in `zustand.zustaende`; gehen in Probe, Angriff und Zauber ein.
 - **Waffenloser Angriff für Gefolgsleute:** Waffen ohne Preis und ohne Verfügbarkeit hat jeder (GRW-Paket: nur Waffenlos, S. 183;
@@ -478,3 +493,9 @@ Alle Begleiter bleiben im Tab „Begleiter“ (Entscheidung 11.11.2026: kein Ber
 - **Offen (Datenseite, Ordner `Werkzeuge`):** Zahlenwerte für Abrichtungen (Boni im Wertekasten), Vertraute aus „Die Magie“ (im Paket
   nur Verweise), Regelwerte von Gefolge/Untoten/Golems in `strukturiert`, fehlende Bestiarium-Werte. **Offen (Entscheidung):**
   Baukasten für beschwörbare Wesen und Bestien braucht eine neue Zeile in der Tabelle „Regelquellen“.
+
+## Google AI Studio
+
+Unverändert eine Vite-/React-App mit `metadata.json` im Wurzelordner; Import über „Import from GitHub“, Hosting über Cloud Run.
+Neue Abhängigkeiten gibt es nicht. Die Regelpakete liegen in `public/` und werden zur Laufzeit geladen.
+
