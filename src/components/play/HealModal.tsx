@@ -202,10 +202,10 @@ export const HealModal: React.FC<HealModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/75 flex items-center justify-center z-50 p-3 sm:p-4 overflow-y-auto">
+    <div className="fixed inset-0 bg-seite/80 flex items-center justify-center z-50 p-3 sm:p-4 overflow-y-auto">
       <div className="bg-flaeche border border-unverletzt rounded-karte shadow-2xl max-w-lg w-full max-h-[92vh] flex flex-col text-schrift overflow-hidden my-auto">
         {/* Header */}
-        <div className="px-4 sm:px-5 py-3.5 border-b border-unverletzt bg-seite flex items-center justify-between shrink-0">
+        <div className="px-4 sm:px-5 py-3.5 border-b border-gold flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-full bg-unverletzt-grund border border-unverletzt flex items-center justify-center text-unverletzt">
               <Heart size={18} />
@@ -222,8 +222,8 @@ export const HealModal: React.FC<HealModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="text-leise hover:text-schrift p-1 rounded-knopf transition-colors cursor-pointer"
-            title="Schließen"
+            className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-knopf border border-rahmen bg-erhoeht text-schrift hover:border-gold transition-colors"
+            title="Schließen" aria-label="Schließen"
           >
             <X size={20} />
           </button>
@@ -634,7 +634,7 @@ export const HealModal: React.FC<HealModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="px-3.5 py-1.5 rounded-knopf text-xs font-semibold text-schrift hover:bg-seite transition-colors cursor-pointer"
+            className="min-h-11 px-3.5 py-1.5 rounded-knopf text-xs font-semibold text-schrift hover:bg-seite transition-colors cursor-pointer"
           >
             Abbrechen
           </button>
@@ -643,7 +643,7 @@ export const HealModal: React.FC<HealModalProps> = ({
             type="button"
             onClick={() => handleSubmit()}
             disabled={totalActualHealed === 0 && conditionsToRemove.size === 0}
-            className="px-5 py-2 rounded-knopf text-xs sm:text-sm font-bold bg-unverletzt-grund hover:bg-unverletzt-grund text-unverletzt border border-unverletzt hover:border-unverletzt transition-colors cursor-pointer flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="min-h-11 px-5 py-2 rounded-knopf text-xs sm:text-sm font-bold bg-unverletzt-grund hover:bg-unverletzt-grund text-unverletzt border border-unverletzt hover:border-unverletzt transition-colors cursor-pointer flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <Check size={16} />
             <span>

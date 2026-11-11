@@ -272,7 +272,7 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-3 sm:p-4">
+    <div className="fixed inset-0 bg-seite/80 flex items-center justify-center z-50 p-3 sm:p-4">
       <div
         id="mastery-modal-dialog"
         className="bg-flaeche text-schrift rounded-karte border border-rahmen shadow-2xl max-w-lg w-full max-h-[92vh] flex flex-col overflow-hidden"
@@ -291,8 +291,8 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="text-leise hover:text-schrift text-lg font-bold w-7 h-7 flex items-center justify-center rounded-knopf hover:bg-rahmen transition-colors cursor-pointer"
-            title="Schließen"
+            className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-knopf border border-rahmen bg-erhoeht text-schrift hover:border-gold transition-colors"
+            title="Schließen" aria-label="Schließen"
           >
             ✕
           </button>
@@ -326,7 +326,7 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="🔍 Nach Name, Manöver oder Voraussetzung filtern..."
+                placeholder="Nach Name, Manöver oder Voraussetzung filtern..."
                 className="w-full p-2 pr-8 border border-rahmen rounded-knopf bg-seite text-schrift text-xs focus:ring-1 focus:ring-gold focus:border-gold outline-none"
               />
               {search && (
@@ -472,7 +472,7 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
               {selectedEntry.manoever && (
                 <div className="flex items-center gap-2 py-1 px-2 rounded-knopf bg-erschoepft-grund border border-erschoepft text-gold-hell">
                   <span className="font-bold text-[11px] uppercase tracking-wider bg-erschoepft-grund px-1.5 py-0.5 rounded-knopf text-gold-hell shrink-0">
-                    ⚔️ Manöver
+                    Manöver
                   </span>
                   <span className="text-[11px] text-gold-hell leading-tight">
                     Aktive Kampftechnik: Muss vor einem Angriff oder einer Aktion angesagt werden (pro Aktion ist maximal 1 Manöver erlaubt).
@@ -488,7 +488,7 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
                       currentValidation?.prerequisitesMet ? 'text-unverletzt' : 'text-gold'
                     }`}
                   >
-                    <span>{currentValidation?.prerequisitesMet ? '✓ Erfüllt:' : '⚠ Fehlend:'}</span>
+                    <span>{currentValidation?.prerequisitesMet ? '✓ Erfüllt:' : 'Fehlend:'}</span>
                     <span>{selectedEntry.prerequisiteText}</span>
                   </span>
                 </div>
@@ -627,7 +627,7 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 bg-seite hover:bg-erhoeht text-leise hover:text-schrift rounded-knopf font-semibold text-xs sm:text-sm transition-colors cursor-pointer border border-rahmen"
+            className="min-h-11 px-4 py-2 bg-seite hover:bg-erhoeht text-leise hover:text-schrift rounded-knopf font-semibold text-xs sm:text-sm transition-colors cursor-pointer border border-rahmen"
           >
             Abbrechen
           </button>
@@ -635,7 +635,7 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
             type="button"
             onClick={handleAdd}
             disabled={isSelectionInvalid || (!selectedName && !customName)}
-            className="px-5 py-2 bg-erhoeht hover:bg-rahmen text-schrift rounded-knopf font-bold text-xs sm:text-sm border border-gold disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
+            className="min-h-11 px-5 py-2 bg-gold hover:bg-gold-hell text-seite rounded-knopf font-bold text-xs sm:text-sm border border-gold disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
             title={
               currentValidation && !currentValidation.canLearn
                 ? `${currentValidation.thresholdReason || ''} ${currentValidation.prerequisiteReason || ''}`.trim()

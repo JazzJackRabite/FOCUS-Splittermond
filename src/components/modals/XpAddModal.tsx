@@ -20,7 +20,7 @@ export const XpAddModal: React.FC<XpAddModalProps> = ({ onClose, onAdd }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-3 sm:p-4">
+    <div className="fixed inset-0 bg-seite/80 flex items-center justify-center z-50 p-3 sm:p-4">
       <div
         id="xp-add-modal-dialog"
         className="bg-flaeche rounded-karte border border-rahmen shadow-2xl max-w-md w-full max-h-[90vh] flex flex-col overflow-hidden"
@@ -107,14 +107,14 @@ export const XpAddModal: React.FC<XpAddModalProps> = ({ onClose, onAdd }) => {
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-schrift hover:bg-rahmen rounded-knopf text-sm font-semibold transition-colors cursor-pointer"
+              className="min-h-11 px-4 py-2 text-schrift hover:bg-rahmen rounded-knopf text-sm font-semibold transition-colors cursor-pointer"
             >
               Abbrechen
             </button>
             <button
               type="submit"
               disabled={val <= 0}
-              className="px-5 py-2 bg-erhoeht hover:bg-rahmen text-schrift rounded-knopf font-bold text-sm border border-rahmen disabled:opacity-50 transition-all cursor-pointer"
+              className="min-h-11 px-5 py-2 bg-gold hover:bg-gold-hell text-seite rounded-knopf font-bold text-sm border border-gold disabled:opacity-50 transition-all cursor-pointer"
             >
               +{val} EP Hinzufügen
             </button>

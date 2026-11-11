@@ -33,7 +33,7 @@ export class ErrorBoundary extends React.Component<React.PropsWithChildren, Erro
             )}
             <button
               onClick={() => window.location.reload()}
-              className="bg-gold text-seite font-bold px-6 py-2 rounded-knopf hover:bg-gold-hell transition-colors"
+              className="min-h-11 bg-gold text-seite font-bold px-6 py-2 rounded-knopf hover:bg-gold-hell transition-colors"
             >
               Neu laden
             </button>

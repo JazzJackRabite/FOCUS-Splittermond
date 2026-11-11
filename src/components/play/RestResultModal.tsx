@@ -37,7 +37,7 @@ export const RestResultModal: React.FC<RestResultModalProps> = ({ data, onClose 
   return (
     <div
       id="rest-result-modal-backdrop"
-      className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 animate-in fade-in duration-200"
+      className="fixed inset-0 bg-seite/80 flex items-center justify-center z-50 p-4 animate-in fade-in duration-200"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -47,7 +47,7 @@ export const RestResultModal: React.FC<RestResultModalProps> = ({ data, onClose 
         className="bg-flaeche text-schrift w-full max-w-md rounded-karte shadow-2xl border border-rahmen overflow-hidden flex flex-col max-h-[90vh]"
       >
         {/* Header Banner */}
-        <div className="bg-erhoeht text-schrift p-5 flex items-center justify-between border-b border-gold">
+        <div className="text-schrift p-5 flex items-center justify-between border-b border-gold">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-karte bg-rahmen border border-rahmen">
               {isVp ? (
@@ -66,8 +66,8 @@ export const RestResultModal: React.FC<RestResultModalProps> = ({ data, onClose 
           <button
             id="close-rest-result-modal-btn"
             onClick={onClose}
-            className="p-1.5 rounded-knopf text-schrift hover:text-schrift hover:bg-rahmen transition-colors"
-            title="Schließen"
+            className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-knopf border border-rahmen bg-erhoeht text-schrift hover:border-gold transition-colors"
+            title="Schließen" aria-label="Schließen"
           >
             <X size={20} />
           </button>
@@ -132,7 +132,7 @@ export const RestResultModal: React.FC<RestResultModalProps> = ({ data, onClose 
           <button
             id="confirm-rest-result-modal-btn"
             onClick={onClose}
-            className="w-full sm:w-auto px-6 py-2.5 rounded-karte font-bold text-sm text-schrift active:scale-98 transition-all flex items-center justify-center gap-2 bg-erhoeht hover:bg-rahmen border border-rahmen cursor-pointer"
+            className="min-h-11 w-full sm:w-auto px-6 py-2.5 rounded-karte font-bold text-sm text-schrift active:scale-98 transition-all flex items-center justify-center gap-2 bg-erhoeht hover:bg-rahmen border border-rahmen cursor-pointer"
           >
             Verstanden
           </button>

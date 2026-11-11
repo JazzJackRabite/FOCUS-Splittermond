@@ -78,11 +78,11 @@ const Werkstatt: React.FC<{ k: Katalog; start: Relikt; frei: number; schliessen:
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 overflow-y-auto" role="dialog" aria-label="Relikt-Werkstatt">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-seite/80 p-4 overflow-y-auto" role="dialog" aria-label="Relikt-Werkstatt">
       <div className="bg-flaeche border border-rahmen rounded-karte shadow-2xl max-w-5xl w-full p-5 space-y-3 max-h-[92vh] flex flex-col">
         <div className="flex items-center justify-between border-b border-rahmen pb-2">
           <h3 className="font-bold text-lg text-gold-hell flex items-center gap-2"><Gem size={18} className="text-gold" />Relikt-Werkstatt</h3>
-          <button type="button" onClick={schliessen} aria-label="Schließen" className="p-1 rounded-knopf hover:bg-black/5 cursor-pointer"><X size={18} /></button>
+          <button type="button" onClick={schliessen} aria-label="Schließen" className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-knopf border border-rahmen bg-erhoeht text-schrift hover:border-gold transition-colors"><X size={18} /></button>
         </div>
 
         <div className="grid md:grid-cols-2 gap-4 min-h-0 flex-1 overflow-y-auto md:overflow-hidden">
@@ -201,8 +201,8 @@ const Werkstatt: React.FC<{ k: Katalog; start: Relikt; frei: number; schliessen:
         </div>
 
         <div className="flex justify-end gap-2 border-t border-rahmen pt-2">
-          <button type="button" onClick={schliessen} className="px-3 py-1.5 rounded-knopf border border-rahmen text-xs cursor-pointer">Abbrechen</button>
-          <button type="button" onClick={speichern} className="bg-gold hover:bg-gold text-seite font-bold px-5 py-1.5 rounded-knopf text-xs cursor-pointer">Relikt speichern</button>
+          <button type="button" onClick={schliessen} className="min-h-11 px-3 py-1.5 rounded-knopf border border-rahmen text-xs cursor-pointer">Abbrechen</button>
+          <button type="button" onClick={speichern} className="min-h-11 bg-gold hover:bg-gold text-seite font-bold px-5 py-1.5 rounded-knopf text-xs cursor-pointer">Relikt speichern</button>
         </div>
       </div>
     </div>

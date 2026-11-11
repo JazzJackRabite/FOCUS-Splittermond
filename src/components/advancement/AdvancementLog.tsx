@@ -372,7 +372,7 @@ export const AdvancementLog: React.FC<AdvancementLogProps> = ({
               {entries.length === 0 && (
                 <button
                   onClick={() => setShowXpModal(true)}
-                  className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 bg-erhoeht text-schrift hover:bg-rahmen rounded-knopf text-xs font-bold transition cursor-pointer"
+                  className="min-h-11 mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 bg-erhoeht text-schrift hover:bg-rahmen rounded-knopf text-xs font-bold transition cursor-pointer"
                 >
                   <Sparkles size={14} /> Erste EP gutschreiben
                 </button>
@@ -472,7 +472,7 @@ export const AdvancementLog: React.FC<AdvancementLogProps> = ({
               <button
                 type="button"
                 onClick={() => setShowEditTotalXpModal(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-erhoeht text-schrift hover:bg-rahmen border border-gold rounded-knopf text-xs font-bold transition cursor-pointer"
+                className="min-h-11 flex items-center gap-1.5 px-3 py-1.5 bg-erhoeht text-schrift hover:bg-rahmen border border-gold rounded-knopf text-xs font-bold transition cursor-pointer"
                 title="Gesamt-EP mit Kommentar und Protokolleintrag korrigieren"
               >
                 <Edit3 size={14} className="text-gold" />
@@ -509,7 +509,7 @@ export const AdvancementLog: React.FC<AdvancementLogProps> = ({
 
       {/* Add Custom Note Modal */}
       {showAddNoteModal && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-seite/80 flex items-center justify-center z-50 p-4">
           <div id="advancement-log-note-dialog" className="bg-flaeche p-5 sm:p-6 rounded-karte border border-rahmen shadow-2xl max-w-md w-full">
             <div className="flex items-center gap-2 border-b border-gold pb-3 mb-4">
               <FileText className="w-5 h-5 text-gold" />
@@ -548,14 +548,14 @@ export const AdvancementLog: React.FC<AdvancementLogProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowAddNoteModal(false)}
-                  className="px-4 py-2 text-schrift hover:bg-rahmen rounded-knopf text-sm font-semibold transition cursor-pointer"
+                  className="min-h-11 px-4 py-2 text-schrift hover:bg-rahmen rounded-knopf text-sm font-semibold transition cursor-pointer"
                 >
                   Abbrechen
                 </button>
                 <button
                   type="submit"
                   disabled={!noteTitle.trim()}
-                  className="px-5 py-2 bg-erhoeht hover:bg-rahmen text-schrift rounded-knopf font-bold text-sm border border-rahmen disabled:opacity-50 transition cursor-pointer"
+                  className="min-h-11 px-5 py-2 bg-gold hover:bg-gold-hell text-seite rounded-knopf font-bold text-sm border border-gold disabled:opacity-50 transition cursor-pointer"
                 >
                   Eintragen
                 </button>

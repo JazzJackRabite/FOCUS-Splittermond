@@ -147,35 +147,35 @@ export const DiceLog: React.FC<DiceLogProps> = ({
         </span>
         <button
           onClick={() => onQuickRoll(4, 1, '1W4')}
-          className="bg-erhoeht hover:bg-rahmen active:scale-95 text-schrift text-xs md:text-sm font-bold min-w-[44px] py-2 px-3 rounded-knopf transition-all touch-manipulation flex items-center justify-center"
+          className="min-h-11 bg-erhoeht hover:bg-rahmen active:scale-95 text-schrift text-xs md:text-sm font-bold min-w-[44px] py-2 px-3 rounded-knopf transition-all touch-manipulation flex items-center justify-center"
           title="1W4 Würfeln"
         >
           1W4
         </button>
         <button
           onClick={() => onQuickRoll(6, 1, '1W6')}
-          className="bg-erhoeht hover:bg-rahmen active:scale-95 text-schrift text-xs md:text-sm font-bold min-w-[44px] py-2 px-3 rounded-knopf transition-all touch-manipulation flex items-center justify-center"
+          className="min-h-11 bg-erhoeht hover:bg-rahmen active:scale-95 text-schrift text-xs md:text-sm font-bold min-w-[44px] py-2 px-3 rounded-knopf transition-all touch-manipulation flex items-center justify-center"
           title="1W6 Würfeln"
         >
           1W6
         </button>
         <button
           onClick={() => onQuickRoll(8, 1, '1W8')}
-          className="bg-erhoeht hover:bg-rahmen active:scale-95 text-schrift text-xs md:text-sm font-bold min-w-[44px] py-2 px-3 rounded-knopf transition-all touch-manipulation flex items-center justify-center"
+          className="min-h-11 bg-erhoeht hover:bg-rahmen active:scale-95 text-schrift text-xs md:text-sm font-bold min-w-[44px] py-2 px-3 rounded-knopf transition-all touch-manipulation flex items-center justify-center"
           title="1W8 Würfeln"
         >
           1W8
         </button>
         <button
           onClick={() => onQuickRoll(10, 1, '1W10')}
-          className="bg-erhoeht hover:bg-rahmen active:scale-95 text-schrift text-xs md:text-sm font-bold min-w-[44px] py-2 px-3 rounded-knopf transition-all touch-manipulation flex items-center justify-center"
+          className="min-h-11 bg-erhoeht hover:bg-rahmen active:scale-95 text-schrift text-xs md:text-sm font-bold min-w-[44px] py-2 px-3 rounded-knopf transition-all touch-manipulation flex items-center justify-center"
           title="1W10 Würfeln"
         >
           1W10
         </button>
         <button
           onClick={() => onQuickRoll(12, 1, '1W12')}
-          className="bg-erhoeht hover:bg-rahmen active:scale-95 text-schrift text-xs md:text-sm font-bold min-w-[44px] py-2 px-3 rounded-knopf transition-all touch-manipulation flex items-center justify-center"
+          className="min-h-11 bg-erhoeht hover:bg-rahmen active:scale-95 text-schrift text-xs md:text-sm font-bold min-w-[44px] py-2 px-3 rounded-knopf transition-all touch-manipulation flex items-center justify-center"
           title="1W12 Würfeln"
         >
           1W12
@@ -350,8 +350,8 @@ export const DiceLog: React.FC<DiceLogProps> = ({
 
                   <div className="text-right shrink-0 ml-2">
                     <div className="protocol-title text-base font-extrabold">{r.total}</div>
-                    {r.isTriumph && <span className="font-bold text-gold uppercase text-[11px] block">✨ Triumph!</span>}
-                    {r.isPatzer && <span className="font-bold text-schaden uppercase text-[11px] block">💀 Patzer!</span>}
+                    {r.isTriumph && <span className="font-bold text-gold uppercase text-[11px] block">Triumph!</span>}
+                    {r.isPatzer && <span className="font-bold text-schaden uppercase text-[11px] block">Patzer!</span>}
                     {!r.isTriumph && !r.isPatzer && r.eg !== undefined && (
                       <span className={`font-bold text-[11px] block ${r.eg >= 0 ? 'text-unverletzt' : 'text-schaden'}`}>
                         {r.eg >= 0 ? `+${r.eg} EG` : `${r.eg} EG`}

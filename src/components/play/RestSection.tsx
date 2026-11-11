@@ -155,7 +155,7 @@ export const RestSection: React.FC<RestSectionProps> = ({
       {/* Section Header */}
       <div className="flex items-center justify-between border-b border-rahmen pb-2">
         <div className="flex items-center gap-2">
-          <span className="text-xl">🏕️</span>
+          
           <h3 className="font-bold text-lg sm:text-xl fantasy-font text-gold-hell">
             Regeneration &amp; Pausen
           </h3>
@@ -164,7 +164,7 @@ export const RestSection: React.FC<RestSectionProps> = ({
 
       {/* Two Action Cards (gestapelt für rechte Spalte) */}
       <div className="grid grid-cols-1 gap-3">
-        {/* ── CARD 1: ☀️ VERSCHNAUFPAUSE ── */}
+        {/* ── CARD 1: VERSCHNAUFPAUSE ── */}
         <div
           id="verschnaufpause-card"
           className="rounded-karte border border-rahmen bg-erhoeht p-4 flex flex-col justify-between hover:border-gold transition-all relative"
@@ -214,7 +214,7 @@ export const RestSection: React.FC<RestSectionProps> = ({
               id="btn-execute-verschnaufpause"
               type="button"
               onClick={handleExecuteVerschnaufpause}
-              className="w-full min-h-[42px] px-4 py-2 rounded-knopf bg-erhoeht hover:bg-rahmen active:scale-[0.99] text-schrift font-bold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer select-none border border-gold"
+              className="w-full min-h-[42px] px-4 py-2 rounded-knopf bg-gold hover:bg-gold-hell active:scale-[0.99] text-seite font-bold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer select-none border border-gold"
             >
               <Sun size={17} className="text-gold" />
               <span>Verschnaufpause durchführen</span>
@@ -245,7 +245,7 @@ export const RestSection: React.FC<RestSectionProps> = ({
           </div>
         </div>
 
-        {/* ── CARD 2: 🌙 RUHEPHASE ── */}
+        {/* ── CARD 2: RUHEPHASE ── */}
         <div
           id="ruhephase-card"
           className="rounded-karte border border-rahmen bg-erhoeht p-4 flex flex-col justify-between hover:border-gold transition-all relative"
@@ -300,7 +300,7 @@ export const RestSection: React.FC<RestSectionProps> = ({
               id="btn-execute-ruhephase"
               type="button"
               onClick={handleExecuteRuhephase}
-              className="w-full min-h-[42px] px-4 py-2 rounded-knopf bg-erhoeht hover:bg-rahmen active:scale-[0.99] text-schrift font-bold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer select-none border border-gold"
+              className="w-full min-h-[42px] px-4 py-2 rounded-knopf bg-gold hover:bg-gold-hell active:scale-[0.99] text-seite font-bold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer select-none border border-gold"
             >
               <Moon size={17} className="text-gold" />
               <span>Ruhephase durchführen</span>
@@ -338,7 +338,7 @@ export const RestSection: React.FC<RestSectionProps> = ({
       {activeModal && (
         <div
           id="rest-options-modal-backdrop"
-          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 animate-in fade-in duration-150"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-seite/80 animate-in fade-in duration-150"
           onClick={(e) => {
             if (e.target === e.currentTarget) setActiveModal(null);
           }}
@@ -348,7 +348,7 @@ export const RestSection: React.FC<RestSectionProps> = ({
             className="bg-flaeche text-schrift w-full max-w-lg rounded-karte shadow-2xl border border-rahmen overflow-hidden flex flex-col max-h-[92vh] animate-in zoom-in-95 duration-150"
           >
             {/* Modal Header */}
-            <div className="bg-erhoeht text-schrift p-4 flex items-center justify-between border-b border-gold">
+            <div className="text-schrift p-4 flex items-center justify-between border-b border-gold">
               <div className="flex items-center gap-2.5">
                 <div className="p-1.5 rounded-knopf bg-rahmen border border-rahmen">
                   {activeModal === 'verschnaufpause' ? (
@@ -586,7 +586,7 @@ export const RestSection: React.FC<RestSectionProps> = ({
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-1">
                       <div className="p-2 rounded-knopf bg-flaeche border border-rahmen">
-                        <div className="font-bold text-schaden">❤️ Lebenspunkte (LP):</div>
+                        <div className="font-bold text-schaden">Lebenspunkte (LP):</div>
                         <div className="tabular-nums text-[11px] mt-0.5 text-schrift">
                           {hasDahinsiechen
                             ? '0 LP (Dahinsiechen)'
@@ -595,7 +595,7 @@ export const RestSection: React.FC<RestSectionProps> = ({
                       </div>
 
                       <div className="p-2 rounded-knopf bg-flaeche border border-rahmen">
-                        <div className="font-bold text-schrift">✨ Fokuspool (FO):</div>
+                        <div className="font-bold text-schrift">Fokuspool (FO):</div>
                         <div className="tabular-nums text-[11px] mt-0.5 text-schrift">
                           {`WIL (${wil}) × ${foMultiplier} = ${calculatedFODefault} FO`}
                         </div>
@@ -759,7 +759,7 @@ export const RestSection: React.FC<RestSectionProps> = ({
                 <button
                   type="button"
                   onClick={() => setActiveModal(null)}
-                  className="px-3.5 py-2 rounded-knopf border border-rahmen bg-flaeche hover:bg-rahmen text-schrift font-bold text-xs transition-colors cursor-pointer"
+                  className="min-h-11 px-3.5 py-2 rounded-knopf border border-rahmen bg-flaeche hover:bg-rahmen text-schrift font-bold text-xs transition-colors cursor-pointer"
                 >
                   Übernehmen &amp; Schließen
                 </button>
@@ -768,7 +768,7 @@ export const RestSection: React.FC<RestSectionProps> = ({
                   <button
                     type="button"
                     onClick={handleExecuteVerschnaufpause}
-                    className="px-4 py-2 rounded-knopf bg-erhoeht hover:bg-rahmen text-schrift font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer border border-rahmen"
+                    className="min-h-11 px-4 py-2 rounded-knopf bg-gold hover:bg-gold-hell text-seite font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer border border-gold"
                   >
                     <Sun size={14} className="text-gold" />
                     <span>Jetzt durchführen</span>
@@ -777,7 +777,7 @@ export const RestSection: React.FC<RestSectionProps> = ({
                   <button
                     type="button"
                     onClick={handleExecuteRuhephase}
-                    className="px-4 py-2 rounded-knopf bg-erhoeht hover:bg-rahmen text-schrift font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer border border-rahmen"
+                    className="min-h-11 px-4 py-2 rounded-knopf bg-gold hover:bg-gold-hell text-seite font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer border border-gold"
                   >
                     <Moon size={14} className="text-gold" />
                     <span>Jetzt durchführen</span>

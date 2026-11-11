@@ -367,7 +367,7 @@ export function CreationView() {
                     <button
                       key={r} onClick={() => handleRaceChange(r)}
                       disabled={mode !== 'creation'}
-                      className={`px-3 py-1 text-sm rounded-knopf transition-all ${race === r ? 'bg-erhoeht text-schrift ring-2 ring-gold ring-offset-1' : 'bg-flaeche text-schrift border border-rahmen hover:bg-rahmen'}`}
+                      className={`min-h-11 px-3 py-1 text-sm rounded-knopf transition-all ${race === r ? 'bg-erhoeht text-schrift ring-2 ring-gold ring-offset-1' : 'bg-flaeche text-schrift border border-rahmen hover:bg-rahmen'}`}
                     >{r}</button>
                   ))}
                 </div>
@@ -621,7 +621,7 @@ export function CreationView() {
                                     tooltipData={{
                                       title: m.name,
                                       description: m.userNote
-                                        ? [m.desc, `📝 ${m.userNote}`].filter(Boolean).join('\n\n')
+                                        ? [m.desc, `${m.userNote}`].filter(Boolean).join('\n\n')
                                         : m.desc,
                                     }}
                                   />

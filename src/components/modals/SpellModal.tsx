@@ -113,7 +113,7 @@ export const SpellModal: React.FC<SpellModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-3 sm:p-4">
+    <div className="fixed inset-0 bg-seite/80 flex items-center justify-center z-50 p-3 sm:p-4">
       <div
         id="spell-modal-dialog"
         className="bg-flaeche rounded-karte border border-rahmen shadow-2xl max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden"
@@ -142,7 +142,7 @@ export const SpellModal: React.FC<SpellModalProps> = ({
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="🔍 Zauber filtern..."
+                placeholder="Zauber filtern..."
                 className="w-full p-2 pr-8 border border-rahmen rounded-knopf bg-flaeche text-xs text-schrift focus:ring-1 focus:ring-rahmen focus:border-rahmen outline-none"
               />
               {search && (
@@ -317,14 +317,14 @@ export const SpellModal: React.FC<SpellModalProps> = ({
         <div className="px-5 py-3.5 border-t border-rahmen bg-black/5 flex justify-end space-x-2 shrink-0">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-schrift hover:bg-rahmen rounded-knopf font-semibold text-sm transition-colors cursor-pointer shrink-0"
+            className="min-h-11 px-4 py-2 text-schrift hover:bg-rahmen rounded-knopf font-semibold text-sm transition-colors cursor-pointer shrink-0"
           >
             Abbrechen
           </button>
           <button
             onClick={handleAdd}
             disabled={(!isAffordable && !hausregeln) || !isValid}
-            className="px-5 py-2 bg-erhoeht hover:bg-rahmen text-schrift rounded-knopf font-bold text-sm border border-gold disabled:opacity-50 disabled:cursor-not-allowed shrink-0 transition-all cursor-pointer"
+            className="min-h-11 px-5 py-2 bg-gold hover:bg-gold-hell text-seite rounded-knopf font-bold text-sm border border-gold disabled:opacity-50 disabled:cursor-not-allowed shrink-0 transition-all cursor-pointer"
           >
             Hinzufügen
           </button>

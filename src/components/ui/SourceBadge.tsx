@@ -185,7 +185,7 @@ export const SourceBadge: React.FC<SourceBadgeProps> = ({ source, page, tooltipD
       {isOpen && tooltipData && (
         isMobile ? (
           <div
-            className="fixed inset-0 z-[9999] bg-black bg-opacity-60 flex items-center justify-center p-4"
+            className="fixed inset-0 z-[9999] bg-seite/80 flex items-center justify-center p-4"
             onClick={() => setIsOpen(false)}
           >
             <div

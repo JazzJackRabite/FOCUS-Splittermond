@@ -124,7 +124,7 @@ describe('Edit Total XP Functionality & Protocol Logging', () => {
       expect(logEntry.category).toBe('xp');
       expect(logEntry.title).toBe('Gesamt-EP korrigiert (+25 EP)');
       expect(logEntry.detail).toContain('Punkteübertrag aus alter Runde');
-      expect(logEntry.detail).toContain('Gesamt: 20 ➔ 45 EP');
+      expect(logEntry.detail).toContain('Gesamt: 20 → 45 EP');
       expect(logEntry.xpDelta).toBe(25);
     });
 
@@ -151,7 +151,7 @@ describe('Edit Total XP Functionality & Protocol Logging', () => {
       expect(logEntry.category).toBe('xp');
       expect(logEntry.title).toBe('Gesamt-EP korrigiert (-10 EP)');
       expect(logEntry.detail).toContain('Tippfehler bei EP-Eingabe korrigiert');
-      expect(logEntry.detail).toContain('Gesamt: 50 ➔ 40 EP');
+      expect(logEntry.detail).toContain('Gesamt: 50 → 40 EP');
       expect(logEntry.xpDelta).toBe(-10);
     });
   });

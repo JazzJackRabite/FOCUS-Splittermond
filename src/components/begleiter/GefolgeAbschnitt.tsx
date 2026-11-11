@@ -165,7 +165,7 @@ const GefolgeEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; maxFer
                   {g.fertigkeiten.map(f => (
                     <tr key={f.id} className={f.zuHoch ? 'text-schaden' : ''}>
                       <td>{f.wert !== null ? (
-                        <button type="button" className={wuerfelKnopf} onClick={() => spiel.aktionen.probe(f.name, f.wert!)} aria-label={`Probe ${f.name} würfeln`}>🎲 {f.name}</button>
+                        <button type="button" className={wuerfelKnopf} onClick={() => spiel.aktionen.probe(f.name, f.wert!)} aria-label={`Probe ${f.name} würfeln`}>{f.name}</button>
                       ) : f.name}</td><td>{f.punkte}</td>
                       <td className="font-bold">{f.wert ?? <span className="font-normal text-leise" title="Kampffertigkeit: Punkte + Attribute der Waffe">+ Waffe</span>}</td>
                       <td className="text-right">
@@ -234,7 +234,7 @@ const GefolgeEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; maxFer
                     {(() => {
                       const sp = alsSpell(z.id, z.schuleId); const sw = g.fertigkeiten.find(f => f.id === z.schuleId)?.wert;
                       return sp && sw !== null && sw !== undefined
-                        ? <button type="button" className={wuerfelKnopf} onClick={() => spiel.aktionen.zaubern?.(sp, sw)} aria-label={`Zauber ${z.name} wirken`}>✨ {z.name}</button>
+                        ? <button type="button" className={wuerfelKnopf} onClick={() => spiel.aktionen.zaubern?.(sp, sw)} aria-label={`Zauber ${z.name} wirken`}>{z.name}</button>
                         : <>{z.name}</>;
                     })()} <span className="text-leise">({z.schule} {z.grad}{i < g.freieZauber ? ', frei' : ', 1 P.'})</span>
                     <button type="button" aria-label={`Zauber ${z.name} entfernen`} onClick={() => aendern({ zauber: zs.filter((_, j) => j !== i) })}

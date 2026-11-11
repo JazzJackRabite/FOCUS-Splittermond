@@ -303,7 +303,7 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
       isPatzer,
     };
     setProtocolHistory((prev) => [entry, ...prev]);
-    toast.success(`🎲 ${label}: ${total} (${normalizedFormula} [${dice.join(', ')}])`);
+    toast.success(`${label}: ${total} (${normalizedFormula} [${dice.join(', ')}])`);
   };
 
   // Roll helpers
@@ -367,7 +367,7 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
 
   const handleAttackSuccess = (result: AttackSuccessResult) => {
     const dmgText = result.damageRoll
-      ? ` · 💥 ${result.damageRoll.netDamage} ${result.damageRoll.damageType} (${result.damageRoll.breakdownText})`
+      ? ` · ${result.damageRoll.netDamage} ${result.damageRoll.damageType} (${result.damageRoll.breakdownText})`
       : '';
     const condText = result.damageRoll?.appliedConditions && result.damageRoll.appliedConditions.length > 0
       ? ` · Effekte: ${result.damageRoll.appliedConditions.join(', ')}`
@@ -377,7 +377,7 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
       { type: 'PLAY_SET_SPLITTER', payload: splitterPoints },
       {
         category: 'combat',
-        title: `Angriff getroffen: ${result.weapon.name} (${result.eg} EG)${result.damageRoll ? ` · 💥 ${result.damageRoll.netDamage} Schaden` : ''}`,
+        title: `Angriff getroffen: ${result.weapon.name} (${result.eg} EG)${result.damageRoll ? ` · ${result.damageRoll.netDamage} Schaden` : ''}`,
         description: `Manöver: ${result.maneuver.name} · Wurf: ${result.totalRoll} vs. VTD ${result.targetVTD} (${result.eg} EG erzielt)${dmgText}${condText}${result.notes ? ` · Ziel: ${result.notes}` : ''}`,
         badge: {
           text: result.damageRoll ? `${result.damageRoll.netDamage} SP · ${result.eg} EG` : `${result.eg} EG`,
@@ -394,7 +394,7 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
       {
         category: 'combat',
         title: `Angriff verfehlt: ${result.weapon.name}`,
-        description: `Manöver: ${result.maneuver.name} · Wurf: ${result.totalRoll} vs. VTD ${result.targetVTD} (Diff ${result.differenz})${result.isFumble ? ' · ⚠️ PATZER!' : ''}`,
+        description: `Manöver: ${result.maneuver.name} · Wurf: ${result.totalRoll} vs. VTD ${result.targetVTD} (Diff ${result.differenz})${result.isFumble ? ' · PATZER!' : ''}`,
         badge: {
           text: result.isFumble ? 'Patzer' : 'Fehlschlag',
           variant: 'danger',
@@ -415,7 +415,7 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
     const totalFO = castResult.exhaustedFocus + castResult.channeledFocus + castResult.consumedFocus;
     const modSummary = castResult.modificationsSummary.length > 0 ? ` (${castResult.modificationsSummary.join(', ')})` : '';
     const damageSummary = castResult.damageRoll
-      ? ` · 💥 ${castResult.damageRoll.total} ${castResult.damageRoll.damageType} (${castResult.damageRoll.formula} [${castResult.damageRoll.dice.join(', ')}])`
+      ? ` · ${castResult.damageRoll.total} ${castResult.damageRoll.damageType} (${castResult.damageRoll.formula} [${castResult.damageRoll.dice.join(', ')}])`
       : '';
 
     logAndDispatch(
@@ -430,7 +430,7 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
       },
       {
         category: 'spell',
-        title: `Zauber gewirkt: ${castResult.spell.name} (${castResult.eg} EG)${castResult.damageRoll ? ` · 💥 ${castResult.damageRoll.total} Schaden` : ''}`,
+        title: `Zauber gewirkt: ${castResult.spell.name} (${castResult.eg} EG)${castResult.damageRoll ? ` · ${castResult.damageRoll.total} Schaden` : ''}`,
         description: `${totalFO} FO aufgewendet [${castResult.exhaustedFocus} Erschöpft, ${castResult.channeledFocus} Kanalisiert, ${castResult.consumedFocus} Verzehrt] · Auslösezeit: ${castResult.effectiveCastTicks} Ticks${modSummary}${damageSummary}${castResult.notes ? ` · Ziel: ${castResult.notes}` : ''}`,
         badge: {
           text: castResult.damageRoll ? `${castResult.damageRoll.total} SP · ${totalFO} FO` : `${totalFO} FO`,
@@ -447,7 +447,7 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
     const zusatzLp = lpWirkung(aktiverKatalog(), spellName, 'zusatz_lp', mitVerstaerkung);
     if (zusatzLp && typeof zusatzLp.lp === 'number' && zusatzLp.lp > 0) {
       dispatch({ type: 'PLAY_ADD_TEMP_HP', payload: { amount: zusatzLp.lp } });
-      toast.success(`💚 +${zusatzLp.lp} temporäre LP erhalten (${spellName})!`);
+      toast.success(`+${zusatzLp.lp} temporäre LP erhalten (${spellName})!`);
     }
 
     // Direkte Selbstheilung oder Zustandsbehebung
@@ -469,8 +469,8 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
         dispatch({ type: 'PLAY_SET_STATE', payload: { ...playState, conditions: cleanConditions } });
         toast.success(
           castResult.healSelf.curesPoisonDisease
-            ? '💚 Wiederherstellung (EG-verstärkt): Alle LP geheilt, Zustände entfernt & Gifte/Krankheiten aufgehoben!'
-            : '💚 Wiederherstellung: Alle LP geheilt & schwere Zustände aufgehoben!'
+            ? 'Wiederherstellung (EG-verstärkt): Alle LP geheilt, Zustände entfernt & Gifte/Krankheiten aufgehoben!'
+            : 'Wiederherstellung: Alle LP geheilt & schwere Zustände aufgehoben!'
         );
       } else if (castResult.healSelf.hp && castResult.healSelf.hp > 0) {
         const healAmount = castResult.healSelf.hp;
@@ -487,7 +487,7 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
             dispatch({ type: 'PLAY_UNDO_DAMAGE', payload: { kind: 'exhausted', amount: exhaustedToHeal, maxLP } });
           }
         }
-        toast.success(`💚 +${healAmount} LP geheilt (${spellName})!`);
+        toast.success(`+${healAmount} LP geheilt (${spellName})!`);
       } else if (castResult.healSelf.removeCondition) {
         const condKey = castResult.healSelf.removeCondition;
         const existing = conditions.find((c) => c.key.toLowerCase() === condKey.toLowerCase());
@@ -495,10 +495,10 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
           if (existing.level && existing.level > 1) {
             const updated = conditions.map((c) => (c.id === existing.id ? { ...c, level: (c.level ?? 2) - 1 } : c));
             dispatch({ type: 'PLAY_SET_STATE', payload: { ...playState, conditions: updated } });
-            toast.success(`✨ Zustand '${condKey}' um 1 Stufe verringert (jetzt Stufe ${existing.level - 1})`);
+            toast.success(`Zustand '${condKey}' um 1 Stufe verringert (jetzt Stufe ${existing.level - 1})`);
           } else {
             dispatch({ type: 'PLAY_REMOVE_CONDITION', payload: { id: existing.id } });
-            toast.success(`✨ Zustand '${condKey}' vollständig aufgehoben!`);
+            toast.success(`Zustand '${condKey}' vollständig aufgehoben!`);
           }
         } else {
           toast(`Info: Kein aktiver Zustand '${condKey}' auf dem Helden.`);
@@ -508,9 +508,9 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
 
     setCastSpellTarget(null);
     const damageToast = castResult.damageRoll
-      ? ` · 💥 ${castResult.damageRoll.total} ${castResult.damageRoll.damageType} angerichtet!`
+      ? ` · ${castResult.damageRoll.total} ${castResult.damageRoll.damageType} angerichtet!`
       : '';
-    toast.success(`✨ '${spellName}' mit ${castResult.eg} EG erfolgreich gewirkt! (-${totalFO} FO)${damageToast}`);
+    toast.success(`'${spellName}' mit ${castResult.eg} EG erfolgreich gewirkt! (-${totalFO} FO)${damageToast}`);
   };
 
   const handleCastSpellFailure = (failureResult: CastSpellFailureResult) => {
@@ -535,7 +535,7 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
 
     const spellName = failureResult.spell.name;
     setCastSpellTarget(null);
-    toast.error(`💨 '${spellName}' ist verpufft! (${failureResult.exhaustedFocusLost} Fokus erschöpft)`);
+    toast.error(`'${spellName}' ist verpufft! (${failureResult.exhaustedFocusLost} Fokus erschöpft)`);
   };
 
   const handleCancelChanneledSpell = (spell: ChanneledSpell) => {
@@ -555,7 +555,7 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
       toast(`Temporäre Lebenspunkte aus '${spell.name}' sind verfallen.`);
     }
 
-    toast.success(`🔮 Kanalisierung von '${spell.name}' gelöst: ${spell.channeledFocus} FO ist nun erschöpft.`);
+    toast.success(`Kanalisierung von '${spell.name}' gelöst: ${spell.channeledFocus} FO ist nun erschöpft.`);
   };
 
   const handleQuickSpellDamageRoll = (spell: Spell, damageInfo: ParsedSpellDamage) => {
@@ -577,7 +577,7 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
       total: res.total,
       outcome: `${res.total} ${res.damageType}`,
     });
-    toast.success(`💥 ${spell.name}: ${res.total} ${res.damageType} gewürfelt! (${res.formula} [${res.dice.join(', ')}])`);
+    toast.success(`${spell.name}: ${res.total} ${res.damageType} gewürfelt! (${res.formula} [${res.dice.join(', ')}])`);
   };
 
   // Rest handlers
@@ -666,7 +666,7 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
       details,
     };
     setProtocolHistory((prev) => [logEntry, ...prev]);
-    toast.success(`☕ Verschnaufpause: ${summary}`, { duration: 4000 });
+    toast.success(`Verschnaufpause: ${summary}`, { duration: 4000 });
   };
 
   const handleRuhephase = (konAmount: number, wilAmount: number) => {
@@ -747,7 +747,7 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
       details,
     };
     setProtocolHistory((prev) => [logEntry, ...prev]);
-    toast.success(`🌙 Ruhephase: ${summary}`, { duration: 4500 });
+    toast.success(`Ruhephase: ${summary}`, { duration: 4500 });
   };
 
   const focusAvailable = maxFO - focus.exhausted - focus.channeled - focus.consumed;
@@ -908,7 +908,7 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
                   badge: { text: '-1 SP', variant: 'gold' },
                 }
               );
-              toast.success(`✨ Splitterpunkt eingesetzt! (${newSP} verbleibend)`);
+              toast.success(`Splitterpunkt eingesetzt! (${newSP} verbleibend)`);
             }
           }}
           onRecordRoll={handleRecordRoll}

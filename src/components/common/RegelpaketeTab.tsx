@@ -68,7 +68,7 @@ export const RegelpaketeTab: React.FC = () => {
           {!rw.dauerhaft && <strong className="block text-erschoepft mt-1">Dieser Browser erlaubt keine dauerhafte Speicherung; die Bücher bleiben nur bis zum Neuladen.</strong>}
         </p>
         <button type="button" disabled={laeuft} onClick={() => eingabe.current?.click()}
-          className="px-3 py-2 rounded-knopf border border-gold bg-erhoeht text-schrift hover:bg-rahmen hover:text-gold-hell transition-colors cursor-pointer text-sm font-bold flex items-center gap-2 disabled:opacity-50">
+          className="min-h-11 px-3 py-2 rounded-knopf border border-gold bg-erhoeht text-schrift hover:bg-rahmen hover:text-gold-hell transition-colors cursor-pointer text-sm font-bold flex items-center gap-2 disabled:opacity-50">
           <Upload size={16} />{laeuft ? 'Lade …' : 'Buchpakete auswählen'}
         </button>
         {bekannt.length > 0 && (

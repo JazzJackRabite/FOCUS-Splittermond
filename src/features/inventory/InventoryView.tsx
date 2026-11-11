@@ -459,17 +459,17 @@ export const InventoryView: React.FC = () => {
         <div className="flex flex-wrap gap-1 bg-seite p-1 rounded-karte border border-rahmen">
           {[
             { id: 'all', label: `Alle (${inventory.length})` },
-            { id: 'weapon', label: '⚔️ Waffen' },
-            { id: 'armor', label: '🛡️ Rüstungen & Schilde' },
-            { id: 'gear', label: '🎒 Ausrüstung' },
-            { id: 'alchemika', label: '🧪 Alchemika' },
-            { id: 'other', label: '💎 Sonstiges' },
+            { id: 'weapon', label: 'Waffen' },
+            { id: 'armor', label: 'Rüstungen & Schilde' },
+            { id: 'gear', label: 'Ausrüstung' },
+            { id: 'alchemika', label: 'Alchemika' },
+            { id: 'other', label: 'Sonstiges' },
           ].map((cat) => (
             <button
               key={cat.id}
               type="button"
               onClick={() => setActiveCategory(cat.id)}
-              className={`px-3 py-1.5 rounded-knopf text-xs font-bold transition-all cursor-pointer ${
+              className={`min-h-11 px-3 py-1.5 rounded-knopf text-xs font-bold transition-all cursor-pointer ${
                 activeCategory === cat.id
                   ? 'bg-erhoeht text-schrift '
                   : 'text-schrift hover:bg-rahmen'
@@ -496,7 +496,7 @@ export const InventoryView: React.FC = () => {
           <button
             type="button"
             onClick={() => setShowAddModal(true)}
-            className="bg-erhoeht hover:bg-rahmen text-schrift border border-gold px-3.5 py-1.5 rounded-knopf text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap active:scale-95"
+            className="min-h-11 bg-erhoeht hover:bg-rahmen text-schrift border border-gold px-3.5 py-1.5 rounded-knopf text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap active:scale-95"
           >
             <Plus size={14} className="text-gold" />
             <span>Gegenstand</span>
@@ -708,7 +708,7 @@ export const InventoryView: React.FC = () => {
 
       {/* ── MODAL: GEGENSTAND HINZUFÜGEN ── */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-seite/80 p-4 overflow-y-auto">
           <div className="bg-flaeche border border-rahmen rounded-karte shadow-2xl max-w-2xl w-full p-5 space-y-4 max-h-[90vh] flex flex-col">
             <div className="flex justify-between items-center border-b border-gold pb-2">
               <h3 className="font-bold text-lg text-gold-hell fantasy-font flex items-center gap-2">
@@ -729,7 +729,7 @@ export const InventoryView: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setModalTab('catalog')}
-                className={`px-4 py-1.5 rounded-knopf font-bold text-xs transition-all cursor-pointer ${
+                className={`min-h-11 px-4 py-1.5 rounded-knopf font-bold text-xs transition-all cursor-pointer ${
                   modalTab === 'catalog'
                     ? 'bg-erhoeht text-schrift border border-gold'
                     : 'bg-erhoeht text-schrift border border-rahmen hover:bg-rahmen'
@@ -740,7 +740,7 @@ export const InventoryView: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setModalTab('custom')}
-                className={`px-4 py-1.5 rounded-knopf font-bold text-xs transition-all cursor-pointer ${
+                className={`min-h-11 px-4 py-1.5 rounded-knopf font-bold text-xs transition-all cursor-pointer ${
                   modalTab === 'custom'
                     ? 'bg-erhoeht text-schrift border border-gold'
                     : 'bg-erhoeht text-schrift border border-rahmen hover:bg-rahmen'
@@ -846,7 +846,7 @@ export const InventoryView: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => handleAddCatalogItem(catItem)}
-                        className="bg-erhoeht hover:bg-rahmen text-schrift px-3 py-1 rounded-knopf font-bold text-xs shrink-0 cursor-pointer shadow-2xs"
+                        className="min-h-11 bg-erhoeht hover:bg-rahmen text-schrift px-3 py-1 rounded-knopf font-bold text-xs shrink-0 cursor-pointer shadow-2xs"
                       >
                         + Hinzufügen
                       </button>
@@ -1001,13 +1001,13 @@ export const InventoryView: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setShowAddModal(false)}
-                    className="px-4 py-1.5 rounded-knopf text-xs font-bold bg-erhoeht text-schrift hover:bg-rahmen"
+                    className="min-h-11 px-4 py-1.5 rounded-knopf text-xs font-bold bg-erhoeht text-schrift hover:bg-rahmen"
                   >
                     Abbrechen
                   </button>
                   <button
                     type="submit"
-                    className="bg-gold hover:bg-gold text-seite font-bold px-5 py-1.5 rounded-knopf text-xs "
+                    className="min-h-11 bg-gold hover:bg-gold text-seite font-bold px-5 py-1.5 rounded-knopf text-xs "
                   >
                     Gegenstand erstellen
                   </button>
@@ -1020,7 +1020,7 @@ export const InventoryView: React.FC = () => {
 
       {/* ── MODAL: GEGENSTAND BEARBEITEN (INKL. QUELLENVERMERK) ── */}
       {editingItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-seite/80 p-4 overflow-y-auto">
           <div className="bg-flaeche border border-rahmen rounded-karte shadow-2xl max-w-xl w-full p-5 space-y-4 max-h-[90vh] flex flex-col">
             <div className="flex justify-between items-center border-b border-gold pb-2">
               <h3 className="font-bold text-lg text-gold-hell fantasy-font flex items-center gap-2">
@@ -1310,13 +1310,13 @@ export const InventoryView: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setEditingItem(null)}
-                  className="px-4 py-1.5 rounded-knopf text-xs font-bold bg-erhoeht text-schrift hover:bg-rahmen cursor-pointer"
+                  className="min-h-11 px-4 py-1.5 rounded-knopf text-xs font-bold bg-erhoeht text-schrift hover:bg-rahmen cursor-pointer"
                 >
                   Abbrechen
                 </button>
                 <button
                   type="submit"
-                  className="bg-gold hover:bg-gold text-seite font-bold px-5 py-1.5 rounded-knopf text-xs cursor-pointer"
+                  className="min-h-11 bg-gold hover:bg-gold text-seite font-bold px-5 py-1.5 rounded-knopf text-xs cursor-pointer"
                 >
                   Änderungen speichern
                 </button>

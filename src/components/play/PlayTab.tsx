@@ -53,7 +53,7 @@ export const PlayTab: React.FC = () => {
               </h3>
               <span className="text-xs text-leise font-medium">Klick zum Würfeln (2W10 + Wert)</span>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-1.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
               {SKILL_CATEGORIES.GENERAL.map((skill) => {
                 const total = getSkillTotal(skill);
                 const skillMasteries = masteries[skill] ?? [];
@@ -69,7 +69,7 @@ export const PlayTab: React.FC = () => {
                           ? `${skill}: Basiswert ${total}, Behinderung −${beh} (effektiv ${Number(total) - beh})`
                           : `${skill} würfeln`
                       }
-                      className="flex justify-between items-center bg-erhoeht hover:bg-rahmen rounded-knopf px-2.5 py-1.5 text-xs font-bold text-schrift transition-all border border-transparent hover:border-gold cursor-pointer w-full shadow-2xs"
+                      className="flex justify-between items-center bg-erhoeht hover:bg-rahmen rounded-knopf min-h-11 px-3 py-2 text-sm font-bold text-schrift transition-all border border-rahmen hover:border-gold cursor-pointer w-full shadow-2xs"
                     >
                       <span className="flex items-center gap-1 truncate mr-1">
                         <DiceIcon size={14} /> {skill}
@@ -92,7 +92,7 @@ export const PlayTab: React.FC = () => {
                             −{beh}
                           </span>
                         )}
-                        <span className="font-bold text-sm">{total}</span>
+                        <span className="font-titel font-bold text-lg">{total}</span>
                       </span>
                     </button>
                     {skillMasteries.length > 0 && (
@@ -100,7 +100,7 @@ export const PlayTab: React.FC = () => {
                         {skillMasteries.map((m) => {
                           const details = getMasteryDetails(skill, m.name, m.desc);
                           const desc = m.userNote
-                            ? `${details.desc}\n\n📝 ${m.userNote}`
+                            ? `${details.desc}\n\n${m.userNote}`
                             : details.desc;
                           return (
                             <li
@@ -297,7 +297,7 @@ export const PlayTab: React.FC = () => {
                   key={key}
                   type="button"
                   onClick={() => session.openRollForAttr(key)}
-                  className="flex justify-between items-center bg-erhoeht hover:bg-rahmen rounded-knopf px-3 py-2 text-sm font-bold text-schrift transition-all border border-transparent hover:border-gold cursor-pointer shadow-2xs"
+                  className="min-h-11 flex justify-between items-center bg-erhoeht hover:bg-rahmen rounded-knopf px-3 py-2 text-sm font-bold text-schrift transition-all border border-transparent hover:border-gold cursor-pointer shadow-2xs"
                   title={`${label}: Klick für Attributsprobe (2W10 + ${key})`}
                 >
                   <span className="flex items-center gap-1.5">

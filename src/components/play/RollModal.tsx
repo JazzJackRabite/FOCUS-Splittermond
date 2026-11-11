@@ -64,25 +64,25 @@ function calcEG(
 
   if (eg >= 5) {
     qualitaet = 'Herausragend gelungen';
-    qualitaetEmoji = '🌟';
+    qualitaetEmoji = '';
   } else if (eg >= 1) {
     qualitaet = 'Gelungen';
-    qualitaetEmoji = '✅';
+    qualitaetEmoji = '';
   } else if (eg === 0) {
     // Distinguish "knapp gelungen" (diff 0–2) vs "knapp misslungen" (diff –1 to –2)
     if (differenz >= 0) {
       qualitaet = 'Knapp gelungen';
-      qualitaetEmoji = '⚪';
+      qualitaetEmoji = '';
     } else {
       qualitaet = 'Knapp misslungen';
-      qualitaetEmoji = '🟡';
+      qualitaetEmoji = '';
     }
   } else if (eg >= -4) {
     qualitaet = 'Misslungen';
-    qualitaetEmoji = '❌';
+    qualitaetEmoji = '';
   } else {
     qualitaet = 'Verheerend misslungen';
-    qualitaetEmoji = '💥';
+    qualitaetEmoji = '';
   }
 
   return { eg, differenz, qualitaet, qualitaetEmoji, hasFumbleModifier: isFumble, hasCritModifier };
@@ -597,13 +597,13 @@ export const RollModal: React.FC<RollModalProps> = ({
           <div className="bg-flaeche rounded-karte border border-gold p-4 text-center space-y-2">
             {result.isFumble && (
               <div className="roll-patzer-banner font-bold py-2.5 px-4 rounded-knopf text-lg fantasy-font tracking-wide flex items-center justify-center gap-2">
-                <span>💀</span>
+                
                 <span className="tracking-widest font-black">PATZER!</span>
               </div>
             )}
             {result.isCrit && !result.isFumble && (
               <div className="roll-triumph-banner font-bold py-2.5 px-4 rounded-knopf text-lg fantasy-font tracking-wide flex items-center justify-center gap-2">
-                <span>⭐</span>
+                
                 <span className="tracking-widest font-black">TRIUMPH!</span>
               </div>
             )}
@@ -652,7 +652,7 @@ export const RollModal: React.FC<RollModalProps> = ({
                       ? 'Keine Splitterpunkte mehr verfügbar'
                       : '1 SP einsetzen für +3 auf dieses Würfelergebnis'
                   }
-                  className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-knopf text-xs font-bold transition-all border ${
+                  className={`min-h-11 flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-knopf text-xs font-bold transition-all border ${
                     splinterBonusSpent
                       ? 'bg-erhoeht text-seite border-gold opacity-90 cursor-default'
                       : splitterPoints >= 1
@@ -674,7 +674,7 @@ export const RollModal: React.FC<RollModalProps> = ({
                       ? 'Keine Splitterpunkte mehr verfügbar'
                       : '1 SP einsetzen um den Wurf komplett neu zu würfeln'
                   }
-                  className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-knopf text-xs font-bold transition-all border ${
+                  className={`min-h-11 flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-knopf text-xs font-bold transition-all border ${
                     splitterPoints >= 1
                       ? 'bg-erhoeht hover:bg-rahmen text-schrift border-rahmen active:scale-98'
                       : 'bg-seite text-leise border-rahmen cursor-not-allowed dark-theme-slot-inactive'
@@ -717,13 +717,13 @@ export const RollModal: React.FC<RollModalProps> = ({
               total >= schwierigkeit ? (
                 <div className="mt-2 space-y-2">
                   <div className="bg-erhoeht border border-unverletzt rounded-knopf px-4 py-2 text-unverletzt font-bold text-sm ">
-                    ✅ {probeOutcomeLabels.success}
+                    {probeOutcomeLabels.success}
                   </div>
                   {onSuccess && successLabel && (
                     <button
                       type="button"
                       onClick={() => { onSuccess(); onClose(); }}
-                      className="w-full bg-erhoeht hover:bg-rahmen text-schrift font-bold py-2 px-4 rounded-knopf border border-rahmen transition-all"
+                      className="min-h-11 w-full bg-erhoeht hover:bg-rahmen text-schrift font-bold py-2 px-4 rounded-knopf border border-rahmen transition-all"
                     >
                       {successLabel}
                     </button>
@@ -732,13 +732,13 @@ export const RollModal: React.FC<RollModalProps> = ({
               ) : (
                 <div className="mt-2 space-y-2">
                   <div className="bg-erhoeht border border-schaden rounded-knopf px-4 py-2 text-schaden font-bold text-sm ">
-                    ❌ {probeOutcomeLabels.failure}
+                    {probeOutcomeLabels.failure}
                   </div>
                   {onFailure && (
                     <button
                       type="button"
                       onClick={() => { onFailure(); onClose(); }}
-                      className="w-full bg-schaden-grund hover:bg-schaden-grund text-schrift font-bold py-2 px-4 rounded-knopf border border-schaden transition-all"
+                      className="min-h-11 w-full bg-schaden-grund hover:bg-schaden-grund text-schrift font-bold py-2 px-4 rounded-knopf border border-schaden transition-all"
                     >
                       Bewusstlos setzen & schließen
                     </button>
@@ -750,7 +750,7 @@ export const RollModal: React.FC<RollModalProps> = ({
                 <button
                   type="button"
                   onClick={() => { onSuccess(); onClose(); }}
-                  className="mt-2 bg-erhoeht hover:bg-rahmen text-schrift font-bold py-2 px-6 rounded-knopf border border-rahmen transition-all"
+                  className="min-h-11 mt-2 bg-erhoeht hover:bg-rahmen text-schrift font-bold py-2 px-6 rounded-knopf border border-rahmen transition-all"
                 >
                   {successLabel}
                 </button>

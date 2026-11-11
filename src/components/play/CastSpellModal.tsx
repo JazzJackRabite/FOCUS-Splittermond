@@ -577,7 +577,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-3 md:p-5 overflow-y-auto"
+      className="fixed inset-0 bg-seite/80 z-50 flex items-center justify-center p-3 md:p-5 overflow-y-auto"
       role="dialog"
       aria-modal="true"
       aria-labelledby={modalHeadingId}
@@ -591,7 +591,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="bg-erhoeht text-schrift px-4 sm:px-5 py-3 sm:py-3.5 flex justify-between items-center border-b border-gold shrink-0">
+        <div className="text-schrift px-4 sm:px-5 py-3 sm:py-3.5 flex justify-between items-center border-b border-gold shrink-0">
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="w-8 h-8 rounded-knopf bg-rahmen border border-gold flex items-center justify-center shrink-0">
               <Sparkles className="w-4 h-4 text-gold" />
@@ -608,29 +608,29 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
           <button
             onClick={onClose}
             aria-label="Schließen"
-            className="text-schrift hover:text-schrift hover:bg-rahmen rounded-knopf p-1.5 transition-colors shrink-0 cursor-pointer"
+            className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-knopf border border-rahmen bg-erhoeht text-schrift hover:border-gold transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Workflow Progress Steps */}
-        <div className="bg-erhoeht border-b border-rahmen px-3 sm:px-4 py-2 flex items-center justify-between text-xs font-semibold text-leise overflow-x-auto gap-1.5 sm:gap-2 shrink-0">
+        <div className="border-b border-gold px-3 sm:px-4 py-2 flex items-center justify-between text-xs font-semibold text-leise overflow-x-auto gap-1.5 sm:gap-2 shrink-0">
           <div className="flex items-center gap-1.5 shrink-0 text-schrift">
             <span className="w-5 h-5 rounded-full bg-gold text-seite font-bold flex items-center justify-center text-[11px]">1</span>
             <span>Vorbereitung &amp; Ziel</span>
           </div>
-          <span className="text-leise">➔</span>
+          <span className="text-leise">→</span>
           <div className={`flex items-center gap-1.5 shrink-0 ${hasRolled ? 'text-schrift' : 'text-leise'}`}>
             <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold ${hasRolled ? 'bg-gold text-seite' : 'bg-seite text-seite'}`}>2</span>
             <span>Zauberprobe (2W10)</span>
           </div>
-          <span className="text-leise">➔</span>
+          <span className="text-leise">→</span>
           <div className={`flex items-center gap-1.5 shrink-0 ${hasRolled && egCalculation?.isSuccess ? 'text-schrift' : 'text-leise'}`}>
             <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold ${hasRolled && egCalculation?.isSuccess ? 'bg-gold text-seite' : 'bg-seite text-seite'}`}>3</span>
             <span>EG-Modifikationen</span>
           </div>
-          <span className="text-leise">➔</span>
+          <span className="text-leise">→</span>
           <div className={`flex items-center gap-1.5 shrink-0 ${hasRolled ? 'text-schrift' : 'text-leise'}`}>
             <span className="w-5 h-5 rounded-full bg-seite text-leise font-bold flex items-center justify-center text-[11px]">4</span>
             <span>Fokus abstreichen</span>
@@ -1062,7 +1062,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                         type="button"
                         onClick={handleApplyManualRoll}
                         disabled={!manualRollVal}
-                        className="px-3 py-1 bg-erhoeht text-schrift text-xs rounded-knopf font-semibold disabled:opacity-50"
+                        className="min-h-11 px-3 py-1 bg-erhoeht text-schrift text-xs rounded-knopf font-semibold disabled:opacity-50"
                       >
                         Übernehmen
                       </button>
@@ -1107,8 +1107,8 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                       <div className="font-extrabold text-xl md:text-2xl text-schrift flex items-center gap-2">
                         <span>Ergebnis: {totalRollResult}</span>
                         <span className="text-xs font-normal text-leise">(gegen {difficulty})</span>
-                        {isCrit && <span className="text-gold text-xs font-bold uppercase tracking-wider">🎉 Triumph</span>}
-                        {isFumble && <span className="text-schaden text-xs font-bold uppercase tracking-wider">⚠️ Patzer</span>}
+                        {isCrit && <span className="text-gold text-xs font-bold uppercase tracking-wider">Triumph</span>}
+                        {isFumble && <span className="text-schaden text-xs font-bold uppercase tracking-wider">Patzer</span>}
                       </div>
                     </div>
                   </div>
@@ -1169,7 +1169,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                           <div>
                             <p className="font-bold text-schrift">Zauber gelungen!</p>
                             <p className="text-xs text-leise">
-                              {egCalculation.differenz} Punkte über Schwierigkeit {difficulty} ➔{' '}
+                              {egCalculation.differenz} Punkte über Schwierigkeit {difficulty} →{' '}
                               <span className="font-bold text-schrift">{egCalculation.eg} Erfolgsgrad(e) (EG)</span> erzielt.
                               {egCalculation.isCrit ? ' (+3 EG durch Triumph)' : ''}
                             </p>
@@ -1232,7 +1232,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                           <button
                             type="button"
                             onClick={handleApplyFailure}
-                            className="py-1.5 px-3 bg-schaden hover:bg-schaden text-schrift rounded-knopf font-bold shadow-2xs border border-schaden transition-colors cursor-pointer"
+                            className="min-h-11 py-1.5 px-3 bg-schaden hover:bg-schaden text-schrift rounded-knopf font-bold shadow-2xs border border-schaden transition-colors cursor-pointer"
                           >
                             Fehlschlag anwenden (-{customFailureFocus !== null ? customFailureFocus : egCalculation.exhaustedFocusLostOnFailure} FO)
                           </button>
@@ -1854,7 +1854,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                     <button
                       type="button"
                       onClick={() => handleRollDamage()}
-                      className="flex-1 min-w-[200px] py-2.5 px-4 bg-erhoeht hover:bg-rahmen text-schrift rounded-karte font-bold text-xs sm:text-sm border border-rahmen flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-98"
+                      className="min-h-11 flex-1 min-w-[200px] py-2.5 px-4 bg-erhoeht hover:bg-rahmen text-schrift rounded-karte font-bold text-xs sm:text-sm border border-rahmen flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-98"
                     >
                       <DiceIcon size={16} />
                       <span>
@@ -1868,10 +1868,10 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                     <button
                       type="button"
                       onClick={() => setManualDamageInputOpen((prev) => !prev)}
-                      className="text-xs px-3 py-2 text-leise hover:text-schrift border border-rahmen rounded-karte hover:bg-rahmen transition-colors cursor-pointer"
+                      className="min-h-11 text-xs px-3 py-2 text-leise hover:text-schrift border border-rahmen rounded-karte hover:bg-rahmen transition-colors cursor-pointer"
                       title="Am Tisch mit physischen Würfeln gewürfelt? Hier eintragen"
                     >
-                      🎲 Tisch-Wurf
+                      Tisch-Wurf
                     </button>
                   </div>
 
@@ -1893,7 +1893,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                         <button
                           type="button"
                           onClick={handleApplyManualDamage}
-                          className="px-3 py-1 bg-erhoeht hover:bg-rahmen text-schrift font-bold rounded-knopf cursor-pointer"
+                          className="min-h-11 px-3 py-1 bg-erhoeht hover:bg-rahmen text-schrift font-bold rounded-knopf cursor-pointer"
                         >
                           Übernehmen
                         </button>
@@ -2039,7 +2039,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-xs font-semibold text-schrift hover:text-schrift border border-rahmen rounded-karte hover:bg-rahmen transition-colors cursor-pointer w-full sm:w-auto text-center"
+            className="min-h-11 px-4 py-2 text-xs font-semibold text-schrift hover:text-schrift border border-rahmen rounded-karte hover:bg-rahmen transition-colors cursor-pointer w-full sm:w-auto text-center"
           >
             Abbrechen
           </button>
@@ -2051,7 +2051,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                   type="button"
                   onClick={() => handleCompleteCast()}
                   disabled={!canAffordFocus}
-                  className="px-3 py-2 text-xs font-semibold text-leise hover:text-schrift underline decoration-dotted transition-colors cursor-pointer"
+                  className="min-h-11 bg-gold px-3 py-2 text-xs font-semibold text-seite underline decoration-dotted transition-colors cursor-pointer"
                   title="Zauber auf Ziel oder Verbündeten anwenden (ohne Selbstheilung)"
                 >
                   Auf Verbündeten wirken (-{finalCosts.totalFocus} FO)
@@ -2067,7 +2067,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                     });
                   }}
                   disabled={!canAffordFocus}
-                  className="py-2.5 px-5 bg-unverletzt-grund hover:bg-unverletzt text-schrift border border-unverletzt rounded-karte font-bold text-sm transition-transform active:scale-95 disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto"
+                  className="min-h-11 py-2.5 px-5 bg-unverletzt-grund hover:bg-unverletzt text-schrift border border-unverletzt rounded-karte font-bold text-sm transition-transform active:scale-95 disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto"
                 >
                   <Heart className="w-4 h-4 fill-schrift shrink-0" />
                   <span>
@@ -2090,7 +2090,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                   type="button"
                   onClick={() => handleCompleteCast()}
                   disabled={!canAffordFocus}
-                  className="px-3 py-2 text-xs font-semibold text-leise hover:text-schrift underline decoration-dotted transition-colors cursor-pointer"
+                  className="min-h-11 bg-gold px-3 py-2 text-xs font-semibold text-seite underline decoration-dotted transition-colors cursor-pointer"
                   title="Zauber auf Ziel oder Verbündeten anwenden"
                 >
                   Auf Verbündeten wirken (-{finalCosts.totalFocus} FO)
@@ -2104,7 +2104,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                     });
                   }}
                   disabled={!canAffordFocus}
-                  className="py-2.5 px-5 bg-unverletzt-grund hover:bg-unverletzt text-schrift border border-unverletzt rounded-karte font-bold text-sm transition-transform active:scale-95 disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto"
+                  className="min-h-11 py-2.5 px-5 bg-unverletzt-grund hover:bg-unverletzt text-schrift border border-unverletzt rounded-karte font-bold text-sm transition-transform active:scale-95 disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto"
                 >
                   <Sparkles className="w-4 h-4 text-unverletzt shrink-0" />
                   <span>Zustand aufheben ({currentHealingInfo.conditionToRemove})</span>
@@ -2116,7 +2116,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                   type="button"
                   onClick={() => handleCompleteCast()}
                   disabled={!canAffordFocus}
-                  className="px-3 py-2 text-xs font-semibold text-leise hover:text-schrift underline decoration-dotted transition-colors cursor-pointer"
+                  className="min-h-11 bg-gold px-3 py-2 text-xs font-semibold text-seite underline decoration-dotted transition-colors cursor-pointer"
                   title="Zauber abschließen ohne Schaden auszuwürfeln"
                 >
                   Ohne Schaden vollenden
@@ -2124,7 +2124,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                 <button
                   type="button"
                   onClick={() => handleRollDamage()}
-                  className="py-2.5 px-6 bg-gold hover:bg-gold-hell text-seite border border-erschoepft rounded-karte font-bold text-sm transition-transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto"
+                  className="min-h-11 py-2.5 px-6 bg-gold hover:bg-gold-hell text-seite border border-erschoepft rounded-karte font-bold text-sm transition-transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto"
                 >
                   <Flame className="w-4 h-4 text-schaden" />
                   <span>
@@ -2140,7 +2140,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                 type="button"
                 onClick={() => handleCompleteCast()}
                 disabled={!canAffordFocus}
-                className="py-2.5 px-6 bg-gold hover:bg-gold-hell text-seite border border-erschoepft rounded-karte font-bold text-sm transition-transform active:scale-95 disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto"
+                className="min-h-11 py-2.5 px-6 bg-gold hover:bg-gold-hell text-seite border border-erschoepft rounded-karte font-bold text-sm transition-transform active:scale-95 disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto"
               >
                 <Sparkles className="w-4 h-4 text-schrift" />
                 <span>

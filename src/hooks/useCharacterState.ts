@@ -220,7 +220,7 @@ export function baseCharacterReducer(
         if (note?.trim()) {
           detailParts.push(note.trim());
         }
-        detailParts.push(`Gesamt: ${state.xpTotal} ➔ ${safeNewTotal} EP`);
+        detailParts.push(`Gesamt: ${state.xpTotal} → ${safeNewTotal} EP`);
         const entry = createLogEntry(
           'xp',
           title,

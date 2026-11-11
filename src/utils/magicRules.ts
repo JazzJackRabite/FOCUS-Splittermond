@@ -545,7 +545,7 @@ export const STANDARD_SPELL_ENHANCEMENTS: SpellEnhancementOption[] = [
     description: 'Verlängert die Wirkungsdauer um eine Stufe (+2 FO)',
     focusDelta: 2,
     focusType: 'exhausted',
-    icon: '⏱️',
+    icon: '⏱',
   },
   {
     id: 'range',
@@ -554,7 +554,7 @@ export const STANDARD_SPELL_ENHANCEMENTS: SpellEnhancementOption[] = [
     description: 'Verdoppelt die Reichweite des Zaubers (+2 FO)',
     focusDelta: 2,
     focusType: 'exhausted',
-    icon: '🏹',
+    icon: '',
   },
   {
     id: 'area',
@@ -563,7 +563,7 @@ export const STANDARD_SPELL_ENHANCEMENTS: SpellEnhancementOption[] = [
     description: 'Erhöht Wirkungsbereich (+1m / +1 Ziel) (+2 FO)',
     focusDelta: 2,
     focusType: 'exhausted',
-    icon: '👥',
+    icon: '',
   },
   {
     id: 'potency',
@@ -572,7 +572,7 @@ export const STANDARD_SPELL_ENHANCEMENTS: SpellEnhancementOption[] = [
     description: 'Erhöht Schaden, Schutz oder Effektstufe (+2 FO)',
     focusDelta: 2,
     focusType: 'exhausted',
-    icon: '⚡',
+    icon: '',
   },
   {
     id: 'speed',
@@ -581,7 +581,7 @@ export const STANDARD_SPELL_ENHANCEMENTS: SpellEnhancementOption[] = [
     description: 'Verkürzt Zauberdauer um z. B. 3 Ticks (+2 FO)',
     focusDelta: 2,
     focusType: 'exhausted',
-    icon: '💨',
+    icon: '',
   },
   {
     id: 'focus_saving',
@@ -590,7 +590,7 @@ export const STANDARD_SPELL_ENHANCEMENTS: SpellEnhancementOption[] = [
     description: 'Reduziert den Fokusaufwand um 1 Punkt (-1 FO)',
     focusDelta: -1,
     focusType: 'exhausted',
-    icon: '💎',
+    icon: '',
   },
 ];
 

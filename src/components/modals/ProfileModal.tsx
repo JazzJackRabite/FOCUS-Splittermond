@@ -167,7 +167,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ onClose, onSelectPro
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black bg-opacity-60 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 bg-seite/80 flex items-center justify-center p-4">
       <div id="profile-modal-dialog" className="bg-flaeche border border-rahmen rounded-karte shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden">
         {/* Header */}
         <div className="bg-erhoeht text-schrift p-4 flex justify-between items-center border-b-2 border-gold">
@@ -223,7 +223,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ onClose, onSelectPro
                   </label>
                   <button
                     onClick={handleCreateNewProfile}
-                    className="bg-erhoeht hover:bg-rahmen text-schrift text-xs font-bold px-3 py-1.5 rounded-knopf border border-rahmen flex items-center gap-1.5 transition-all cursor-pointer"
+                    className="min-h-11 bg-gold hover:bg-gold-hell text-seite text-xs font-bold px-3 py-1.5 rounded-knopf border border-gold flex items-center gap-1.5 transition-all cursor-pointer"
                   >
                     <Plus size={14} /> Neuer Charakter
                   </button>
@@ -356,7 +356,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ onClose, onSelectPro
         <div className="p-3 bg-seite border-t border-rahmen flex justify-end no-print">
           <button
             onClick={onClose}
-            className="px-5 py-2 bg-erhoeht hover:bg-rahmen text-schrift rounded-knopf font-bold text-xs border border-rahmen transition-all cursor-pointer"
+            className="min-h-11 px-5 py-2 bg-erhoeht hover:bg-rahmen text-schrift rounded-knopf font-bold text-xs border border-rahmen transition-all cursor-pointer"
           >
             Schließen
           </button>

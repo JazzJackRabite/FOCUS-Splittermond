@@ -369,7 +369,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
 
     setDamageRollResult(res);
     const spellDmgText = extraSpellDmg > 0 ? ` (inkl. ${spellWeaponDamage.bonusText})` : '';
-    toast.success(`💥 ${res.netDamage} Schaden erzielt! (${res.grossDamage} Brutto - ${res.effectiveArmor} RS)${spellDmgText}`);
+    toast.success(`${res.netDamage} Schaden erzielt! (${res.grossDamage} Brutto - ${res.effectiveArmor} RS)${spellDmgText}`);
   };
 
   // Complete and Log Attack
@@ -396,7 +396,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
           isTriumph: isCrit,
           isPatzer: isFumble,
           outcome: `${egCalculation.outcomeLabel} (${egCalculation.eg} EG vs. VTD ${effectiveTargetVTD})${
-            damageRollResult ? ` · 💥 ${damageRollResult.netDamage} Schaden (${damageRollResult.breakdownText})` : ''
+            damageRollResult ? ` · ${damageRollResult.netDamage} Schaden (${damageRollResult.breakdownText})` : ''
           }`,
         });
       }
@@ -417,8 +417,8 @@ export const AttackModal: React.FC<AttackModalProps> = ({
         notes: attackNote,
       });
 
-      const dmgText = damageRollResult ? ` · 💥 ${damageRollResult.netDamage} Schaden angerichtet!` : '';
-      toast.success(`⚔️ Treffer mit ${weapon.name}! (${egCalculation.eg} EG)${dmgText}`);
+      const dmgText = damageRollResult ? ` · ${damageRollResult.netDamage} Schaden angerichtet!` : '';
+      toast.success(`Treffer mit ${weapon.name}! (${egCalculation.eg} EG)${dmgText}`);
     } else {
       if (onRecordRoll) {
         onRecordRoll({
@@ -446,7 +446,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
         notes: attackNote,
       });
 
-      toast(`❌ Angriff mit ${weapon.name} verfehlt (Diff ${egCalculation.differenz}).`);
+      toast(`Angriff mit ${weapon.name} verfehlt (Diff ${egCalculation.differenz}).`);
     }
 
     onClose();
@@ -457,11 +457,11 @@ export const AttackModal: React.FC<AttackModalProps> = ({
       role="dialog"
       aria-modal="true"
       aria-labelledby={modalHeadingId}
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 overflow-y-auto animate-fadeIn"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-seite/80 overflow-y-auto animate-fadeIn"
     >
       <div className="bg-flaeche text-schrift border border-rahmen rounded-karte shadow-2xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden my-auto">
         {/* ── HEADER ── */}
-        <div className="bg-seite p-4 sm:p-5 border-b border-rahmen flex items-center justify-between shrink-0">
+        <div className="p-4 sm:p-5 border-b border-gold flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3 min-w-0">
             <div className="w-10 h-10 rounded-karte bg-schaden-grund border border-schaden flex items-center justify-center shrink-0">
               <Sword size={22} className="text-schaden" />
@@ -547,7 +547,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                     <button
                       type="button"
                       onClick={() => setTargetVTD((prev) => Math.max(5, prev - 1))}
-                      className="px-3 py-1.5 hover:bg-rahmen text-schrift font-bold transition-colors cursor-pointer"
+                      className="min-h-11 px-3 py-1.5 hover:bg-rahmen text-schrift font-bold transition-colors cursor-pointer"
                     >
                       −
                     </button>
@@ -561,7 +561,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                     <button
                       type="button"
                       onClick={() => setTargetVTD((prev) => prev + 1)}
-                      className="px-3 py-1.5 hover:bg-rahmen text-schrift font-bold transition-colors cursor-pointer"
+                      className="min-h-11 px-3 py-1.5 hover:bg-rahmen text-schrift font-bold transition-colors cursor-pointer"
                     >
                       +
                     </button>
@@ -595,7 +595,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                     <button
                       type="button"
                       onClick={() => setTargetArmor((prev) => Math.max(0, prev - 1))}
-                      className="px-3 py-1.5 hover:bg-rahmen text-schrift font-bold transition-colors cursor-pointer"
+                      className="min-h-11 px-3 py-1.5 hover:bg-rahmen text-schrift font-bold transition-colors cursor-pointer"
                     >
                       −
                     </button>
@@ -609,7 +609,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                     <button
                       type="button"
                       onClick={() => setTargetArmor((prev) => prev + 1)}
-                      className="px-3 py-1.5 hover:bg-rahmen text-schrift font-bold transition-colors cursor-pointer"
+                      className="min-h-11 px-3 py-1.5 hover:bg-rahmen text-schrift font-bold transition-colors cursor-pointer"
                     >
                       +
                     </button>
@@ -905,7 +905,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                 type="button"
                 onClick={() => handleExecuteRoll()}
                 disabled={isRolling}
-                className="flex-1 bg-erhoeht hover:bg-rahmen text-schrift border border-gold font-bold py-2.5 px-4 rounded-karte text-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-98"
+                className="min-h-11 flex-1 bg-gold hover:bg-gold-hell text-seite border border-gold font-bold py-2.5 px-4 rounded-karte text-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-98"
               >
                 <Dice1 size={18} className="text-gold" />
                 <span>{hasRolled ? 'Erneut würfeln' : 'Angriff würfeln'}</span>
@@ -914,7 +914,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
               <button
                 type="button"
                 onClick={() => setManualInputOpen((prev) => !prev)}
-                className="bg-seite hover:bg-flaeche text-schrift border border-rahmen py-2.5 px-3 rounded-karte text-xs font-semibold transition-all cursor-pointer"
+                className="min-h-11 bg-seite hover:bg-flaeche text-schrift border border-rahmen py-2.5 px-3 rounded-karte text-xs font-semibold transition-all cursor-pointer"
                 title="Ergebnis vom echten Spieltisch eingeben"
               >
                 Tisch-Wurf
@@ -937,7 +937,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                 />
                 <button
                   type="submit"
-                  className="bg-gold hover:bg-gold-hell text-seite font-bold px-3 py-1 rounded-knopf text-xs transition-colors cursor-pointer"
+                  className="min-h-11 bg-gold hover:bg-gold-hell text-seite font-bold px-3 py-1 rounded-knopf text-xs transition-colors cursor-pointer"
                 >
                   Übernehmen
                 </button>
@@ -1124,7 +1124,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                         toast('Benötigt mindestens 2 ungenutzte Erfolgsgrade');
                       }
                     }}
-                    className={`px-3 py-1 rounded-knopf font-bold text-xs border transition-all cursor-pointer ${
+                    className={`min-h-11 px-3 py-1 rounded-knopf font-bold text-xs border transition-all cursor-pointer ${
                       egTripSpent
                         ? 'bg-unverletzt-grund text-unverletzt border-unverletzt'
                         : 'bg-seite text-leise border-rahmen hover:bg-erhoeht'
@@ -1190,7 +1190,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
               <button
                 type="button"
                 onClick={handleRollDamage}
-                className="w-full damage-roll-btn font-bold py-2.5 px-4 rounded-karte text-sm transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+                className="min-h-11 w-full damage-roll-btn font-bold py-2.5 px-4 rounded-karte text-sm transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98"
               >
                 <Flame size={16} />
                 <span>
@@ -1234,7 +1234,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                     <div className="text-right">
                       <span className="text-xs text-leise mr-1.5">Netto am Ziel:</span>
                       <span className="text-lg font-extrabold text-schaden tabular-nums">
-                        💥 {damageRollResult.netDamage} {damageRollResult.damageType}
+                        {damageRollResult.netDamage} {damageRollResult.damageType}
                       </span>
                     </div>
                   </div>
@@ -1280,7 +1280,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-karte text-xs font-semibold bg-seite hover:bg-erhoeht text-schrift transition-colors cursor-pointer"
+            className="min-h-11 px-4 py-2 rounded-karte text-xs font-semibold bg-seite hover:bg-erhoeht text-schrift transition-colors cursor-pointer"
           >
             Abbrechen
           </button>
@@ -1292,7 +1292,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                   <button
                     type="button"
                     onClick={handleCompleteAttack}
-                    className="px-3 py-2 text-xs font-semibold text-leise hover:text-schrift underline decoration-dotted transition-colors cursor-pointer"
+                    className="min-h-11 bg-gold px-3 py-2 text-xs font-semibold text-seite underline decoration-dotted transition-colors cursor-pointer"
                     title="Angriff abschließen ohne Schaden auszuwürfeln"
                   >
                     Ohne Schaden vollenden
@@ -1300,7 +1300,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                   <button
                     type="button"
                     onClick={handleRollDamage}
-                    className="bg-gold hover:bg-gold-hell text-seite font-bold px-4 py-2 rounded-karte text-xs sm:text-sm transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+                    className="min-h-11 bg-gold hover:bg-gold-hell text-seite font-bold px-4 py-2 rounded-karte text-xs sm:text-sm transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
                   >
                     <Flame size={16} className="text-schaden" />
                     <span>
@@ -1314,12 +1314,12 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                 <button
                   type="button"
                   onClick={handleCompleteAttack}
-                  className="bg-gold hover:bg-gold-hell text-seite font-bold px-4 py-2 rounded-karte text-xs sm:text-sm transition-all flex items-center gap-1.5 cursor-pointer"
+                  className="min-h-11 bg-gold hover:bg-gold-hell text-seite font-bold px-4 py-2 rounded-karte text-xs sm:text-sm transition-all flex items-center gap-1.5 cursor-pointer"
                 >
                   <Check size={16} />
                   <span>
                     Angriff vollenden
-                    {damageRollResult ? ` (· 💥 ${damageRollResult.netDamage} Schaden)` : ''}
+                    {damageRollResult ? ` (· ${damageRollResult.netDamage} Schaden)` : ''}
                   </span>
                 </button>
               )

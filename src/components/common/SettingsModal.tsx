@@ -32,7 +32,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/70 overflow-y-auto no-print"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-seite/80 overflow-y-auto no-print"
       onClick={onClose}
     >
       <div
@@ -66,7 +66,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="p-1.5 text-leise hover:text-gold-hell rounded-knopf hover:bg-black/5 transition-colors cursor-pointer"
+              className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-knopf border border-rahmen bg-erhoeht text-schrift hover:border-gold transition-colors"
               aria-label="Schließen"
             >
               <X size={22} />
@@ -79,7 +79,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           <button
             type="button"
             onClick={() => setActiveTab('general')}
-            className={`shrink-0 whitespace-nowrap px-3 sm:px-4 py-2 text-xs sm:text-sm font-bold flex items-center gap-2 rounded-t-knopf transition-colors cursor-pointer ${
+            className={`min-h-11 shrink-0 whitespace-nowrap px-3 sm:px-4 py-2 text-xs sm:text-sm font-bold flex items-center gap-2 rounded-t-knopf transition-colors cursor-pointer ${
               activeTab === 'general'
                 ? 'bg-erhoeht text-schrift border-t-2 border-gold'
                 : 'text-leise hover:text-gold-hell hover:bg-black/5'
@@ -92,7 +92,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           <button
             type="button"
             onClick={() => setActiveTab('regelpakete')}
-            className={`shrink-0 whitespace-nowrap px-3 sm:px-4 py-2 text-xs sm:text-sm font-bold flex items-center gap-2 rounded-t-knopf transition-colors cursor-pointer ${
+            className={`min-h-11 shrink-0 whitespace-nowrap px-3 sm:px-4 py-2 text-xs sm:text-sm font-bold flex items-center gap-2 rounded-t-knopf transition-colors cursor-pointer ${
               activeTab === 'regelpakete'
                 ? 'bg-erhoeht text-schrift border-t-2 border-gold'
                 : 'text-leise hover:text-gold-hell hover:bg-black/5'
@@ -107,7 +107,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           <button
             type="button"
             onClick={() => setActiveTab('info')}
-            className={`shrink-0 whitespace-nowrap px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold flex items-center gap-2 rounded-t-knopf transition-colors cursor-pointer ${
+            className={`min-h-11 shrink-0 whitespace-nowrap px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold flex items-center gap-2 rounded-t-knopf transition-colors cursor-pointer ${
               activeTab === 'info'
                 ? 'bg-erhoeht text-schrift border-t-2 border-gold'
                 : 'text-leise hover:text-schrift hover:bg-black/5'
@@ -183,7 +183,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-1.5 bg-erhoeht hover:bg-rahmen text-schrift text-xs sm:text-sm font-bold rounded-knopf transition-colors cursor-pointer"
+            className="min-h-11 px-4 py-1.5 bg-erhoeht hover:bg-rahmen text-schrift text-xs sm:text-sm font-bold rounded-knopf transition-colors cursor-pointer"
           >
             Fertig
           </button>

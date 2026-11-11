@@ -55,7 +55,7 @@ describe('Freie Meisterschaft trotz unerfüllter Voraussetzung (GRW S. 92)', () 
     expect(option.disabled).toBe(false);
     fireEvent.change(option.closest('select')!, { target: { value: option.value } });
     expect(screen.getByTestId('frei-trotz-voraussetzung')).toBeTruthy();
-    const hinzufuegen = () => screen.getAllByRole('button').find(x => /hinzufügen|lernen|übernehmen/i.test(x.textContent ?? '') && x.className.includes('bg-erhoeht')) as HTMLButtonElement;
+    const hinzufuegen = () => screen.getAllByRole('button').find(x => /hinzufügen|lernen|übernehmen/i.test(x.textContent ?? '') && x.className.includes('bg-gold')) as HTMLButtonElement;
     expect(hinzufuegen().disabled).toBe(true);
     fireEvent.click(screen.getByLabelText('Gratis-Slot nutzen'));
     expect(hinzufuegen().disabled).toBe(false);

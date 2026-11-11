@@ -703,7 +703,7 @@ export function executeAttackDamageRoll(input: DamageRollInput): DamageRollResul
     ? ` - ${effectiveArmor} RS${armorPen > 0 ? ` (${rawArmor} - ${armorPen} durchdrungen)` : ''}`
     : '';
 
-  const breakdownText = `${dicePart}${bonusPart}${egPart}${manPart}${multPart} = ${grossDamage} Brutto${armorPart} ➔ ${netDamage} Netto`;
+  const breakdownText = `${dicePart}${bonusPart}${egPart}${manPart}${multPart} = ${grossDamage} Brutto${armorPart} → ${netDamage} Netto`;
 
   return {
     baseDice,

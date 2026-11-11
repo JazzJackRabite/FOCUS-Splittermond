@@ -89,7 +89,7 @@ export function useBegleiterSpiel(b: Begleiter, index: number, daten: BegleiterS
       if (!r) { toast.error(`Schaden „${w.schaden}“ nicht lesbar`); return; }
       wurfLog({ id: generateId(), type: 'roll', timestamp: zeit(), label: `${daten.name}: Schaden ${w.name} (${r.formel})`, d10s: r.wuerfel, baseVal: 0, modifier: r.mod, total: r.summe,
         outcome: `[${r.wuerfel.join(', ')}]${r.mod ? (r.mod > 0 ? ` + ${r.mod}` : ` − ${-r.mod}`) : ''} = ${r.summe}` });
-      toast.success(`🎲 ${daten.name}, ${w.name}: ${r.summe} Schaden (${r.formel} [${r.wuerfel.join(', ')}])`);
+      toast.success(`${daten.name}, ${w.name}: ${r.summe} Schaden (${r.formel} [${r.wuerfel.join(', ')}])`);
     },
     zaubern: (spell, wert) => setZauber({ spell, wert }),
   };
@@ -106,7 +106,7 @@ export function useBegleiterSpiel(b: Begleiter, index: number, daten: BegleiterS
         <AttackModal target={angriff} woundPenalty={lage.wundabzug} splitterpunkte={0} onClose={() => setAngriff(null)} onSpendSplitterpunkt={() => {}}
           onRecordRoll={wurfLog}
           onAttackSuccess={r => {
-            log('combat', `Angriff getroffen: ${r.weapon.name} (${r.eg} EG)${r.damageRoll ? ` · 💥 ${r.damageRoll.netDamage} Schaden` : ''}`,
+            log('combat', `Angriff getroffen: ${r.weapon.name} (${r.eg} EG)${r.damageRoll ? ` · ${r.damageRoll.netDamage} Schaden` : ''}`,
               `Wurf ${r.totalRoll} gegen VTD ${r.targetVTD}${r.damageRoll ? ` · ${r.damageRoll.breakdownText}` : ''}`,
               { text: r.damageRoll ? `${r.damageRoll.netDamage} SP · ${r.eg} EG` : `${r.eg} EG`, variant: r.damageRoll ? 'danger' : 'success' });
             setAngriff(null);
@@ -261,7 +261,7 @@ export const VitalKurz: React.FC<{ spiel: ReturnType<typeof useBegleiterSpiel>; 
   const { lage } = spiel;
   return (
     <span className={`font-bold ${lage.ausser ? 'text-schaden' : lage.wundabzug ? 'text-erschoepft' : 'text-schrift'}`} title={lage.stufenName}>
-      ♥ {lage.frei}/{lage.gesamt}{daten.fo ? ` · FO ${fokusFrei(daten.fo, spiel.zustand)}/${daten.fo}` : ''}
+      {lage.frei}/{lage.gesamt}{daten.fo ? ` · FO ${fokusFrei(daten.fo, spiel.zustand)}/${daten.fo}` : ''}
     </span>
   );
 };

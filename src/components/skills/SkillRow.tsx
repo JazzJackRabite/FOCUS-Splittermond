@@ -219,7 +219,7 @@ export const SkillRow: React.FC<SkillRowProps> = ({
           {(val >= 6 || (creationMode && creationBudget > 0 && val >= 1)) && (
             <button
               onClick={onAddMastery}
-              className="text-xs bg-erhoeht hover:bg-rahmen active:scale-[0.98] px-3 py-2 md:py-1.5 rounded-knopf w-full text-center no-print border border-gold text-schrift font-bold touch-manipulation transition-colors cursor-pointer "
+              className="min-h-11 text-xs bg-erhoeht hover:bg-rahmen active:scale-[0.98] px-3 py-2 md:py-1.5 rounded-knopf w-full text-center no-print border border-gold text-schrift font-bold touch-manipulation transition-colors cursor-pointer "
             >
               + Meisterschaft hinzufügen
             </button>
@@ -227,7 +227,7 @@ export const SkillRow: React.FC<SkillRowProps> = ({
           {isMagic && val >= 1 && (
             <button
               onClick={onAddSpell}
-              className="text-xs bg-erhoeht hover:bg-rahmen active:scale-[0.98] px-3 py-2 md:py-1.5 rounded-knopf w-full text-center no-print border border-kanalisiert text-kanalisiert hover:text-schrift font-bold touch-manipulation transition-colors cursor-pointer "
+              className="min-h-11 text-xs bg-erhoeht hover:bg-rahmen active:scale-[0.98] px-3 py-2 md:py-1.5 rounded-knopf w-full text-center no-print border border-kanalisiert text-kanalisiert hover:text-schrift font-bold touch-manipulation transition-colors cursor-pointer "
             >
               + Zauber hinzufügen
             </button>
@@ -241,7 +241,7 @@ export const SkillRow: React.FC<SkillRowProps> = ({
               {sortedMasteries.map((m, idx) => {
                 const baseDesc =
                   m.desc || getMasteryDesc(m.name) || 'Details zur Meisterschaft im Regelwerk.';
-                const description = m.userNote ? `${baseDesc}\n\n📝 ${m.userNote}` : baseDesc;
+                const description = m.userNote ? `${baseDesc}\n\n${m.userNote}` : baseDesc;
                 const canRemoveMastery =
                   mode === 'creation' ||
                   (mode === 'xp' && !m.isCreationBonus && m.source !== 'Erschaffung');

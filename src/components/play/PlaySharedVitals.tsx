@@ -437,7 +437,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                   <span>{currentHealthLevelName || 'Verletzt'}</span>
                   <span className="tabular-nums font-black">{woundPenaltyDisplay}</span>
                   {activeSpellMods.woundPenaltyReduction > 0 && (
-                    <span className="text-unverletzt text-[11px] font-bold">+{activeSpellMods.woundPenaltyReduction} ✨</span>
+                    <span className="text-unverletzt text-[11px] font-bold">+{activeSpellMods.woundPenaltyReduction} </span>
                   )}
                 </span>
               ) : currentWoundPenalty < 0 && activeSpellMods.woundPenaltyReduction > 0 ? (
@@ -452,7 +452,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                 </span>
               ) : dyingLevel > 0 ? (
                 <span className="border border-schaden bg-schaden-grund text-schaden text-xs font-semibold px-2 py-0.5 rounded-knopf flex items-center gap-1 animate-pulse">
-                  <span>💀 Sterbend {dyingLevel}</span>
+                  <span>Sterbend {dyingLevel}</span>
                 </span>
               ) : (
                 <span className="border border-unverletzt bg-unverletzt-grund text-leise text-xs font-semibold px-2 py-0.5 rounded-knopf flex items-center gap-1 ">
@@ -1280,7 +1280,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
 
             <div className="grid grid-cols-3 @[480px]:grid-cols-6 gap-2 text-center derived-stats-grid">
               <div
-                className="bg-seite rounded-knopf p-2 border border-rahmen shadow-2xs"
+                className="bg-seite rounded-karte px-2 py-3 border border-rahmen"
                 title={
                   isRingend
                     ? 'Geschwindigkeit: 0 (Zustand: Ringend)'
@@ -1291,8 +1291,8 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                         : 'Geschwindigkeit (GSW)'
                 }
               >
-                <span className="text-[11px] uppercase font-bold text-leise block">GSW</span>
-                <span className="text-xl font-bold text-schrift tabular-nums">
+                <span className="text-[11px] uppercase tracking-widest text-leise block mb-1">GSW</span>
+                <span className="font-titel text-2xl font-bold text-schrift tabular-nums">
                   {effectiveGSW}
                   {isRingend ? (
                     <span className="text-[11px] text-schaden font-bold ml-1 tabular-nums">(0)</span>
@@ -1305,12 +1305,12 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                   ) : null}
                 </span>
               </div>
-              <div className="bg-seite rounded-knopf p-2 border border-rahmen shadow-2xs">
-                <span className="text-[11px] uppercase font-bold text-leise block">INI</span>
-                <span className="text-xl font-bold text-schrift tabular-nums">{derived.INI}</span>
+              <div className="bg-seite rounded-karte px-2 py-3 border border-rahmen">
+                <span className="text-[11px] uppercase tracking-widest text-leise block mb-1">INI</span>
+                <span className="font-titel text-2xl font-bold text-schrift tabular-nums">{derived.INI}</span>
               </div>
               <div
-                className="bg-seite rounded-knopf p-2 border border-rahmen shadow-2xs"
+                className="bg-seite rounded-karte px-2 py-3 border border-rahmen"
                 title={
                   isBewusstlos
                     ? 'Verteidigung: 0 (Zustand: Bewusstlos/Wehrlos)'
@@ -1323,8 +1323,8 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                           : 'Verteidigung'
                 }
               >
-                <span className="text-[11px] uppercase font-bold text-leise block">VTD</span>
-                <span className="text-xl font-bold text-schrift tabular-nums">
+                <span className="text-[11px] uppercase tracking-widest text-leise block mb-1">VTD</span>
+                <span className="font-titel text-2xl font-bold text-schrift tabular-nums">
                   {effectiveVTD}
                   {isBewusstlos ? (
                     <span className="text-[11px] text-schaden font-bold ml-1">(=0)</span>
@@ -1348,11 +1348,11 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                 </span>
               </div>
               <div
-                className="bg-seite rounded-knopf p-2 border border-rahmen shadow-2xs"
+                className="bg-seite rounded-karte px-2 py-3 border border-rahmen"
                 title={`Schadensreduktion: ${armorSR} Rüstung + ${derived.SR - armorSR} natürlich${activeSpellMods.srBonus > 0 ? ` + ${activeSpellMods.srBonus} Zauber (${activeSpellMods.breakdown.filter((b) => b.sr).map((b) => b.spellName).join(', ')})` : ''}`}
               >
-                <span className="text-[11px] uppercase font-bold text-leise block">SR</span>
-                <span className="text-xl font-bold text-schrift tabular-nums">
+                <span className="text-[11px] uppercase tracking-widest text-leise block mb-1">SR</span>
+                <span className="font-titel text-2xl font-bold text-schrift tabular-nums">
                   {effectiveSR}
                   {armorSR > 0 && <span className="text-[11px] text-gold font-bold ml-0.5">({armorSR})</span>}
                   {activeSpellMods.srBonus > 0 && (
@@ -1365,9 +1365,9 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                   )}
                 </span>
               </div>
-              <div className="bg-seite rounded-knopf p-2 border border-rahmen shadow-2xs" title={activeSpellMods.gwBonus > 0 ? `Geistiger Widerstand (+${activeSpellMods.gwBonus} Zauber)` : 'Geistiger Widerstand'}>
-                <span className="text-[11px] uppercase font-bold text-leise block">GW</span>
-                <span className="text-xl font-bold text-schrift tabular-nums">
+              <div className="bg-seite rounded-karte px-2 py-3 border border-rahmen" title={activeSpellMods.gwBonus > 0 ? `Geistiger Widerstand (+${activeSpellMods.gwBonus} Zauber)` : 'Geistiger Widerstand'}>
+                <span className="text-[11px] uppercase tracking-widest text-leise block mb-1">GW</span>
+                <span className="font-titel text-2xl font-bold text-schrift tabular-nums">
                   {effectiveGW}
                   {activeSpellMods.gwBonus > 0 && (
                     <span className="text-[11px] text-temporaer font-bold ml-0.5 bg-temporaer-grund px-1 py-0.2 rounded-knopf border border-temporaer">
@@ -1376,9 +1376,9 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                   )}
                 </span>
               </div>
-              <div className="bg-seite rounded-knopf p-2 border border-rahmen shadow-2xs" title={activeSpellMods.kwBonus > 0 ? `Körperlicher Widerstand (+${activeSpellMods.kwBonus} Zauber)` : 'Körperlicher Widerstand'}>
-                <span className="text-[11px] uppercase font-bold text-leise block">KW</span>
-                <span className="text-xl font-bold text-schrift tabular-nums">
+              <div className="bg-seite rounded-karte px-2 py-3 border border-rahmen" title={activeSpellMods.kwBonus > 0 ? `Körperlicher Widerstand (+${activeSpellMods.kwBonus} Zauber)` : 'Körperlicher Widerstand'}>
+                <span className="text-[11px] uppercase tracking-widest text-leise block mb-1">KW</span>
+                <span className="font-titel text-2xl font-bold text-schrift tabular-nums">
                   {effectiveKW}
                   {activeSpellMods.kwBonus > 0 && (
                     <span className="text-[11px] text-temporaer font-bold ml-0.5 bg-temporaer-grund px-1 py-0.2 rounded-knopf border border-temporaer">
