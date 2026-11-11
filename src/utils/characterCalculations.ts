@@ -16,6 +16,7 @@ import {
 } from '../data/rules';
 import { getSkillXpCost, getAttrXpCost } from './costCalculations';
 import { abgeleiteteFuerCharakter, wirkungenFuerCharakter, type CharakterWirkungen, type KatalogWerte } from '../regelwerk/bruecke';
+import { reliktWiderstandFuerCharakter } from '../regelwerk/relikte';
 
 export interface CharacterCalculationResult {
   getAttrValue: (key: string) => number;
@@ -251,6 +252,12 @@ export function calculateCharacter(state: CharacterState): CharacterCalculationR
     for (const [wert, b] of Object.entries(wirkungen.werteBoni)) {
       if (wert in derived) (derived as unknown as Record<string, number>)[wert] += b.summe;
     }
+  }
+
+  // 5c. Relikte im Besitz: Bonus auf GW/KW (Strukturgeber, GRW S. 254: nur der höchste Bonus zählt), nur mit Regelpaketen
+  const reliktBoni = regelwerk ? reliktWiderstandFuerCharakter(state) : {};
+  for (const [wert, b] of Object.entries(reliktBoni)) {
+    if (wert in derived) (derived as unknown as Record<string, number>)[wert] += b.summe;
   }
 
   const lpMod = Number(state.playState?.lpModifier) || 0;
