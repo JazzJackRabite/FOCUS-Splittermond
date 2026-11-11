@@ -39,7 +39,7 @@ export const EditTotalXpModal: React.FC<EditTotalXpModalProps> = ({
       >
         <div className="px-5 py-4 border-b border-gold flex items-center gap-2 shrink-0">
           <Edit3 className="w-5 h-5 text-gold" />
-          <h3 className="fantasy-font text-xl text-gold-hell">
+          <h3 className="fantasy-font text-[17px] font-bold text-gold-hell">
             Gesamt-EP editieren
           </h3>
         </div>
@@ -67,7 +67,7 @@ export const EditTotalXpModal: React.FC<EditTotalXpModalProps> = ({
               <button
                 type="button"
                 onClick={() => adjustBy(-10)}
-                className="px-2.5 py-1.5 rounded-knopf bg-flaeche hover:bg-rahmen border border-rahmen text-xs font-bold text-schrift transition shadow-2xs cursor-pointer"
+                className="px-2.5 py-1.5 rounded-knopf bg-flaeche hover:bg-rahmen border border-rahmen text-xs font-bold text-schrift transition cursor-pointer"
                 title="-10 EP"
               >
                 -10
@@ -75,7 +75,7 @@ export const EditTotalXpModal: React.FC<EditTotalXpModalProps> = ({
               <button
                 type="button"
                 onClick={() => adjustBy(-1)}
-                className="p-1.5 rounded-knopf bg-flaeche hover:bg-rahmen border border-rahmen text-schrift transition shadow-2xs cursor-pointer"
+                className="p-1.5 rounded-knopf bg-flaeche hover:bg-rahmen border border-rahmen text-schrift transition cursor-pointer"
                 title="-1 EP"
               >
                 <Minus size={16} />
@@ -94,7 +94,7 @@ export const EditTotalXpModal: React.FC<EditTotalXpModalProps> = ({
               <button
                 type="button"
                 onClick={() => adjustBy(1)}
-                className="p-1.5 rounded-knopf bg-flaeche hover:bg-rahmen border border-rahmen text-schrift transition shadow-2xs cursor-pointer"
+                className="p-1.5 rounded-knopf bg-flaeche hover:bg-rahmen border border-rahmen text-schrift transition cursor-pointer"
                 title="+1 EP"
               >
                 <Plus size={16} />
@@ -102,7 +102,7 @@ export const EditTotalXpModal: React.FC<EditTotalXpModalProps> = ({
               <button
                 type="button"
                 onClick={() => adjustBy(10)}
-                className="px-2.5 py-1.5 rounded-knopf bg-flaeche hover:bg-rahmen border border-rahmen text-xs font-bold text-schrift transition shadow-2xs cursor-pointer"
+                className="px-2.5 py-1.5 rounded-knopf bg-flaeche hover:bg-rahmen border border-rahmen text-xs font-bold text-schrift transition cursor-pointer"
                 title="+10 EP"
               >
                 +10

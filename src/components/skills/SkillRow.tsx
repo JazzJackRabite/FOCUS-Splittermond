@@ -133,7 +133,7 @@ export const SkillRow: React.FC<SkillRowProps> = ({
           </span>
           {freeSlots > 0 && (
             <span
-              className="ml-2 text-[11px] tabular-nums font-bold px-2 py-0.5 rounded-full shrink-0 shadow-2xs border bg-erhoeht text-gold border-gold badge-free-mastery"
+              className="ml-2 text-[11px] tabular-nums font-bold px-2 py-0.5 rounded-full shrink-0 border bg-erhoeht text-gold border-gold badge-free-mastery"
               title={`Verfügbare Gratis-Meisterschaften: ${freeSlots}`}
             >
               {freeSlots}
@@ -141,7 +141,7 @@ export const SkillRow: React.FC<SkillRowProps> = ({
           )}
           {freeSpellSlotsCount > 0 && isMagic && (
             <span
-              className="ml-2 text-[11px] tabular-nums font-bold px-2 py-0.5 rounded-full shrink-0 shadow-2xs border bg-erhoeht text-schrift border-kanalisiert badge-free-spell"
+              className="ml-2 text-[11px] tabular-nums font-bold px-2 py-0.5 rounded-full shrink-0 border bg-erhoeht text-schrift border-kanalisiert badge-free-spell"
               title={`Verfügbare Gratis-Zauber: ${freeSpellSlotsCount}`}
             >
               {freeSpellSlotsCount}

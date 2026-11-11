@@ -412,7 +412,7 @@ export const RollModal: React.FC<RollModalProps> = ({
                     type="button"
                     onClick={() => toggleSpellBonus(b.id)}
                     title={`${b.description} (Klicken zum ${isActive ? 'Abwählen' : 'Aktivieren'})`}
-                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-knopf text-xs font-bold transition-all border shadow-2xs cursor-pointer ${
+                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-knopf text-xs font-bold transition-all border cursor-pointer ${
                       isActive
                         ? 'bg-magie-grund text-schrift border-magie hover:bg-magie hover:text-seite active:scale-98'
                         : 'bg-flaeche text-leise border-rahmen line-through hover:opacity-100'
@@ -470,7 +470,7 @@ export const RollModal: React.FC<RollModalProps> = ({
                     type="button"
                     onClick={() => toggleModifier(m.id)}
                     title={`${m.description || m.label} (Klicken zum ${m.active ? 'Abwählen' : 'Aktivieren'})`}
-                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-knopf text-xs font-bold transition-all border shadow-2xs cursor-pointer ${
+                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-knopf text-xs font-bold transition-all border cursor-pointer ${
                       m.active
                         ? isWound
                           ? 'bg-schaden-grund text-schrift border-schaden hover:bg-schaden-grund hover:text-schrift active:scale-98'
@@ -693,7 +693,7 @@ export const RollModal: React.FC<RollModalProps> = ({
                 <div className="text-3xl font-bold text-schrift">
                   EG: {egResult.eg >= 0 ? '+' : ''}{egResult.eg}
                 </div>
-                <div className="inline-block rounded-knopf px-3 py-1 text-sm font-bold bg-erhoeht text-schrift border border-gold shadow-2xs">
+                <div className="inline-block rounded-knopf px-3 py-1 text-sm font-bold bg-erhoeht text-schrift border border-gold">
                   {egResult.qualitaetEmoji} {egResult.qualitaet}
                 </div>
                 {egResult.hasFumbleModifier && (

@@ -129,8 +129,8 @@ export const ErschaffungRegelwerk: React.FC = () => {
   const fehler = pruefung?.befunde.filter(b => b[0] === 'fehler') ?? [];
   const sl = pruefung?.befunde.filter(b => b[0] === 'spielleiter') ?? [];
   return (
-    <div className="bg-flaeche bg-opacity-60 p-5 rounded-knopf border border-rahmen relative" data-testid="erschaffung-regelwerk">
-      <h3 className="font-bold text-xl mb-4 border-b border-gold pb-2 fantasy-font text-gold-hell">Kultur & Abstammung</h3>
+    <div className="bg-flaeche p-5 rounded-karte border border-rahmen relative" data-testid="erschaffung-regelwerk">
+      <h3 className="font-bold text-[17px] mb-4 border-b border-gold pb-2 fantasy-font text-gold-hell">Kultur & Abstammung</h3>
       <div className="space-y-4">
         <ModulAuswahl art="kultur" k={katalog} />
         <ModulAuswahl art="abstammung" k={katalog} />

@@ -704,7 +704,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
 
           {/* Ausrüstungs-Zielauswahl für Zauber, die Ausrüstung verzaubern (Flammende Waffe etc.) */}
           {equipmentTargetCheck.isEquipmentSpell && (
-            <div className="bg-flaeche rounded-karte border border-rahmen p-4 space-y-3">
+            <div className="bg-flaeche rounded-karte border border-rahmen p-5 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="p-1.5 bg-erhoeht text-schrift rounded-knopf border border-rahmen">
@@ -827,7 +827,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
 
           {/* STEP 1: Difficulty & Target Selection */}
           {isFixedDifficulty ? (
-            <div className="bg-flaeche rounded-karte border border-rahmen p-4 space-y-2.5">
+            <div className="bg-flaeche rounded-karte border border-rahmen p-5 space-y-2.5">
               <div className="flex items-center justify-between">
                 <div>
                   <span className="font-bold text-sm text-schrift flex items-center gap-1.5">
@@ -857,7 +857,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
               </div>
             </div>
           ) : (
-            <div className="bg-flaeche rounded-karte border border-rahmen p-4 space-y-3">
+            <div className="bg-flaeche rounded-karte border border-rahmen p-5 space-y-3">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
                   <label htmlFor="spell-diff-input" className="font-bold text-sm text-schrift flex items-center gap-1.5">
@@ -932,7 +932,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
           )}
 
           {/* STEP 2: Probe Calculation & Rolling */}
-          <div className="bg-flaeche rounded-karte border border-rahmen p-4 space-y-3">
+          <div className="bg-flaeche rounded-karte border border-rahmen p-5 space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-rahmen pb-2.5">
               <div>
                 <span className="text-xs font-semibold text-leise uppercase tracking-wider">Zauberprobe</span>
@@ -945,7 +945,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                   FW +{schoolSkillTotal}
                 </span>
                 {woundPenalty !== 0 && (
-                  <span className="bg-schaden-grund text-schrift border border-schaden px-2 py-0.5 rounded-knopf tabular-nums font-bold shadow-2xs">
+                  <span className="bg-schaden-grund text-schrift border border-schaden px-2 py-0.5 rounded-knopf tabular-nums font-bold">
                     Wundabzug {woundPenalty}
                   </span>
                 )}
@@ -1019,7 +1019,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                   type="button"
                   onClick={() => performRoll(rollType)}
                   disabled={isRolling}
-                  className="w-full bg-erhoeht hover:bg-rahmen disabled:opacity-60 text-schrift font-bold py-3 rounded-knopf text-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full min-h-11 bg-gold hover:bg-gold-hell disabled:opacity-60 text-seite font-bold py-3 rounded-knopf text-base transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <DiceIcon size={20} />
                   <span>Würfeln!</span>
@@ -1120,7 +1120,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                       onClick={handleSpendSPBonus}
                       disabled={splitterpunkte <= 0 || isRolling}
                       title="Kostet 1 Splitterpunkt: +3 Bonus auf das Ergebnis"
-                      className="px-2.5 py-1.5 bg-gold hover:bg-gold-hell text-seite border border-erschoepft rounded-knopf text-xs font-bold shadow-2xs transition-colors disabled:opacity-40 flex items-center gap-1 cursor-pointer"
+                      className="px-2.5 py-1.5 bg-gold hover:bg-gold-hell text-seite border border-erschoepft rounded-knopf text-xs font-bold transition-colors disabled:opacity-40 flex items-center gap-1 cursor-pointer"
                     >
                       <Sparkles className="w-3.5 h-3.5" />
                       <span>+3 (1 SP)</span>
@@ -1130,7 +1130,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                       onClick={handleSpendSPReroll}
                       disabled={splitterpunkte <= 0 || isRolling}
                       title="Kostet 1 Splitterpunkt: Neuwurf"
-                      className="px-2.5 py-1.5 bg-flaeche text-schrift border border-gold hover:bg-rahmen rounded-knopf text-xs font-semibold shadow-2xs transition-colors disabled:opacity-40 flex items-center gap-1 cursor-pointer"
+                      className="px-2.5 py-1.5 bg-flaeche text-schrift border border-gold hover:bg-rahmen rounded-knopf text-xs font-semibold transition-colors disabled:opacity-40 flex items-center gap-1 cursor-pointer"
                     >
                       <RotateCcw className="w-3.5 h-3.5" />
                       <span>Reroll (1 SP)</span>
@@ -1176,7 +1176,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                           </div>
                         </div>
                         <div className="text-right">
-                          <span className="inline-block bg-erhoeht text-gold border border-gold px-3 py-1 rounded-knopf font-bold text-sm shadow-2xs tabular-nums">
+                          <span className="inline-block bg-erhoeht text-gold border border-gold px-3 py-1 rounded-knopf font-bold text-sm tabular-nums">
                             {egCalculation.eg} EG
                           </span>
                         </div>
@@ -1232,7 +1232,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                           <button
                             type="button"
                             onClick={handleApplyFailure}
-                            className="min-h-11 py-1.5 px-3 bg-schaden-grund hover:bg-schaden-grund hover:text-schrift text-schrift rounded-knopf font-bold shadow-2xs border border-schaden transition-colors cursor-pointer"
+                            className="min-h-11 py-1.5 px-3 bg-schaden-grund hover:bg-schaden-grund hover:text-schrift text-schrift rounded-knopf font-bold border border-schaden transition-colors cursor-pointer"
                           >
                             Fehlschlag anwenden (-{customFailureFocus !== null ? customFailureFocus : egCalculation.exhaustedFocusLostOnFailure} FO)
                           </button>
@@ -1247,7 +1247,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
 
           {/* STEP 4: EG Modifications Allocation (Only on Success) */}
           {hasRolled && egCalculation?.isSuccess && (
-            <div className="bg-flaeche rounded-karte border border-rahmen p-4 space-y-4">
+            <div className="bg-flaeche rounded-karte border border-rahmen p-5 space-y-4">
               {/* Clean EG Summary Bar */}
               <div className="flex flex-wrap items-center justify-between gap-2 bg-erhoeht p-3 rounded-karte border border-rahmen">
                 <div>
@@ -1261,8 +1261,8 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                   <span
                     className={`px-3 py-1 rounded-knopf text-xs font-bold border transition-all ${
                       remainingEG === 0
-                        ? 'bg-erhoeht text-gold border-gold shadow-2xs'
-                        : 'bg-erhoeht text-schrift border-gold shadow-2xs'
+                        ? 'bg-erhoeht text-gold border-gold'
+                        : 'bg-erhoeht text-schrift border-gold'
                     }`}
                   >
                     {remainingEG === 0 ? 'Alle EG verteilt' : `Noch ${remainingEG} EG verfügbar`}
@@ -1642,7 +1642,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                                   </span>
                                 )}
                                 {isSelected && (
-                                  <span className="text-[11px] bg-unverletzt-grund text-unverletzt font-bold px-2 py-0.5 rounded-full inline-flex items-center gap-1 shadow-2xs">
+                                  <span className="text-[11px] bg-unverletzt-grund text-unverletzt font-bold px-2 py-0.5 rounded-full inline-flex items-center gap-1">
                                     ✓ Aktiviert
                                   </span>
                                 )}
@@ -1748,7 +1748,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
           {hasRolled && egCalculation?.isSuccess && (
             <>
               {(enableDamageRoll || detectedDamage || allocations.increaseDamage > 0) ? (
-                <div className="bg-flaeche rounded-karte border border-rahmen p-4 space-y-3">
+                <div className="bg-flaeche rounded-karte border border-rahmen p-5 space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className="p-1.5 bg-erhoeht text-schrift rounded-knopf border border-magie">
@@ -1911,7 +1911,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                             {currentDamageResult.dice.map((d, i) => (
                               <span
                                 key={i}
-                                className="w-6 h-6 rounded-knopf bg-flaeche text-schrift font-bold tabular-nums text-xs flex items-center justify-center border border-rahmen shadow-2xs"
+                                className="w-6 h-6 rounded-knopf bg-flaeche text-schrift font-bold tabular-nums text-xs flex items-center justify-center border border-rahmen"
                               >
                                 {d}
                               </span>
@@ -1962,7 +1962,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
 
           {/* STEP 5: Final Cost Summary & Execution */}
           {hasRolled && egCalculation?.isSuccess && (
-            <div className="bg-flaeche rounded-karte border border-rahmen p-4 space-y-3">
+            <div className="bg-flaeche rounded-karte border border-rahmen p-5 space-y-3">
               <div className="flex items-center justify-between">
                 <div>
                   <span className="text-xs text-leise font-medium">Finaler Fokusaufwand</span>

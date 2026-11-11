@@ -279,7 +279,7 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
       >
         <div className="px-5 py-4 border-b border-gold flex justify-between items-start shrink-0">
           <div>
-            <h3 className="fantasy-font text-xl text-gold-hell tracking-wide uppercase">
+            <h3 className="fantasy-font text-[17px] font-bold text-gold-hell tracking-wide uppercase">
               Meisterschaft hinzufügen
             </h3>
             <div className="text-xs text-leise mt-0.5">

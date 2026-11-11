@@ -208,7 +208,7 @@ export const AdvancementLog: React.FC<AdvancementLogProps> = ({
   return (
     <div
       id="advancement-protocol-section"
-      className="bg-flaeche bg-opacity-60 rounded-karte border border-rahmen p-4 text-schrift mt-6 no-print"
+      className="bg-flaeche rounded-karte border border-rahmen p-5 text-schrift mt-6 no-print"
     >
       {/* Header */}
       <div className="flex flex-wrap justify-between items-center border-b border-gold pb-3 mb-4 gap-2">
@@ -217,7 +217,7 @@ export const AdvancementLog: React.FC<AdvancementLogProps> = ({
             <History size={20} className="text-schrift" />
           </div>
           <div>
-            <h3 className="font-bold text-lg fantasy-font leading-tight text-gold-hell flex items-center gap-2">
+            <h3 className="font-bold text-[17px] fantasy-font leading-tight text-gold-hell flex items-center gap-2">
               Protokoll: Steigerungen &amp; Erfahrungspunkte
               <span className="text-xs font-medium text-schrift bg-erhoeht px-2 py-0.5 rounded-full border border-rahmen">
                 {entries.length} Einträge
@@ -513,7 +513,7 @@ export const AdvancementLog: React.FC<AdvancementLogProps> = ({
           <div id="advancement-log-note-dialog" className="bg-flaeche p-5 sm:p-6 rounded-karte border border-rahmen shadow-2xl max-w-md w-full">
             <div className="flex items-center gap-2 border-b border-gold pb-3 mb-4">
               <FileText className="w-5 h-5 text-gold" />
-              <h3 className="fantasy-font text-xl text-gold-hell">
+              <h3 className="fantasy-font text-[17px] font-bold text-gold-hell">
                 Notiz zum Protokoll hinzufügen
               </h3>
             </div>

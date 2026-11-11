@@ -62,7 +62,7 @@ export const ChanneledSpellsTracker: React.FC<ChanneledSpellsTrackerProps> = ({
             <Sparkles size={16} />
           </span>
           <div>
-            <h3 className="font-bold text-sm sm:text-base text-gold-hell fantasy-font leading-tight">
+            <h3 className="font-bold text-sm text-gold-hell fantasy-font leading-tight">
               Aktive Kanalisierungen ({channeledSpells.length})
             </h3>
             <span className="text-[11px] text-leise">

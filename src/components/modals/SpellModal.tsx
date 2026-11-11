@@ -119,7 +119,7 @@ export const SpellModal: React.FC<SpellModalProps> = ({
         className="bg-flaeche rounded-karte border border-rahmen shadow-2xl max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden"
       >
         <div className="px-5 py-4 border-b border-gold shrink-0">
-          <h3 className="fantasy-font text-xl text-gold-hell tracking-wide uppercase">
+          <h3 className="fantasy-font text-[17px] font-bold text-gold-hell tracking-wide uppercase">
             Zauber hinzufügen
           </h3>
           <div className="text-xs text-leise mt-0.5">
@@ -308,7 +308,7 @@ export const SpellModal: React.FC<SpellModalProps> = ({
             </span>
           </div>
           {!isAffordable && selectedSpell && (
-            <div className="text-xs text-schaden font-bold text-center border border-magie bg-erhoeht p-1.5 rounded-knopf shadow-2xs">
+            <div className="text-xs text-schaden font-bold text-center border border-magie bg-erhoeht p-1.5 rounded-knopf">
               Nicht genügend EP verfügbar!
             </div>
           )}

@@ -38,7 +38,7 @@ export const StatusWidget: React.FC<StatusWidgetProps> = ({
         {/* Left: Status & Heldengrad */}
         <div className="flex flex-col">
           <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap">
-            <h3 className="font-bold text-xl fantasy-font tracking-widest text-gold-hell">STATUS</h3>
+            <h3 className="font-bold text-[17px] fantasy-font tracking-widest text-gold-hell">STATUS</h3>
             {onToggleCreationMode && (
               mode === 'creation' ? (
                 <button

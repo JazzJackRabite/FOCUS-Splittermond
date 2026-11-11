@@ -173,7 +173,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ onClose, onSelectPro
         <div className="bg-erhoeht text-schrift p-4 flex justify-between items-center border-b-2 border-gold">
           <div className="flex items-center gap-2">
             <User className="text-gold" size={24} />
-            <h2 className="text-xl font-bold fantasy-font">Charakter-Profile & Vorlagen</h2>
+            <h2 className="text-[17px] font-bold fantasy-font">Charakter-Profile & Vorlagen</h2>
           </div>
           <button onClick={onClose} className="hover:text-schrift transition-colors">
             <X size={20} />
@@ -265,7 +265,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ onClose, onSelectPro
                         {!isActive && (
                           <button
                             onClick={() => handleSwitchProfile(p.id)}
-                            className="bg-gold hover:bg-gold-hell text-seite p-2 rounded-knopf text-xs font-bold flex items-center gap-1 border border-erschoepft cursor-pointer shadow-2xs"
+                            className="bg-gold hover:bg-gold-hell text-seite p-2 rounded-knopf text-xs font-bold flex items-center gap-1 border border-erschoepft cursor-pointer"
                             title="Zu diesem Profil wechseln"
                           >
                             <Check size={14} /> Laden

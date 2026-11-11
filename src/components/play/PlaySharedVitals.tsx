@@ -816,7 +816,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
               </div>
 
               {/* ── Action Stepper Row 2: Temp LP & LP-Modifikator ── */}
-              <div className="grid grid-cols-2 gap-2.5 pt-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
                 <CompoundStepper
                   label={`Temp LP (${activeTempHP})`}
                   variant="teal"
@@ -1148,7 +1148,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
               )}
 
               {/* 3 compound steppers */}
-              <div className="grid grid-cols-3 gap-2 pt-3 border-t border-rahmen">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-3 border-t border-rahmen">
                 <CompoundStepper
                   label="Erschöpft"
                   variant="amber"

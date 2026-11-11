@@ -57,7 +57,7 @@ export const RestResultModal: React.FC<RestResultModalProps> = ({ data, onClose 
               )}
             </div>
             <div>
-              <h2 className="text-lg font-bold fantasy-font tracking-wide flex items-center gap-2">
+              <h2 className="text-[17px] font-bold fantasy-font tracking-wide flex items-center gap-2">
                 {data.title}
               </h2>
               <p className="text-xs text-schrift font-medium">{data.durationText}</p>
@@ -111,7 +111,7 @@ export const RestResultModal: React.FC<RestResultModalProps> = ({ data, onClose 
                 return (
                   <div
                     key={idx}
-                    className="flex items-center justify-between p-2.5 rounded-knopf bg-flaeche border border-rahmen text-xs shadow-2xs"
+                    className="flex items-center justify-between p-2.5 rounded-knopf bg-flaeche border border-rahmen text-xs"
                   >
                     <div className="flex items-center gap-2">
                       {icon}

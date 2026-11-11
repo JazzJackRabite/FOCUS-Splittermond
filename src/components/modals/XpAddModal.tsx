@@ -27,7 +27,7 @@ export const XpAddModal: React.FC<XpAddModalProps> = ({ onClose, onAdd }) => {
       >
         <div className="px-5 py-4 border-b border-gold flex items-center gap-2 shrink-0">
           <Sparkles className="w-5 h-5 text-gold" />
-          <h3 className="fantasy-font text-xl text-gold-hell">
+          <h3 className="fantasy-font text-[17px] font-bold text-gold-hell">
             Erfahrungspunkte (EP) hinzufügen
           </h3>
         </div>
@@ -66,7 +66,7 @@ export const XpAddModal: React.FC<XpAddModalProps> = ({ onClose, onAdd }) => {
                 <button
                   type="button"
                   onClick={() => setVal(Math.max(1, val - 1))}
-                  className="w-10 h-10 rounded-knopf bg-erhoeht hover:bg-rahmen active:scale-95 font-bold flex items-center justify-center text-schrift border border-rahmen shadow-2xs touch-manipulation cursor-pointer transition-all"
+                  className="w-10 h-10 rounded-knopf bg-erhoeht hover:bg-rahmen active:scale-95 font-bold flex items-center justify-center text-schrift border border-rahmen touch-manipulation cursor-pointer transition-all"
                 >
                   <Minus size={18} />
                 </button>
@@ -81,7 +81,7 @@ export const XpAddModal: React.FC<XpAddModalProps> = ({ onClose, onAdd }) => {
                 <button
                   type="button"
                   onClick={() => setVal(val + 1)}
-                  className="w-10 h-10 rounded-knopf bg-erhoeht hover:bg-rahmen active:scale-95 font-bold flex items-center justify-center text-schrift border border-rahmen shadow-2xs touch-manipulation cursor-pointer transition-all"
+                  className="w-10 h-10 rounded-knopf bg-erhoeht hover:bg-rahmen active:scale-95 font-bold flex items-center justify-center text-schrift border border-rahmen touch-manipulation cursor-pointer transition-all"
                 >
                   <Plus size={18} />
                 </button>

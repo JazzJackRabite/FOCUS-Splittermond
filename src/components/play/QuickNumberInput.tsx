@@ -293,7 +293,7 @@ export const QuickNumberInput: React.FC<QuickNumberInputProps> = ({
                   key={digit}
                   type="button"
                   onClick={() => handlePadDigit(digit.toString())}
-                  className="h-9 rounded-knopf bg-flaeche border border-rahmen hover:bg-rahmen active:bg-erhoeht font-bold text-sm text-schrift shadow-2xs active:scale-95 transition-all flex items-center justify-center cursor-pointer"
+                  className="h-9 rounded-knopf bg-flaeche border border-rahmen hover:bg-rahmen active:bg-erhoeht font-bold text-sm text-schrift active:scale-95 transition-all flex items-center justify-center cursor-pointer"
                 >
                   {digit}
                 </button>
@@ -301,7 +301,7 @@ export const QuickNumberInput: React.FC<QuickNumberInputProps> = ({
               <button
                 type="button"
                 onClick={handlePadClear}
-                className="h-9 rounded-knopf bg-seite border border-rahmen hover:bg-rahmen active:bg-erhoeht font-bold text-xs text-schrift shadow-2xs active:scale-95 transition-all flex items-center justify-center cursor-pointer"
+                className="h-9 rounded-knopf bg-seite border border-rahmen hover:bg-rahmen active:bg-erhoeht font-bold text-xs text-schrift active:scale-95 transition-all flex items-center justify-center cursor-pointer"
                 title="Löschen"
               >
                 C
@@ -309,14 +309,14 @@ export const QuickNumberInput: React.FC<QuickNumberInputProps> = ({
               <button
                 type="button"
                 onClick={() => handlePadDigit('0')}
-                className="h-9 rounded-knopf bg-flaeche border border-rahmen hover:bg-rahmen active:bg-erhoeht font-bold text-sm text-schrift shadow-2xs active:scale-95 transition-all flex items-center justify-center cursor-pointer"
+                className="h-9 rounded-knopf bg-flaeche border border-rahmen hover:bg-rahmen active:bg-erhoeht font-bold text-sm text-schrift active:scale-95 transition-all flex items-center justify-center cursor-pointer"
               >
                 0
               </button>
               <button
                 type="button"
                 onClick={handlePadBackspace}
-                className="h-9 rounded-knopf bg-erhoeht border border-rahmen hover:bg-rahmen active:bg-erhoeht font-bold text-xs text-schrift shadow-2xs active:scale-95 transition-all flex items-center justify-center cursor-pointer"
+                className="h-9 rounded-knopf bg-erhoeht border border-rahmen hover:bg-rahmen active:bg-erhoeht font-bold text-xs text-schrift active:scale-95 transition-all flex items-center justify-center cursor-pointer"
                 title="Letzte Ziffer löschen"
               >
                 <Delete size={14} />

@@ -228,7 +228,7 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
               <Flame size={18} />
             </div>
             <div>
-              <h3 className="fantasy-font text-lg sm:text-xl text-gold-hell font-bold leading-tight">
+              <h3 className="fantasy-font text-[17px] text-gold-hell font-bold leading-tight">
                 {begleiter ? `${begleiter}: Schaden erleiden` : 'Schaden erleiden'}
               </h3>
               <p className="text-[11px] text-gold leading-tight">

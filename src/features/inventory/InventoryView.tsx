@@ -227,7 +227,7 @@ export const InventoryView: React.FC = () => {
       {/* ── HEADER & VERMÖGEN ── */}
       <div className="bg-erhoeht text-schrift rounded-karte border border-gold p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="font-bold text-xl md:text-2xl fantasy-font text-gold-hell tracking-wide flex items-center gap-2">
+          <h2 className="font-bold text-[17px] fantasy-font text-gold-hell tracking-wide flex items-center gap-2">
             <Package size={24} className="text-gold" />
             Inventar &amp; Ausrüstung
           </h2>
@@ -249,7 +249,7 @@ export const InventoryView: React.FC = () => {
             title="Solare (Goldmünzen, 1 S = 100 L) · Klick auf ▲/▼ zum Anpassen (Shift+Klick: 10er-Schritte)"
           >
             <span className="flex items-center gap-1 select-none shrink-0 tabular-nums text-xs font-bold" title="Solare (Goldmünzen, 1 S = 100 L)">
-              <span className="w-3 h-3 rounded-full bg-erschoepft border border-erschoepft shadow-2xs inline-block shrink-0" />
+              <span className="w-3 h-3 rounded-full bg-erschoepft border border-erschoepft inline-block shrink-0" />
               <span className="text-gold">S</span>
             </span>
             <input
@@ -296,7 +296,7 @@ export const InventoryView: React.FC = () => {
             title="Lunare (Silbermünzen, 1 L = 100 T) · Klick auf ▲/▼ zum Anpassen (Shift+Klick: 10er-Schritte)"
           >
             <span className="flex items-center gap-1 select-none shrink-0 tabular-nums text-xs font-bold" title="Lunare (Silbermünzen, 1 L = 100 T)">
-              <span className="w-3 h-3 rounded-full bg-erhoeht border border-rahmen shadow-2xs inline-block shrink-0" />
+              <span className="w-3 h-3 rounded-full bg-erhoeht border border-rahmen inline-block shrink-0" />
               <span className="text-schrift">L</span>
             </span>
             <input
@@ -343,7 +343,7 @@ export const InventoryView: React.FC = () => {
             title="Telare (Kupfermünzen) · Klick auf ▲/▼ zum Anpassen (Shift+Klick: 10er-Schritte)"
           >
             <span className="flex items-center gap-1 select-none shrink-0 tabular-nums text-xs font-bold" title="Telare (Kupfermünzen)">
-              <span className="w-3 h-3 rounded-full bg-gold-hell border border-erschoepft shadow-2xs inline-block shrink-0" />
+              <span className="w-3 h-3 rounded-full bg-gold-hell border border-erschoepft inline-block shrink-0" />
               <span className="text-erschoepft">T</span>
             </span>
             <input
@@ -387,7 +387,7 @@ export const InventoryView: React.FC = () => {
       </div>
 
       {/* ── TRAGKRAFT & LAST (BELASTUNG) ── */}
-      <div className="bg-flaeche bg-opacity-70 rounded-karte border border-rahmen p-4">
+      <div className="bg-flaeche rounded-karte border border-rahmen p-5">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-2">
           <div className="flex items-center gap-2 flex-wrap">
             <Weight size={18} className="text-schrift" />
@@ -400,7 +400,7 @@ export const InventoryView: React.FC = () => {
           <div className="flex items-center gap-2.5 flex-wrap">
             {/* Checkbox: Tragelast ignorieren */}
             <label
-              className="flex items-center gap-1.5 cursor-pointer text-xs select-none bg-erhoeht hover:bg-rahmen text-schrift border border-gold px-2.5 py-1 rounded-knopf transition-colors shadow-2xs"
+              className="flex items-center gap-1.5 cursor-pointer text-xs select-none bg-erhoeht hover:bg-rahmen text-schrift border border-gold px-2.5 py-1 rounded-knopf transition-colors"
               title="Aktivieren, um ohne die optionale Traglast-Regel zu spielen (Überlastung erzeugt keine Behinderung)"
             >
               <input
@@ -507,7 +507,7 @@ export const InventoryView: React.FC = () => {
       {/* ── ITEMS LIST ── */}
       <div className="space-y-2.5">
         {filteredItems.length === 0 ? (
-          <div className="bg-flaeche bg-opacity-70 rounded-karte border border-rahmen p-8 text-center text-leise italic">
+          <div className="bg-flaeche rounded-karte border border-rahmen p-8 text-center text-leise italic">
             <Package size={32} className="mx-auto text-leise mb-2 opacity-60" />
             {inventory.length === 0
               ? 'Das Inventar ist noch leer. Klicke oben auf "Gegenstand", um Ausrüstung aus dem offiziellen Splittermond-Katalog hinzuzufügen.'
@@ -519,10 +519,10 @@ export const InventoryView: React.FC = () => {
             return (
               <div
                 key={item.id}
-                className={`rounded-karte border p-3.5 shadow-2xs transition-all flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 ${
+                className={`rounded-karte border p-3.5 transition-all flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 ${
                   item.equipped
                     ? 'bg-erhoeht border-gold ring-1 ring-rahmen'
-                    : 'bg-flaeche bg-opacity-80 border-rahmen'
+                    : 'bg-flaeche border-rahmen'
                 }`}
               >
                 {/* Item Info */}
@@ -711,7 +711,7 @@ export const InventoryView: React.FC = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-seite/80 p-4 overflow-y-auto">
           <div className="bg-flaeche border border-rahmen rounded-karte shadow-2xl max-w-2xl w-full p-5 space-y-4 max-h-[90vh] flex flex-col">
             <div className="flex justify-between items-center border-b border-gold pb-2">
-              <h3 className="font-bold text-lg text-gold-hell fantasy-font flex items-center gap-2">
+              <h3 className="font-bold text-[17px] text-gold-hell fantasy-font flex items-center gap-2">
                 <Package size={20} className="text-gold" />
                 Gegenstand hinzufügen
               </h3>
@@ -846,7 +846,7 @@ export const InventoryView: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => handleAddCatalogItem(catItem)}
-                        className="min-h-11 bg-erhoeht hover:bg-rahmen text-schrift px-3 py-1 rounded-knopf font-bold text-xs shrink-0 cursor-pointer shadow-2xs"
+                        className="min-h-11 bg-erhoeht hover:bg-rahmen text-schrift px-3 py-1 rounded-knopf font-bold text-xs shrink-0 cursor-pointer"
                       >
                         + Hinzufügen
                       </button>
@@ -1023,7 +1023,7 @@ export const InventoryView: React.FC = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-seite/80 p-4 overflow-y-auto">
           <div className="bg-flaeche border border-rahmen rounded-karte shadow-2xl max-w-xl w-full p-5 space-y-4 max-h-[90vh] flex flex-col">
             <div className="flex justify-between items-center border-b border-gold pb-2">
-              <h3 className="font-bold text-lg text-gold-hell fantasy-font flex items-center gap-2">
+              <h3 className="font-bold text-[17px] text-gold-hell fantasy-font flex items-center gap-2">
                 <Edit2 size={18} className="text-gold" />
                 Gegenstand bearbeiten: {editingItem.name}
               </h3>

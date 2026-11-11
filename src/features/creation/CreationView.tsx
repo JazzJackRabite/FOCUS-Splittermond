@@ -308,8 +308,8 @@ export function CreationView() {
           />
 
           {/* Character Info */}
-          <div className="bg-flaeche bg-opacity-60 p-5 rounded-knopf border border-rahmen relative">
-            <h3 className="font-bold text-xl mb-4 border-b border-gold pb-2 fantasy-font text-gold-hell">Charakter</h3>
+          <div className="bg-flaeche p-5 rounded-karte border border-rahmen relative">
+            <h3 className="font-bold text-[17px] mb-4 border-b border-gold pb-2 fantasy-font text-gold-hell">Charakter</h3>
             <div className="space-y-4">
               <div>
                 <label className="block text-xs uppercase text-leise font-bold mb-1">Name</label>
@@ -411,9 +411,9 @@ export function CreationView() {
           <ErschaffungRegelwerk />
 
           {/* Attributes */}
-          <div className="bg-flaeche bg-opacity-60 p-4 sm:p-5 rounded-knopf border border-rahmen relative overflow-hidden">
+          <div className="bg-flaeche p-5 rounded-karte border border-rahmen relative overflow-hidden">
             <div className="flex justify-between items-center border-b border-gold pb-2 mb-4">
-              <h3 className="font-bold text-xl fantasy-font text-gold-hell">Attribute</h3>
+              <h3 className="font-bold text-[17px] fantasy-font text-gold-hell">Attribute</h3>
               <PointDisplay current={creationUsage.attr} max={18} label="Punkte" mode={mode} />
             </div>
             <div className="space-y-1">
@@ -442,8 +442,8 @@ export function CreationView() {
           </div>
 
           {/* Derived Stats */}
-          <div className="bg-flaeche bg-opacity-60 p-5 rounded-knopf border border-rahmen relative print:break-inside-avoid">
-            <h3 className="font-bold text-xl mb-4 border-b border-gold pb-2 fantasy-font text-gold-hell">Abgeleitete Werte</h3>
+          <div className="bg-flaeche p-5 rounded-karte border border-rahmen relative print:break-inside-avoid">
+            <h3 className="font-bold text-[17px] mb-4 border-b border-gold pb-2 fantasy-font text-gold-hell">Abgeleitete Werte</h3>
             <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
               <StatDisplay label="GSW" value={derived.GSW} subLabel="Geschw." />
               <StatDisplay label="INI" value={derived.INI} subLabel="Initiative" />
@@ -471,9 +471,9 @@ export function CreationView() {
         {/* RIGHT COLUMN */}
         <div className="lg:col-span-7 space-y-8">
           {/* Skills */}
-          <div className="bg-flaeche bg-opacity-60 p-5 rounded-knopf border border-rahmen relative">
+          <div className="bg-flaeche p-5 rounded-karte border border-rahmen relative">
             <div className="flex justify-between items-center border-b border-gold pb-2 mb-4 flex-wrap gap-2">
-              <h3 className="font-bold text-xl fantasy-font text-gold-hell">Fertigkeiten</h3>
+              <h3 className="font-bold text-[17px] fantasy-font text-gold-hell">Fertigkeiten</h3>
               <div className="flex items-center gap-4">
                 <PointDisplay current={creationUsage.skill} max={55} label="Punkte" mode={mode} />
                 <div className="flex gap-1 no-print items-center">
@@ -547,9 +547,9 @@ export function CreationView() {
 
           {/* Strengths & Weaknesses */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-            <div className="bg-flaeche bg-opacity-60 p-5 rounded-knopf border border-rahmen relative flex flex-col">
+            <div className="bg-flaeche p-5 rounded-karte border border-rahmen relative flex flex-col">
               <div className="flex justify-between items-center border-b border-gold pb-2 mb-2">
-                <h3 className="font-bold text-lg fantasy-font text-gold-hell truncate min-w-0">Stärken</h3>
+                <h3 className="font-bold text-[17px] fantasy-font text-gold-hell truncate min-w-0">Stärken</h3>
                 <button onClick={() => setShowStrengthModal(true)} className="text-xs bg-erhoeht hover:bg-rahmen border border-gold px-2.5 py-1 rounded-knopf no-print font-bold text-schrift shrink-0 ml-2 transition-colors cursor-pointer ">+ Hinzufügen</button>
               </div>
               <PointDisplay current={creationUsage.strength} max={creationUsage.strengthLimit} label="Erstellung" mode={mode} />
@@ -557,9 +557,9 @@ export function CreationView() {
                 <ItemList items={strengthsList} onDelete={(idx) => removeListEntry('strength', idx)} typeLabel="Stärken" showCosts xpMultiplier={7} mode={mode} />
               </div>
             </div>
-            <div className="bg-flaeche bg-opacity-60 p-5 rounded-knopf border border-rahmen relative flex flex-col">
+            <div className="bg-flaeche p-5 rounded-karte border border-rahmen relative flex flex-col">
               <div className="flex justify-between items-center border-b border-gold pb-2 mb-2">
-                <h3 className="font-bold text-lg fantasy-font text-gold-hell truncate min-w-0">Schwächen</h3>
+                <h3 className="font-bold text-[17px] fantasy-font text-gold-hell truncate min-w-0">Schwächen</h3>
                 <button onClick={() => setShowWeaknessModal(true)} className="text-xs bg-erhoeht hover:bg-rahmen border border-gold px-2.5 py-1 rounded-knopf no-print font-bold text-schrift shrink-0 ml-2 transition-colors cursor-pointer ">+ Hinzufügen</button>
               </div>
               <div className="flex-grow">
@@ -570,9 +570,9 @@ export function CreationView() {
 
           {/* Resources & Languages */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-            <div className="bg-flaeche bg-opacity-60 p-5 rounded-knopf border border-rahmen relative flex flex-col">
+            <div className="bg-flaeche p-5 rounded-karte border border-rahmen relative flex flex-col">
               <div className="flex justify-between items-center border-b border-gold pb-2 mb-2">
-                <h3 className="font-bold text-lg fantasy-font text-gold-hell truncate min-w-0">Ressourcen</h3>
+                <h3 className="font-bold text-[17px] fantasy-font text-gold-hell truncate min-w-0">Ressourcen</h3>
                 <button onClick={() => setShowResourceModal(true)} className="text-xs bg-erhoeht hover:bg-rahmen border border-gold px-2.5 py-1 rounded-knopf no-print font-bold text-schrift shrink-0 ml-2 transition-colors cursor-pointer ">+ Hinzufügen</button>
               </div>
               <PointDisplay current={creationUsage.resource} max={creationUsage.resourceLimit} label="Erstellung" mode={mode} />
@@ -580,9 +580,9 @@ export function CreationView() {
                 <ItemList items={resourcesList} onDelete={(idx) => removeListEntry('resource', idx)} typeLabel="Ressourcen" showCosts xpMultiplier={7} mode={mode} />
               </div>
             </div>
-            <div className="bg-flaeche bg-opacity-60 p-5 rounded-knopf border border-rahmen relative flex flex-col">
+            <div className="bg-flaeche p-5 rounded-karte border border-rahmen relative flex flex-col">
               <div className="flex justify-between items-center border-b border-gold pb-2 mb-2">
-                <h3 className="font-bold text-lg fantasy-font text-gold-hell truncate min-w-0">Sprachen</h3>
+                <h3 className="font-bold text-[17px] fantasy-font text-gold-hell truncate min-w-0">Sprachen</h3>
                 <button onClick={() => setShowLanguageModal(true)} className="text-xs bg-erhoeht hover:bg-rahmen border border-gold px-2.5 py-1 rounded-knopf no-print font-bold text-schrift shrink-0 ml-2 transition-colors cursor-pointer ">+ Hinzufügen</button>
               </div>
               <div className="flex-grow">
@@ -592,9 +592,9 @@ export function CreationView() {
           </div>
 
           {/* Learned Skills (Masteries + Spells) */}
-          <div className="bg-flaeche bg-opacity-60 p-5 rounded-knopf border border-rahmen relative">
+          <div className="bg-flaeche p-5 rounded-karte border border-rahmen relative">
             <div className="flex justify-between items-center border-b border-gold pb-2 mb-4">
-              <h3 className="font-bold text-xl fantasy-font text-gold-hell">Gelernte Fähigkeiten</h3>
+              <h3 className="font-bold text-[17px] fantasy-font text-gold-hell">Gelernte Fähigkeiten</h3>
             </div>
             <div className="space-y-6">
               {groupedMasteries.length > 0 && (

@@ -211,7 +211,7 @@ export const HealModal: React.FC<HealModalProps> = ({
               <Heart size={18} />
             </div>
             <div>
-              <h3 className="fantasy-font text-lg sm:text-xl text-gold-hell font-bold leading-tight">
+              <h3 className="fantasy-font text-[17px] text-gold-hell font-bold leading-tight">
                 {begleiter ? `${begleiter}: Heilung anwenden` : 'Heilung anwenden'}
               </h3>
               <p className="text-[11px] text-unverletzt leading-tight">

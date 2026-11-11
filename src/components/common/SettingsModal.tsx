@@ -164,7 +164,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <div className="mx-auto w-12 h-12 rounded-full bg-flaeche flex items-center justify-center text-schrift mb-3">
                 <ShieldCheck size={24} />
               </div>
-              <h3 className="font-bold text-base sm:text-lg text-gold-hell mb-1">
+              <h3 className="font-bold text-base text-gold-hell mb-1">
                 Splittermond Charaktergenerator
               </h3>
               <p className="text-xs sm:text-sm text-leise max-w-md mx-auto mb-3">

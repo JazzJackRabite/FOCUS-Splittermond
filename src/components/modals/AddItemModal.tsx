@@ -248,7 +248,7 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({
         className="bg-flaeche rounded-karte border border-rahmen shadow-2xl max-w-md w-full max-h-[90vh] flex flex-col overflow-hidden"
       >
         <div className="px-5 py-4 border-b border-gold shrink-0">
-          <h3 className="fantasy-font text-xl text-gold-hell">
+          <h3 className="fantasy-font text-[17px] font-bold text-gold-hell">
             {title} hinzufügen
           </h3>
         </div>
@@ -466,14 +466,14 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({
           )}
 
           {!isAffordable && type !== 'weakness' && (
-            <div className="text-xs text-schaden font-bold text-center border border-magie bg-erhoeht p-1.5 rounded-knopf shadow-2xs">
+            <div className="text-xs text-schaden font-bold text-center border border-magie bg-erhoeht p-1.5 rounded-knopf">
               Nicht genügend {mode === 'creation' ? 'Punkte' : 'EP'} verfügbar! (Rest:{' '}
               {budget})
             </div>
           )}
 
           {isLanguageLimitReached && (
-            <div className="text-xs text-schaden font-bold text-center border border-magie bg-erhoeht p-2 rounded-knopf shadow-2xs">
+            <div className="text-xs text-schaden font-bold text-center border border-magie bg-erhoeht p-2 rounded-knopf">
               Bei der Erschaffung sind nur Basargnomisch und eine Muttersprache erlaubt.
             </div>
           )}
