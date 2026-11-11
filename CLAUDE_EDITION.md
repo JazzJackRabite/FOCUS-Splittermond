@@ -399,6 +399,12 @@ Dateien aus AI Studio im Repository: `public/assets/aistudio/*.png`, `.aistudio/
 - Die Ansichten sind noch nicht auf die Bausteine umgestellt; sie sehen aus wie bisher im Dunkelmodus, nur der Scrollbalken
   ist neu. Reihenfolge der Umstellung: Dialoge, Spielen und Kampf, Charakter, Inventar, Begleiter, Erschaffung.
 - 329 Tests grün ohne Bücher; Build läuft.
+- **Nachtrag 11.11.2026 – Regelquellen geprüft:** Tabelle in `FUNDAMENT.md` gegen den Code abgeglichen und ergänzt
+  (Auswahllisten aus Büchern über `bruecke.ts`, Paketspeicher, `modifikationen.ts`, `reichweite` wird in
+  `utils/magicRules.ts` gelesen). Altlasten nachgetragen: `src/data/rules.ts`, `presets.ts`, `utils/costCalculations.ts`,
+  `conditionModifiers.ts`, Heldengrad-Schwellen, Fertigkeitswert je Zaubergrad. Dritte Prüfung eingebaut: Tabelle passt
+  zum Code; Paketdaten lesen nur die dort genannten Dateien (7 Ansichten als Altlast `paketzugriffe`). Grundsatz 7 als
+  „noch nicht entschieden“ gekennzeichnet.
 
 ## Google AI Studio
 

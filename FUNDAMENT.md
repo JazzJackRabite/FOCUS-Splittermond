@@ -7,8 +7,8 @@ Gemini in Google AI Studio – liest diese Datei zuerst und hält sich daran.
 - Die Prüfungen in `src/fundament/__tests__/` setzen diese Datei durch. Schlägt eine fehl, ist der Code zu ändern, nicht die Prüfung.
 - Änderungen an dieser Datei entscheidet der Projektinhaber.
 
-> **Entwurf vom 11.11.2026.** Teil 2 (Regelquellen) ist aus dem Code abgelesen und noch nicht vom Projektinhaber
-> gegengelesen. Die Prüfung der Tabelle gegen den Code wird erst danach eingebaut.
+> **Stand 11.11.2026.** Teil 2 (Regelquellen) ist gegen den Code geprüft; eine Prüfung hält Tabelle und Code seitdem
+> zusammen (`src/fundament/__tests__`).
 
 ---
 
@@ -27,7 +27,10 @@ Gemini in Google AI Studio – liest diese Datei zuerst und hält sich daran.
 5. **Die App bleibt in Google AI Studio lauffähig:** Vite und React, `metadata.json` im Wurzelordner, Daten unter
    `public/`, keine neuen Abhängigkeiten ohne Rücksprache.
 6. **Ein Erscheinungsbild.** Es gibt genau ein Design: das dunkle CI aus Teil 3. Kein helles Design, kein Farbschema-Menü.
-7. **Warnen statt sperren.** Verstößt eine Eingabe gegen eine Regel, zeigt der Editor das an, lässt sie aber zu.
+7. **Warnen statt sperren – noch nicht entschieden.** Vorschlag: Verstößt eine Eingabe gegen eine Regel, zeigt der Editor
+   das an, lässt sie aber zu. Heute ist das uneinheitlich: Relikt-Werkstatt und Begleiter warnen nur; Steigerung und
+   Erschaffung sperren (zu wenig Erfahrungspunkte, Zauber über dem Fertigkeitswert, Entfernen von Erschaffungswahlen).
+   Bis zur Entscheidung bleibt jede Ansicht, wie sie ist.
 
 ## 2. Regelquellen
 
@@ -36,18 +39,23 @@ Felder stehen unter `daten` des jeweiligen Eintrags. **Was hier nicht steht, dar
 
 | Bereich | Quelle im Paket | Liest im Editor |
 |---|---|---|
-| Einträge finden, Namen und IDs, Umbenennungen | Einträge mit `id`, `typ`, `name`; ID-Register | `regelwerk/katalog.ts`, `bruecke.ts`, `ids.ts` |
-| Abgeleitete Werte, Heldengrade, Höchstbonus | Kernregeln: `strukturiert`; an Stärken: `abgeleitete_werte_modifikatoren`; `groessenklasse` | `regelwerk/abgeleitet.ts` |
+| Pakete laden und im Browser speichern | Paketkopf, Einträge | `regelwerk/laden.ts`, `regelwerk/paketSpeicher.ts` |
+| Einträge finden, Namen und IDs, Umbenennungen | Einträge mit `id`, `typ`, `name`; ID-Register | `regelwerk/katalog.ts`, `regelwerk/bruecke.ts`, `regelwerk/ids.ts` |
+| Abgeleitete Werte, Heldengrade, Höchstbonus | Kernregeln: `strukturiert`; an Stärken: `abgeleitete_werte_modifikatoren`; `groessenklasse`; an Ausrüstung: `behinderung`, `vtd_bonus`, `mindest_staerke` | `regelwerk/abgeleitet.ts` |
 | Voraussetzungen | `voraussetzungen` (formal, mit IDs) | `regelwerk/bedingungen.ts` |
-| Erschaffung: Rassen, Kulturen, Abstammungen, Module, Grenzen je Schritt | `modulwerte`, `attributsmodifikatoren`, `staerken_refs`, `strukturiert`, `tabelle` | `regelwerk/erschaffung.ts`, `erschaffungEditor.ts` |
+| Erschaffung: Rassen, Kulturen, Abstammungen, Module, Grenzen je Schritt | `modulwerte`, `attributsmodifikatoren`, `staerken_refs`, `strukturiert`, `tabelle` | `regelwerk/erschaffung.ts`, `regelwerk/erschaffungEditor.ts` |
 | Wirkungen von Stärken und Meisterschaften (feste Boni, Boni beim Würfeln) | `wirkungen_strukturiert` mit `fertigkeit_refs`, `alle_proben`, `gilt`, `traeger` | `regelwerk/wirkungen.ts` |
 | Kosten und Zauberdauer aus Meisterschaften | `wirkungen_strukturiert`, Gruppe B | `regelwerk/wirkungen.ts` |
-| Wirkung aktiver Zauber (Kampfwerte, Proben, Zusatzschaden, Lebenspunkte, unterdrückte Zustände) | `spielwerte`, `typus`, `reichweite` | `regelwerk/zauberwerte.ts` |
+| Wirkung aktiver Zauber (Kampfwerte, Proben, Zusatzschaden, Lebenspunkte, unterdrückte Zustände) | `spielwerte`, `typus`, `reichweite` | `regelwerk/zauberwerte.ts`, `utils/magicRules.ts` |
+| Zauber, Meisterschaften, Stärken, Ressourcen aus Büchern in den Auswahllisten | `schulen`, `kosten`, `zauberdauer`, `reichweite`, `wirkungsdauer`, `wirkung`, `erfolgsgrade`, `schwelle`, `stufe`, `fertigkeit`, `manoever` | `regelwerk/bruecke.ts` |
 | Ausrüstung aus Büchern | Ausrüstungseinträge; `modus` (ersetzt, ergänzt) | `regelwerk/ausruestung.ts` |
 | Relikte | `relikt_baukasten`, `baustein` | `regelwerk/relikte.ts` |
-| Begleiter: Tiere, beschworene Wesen, Dienste | `werte_berechnet`, `tabellenzeile`, `beschwoerbares_wesen_stufe`, `immer_verfuegbar` | `regelwerk/begleiter.ts`, `dienste.ts` |
-| Begleiter: Gefolge, erhobene Untote, Golems | `attribute`, `modulwerte`, `modifikationen`, `kosten_ep`, `baustein`, `felder`, `tabellen` | `regelwerk/gefolge.ts`, `untote.ts`, `golem.ts` |
+| Begleiter: Tiere, beschworene Wesen, Dienste | `werte_berechnet`, `tabellenzeile`, `beschwoerbares_wesen_stufe`, `immer_verfuegbar` | `regelwerk/begleiter.ts`, `regelwerk/dienste.ts` |
+| Begleiter: Gefolge, erhobene Untote, Golems | `attribute`, `modulwerte`, `modifikationen`, `kosten_ep`, `baustein`, `felder`, `tabellen` | `regelwerk/gefolge.ts`, `regelwerk/untote.ts`, `regelwerk/golem.ts`, `regelwerk/modifikationen.ts` |
 | Lebenspunkte und Stufen der Begleiter | Kernregeln: `strukturiert`; Merkmale: `beschreibung` | `regelwerk/vitals.ts` |
+
+Ansichten (`components/`) greifen nicht selbst in die Paketdaten, sondern fragen die Module aus `regelwerk/`. Wo eine
+Ansicht das heute noch tut, steht sie in `src/fundament/altlasten.json` (`paketzugriffe`).
 
 ### Regeln, die noch im Code stehen (Altlasten)
 
@@ -57,6 +65,11 @@ Datenseite wandern. Neue kommen nicht hinzu.
 | Was | Wo | Ziel |
 |---|---|---|
 | Eingebaute Listen des Grundregelwerks: Zauber, Meisterschaften, Stärken, Schwächen, Ressourcen, Ausrüstung, Sprachen | `src/data/*.ts` | Der Editor liest diese Listen aus dem GRW-Paket; `src/data` entfällt |
+| Attribute, Fertigkeiten mit ihren Attributen, Rassen, Mondzeichen, Heldengrade (Grenzen, Boni), Zustandslisten, Wundabzüge | `src/data/rules.ts` | Kernregeln und Einträge des GRW-Pakets |
+| Beispielcharaktere (Archetypen) mit Namen von Stärken, Meisterschaften und Zaubern | `src/data/presets.ts` | Auf IDs umstellen |
+| Kosten in Erfahrungspunkten (Attribute, Fertigkeiten, Stärken, Meisterschaften, Zauber), GRW S. 25 und 87 | `utils/costCalculations.ts` | Kernregeln `strukturiert` |
+| Heldengrad-Schwellen (100/300/600), Fertigkeitswert je Zaubergrad | `utils/characterCalculations.ts`, `hooks/useSpellHandlers.ts` | Kernregeln `strukturiert` |
+| Abzüge und Beschreibungen der Zustände | `utils/conditionModifiers.ts` | Zustandseinträge des Pakets |
 | Würfelmechanik (Standard-, Sicherheits-, Risikowurf, Patzer, Triumph, Erfolgsgrade), GRW S. 16–19 | `utils/wuerfeln.ts` | Kernregeln `strukturiert` |
 | Fokuskosten, Erfolgsgrade beim Zaubern, GRW S. 221–222 | `utils/magicRules.ts` | Kernregeln `strukturiert` |
 | Kampfmanöver nach Namen | `utils/combatRules.ts` | Daten der Meisterschaften |
@@ -65,6 +78,7 @@ Datenseite wandern. Neue kommen nicht hinzu.
 | Schadens- und Heildialog: Zustandsliste, Verschnaufpause | `components/play/TakeDamageModal.tsx`, `HealModal.tsx` | Zustände und Kernregeln des Pakets |
 
 Die genaue Liste der geduldeten Regelnamen steht in `src/fundament/altlasten.json` (`regelnamen`).
+Ohne geladenes Regelpaket rechnet der Editor mit diesen eingebauten Werten weiter (Rückfall).
 
 ## 3. Gestaltung
 

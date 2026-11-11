@@ -60,3 +60,42 @@ export function regelnamenImCode(): string[] {
   }
   return [...out].sort();
 }
+
+/** Zeilen der Tabelle „Regelquellen“ aus FUNDAMENT.md: Felder (Spalte 2) und Dateien (Spalte 3) */
+export function regelquellen(): { bereich: string; felder: string[]; dateien: string[] }[] {
+  const md = fs.readFileSync(path.join(WURZEL, 'FUNDAMENT.md'), 'utf8');
+  const teil = md.slice(md.indexOf('## 2. Regelquellen'), md.indexOf('### Regeln, die noch im Code stehen'));
+  const marken = (s: string) => [...s.matchAll(/`([^`]+)`/g)].map((m) => m[1]);
+  return teil.split('\n').filter((z) => z.startsWith('| ') && !z.startsWith('| Bereich') && !z.startsWith('|---'))
+    .map((z) => z.split('|').map((s) => s.trim()))
+    .map(([, bereich, quelle, liest]) => ({ bereich, felder: marken(quelle).filter((f) => /^[a-z_]+$/.test(f)), dateien: marken(liest).map((d) => `src/${d}`) }));
+}
+
+/** Befunde, wenn die Tabelle nicht zum Code passt: Datei fehlt oder Feld wird in keiner der genannten Dateien gelesen */
+export function regelquellenBefunde(): string[] {
+  const out: string[] = [];
+  for (const z of regelquellen()) {
+    const texte = z.dateien.map((d) => {
+      const p = path.join(WURZEL, d);
+      if (!fs.existsSync(p)) { out.push(`${z.bereich}: Datei ${d} gibt es nicht`); return ''; }
+      return fs.readFileSync(p, 'utf8');
+    });
+    for (const f of z.felder) {
+      if (['id', 'typ', 'name'].includes(f)) continue;
+      if (!texte.some((t) => new RegExp(`\\b${f}\\b`).test(t))) out.push(`${z.bereich}: Feld ${f} wird in ${z.dateien.join(', ')} nicht gelesen`);
+    }
+  }
+  return out;
+}
+
+/** Dateien außerhalb der Tabelle „Regelquellen“, die selbst in die Paketdaten greifen (…daten.feld) */
+export function paketzugriffe(): string[] {
+  const erlaubt = new Set(regelquellen().flatMap((z) => z.dateien));
+  const out: string[] = [];
+  for (const p of dateien(SRC)) {
+    const r = rel(p);
+    if (p.endsWith('.css') || erlaubt.has(r) || r.startsWith('src/data/') || r === 'src/regelwerk/typen.ts') continue;
+    if (/\bdaten\??\.[a-z_]+/.test(fs.readFileSync(p, 'utf8').replace(/\/\*[\s\S]*?\*\/|\/\/[^\n]*/g, ''))) out.push(r);
+  }
+  return out.sort();
+}

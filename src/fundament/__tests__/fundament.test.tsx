@@ -2,6 +2,7 @@
  * Prüfungen zum FUNDAMENT (siehe FUNDAMENT.md im Wurzelordner). Sie setzen durch, was dort steht:
  *   1. Farbwerte stehen nur in src/fundament/fundament.css.
  *   2. Regeln hängen nicht an Zauber-, Meisterschafts- oder Stärkennamen im Programmcode.
+ *   3. Die Tabelle „Regelquellen“ stimmt mit dem Code überein; nur die dort genannten Dateien lesen Paketdaten.
  * Was heute noch dagegen verstößt, steht als Altlast in src/fundament/altlasten.json und darf nur weniger werden.
  * Altlastenliste nach einer Umstellung neu schreiben:  FUNDAMENT_ALTLASTEN=schreiben npx vitest run src/fundament
  */
@@ -10,21 +11,22 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { FARBEN_ERLAUBT, WURZEL, farbwerte, regelnamenImCode } from './pruefen';
+import { FARBEN_ERLAUBT, WURZEL, farbwerte, paketzugriffe, regelnamenImCode, regelquellen, regelquellenBefunde } from './pruefen';
 import { Abschnittstitel, Auswahl, Dialog, Eingabe, Karte, Knopf, Marke, Rollbereich } from '..';
 
 const ALTLASTEN = path.join(WURZEL, 'src/fundament/altlasten.json');
 
 describe('Fundament: Altlasten dürfen nur weniger werden', () => {
-  const ist = { farbwerte: farbwerte(), regelnamen: regelnamenImCode() };
+  const ist = { farbwerte: farbwerte(), regelnamen: regelnamenImCode(), paketzugriffe: paketzugriffe() };
   if (process.env.FUNDAMENT_ALTLASTEN === 'schreiben') {
     fs.writeFileSync(ALTLASTEN, JSON.stringify({
       _hinweis: 'Bekannte Verstöße gegen FUNDAMENT.md. Wird nur kleiner: nach einer Umstellung mit FUNDAMENT_ALTLASTEN=schreiben npx vitest run src/fundament neu schreiben. Nie von Hand erweitern.',
       farbwerte: ist.farbwerte,
       regelnamen: ist.regelnamen,
+      paketzugriffe: ist.paketzugriffe,
     }, null, 2) + '\n');
   }
-  const soll = JSON.parse(fs.readFileSync(ALTLASTEN, 'utf8')) as { farbwerte: Record<string, number>; regelnamen: string[] };
+  const soll = JSON.parse(fs.readFileSync(ALTLASTEN, 'utf8')) as { farbwerte: Record<string, number>; regelnamen: string[]; paketzugriffe: string[] };
 
   it(`Farbwerte stehen nur in ${FARBEN_ERLAUBT}`, () => {
     const zuviel = Object.entries(ist.farbwerte)
@@ -36,6 +38,16 @@ describe('Fundament: Altlasten dürfen nur weniger werden', () => {
   it('keine neuen Regelnamen im Programmcode', () => {
     const neu = ist.regelnamen.filter((x) => !soll.regelnamen.includes(x));
     expect(neu, 'Ein Zauber-, Meisterschafts- oder Stärkenname steht als Text im Code. Regeln kommen aus den Regelpaketen (FUNDAMENT.md, Regelquellen): den Wert ins Paket legen und über die ID oder das Datenfeld lesen.').toEqual([]);
+  });
+
+  it('die Tabelle „Regelquellen“ in FUNDAMENT.md passt zum Code', () => {
+    expect(regelquellen().length).toBeGreaterThan(10);
+    expect(regelquellenBefunde(), 'FUNDAMENT.md nennt eine Datei, die es nicht gibt, oder ein Feld, das dort nicht gelesen wird. Tabelle und Code zusammen ändern.').toEqual([]);
+  });
+
+  it('nur die Dateien aus der Tabelle „Regelquellen“ lesen Paketdaten', () => {
+    const neu = ist.paketzugriffe.filter((x) => !soll.paketzugriffe.includes(x));
+    expect(neu, 'Eine Datei greift selbst in die Paketdaten (…daten.feld). Das gehört in ein Modul unter src/regelwerk, das in FUNDAMENT.md (Regelquellen) eingetragen ist.').toEqual([]);
   });
 
   it('die Bausteine selbst enthalten keinen Farbwert', () => {
