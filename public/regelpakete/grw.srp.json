@@ -13,7 +13,7 @@
    "pdf_datei": "Splittermond_GRW_dritte-erratierte-Neuauflage-1.pdf",
    "pdf_sha256": "f824ffc4850360d07e1633bdc27cc922dd2ae498320187e7e9e3def3a5dd6cc3",
    "datenbank_datei": "GRW_2026-10-27_mit-Fertigkeiten-und-Mondzeichen.sqlite",
-   "datenbank_sha256": "22ccae7deaf39d7cce62a4833f97d9ef90ada82a20d49b56af3ef38a8fc0c131"
+   "datenbank_sha256": "d533986cd493844e34f0c58eebc92e5c2d1c35b3034856cbd8e1952a2b6a7fee"
   },
   "seitenangaben": "buch_seiten = gedruckte Seitenzahl im Buch; pdf_seiten = Seite in der PDF-Datei"
  },
@@ -65553,7 +65553,8 @@
        "wert": 1
       }
      ],
-     "nur_hoechster": "gw"
+     "nur_hoechster": "gw",
+     "wirkt": "besitz"
     }
    },
    "hinweise": [
@@ -65598,7 +65599,8 @@
        "wert": 1
       }
      ],
-     "nur_hoechster": "kw"
+     "nur_hoechster": "kw",
+     "wirkt": "besitz"
     }
    },
    "hinweise": [
@@ -65691,7 +65693,15 @@
        "kosten": 6
       }
      ],
-     "auswahl": "zauber"
+     "auswahl": "zauber",
+     "ausloesung": {
+      "fertigkeit": "grw:fertigkeit:arkane-kunde",
+      "probe": "einfach",
+      "schwierigkeit": "zauber",
+      "fokus": "zauber",
+      "erfolgsgrade": "zauber",
+      "voraussetzung": "in_der_hand"
+     }
     }
    },
    "hinweise": [

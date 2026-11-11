@@ -81,7 +81,8 @@ describe('Relikt-Baukasten aus dem GRW', () => {
     const r = relikt({ name: 'Großvaters Klinge', basisId: basis.id, bausteine: [{ id: 'grw:verbesserung:waffenschaden-1', anzahl: 2 }] });
     const it = reliktAlsInventar(r, bs, basis);
     expect(it).toEqual(expect.objectContaining({ id: 'i1', name: 'Großvaters Klinge', type: 'weapon', category: 'Relikt', source: 'GRW',
-      damage: (basis as { damage: string }).damage, quantity: 1 }));
+      damage: '1W6+6', quantity: 1 }));
+    expect(it.desc).toContain('Werte: Schaden 1W6+4 → 1W6+6.');
     expect(it.desc).toContain('Waffenschaden +1 ×2 – 2 P., GRW S. 142');
   });
 });

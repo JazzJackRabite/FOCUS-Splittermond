@@ -8,8 +8,9 @@
  */
 import type { Katalog } from './katalog';
 import type { Eintrag } from './typen';
-import type { InventoryItem, Relikt, ReliktBaustein } from '../types';
+import type { InventoryItem, Relikt, ReliktBaustein, Spell } from '../types';
 import type { AusruestungsItem } from './ausruestung';
+import { aktiverKatalog } from './bruecke';
 
 /** Gegenstandsarten, wie sie daten.baustein.gilt_fuer nennt */
 export const GEGENSTANDSARTEN: Record<string, string> = {
@@ -41,13 +42,31 @@ export interface BausteinInfo {
   mindestVtd?: number;
   mindestPunkte?: number;
   variante?: string;
-  aenderungen: Array<Record<string, unknown>>;
+  aenderungen: Aenderung[];
+  /** eine der Listen gilt (Wahl beim Bau, Index in ReliktBaustein.auswahl) */
+  aenderungenWahl?: Aenderung[][];
+  /** 'besitz': wirkt, solange der Charakter das Relikt besitzt (z. B. verbesserter Widerstand) */
+  wirkt?: string;
+  /** nur der höchste Bonus dieser Art zählt (über alle Relikte) */
+  nurHoechster?: string;
+  /** Auslösen einer Zauberverankerung (GRW S. 255) */
+  ausloesung?: { fertigkeit: string; probe: string; schwierigkeit: string; fokus: string; erfolgsgrade: string; voraussetzung: string };
   quelle: string;
   beschreibung: string;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type D = Record<string, any>;
+
+/** Wertänderung eines Bausteins (daten.baustein.aenderungen) */
+export interface Aenderung {
+  feld: string;
+  wert?: number;
+  merkmal?: string;
+  merkmal_id?: string;
+  mindestens?: number;
+  hoechstens_nach_schadenswuerfel?: Record<string, number>;
+}
 const txt = (v: unknown) => (v === null || v === undefined ? '' : String(v).trim());
 
 function alleEintraege(k: Katalog): Eintrag[] {
@@ -114,7 +133,8 @@ export function reliktBausteine(k: Katalog | null, bk: Baukasten | null = relikt
       id: e.id, typ: e.typ, name: e.name, kosten: b.kosten ?? null, kostenNachGrad: b.kosten_nach_grad, kostenJe: b.kosten_je,
       maxAnzahl: b.max_anzahl ?? null, giltFuer: b.gilt_fuer ?? ['alle'], auswahl: b.auswahl, grenze: b.grenze,
       bedingungMerkmal: b.bedingung_merkmal, mindestVtd: b.mindest_vtd_bonus, variante: b.variante_von,
-      aenderungen: b.aenderungen ?? [], quelle: quelleText(k, e), beschreibung: beschreibung(k, e),
+      aenderungen: b.aenderungen ?? [], aenderungenWahl: b.aenderungen_wahl, wirkt: b.wirkt, nurHoechster: b.nur_hoechster, ausloesung: b.ausloesung,
+      quelle: quelleText(k, e), beschreibung: beschreibung(k, e),
     });
   }
   const ord = (t: string) => bk.typen.indexOf(t);
@@ -170,12 +190,16 @@ export function pruefeRelikt(relikt: Relikt, bausteine: BausteinInfo[], bk: Bauk
       W.push(`${b.name}: Der Gegenstand braucht das Merkmal ${b.bedingungMerkmal}.`);
     if (b.mindestVtd && basis && 'vtdBonus' in basis && Number(basis.vtdBonus) < b.mindestVtd) W.push(`${b.name}: nur ab VTD-Bonus +${b.mindestVtd}.`);
     if (b.auswahl && !w.auswahl?.trim()) W.push(`${b.name}: Auswahl fehlt (${AUSWAHL[b.auswahl] ?? b.auswahl}).`);
+    if (b.aenderungenWahl && !(Number(w.auswahl) >= 0 && Number(w.auswahl) < b.aenderungenWahl.length && w.auswahl !== '' && w.auswahl !== undefined))
+      W.push(`${b.name}: Wahl fehlt (${b.aenderungenWahl.map(wahlText).join(' oder ')}).`);
   }
   for (const [id, n] of anzahl) {
     const b = nachId.get(id)!;
     if (b.maxAnzahl !== null && n > b.maxAnzahl) W.push(`${b.name}: höchstens ${b.maxAnzahl}×, gewählt ${n}×.`);
   }
   for (const [v, namen] of varianten) if (namen.length > 1) W.push(`${v === 'material' ? 'Material' : v}: nur eine Variante wählbar (${namen.join(', ')}).`);
+  // Merkmale über ihrem Höchstwert (z. B. Scharf je nach Schadenswürfel)
+  if (basis) for (const t of reliktWerte(relikt, bausteine, basis).ueberHoechstwert) W.push(t);
   if (verwendet > relikt.punkte) W.push(`Die Bausteine kosten ${verwendet} Punkte, das Relikt hat ${relikt.punkte}.`);
   if (bk?.maxPunkte !== null && bk?.maxPunkte !== undefined && relikt.punkte > bk.maxPunkte) W.push(`Mehr als ${bk.maxPunkte} Punkte in einem Relikt (nur nach Spielleiterentscheid).`);
   return { verwendet, warnungen: W };
@@ -190,41 +214,214 @@ export function ressourcePunkte(resources: Array<{ name: string; level: number }
   return resources.filter(r => /^Relikt\b/i.test(r.name)).reduce((s, r) => s + (Number(r.level) || 0), 0);
 }
 
+const FELDNAME: Record<string, string> = {
+  schaden: 'Schaden', wgs: 'WGS', sr: 'SR', behinderung: 'Behinderung', tick_zuschlag: 'Tick-Zuschlag', haerte: 'Härte', last: 'Last',
+  gw: 'GW', kw: 'KW', schwerpunkt: 'Schwerpunkt', merkmal: 'Merkmal', merkmal_entfernen: 'Merkmal entfällt',
+};
+const vz = (n: number) => (n >= 0 ? `+${n}` : `${n}`);
+export function wahlText(liste: Aenderung[]): string {
+  return liste.map(a => `${FELDNAME[a.feld] ?? a.feld} ${vz(a.wert ?? 0)}`).join(', ');
+}
+
+/** Merkmale aus „Scharf 2, Wurffähig“ bzw. „Scharf (2)“ */
+function merkmaleLesen(text?: string): Array<{ name: string; stufe: number | null }> {
+  return String(text ?? '').split(/,\s*/).map(t => t.trim()).filter(t => t && t !== '–' && t !== '-').map(t => {
+    const m = t.match(/^(.*?)\s*\(?(\d+)\)?$/);
+    return m ? { name: m[1].trim(), stufe: Number(m[2]) } : { name: t, stufe: null };
+  });
+}
+const merkmaleText = (l: Array<{ name: string; stufe: number | null }>) => l.map(m => (m.stufe === null ? m.name : `${m.name} ${m.stufe}`)).join(', ') || '–';
+
+/** Alle wirksamen Änderungen eines Relikts (Anzahl berücksichtigt, gewählte Variante aufgelöst) */
+export function reliktAenderungen(relikt: Relikt, bausteine: BausteinInfo[]): Array<{ a: Aenderung; baustein: BausteinInfo; w: ReliktBaustein }> {
+  const nachId = new Map(bausteine.map(b => [b.id, b]));
+  const out: Array<{ a: Aenderung; baustein: BausteinInfo; w: ReliktBaustein }> = [];
+  for (const w of relikt.bausteine) {
+    const b = nachId.get(w.id);
+    if (!b) continue;
+    const n = Math.max(1, w.anzahl || 1);
+    const liste = [...b.aenderungen, ...(b.aenderungenWahl?.[Number(w.auswahl)] ?? [])];
+    for (const a of liste) out.push({ a: a.wert !== undefined ? { ...a, wert: a.wert * n } : a, baustein: b, w });
+  }
+  return out;
+}
+
+export interface ReliktWerte {
+  item: Partial<InventoryItem>;
+  /** lesbare Änderungen für die Beschreibung */
+  zeilen: string[];
+  /** Merkmale, die ihren Höchstwert überschreiten würden (Warnung) */
+  ueberHoechstwert: string[];
+}
+
+/** Werte des Relikts: Grundgegenstand plus Wertänderungen der Bausteine (daten.baustein.aenderungen) */
+export function reliktWerte(relikt: Relikt, bausteine: BausteinInfo[], basis: AusruestungsItem | null | undefined): ReliktWerte {
+  const b = (basis ?? {}) as Record<string, unknown>;
+  const item: Partial<InventoryItem> = {
+    weaponSkill: b.skill as string | undefined, damage: b.damage as string | undefined, wgs: b.wgs as number | string | undefined,
+    range: b.range as string | undefined, attributes: b.attributes as string | undefined, vtdBonus: b.vtdBonus as number | undefined,
+    sr: b.sr as number | undefined, handicap: b.handicap as number | undefined, tickModifier: b.tickModifier as number | undefined,
+    minStrength: b.minStrength as number | undefined,
+    weight: typeof b.load === 'number' ? b.load : parseInt(String(b.load ?? ''), 10) || 0,
+  };
+  const zeilen: string[] = []; const ueber: string[] = [];
+  let merkmale = merkmaleLesen(item.attributes);
+  const lastBasis = item.weight ?? 0;
+  const zahl = (v: unknown) => Number(v) || 0;
+  for (const { a, baustein } of reliktAenderungen(relikt, bausteine)) {
+    const n = a.wert ?? 0;
+    switch (a.feld) {
+      case 'schaden': {
+        const alt = String(item.damage ?? '');
+        const m = alt.match(/^(\d*W\d+)\s*([+-]\s*\d+)?$/i);
+        item.damage = m ? `${m[1]}${(() => { const s = (Number((m[2] ?? '0').replace(/\s/g, '')) || 0) + n; return s ? vz(s) : ''; })()}` : (alt ? `${alt} ${vz(n)}` : vz(n));
+        if (alt) zeilen.push(`Schaden ${alt} → ${item.damage}`);
+        break;
+      }
+      case 'wgs': { const alt = zahl(item.wgs); item.wgs = Math.max(1, alt + n); zeilen.push(`WGS ${alt} → ${item.wgs}`); break; }
+      case 'sr': { const alt = zahl(item.sr); item.sr = Math.max(0, alt + n); zeilen.push(`SR ${alt} → ${item.sr}`); break; }
+      case 'behinderung': { const alt = zahl(item.handicap); item.handicap = Math.max(0, alt + n); zeilen.push(`Behinderung ${alt} → ${item.handicap}`); break; }
+      case 'tick_zuschlag': { const alt = zahl(item.tickModifier); item.tickModifier = Math.max(0, alt + n); zeilen.push(`Tick-Zuschlag ${alt} → ${item.tickModifier}`); break; }
+      case 'last': {
+        const alt = item.weight ?? 0;
+        const grenze = baustein.grenze === 'last_haelfte' ? Math.ceil(lastBasis / 2) : 0;
+        item.weight = Math.max(grenze, alt + n);
+        zeilen.push(`Last ${alt} → ${item.weight}`);
+        break;
+      }
+      case 'merkmal': case 'merkmal_entfernen': {
+        const name = a.merkmal ?? '';
+        const i = merkmale.findIndex(m => m.name.toLowerCase() === name.toLowerCase());
+        if (a.feld === 'merkmal_entfernen') { if (i >= 0) { merkmale = merkmale.filter((_, j) => j !== i); zeilen.push(`Merkmal ${name} entfällt`); } break; }
+        const vorher = i >= 0 ? merkmale[i].stufe : null;
+        let stufe: number | null = a.wert === undefined ? vorher : (vorher ?? 0) + n;
+        if (a.mindestens !== undefined && stufe !== null) stufe = Math.max(stufe, a.mindestens);
+        const wuerfel = String(item.damage ?? '').match(/W(\d+)/i)?.[0]?.toUpperCase();
+        const hoechst = wuerfel ? a.hoechstens_nach_schadenswuerfel?.[wuerfel] : undefined;
+        if (hoechst !== undefined && stufe !== null && stufe > hoechst) { ueber.push(`${baustein.name}: ${name} höchstens ${hoechst} bei ${wuerfel}-Waffen.`); stufe = hoechst; }
+        if (i >= 0) merkmale[i] = { name: merkmale[i].name, stufe }; else merkmale.push({ name, stufe });
+        zeilen.push(i >= 0 && vorher !== stufe ? `Merkmal ${name} ${vorher ?? ''} → ${stufe ?? ''}`.replace(/\s+/g, ' ') : i >= 0 ? `Merkmal ${name}` : `Merkmal ${name}${stufe !== null ? ` ${stufe}` : ''} neu`);
+        break;
+      }
+      case 'haerte': zeilen.push(`Härte ${vz(n)}`); break;
+      case 'schwerpunkt': break; // Bonus auf einen Schwerpunkt: Auswahl steht beim Baustein
+      default: break; // gw/kw wirken auf den Charakter (reliktWiderstand)
+    }
+  }
+  if (merkmale.length || item.attributes) item.attributes = merkmaleText(merkmale);
+  return { item, zeilen, ueberHoechstwert: ueber };
+}
+
+/** Bonus auf GW/KW aus Relikten im Besitz: je Relikt Summe, über alle Relikte nur der höchste (GRW S. 254) */
+export function reliktWiderstand(relikte: Relikt[], inventar: Array<{ id: string }>, bausteine: BausteinInfo[]): Record<string, { summe: number; quellen: { name: string; wert: number }[] }> {
+  const imBesitz = new Set(inventar.map(i => i.id));
+  const out: Record<string, { summe: number; quellen: { name: string; wert: number }[] }> = {};
+  for (const r of relikte) {
+    if (!imBesitz.has(r.inventarId)) continue;
+    const jeWert: Record<string, number> = {};
+    for (const { a, baustein } of reliktAenderungen(r, bausteine)) {
+      if (baustein.wirkt !== 'besitz' || (a.feld !== 'gw' && a.feld !== 'kw')) continue;
+      jeWert[a.feld] = (jeWert[a.feld] ?? 0) + (a.wert ?? 0);
+    }
+    for (const [feld, wert] of Object.entries(jeWert)) {
+      const key = feld.toUpperCase();
+      if (!out[key] || wert > out[key].summe) out[key] = { summe: wert, quellen: [{ name: r.name, wert }] };
+    }
+  }
+  return out;
+}
+
+export interface ReliktZauber { relikt: Relikt; spell: Spell; ausloesung: NonNullable<BausteinInfo['ausloesung']> }
+
+/** Zauber aus Zauberverankerungen der Relikte im Besitz, als Zauber zum Wirken (Probe auf die Fertigkeit der Auslösung) */
+export function reliktZauber(k: Katalog | null, relikte: Relikt[], inventar: Array<{ id: string }>, bausteine: BausteinInfo[]): ReliktZauber[] {
+  if (!k) return [];
+  const imBesitz = new Set(inventar.map(i => i.id));
+  const nachId = new Map(bausteine.map(b => [b.id, b]));
+  const out: ReliktZauber[] = [];
+  for (const r of relikte) {
+    if (!imBesitz.has(r.inventarId)) continue;
+    for (const w of r.bausteine) {
+      const b = nachId.get(w.id);
+      if (!b?.ausloesung || !w.auswahl) continue;
+      const z = k.get(w.auswahl) ?? k.nachTyp('zauber').find(e => e.name === w.auswahl);
+      if (!z || z.typ !== 'zauber') continue;
+      const d = z.daten as D;
+      const schulen = (d.schulen ?? []) as Array<{ id: string; schule: string; grad: number | null }>;
+      const s = schulen.find(x => x.grad === (w.grad ?? 0)) ?? schulen[0];
+      const fert = k.get(b.ausloesung.fertigkeit)?.name ?? b.ausloesung.fertigkeit;
+      const sw = d.schwierigkeit_strukturiert as { art?: string; wert?: number } | undefined;
+      const spell: Spell = {
+        name: z.name, school: (s && k.get(s.id)?.name) ?? s?.schule ?? '', grade: w.grad ?? s?.grad ?? 0, cost: txt(d.kosten),
+        castTime: txt(d.zauberdauer) || undefined, range: txt(d.reichweite) || undefined, duration: txt(d.wirkungsdauer) || undefined,
+        target: (d.typus ?? []).join(', ') || undefined,
+        description: [txt(d.wirkung), txt(d.erfolgsgrade) ? `Erfolgsgrade:\n${txt(d.erfolgsgrade)}` : ''].filter(Boolean).join('\n\n'),
+        page: (z.quelle.buch_seiten ?? [])[0], source: k.pakete[z.quelle.paket]?.kuerzel ?? z.quelle.paket.toUpperCase(),
+        difficulty: txt(d.schwierigkeit) || undefined,
+        ...(sw?.art === 'fest' && typeof sw.wert === 'number' ? { difficultyType: 'fest' as const, difficultyValue: sw.wert }
+          : sw?.art && ['VTD', 'GW', 'KW'].includes(sw.art) ? { difficultyType: sw.art as 'VTD' | 'GW' | 'KW' } : {}),
+        probeFertigkeit: fert, ausRelikt: r.name,
+      };
+      out.push({ relikt: r, spell, ausloesung: b.ausloesung });
+    }
+  }
+  return out;
+}
+
 /** Der Inventareintrag eines Relikts: Werte des Grundgegenstands, Name und Beschreibung des Relikts */
-export function reliktAlsInventar(relikt: Relikt, bausteine: BausteinInfo[], basis: AusruestungsItem | null | undefined, alt?: InventoryItem): InventoryItem {
+/** Auswahl eines Bausteins lesbar: Zauber-ID → Name, Wahl-Index → Änderungen, sonst der Text */
+export function auswahlAnzeige(b: BausteinInfo | undefined, w: ReliktBaustein, k?: Katalog | null): string {
+  if (!w.auswahl) return '';
+  if (b?.aenderungenWahl) return b.aenderungenWahl[Number(w.auswahl)] ? wahlText(b.aenderungenWahl[Number(w.auswahl)]) : '';
+  if (b?.auswahl === 'zauber') return k?.get(w.auswahl)?.name ?? w.auswahl;
+  return w.auswahl;
+}
+
+export function reliktAlsInventar(relikt: Relikt, bausteine: BausteinInfo[], basis: AusruestungsItem | null | undefined, alt?: InventoryItem, k?: Katalog | null): InventoryItem {
   const nachId = new Map(bausteine.map(b => [b.id, b]));
   const zeilen = relikt.bausteine.map(w => {
     const b = nachId.get(w.id);
     const name = b?.name ?? w.name ?? w.id;
-    const extra = [w.grad !== undefined && b?.kostenNachGrad ? `Grad ${w.grad}` : '', w.stufe && b?.kostenJe ? `Stufe ${w.stufe}` : '', w.auswahl ?? ''].filter(Boolean).join(', ');
+    const extra = [w.grad !== undefined && b?.kostenNachGrad ? `Grad ${w.grad}` : '', w.stufe && b?.kostenJe ? `Stufe ${w.stufe}` : '', auswahlAnzeige(b, w, k)].filter(Boolean).join(', ');
     return `• ${name}${(w.anzahl ?? 1) > 1 ? ` ×${w.anzahl}` : ''}${extra ? ` (${extra})` : ''}${b ? ` – ${kostenVon(b, w)} P., ${b.quelle}` : ''}`;
   });
+  const werte = reliktWerte(relikt, bausteine, basis);
   const kopf = `Relikt mit ${relikt.punkte} Punkten${basis ? ` auf Basis von ${basis.name}` : ''}.`;
-  const desc = [kopf, ...zeilen, relikt.notiz ?? ''].filter(Boolean).join('\n');
-  const b = (basis ?? {}) as Record<string, unknown>;
+  const desc = [kopf, ...zeilen, werte.zeilen.length ? `Werte: ${werte.zeilen.join('; ')}.` : '', relikt.notiz ?? ''].filter(Boolean).join('\n');
   const typ = (basis?.type ?? (relikt.art === 'ruestung' ? 'armor' : relikt.art === 'schild' ? 'shield' : relikt.art.endsWith('waffe') ? 'weapon' : 'gear')) as InventoryItem['type'];
-  const last = typeof b.load === 'number' ? b.load : parseInt(String(b.load ?? ''), 10) || 0;
   return {
+    ...werte.item,
     id: relikt.inventarId,
     name: relikt.name,
     type: typ,
     category: 'Relikt',
     quantity: 1,
-    weight: alt?.weight ?? last,
+    weight: werte.item.weight ?? 0,
     price: undefined,
     desc,
     equipped: alt?.equipped ?? false,
     source: basis?.source ?? 'Eigen',
     page: typeof basis?.page === 'number' && basis.page ? basis.page : undefined,
-    weaponSkill: b.skill as string | undefined,
-    damage: b.damage as string | undefined,
-    wgs: b.wgs as number | string | undefined,
-    range: b.range as string | undefined,
-    attributes: b.attributes as string | undefined,
-    vtdBonus: b.vtdBonus as number | undefined,
-    sr: b.sr as number | undefined,
-    handicap: b.handicap as number | undefined,
-    tickModifier: b.tickModifier as number | undefined,
-    minStrength: b.minStrength as number | undefined,
   };
+}
+
+const BAUSTEIN_CACHE = new WeakMap<Katalog, BausteinInfo[]>();
+/** Bausteine des aktiven Katalogs (zwischengespeichert je Katalog) */
+export function bausteineAktiv(k: Katalog | null = aktiverKatalog()): BausteinInfo[] {
+  if (!k) return [];
+  let b = BAUSTEIN_CACHE.get(k);
+  if (!b) { b = reliktBausteine(k); BAUSTEIN_CACHE.set(k, b); }
+  return b;
+}
+
+/** GW/KW-Boni aus den Relikten eines Charakters (aktiver Katalog) */
+export function reliktWiderstandFuerCharakter(state: { relikte?: Relikt[]; inventory?: Array<{ id: string }> }) {
+  if (!state.relikte?.length) return {};
+  return reliktWiderstand(state.relikte, state.inventory ?? [], bausteineAktiv());
+}
+
+/** Zauber, die einen Grad in einer Schule haben (Auswahl der Zauberverankerung), alphabetisch */
+export function zauberMitGrad(k: Katalog, grad: number): Array<{ id: string; name: string }> {
+  return k.nachTyp('zauber').filter(z => ((z.daten.schulen ?? []) as Array<{ grad: number | null }>).some(s => s.grad === grad))
+    .map(z => ({ id: z.id, name: z.name })).sort((a, c) => a.name.localeCompare(c.name, 'de'));
 }

@@ -446,6 +446,27 @@ Dateien aus AI Studio im Repository: `public/assets/aistudio/*.png`, `.aistudio/
   ist `schrift`, auf Gold `seite`; kräftige Bedeutungsfarben sind keine Textflächen mehr.
 - **Splitterpunkte als Rauten** wie im Mockup (neuer Baustein `Rauten`), statt Sternen in Kreisen.
 
+## Stand 21 (11.11.2026): Relikte, Stufe 2 – Werte, Widerstand, Zauberverankerung
+
+- **Wertänderungen** der Bausteine wirken jetzt auf den Grundgegenstand: Schaden, WGS (mindestens 1), SR, Behinderung,
+  Tick-Zuschlag, Last (höchstens halbiert) und Merkmale (neu, erhöhen, entfernen). Das Inventar zeigt die geänderten
+  Werte, die Notiz nennt sie („Werte: Schaden 1W6+4 → 1W6+6.“). Höchstwerte von Merkmalen richten sich nach dem
+  Schadenswürfel; Bausteine mit Wahl (z. B. Tick-Zuschlag oder Behinderung) fragen in der Werkstatt nach.
+- **Verbesserter Widerstand (GW/KW)** gilt, solange das Relikt im Inventar ist. Bei mehreren Relikten zählt nur der
+  höchste Bonus (GRW S. 254); eingerechnet in `calculateCharacter`.
+- **Zauberverankerung:** Grad und Zauber werden in der Werkstatt gewählt (Zauber aus dem Katalog). Unter Kampf & Magie
+  erscheint der Abschnitt „Aus Relikten“; der Zauberdialog würfelt auf Arkane Kunde, den Fokus trägt der Charakter
+  (GRW S. 255).
+- **Werkstatt** ganz aus den Bausteinen (`Dialog`, `Knopf`, `Eingabe`, `Auswahl`). Mehr Punkte als die Ressource Relikt
+  oder andere Prüfbefunde sperren das Speichern; mit Hausregeln wird nur gewarnt. Paketzugriffe liegen jetzt in
+  `regelwerk/relikte.ts`, die Altlast für `ReliktKarte.tsx` ist entfernt.
+- **Datenfelder** in `relikt_bausteine.json` (Werkzeuge): `wirkt`, `ausloesung`, `aenderungen_wahl`,
+  `hoechstens_nach_schadenswuerfel`; vom Paketbau geprüft. `grw.srp.json` neu gebaut, Prüfsuite ohne neue Befunde.
+- Im Browser geprüft: Relikt mit GW-Bonus (GW 15 → 16), Sperre bei überzogener Ressource, Speichern mit Hausregeln,
+  Zauber aus Relikt im Zauberdialog mit Arkane Kunde.
+- Offen: Wachsen des Relikts und Chronik, beseelte Gegenstände, Schwerpunkt-Bonus bei Proben, Härte (kein Feld im
+  Inventar, nur als Text).
+
 ## Google AI Studio
 
 Unverändert eine Vite-/React-App mit `metadata.json` im Wurzelordner; Import über „Import from GitHub“, Hosting über Cloud Run.
