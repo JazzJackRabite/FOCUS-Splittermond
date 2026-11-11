@@ -10,7 +10,7 @@ import { Katalog } from '../katalog';
 import { erfuellt } from '../bedingungen';
 import { abgeleiteteWerte } from '../abgeleitet';
 import { pruefeErschaffung, type Bau } from '../erschaffung';
-import { buchpaketLesen, erstelleKatalog } from '../laden';
+import { grimoireLesen, erstelleKatalog } from '../laden';
 import { basisAusDateien, charAusJson } from './hilfen';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -23,7 +23,7 @@ describe('Katalog (nur Grundregelwerk)', () => {
     expect(Object.keys(K.eintraege).sort()).toEqual(REF.katalog.ids);
     expect(K.geladen).toEqual(REF.katalog.geladen);
     expect(K.alias).toEqual(REF.katalog.alias);
-    // Regelgruppen kommen im Editor nur mit den Buchpaketen; ohne Bücher gilt jede Fassung für sich (Python: geltend[x] = x)
+    // Regelgruppen kommen im Editor nur mit den Grimoires; ohne Bücher gilt jede Fassung für sich (Python: geltend[x] = x)
     const nichtIdentisch = (g: Record<string, string>) => Object.fromEntries(Object.entries(g).filter(([k, v]) => k !== v));
     expect(nichtIdentisch(K.geltend)).toEqual(nichtIdentisch(REF.katalog.geltend));
     expect(K.befunde).toEqual(REF.katalog.befunde);
@@ -89,11 +89,11 @@ describe('Charaktererschaffung', () => {
   });
 });
 
-describe('Buchpakete hochladen', () => {
+describe('Grimoires hochladen', () => {
   it('weist das Grundregelwerk und fremde Dateien zurück', () => {
-    expect(() => buchpaketLesen('kein json', basis.manifest)).toThrow('kein gültiges JSON');
-    expect(() => buchpaketLesen('{"format":"x"}', basis.manifest)).toThrow('kein Splittermond-Regelpaket');
-    expect(() => buchpaketLesen(JSON.stringify(basis.basis.paket), basis.manifest)).toThrow('bereits im Editor');
+    expect(() => grimoireLesen('kein json', basis.manifest)).toThrow('kein gültiges JSON');
+    expect(() => grimoireLesen('{"format":"x"}', basis.manifest)).toThrow('kein Splittermond-Regelpaket');
+    expect(() => grimoireLesen(JSON.stringify(basis.basis.paket), basis.manifest)).toThrow('bereits im Editor');
   });
   it('lädt ein Buch mit ladeinfo, wendet Regelgruppen an und lässt Bücher mit fehlender Abhängigkeit aus', () => {
     const buch = {
@@ -110,14 +110,14 @@ describe('Buchpakete hochladen', () => {
         original: { datei: 'x', sha256: 'x', bytes: 0, eintraege: 2 },
       },
     };
-    const lp = buchpaketLesen(JSON.stringify(buch), basis.manifest);
+    const lp = grimoireLesen(JSON.stringify(buch), basis.manifest);
     const { katalog, ausgelassen } = erstelleKatalog(basis, [lp]);
     expect(ausgelassen).toEqual([]);
     expect(katalog.befunde).toEqual([]);
     expect(katalog.get('testbuch:staerke:flink')!.id).toBe('grw:staerke:flink');
     expect(katalog.get('testbuch:staerke:alt')!.name).toBe('Neu');
     expect(katalog.get('grw:staerke:flink')!._quellen).toEqual([{ paket: 'testbuch' }]);
-    const ohne = buchpaketLesen(JSON.stringify({ ...buch, ladeinfo: { ...buch.ladeinfo, abhaengigkeiten: ['grw', 'magie'] } }), basis.manifest);
+    const ohne = grimoireLesen(JSON.stringify({ ...buch, ladeinfo: { ...buch.ladeinfo, abhaengigkeiten: ['grw', 'magie'] } }), basis.manifest);
     expect(erstelleKatalog(basis, [ohne]).ausgelassen).toEqual([{ id: 'testbuch', grund: 'benötigt magie' }]);
   });
 });

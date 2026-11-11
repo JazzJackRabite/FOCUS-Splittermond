@@ -1,5 +1,5 @@
 /**
- * Dienste beschworener Wesen (Buchpaket „Die Magie“, S. 186–191). Portierung von verfuegbare_dienste() aus Pruefsuite/lader.py.
+ * Dienste beschworener Wesen (Grimoire „Die Magie“, S. 186–191). Portierung von verfuegbare_dienste() aus Pruefsuite/lader.py.
  * Ohne geladenes Paket „magie“ gibt es keine Dienste; die Funktion liefert dann eine leere Liste.
  */
 import type { KatalogSicht } from './bedingungen';

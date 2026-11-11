@@ -1,6 +1,6 @@
 /**
  * Begleiter: Tiergefährten aus dem GRW (Ressource Kreatur, S. 78; Tierwerte S. 284–287), Tab „Begleiter“,
- * Abrichtungen und Potenzial (Bestienmeister S. 15–23, lokal mit FOKUS_BUECHER).
+ * Abrichtungen und Potenzial (Bestienmeister S. 15–23, lokal mit FOKUS_GRIMOIRES).
  */
 import React from 'react';
 import fs from 'fs';
@@ -13,8 +13,8 @@ import { BegleiterView } from '../../features/begleiter/BegleiterView';
 import { kreaturZuordnung } from '../../components/begleiter/TierAbschnitt';
 import { validateCharacterImport } from '../../utils/importValidation';
 import { Katalog } from '../katalog';
-import { basisAusDateien } from './hilfen';
-import { erstelleKatalog, buchpaketLesen } from '../laden';
+import { basisAusDateien, grimoireDatei } from './hilfen';
+import { erstelleKatalog, grimoireLesen } from '../laden';
 import { bedingungsCharakter } from '../bruecke';
 import {
   abrichtungen, alleTiere, beschwoerbareWesen, diensteFuer, istReittier, kreaturStufe, mehrfachGrenze, potenzial, pruefeAbrichtung,
@@ -105,7 +105,7 @@ describe('Tab „Begleiter“ (nur GRW)', () => {
     expect(within(tiere).getByText('Reittier')).toBeTruthy();
     fireEvent.click(within(tiere).getByRole('button', { name: /^Pferd$/ }));
     expect(screen.getByText('GSW')).toBeTruthy();
-    expect(screen.getByText(/Buchpaket „Bestienmeister“/)).toBeTruthy();
+    expect(screen.getByText(/Grimoire „Bestienmeister“/)).toBeTruthy();
     fireEvent.change(screen.getByPlaceholderText('Pferd'), { target: { value: 'Blitz' } });
     expect(within(tiere).getByRole('button', { name: 'Blitz (Pferd)' })).toBeTruthy();
 
@@ -119,17 +119,16 @@ describe('Tab „Begleiter“ (nur GRW)', () => {
   it('Hinweis auf „Die Magie“ bei den Wesen', () => {
     kat.aktuell = K;
     render(<Rahmen start={{}} />);
-    expect(within(screen.getByTestId('begleiter-wesen')).getByText(/Buchpaket „Die Magie“/)).toBeTruthy();
+    expect(within(screen.getByTestId('begleiter-wesen')).getByText(/Grimoire „Die Magie“/)).toBeTruthy();
   });
 });
 
-const BUECHER = process.env.FOKUS_BUECHER ?? '';
-const MAGIE = BUECHER ? path.join(BUECHER, 'magie.srp.json') : '';
-const BESTIEN = BUECHER ? path.join(BUECHER, 'bestien.srp.json') : '';
+const MAGIE = grimoireDatei('magie');
+const BESTIEN = grimoireDatei('bestien');
 
 describe.skipIf(!MAGIE || !fs.existsSync(MAGIE))('Beschworene Wesen mit „Die Magie“ (lokal)', () => {
   it('Wesen und Dienste: Basisdienste für alle, erweiterte nur mit passender Meisterschaft', () => {
-    const { katalog: KM } = erstelleKatalog(b, [buchpaketLesen(fs.readFileSync(MAGIE, 'utf-8'), b.manifest)]);
+    const { katalog: KM } = erstelleKatalog(b, [grimoireLesen(fs.readFileSync(MAGIE, 'utf-8'), b.manifest)]);
     const w = beschwoerbareWesen(KM);
     expect(w.length).toBe(62); // ohne die drei Korpusse des Wesen-Baukastens (Klein, Mittel, Groß)
     const aschling = w.find(x => x.name === 'Aschling')!;
@@ -142,7 +141,7 @@ describe.skipIf(!MAGIE || !fs.existsSync(MAGIE))('Beschworene Wesen mit „Die M
 describe.skipIf(!BESTIEN || !fs.existsSync(BESTIEN))('Abrichtungen mit „Bestienmeister“ (lokal)', () => {
   let KB = K; let liste: ReturnType<typeof abrichtungen> = [];
   beforeAll(() => {
-    KB = erstelleKatalog(b, [buchpaketLesen(fs.readFileSync(BESTIEN, 'utf-8'), b.manifest)]).katalog;
+    KB = erstelleKatalog(b, [grimoireLesen(fs.readFileSync(BESTIEN, 'utf-8'), b.manifest)]).katalog;
     liste = abrichtungen(KB);
   });
   const A = (n: string) => liste.find(a => a.name === n)!;

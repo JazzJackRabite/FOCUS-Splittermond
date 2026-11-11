@@ -164,7 +164,7 @@ export const UntotAbschnitt: React.FC<{ k: Katalog }> = ({ k }) => {
       </div>
       <p className="text-sm text-leise">
         Der Erhebungszauber bestimmt den Wertesatz; Steigerungen mit den EP aus seiner Verstärkung (Die Magie S. 182–184).
-        {!liste.some(x => x.zauber.quelle.paket === 'magie') && ' Weitere Zauber und Abnormitäten im Buchpaket „Die Magie“.'}
+        {!liste.some(x => x.zauber.quelle.paket === 'magie') && ' Weitere Zauber und Abnormitäten im Grimoire „Die Magie“.'}
       </p>
       {eigene.length > 0 && <ul className="space-y-3">{eigene.map(({ b, i }) => <UntotEintrag key={`${b.id}-${i}`} k={k} b={b} index={i} n={n} />)}</ul>}
       <div className="flex flex-wrap gap-2 items-end">

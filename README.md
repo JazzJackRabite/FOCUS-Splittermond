@@ -6,7 +6,7 @@
 
 **FOCUS** ist ein moderner, browserbasierter Charaktereditor für das Pen-&-Paper-Rollenspiel **Splittermond**. Das Tool unterstützt dich vollständig bei der Charaktererschaffung, Steigerung mit Erfahrungspunkten und der Verwaltung deines Charakters während der Spielsession – alles nach den offiziellen Splittermond-Regeln.
 
-> **Claude-Edition:** lädt die Splittermond-Regelpakete; eingebaut ist nur das Grundregelwerk, weitere Bücher lädt man in den Einstellungen selbst. Details: [CLAUDE_EDITION.md](CLAUDE_EDITION.md).
+> **Claude-Edition:** lädt die Splittermond-Regelpakete; eingebaut ist nur das Grundregelwerk, Grimoires lädt man in den Einstellungen selbst. Details: [CLAUDE_EDITION.md](CLAUDE_EDITION.md).
 
 ## 🎯 Wofür ist FOCUS da?
 

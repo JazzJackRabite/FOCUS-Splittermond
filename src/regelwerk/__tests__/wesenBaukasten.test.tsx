@@ -1,5 +1,5 @@
 /**
- * Wesen-Baukasten: beschwörbare Wesen (Die Magie) und Kreaturen (Bestienmeister). Lokal mit FOKUS_BUECHER.
+ * Wesen-Baukasten: beschwörbare Wesen (Die Magie) und Kreaturen (Bestienmeister). Lokal mit FOKUS_GRIMOIRES.
  */
 import React from 'react';
 import fs from 'fs';
@@ -10,8 +10,8 @@ import { baseCharacterReducer, DEFAULT_STATE } from '../../hooks/useCharacterSta
 import { CharacterContext } from '../../context/CharacterContext';
 import { BegleiterView } from '../../features/begleiter/BegleiterView';
 import { Katalog } from '../katalog';
-import { basisAusDateien } from './hilfen';
-import { erstelleKatalog, buchpaketLesen } from '../laden';
+import { basisAusDateien, GRIMOIRE_ORDNER, grimoireDatei } from './hilfen';
+import { erstelleKatalog, grimoireLesen } from '../laden';
 import { setzeAktivenKatalog } from '../bruecke';
 import { basen, baukastenArt, wesenBaukastenWerte } from '../wesenBaukasten';
 import { beschwoerbareWesen } from '../begleiter';
@@ -22,7 +22,7 @@ const b = basisAusDateien();
 const kat = { aktuell: new Katalog(b.manifest, [b.basis]) as Katalog };
 vi.mock('../RegelwerkContext', () => ({ useRegelwerk: () => ({ katalog: kat.aktuell }) }));
 
-describe('Wesen-Baukasten ohne Buchpakete', () => {
+describe('Wesen-Baukasten ohne Grimoires', () => {
   it('keine Basen, Import übernimmt Dienste', () => {
     expect(basen(kat.aktuell, 'beschwoerbar')).toEqual([]);
     const r = validateCharacterImport({ ...DEFAULT_STATE, begleiter: [{ id: 'x', art: 'wesen', name: 'W', bausteine: ['a'], dienste: ['d', 1], basisdienst: 'd' }] });
@@ -30,14 +30,13 @@ describe('Wesen-Baukasten ohne Buchpakete', () => {
   });
 });
 
-const BUECHER = process.env.FOKUS_BUECHER ?? '';
-const datei = (n: string) => (BUECHER ? path.join(BUECHER, `${n}.srp.json`) : '');
+const datei = grimoireDatei;
 
-describe.skipIf(!BUECHER || !fs.existsSync(datei('magie')) || !fs.existsSync(datei('bestien')))('Wesen-Baukasten mit „Die Magie“ und „Bestienmeister“ (lokal)', () => {
+describe.skipIf(!GRIMOIRE_ORDNER || !fs.existsSync(datei('magie')) || !fs.existsSync(datei('bestien')))('Wesen-Baukasten mit „Die Magie“ und „Bestienmeister“ (lokal)', () => {
   let K: Katalog;
   const id = (paket: string, name: string, typ = 'wesen_baukasten_modul') => Object.values(K.eintraege).find(e => e.typ === typ && e.name === name && e.quelle.paket === paket)!.id;
   beforeAll(() => {
-    K = erstelleKatalog(b, ['magie', 'bestien'].map(n => buchpaketLesen(fs.readFileSync(datei(n), 'utf-8'), b.manifest))).katalog;
+    K = erstelleKatalog(b, ['magie', 'bestien'].map(n => grimoireLesen(fs.readFileSync(datei(n), 'utf-8'), b.manifest))).katalog;
     kat.aktuell = K; setzeAktivenKatalog(K, false);
   });
 

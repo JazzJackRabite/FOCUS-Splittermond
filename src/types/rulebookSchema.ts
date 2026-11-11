@@ -1,6 +1,6 @@
 /**
- * Modulformat des Editors für Inhalte aus Büchern. Die Claude-Edition erzeugt diese Module aus den hochgeladenen
- * Regelpaketen (regelwerk/bruecke.ts → buchModule()); der frühere JSON-Import über „Admin & Ressourcen“ ist entfernt.
+ * Modulformat des Editors für Inhalte aus Grimoires. Die Claude-Edition erzeugt diese Module aus den hochgeladenen
+ * Regelpaketen (regelwerk/bruecke.ts → grimoireModule()); der frühere JSON-Import über „Admin & Ressourcen“ ist entfernt.
  */
 
 export interface RulebookSpell {

@@ -111,7 +111,7 @@ export function mehrfachGrenze(text: string | null | undefined, heldengrad: numb
   return Infinity; // z. B. „einmal pro Magieschule und Heldengrad“: Grenze hängt von der Wahl ab → Spielleitung
 }
 
-/** Alle Abrichtungen im Katalog (leer ohne Buchpaket „Bestienmeister“) */
+/** Alle Abrichtungen im Katalog (leer ohne Grimoire „Bestienmeister“) */
 export function abrichtungen(k: Katalog): AbrichtungsInfo[] {
   const alle = Object.values(k.eintraege).filter(e => e.typ === 'abrichtung');
   const grund = alle.find(e => e.name === 'Grundausbildung' && !e.daten.tabellenzeile);

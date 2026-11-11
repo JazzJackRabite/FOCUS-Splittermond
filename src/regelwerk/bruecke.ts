@@ -1,7 +1,7 @@
 /**
  * Brücke zwischen dem bisherigen Editor (Namen, Kürzel wie STA) und dem Regel-Katalog (IDs).
  * - Der RegelwerkProvider setzt den aktiven Katalog; ohne Katalog rechnet der Editor wie bisher.
- * - buchModule(): hochgeladene Bücher als Module im bisherigen Format (Zauber, Meisterschaften, Stärken, Schwächen, Ressourcen).
+ * - grimoireModule(): hochgeladene Grimoires als Module im bisherigen Format (Zauber, Meisterschaften, Stärken, Schwächen, Ressourcen).
  * - abgeleiteteFuerCharakter(): abgeleitete Werte nach den Formeln des Grundregelwerks (daten.strukturiert).
  * - voraussetzungAusKatalog(): Voraussetzungen einer Meisterschaft über erfuellt().
  */
@@ -88,14 +88,14 @@ export function meisterschaftId(k: Katalog, name: string, fertigkeit?: string, r
   return l && l.length === 1 ? l[0] : undefined;
 }
 
-// ---------------------------------------------------------------- Bücher als Module
+// ---------------------------------------------------------------- Grimoires als Module
 let modulCache: RulebookModulePackage[] | null = null;
 
 const zahl = (v: unknown, d = 0) => { const n = Number(v); return Number.isFinite(n) ? n : d; };
 const seite = (e: Eintrag) => (e.quelle.buch_seiten ?? [])[0];
 
-/** Alle geladenen Bücher außer dem Grundregelwerk als Module im bisherigen Editor-Format. */
-export function buchModule(): RulebookModulePackage[] {
+/** Alle geladenen Grimoires außer dem Grundregelwerk als Module im bisherigen Editor-Format. */
+export function grimoireModule(): RulebookModulePackage[] {
   const k = aktiv;
   if (!k) return [];
   if (modulCache) return modulCache;

@@ -2,7 +2,7 @@
 /**
  * Laden der Regelpakete im Browser.
  * - Basis (Grundregelwerk) liegt im Editor: public/regelpakete/manifest.json und grw.srp.json.
- * - Weitere Bücher lädt die Nutzerin oder der Nutzer als Datei hoch (Regelpakete/editor/buecher/<id>.srp.json);
+ * - Grimoires lädt die Nutzerin oder der Nutzer als Datei hoch (Regelpakete/editor/buecher/<id>.grim);
  *   sie bleiben im Browser (siehe paketSpeicher.ts) und werden nie an einen Server geschickt.
  */
 import { Katalog } from './katalog';
@@ -39,8 +39,8 @@ export async function ladeBasis(basisUrl: string = (import.meta.env?.BASE_URL ??
   return { manifest, basis: { info, paket, erwarteteEintraege: info.eintraege }, warnungen };
 }
 
-/** Liest ein hochgeladenes Buchpaket und prüft, ob es zum Editor passt. Wirft einen Fehler mit verständlicher Meldung. */
-export function buchpaketLesen(text: string, manifest: Manifest): LadePaket {
+/** Liest ein hochgeladenes Grimoire und prüft, ob es zum Editor passt. Wirft einen Fehler mit verständlicher Meldung. */
+export function grimoireLesen(text: string, manifest: Manifest): LadePaket {
   let paket: RegelPaket;
   try {
     paket = JSON.parse(text);
@@ -54,7 +54,7 @@ export function buchpaketLesen(text: string, manifest: Manifest): LadePaket {
   if (id === manifest.basis_paket) throw new Error('Das Grundregelwerk ist bereits im Editor enthalten.');
   const bekannt = manifest.bekannte_pakete?.find(p => p.id === id);
   const li = paket.ladeinfo;
-  if (!li && !bekannt) throw new Error(`Unbekanntes Buch „${id}“ ohne Ladeangaben. Bitte die Datei aus Regelpakete/editor/buecher verwenden.`);
+  if (!li && !bekannt) throw new Error(`Unbekanntes Grimoire „${id}“ ohne Ladeangaben. Bitte das Grimoire (.grim) aus dem Export der Datenseite verwenden.`);
   const info: PaketInfo = {
     id,
     titel: paket.paket.titel,
@@ -68,11 +68,11 @@ export function buchpaketLesen(text: string, manifest: Manifest): LadePaket {
   return { info, paket, regelgruppen: li?.regelgruppen ?? {}, umbenannt: li?.umbenannt ?? {}, erwarteteEintraege: li?.original.eintraege ?? paket.statistik?.eintraege };
 }
 
-/** Baut den Katalog aus Basis und hochgeladenen Büchern. Bücher mit fehlenden Pflicht-Abhängigkeiten werden ausgelassen. */
-export function erstelleKatalog(basis: Basis, buecher: LadePaket[]): { katalog: Katalog; ausgelassen: { id: string; grund: string }[] } {
-  const da = new Set([basis.basis.info.id, ...buecher.map(b => b.info.id)]);
+/** Baut den Katalog aus Basis und hochgeladenen Grimoires. Grimoires mit fehlenden Pflicht-Abhängigkeiten werden ausgelassen. */
+export function erstelleKatalog(basis: Basis, grimoires: LadePaket[]): { katalog: Katalog; ausgelassen: { id: string; grund: string }[] } {
+  const da = new Set([basis.basis.info.id, ...grimoires.map(b => b.info.id)]);
   const ausgelassen: { id: string; grund: string }[] = [];
-  const nutzbar = buecher.filter(b => {
+  const nutzbar = grimoires.filter(b => {
     const fehlt = b.info.abhaengigkeiten.filter(a => !da.has(a));
     if (fehlt.length) ausgelassen.push({ id: b.info.id, grund: `benötigt ${fehlt.join(', ')}` });
     return !fehlt.length;

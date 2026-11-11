@@ -1,11 +1,11 @@
 /**
  * Brücke Editor ↔ Regelpakete: Zuordnung der Editor-Namen zu Katalog-IDs, abgeleitete Werte aus den Regeldaten,
- * Bücher als Module, Voraussetzungen über den Katalog.
+ * Grimoires als Module, Voraussetzungen über den Katalog.
  */
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { Katalog } from '../katalog';
-import { buchpaketLesen, erstelleKatalog } from '../laden';
-import { setzeAktivenKatalog, meisterschaftId, fertigkeitId, idNachName, RASSE_ID, buchModule } from '../bruecke';
+import { grimoireLesen, erstelleKatalog } from '../laden';
+import { setzeAktivenKatalog, meisterschaftId, fertigkeitId, idNachName, RASSE_ID, grimoireModule } from '../bruecke';
 import { basisAusDateien } from './hilfen';
 import { ALL_SKILLS, RACES } from '../../data/rules';
 import { MASTERIES_DB, GENERAL_COMBAT_MASTERIES, GENERAL_MAGIC_MASTERIES } from '../../data/masteries';
@@ -104,12 +104,12 @@ describe('Hochgeladene Bücher im Editor', () => {
     ladeinfo: { format: 'splittermond-editor-ladeinfo', format_version: '1.0', ladereihenfolge: 99, abhaengigkeiten: ['grw'], optionale_pakete: [], regelgruppen: {}, umbenannt: {}, begleiter: {},
       original: { datei: 'x', sha256: 'x', bytes: 0, eintraege: 3 } },
   };
-  const { katalog } = erstelleKatalog(basis, [buchpaketLesen(JSON.stringify(buch), basis.manifest)]);
+  const { katalog } = erstelleKatalog(basis, [grimoireLesen(JSON.stringify(buch), basis.manifest)]);
   beforeAll(() => setzeAktivenKatalog(katalog, false));
   afterAll(() => setzeAktivenKatalog(null, false));
 
   it('Meisterschaften und Zauber erscheinen in den Auswahllisten', () => {
-    expect(buchModule().map(m => m.shortName)).toEqual(['TB']);
+    expect(grimoireModule().map(m => m.shortName)).toEqual(['TB']);
     const m = getResolvedMasteries('Klingenwaffen').find(x => x.name === 'Testhieb (S2)');
     expect(m).toMatchObject({ tier: 2, source: 'TB', page: 7, manoever: true, id: 'testbuch:meisterschaft:klingenwaffen:testhieb' });
     const z = getResolvedSpells('Lichtmagie').find(x => x.name === 'Testlicht');

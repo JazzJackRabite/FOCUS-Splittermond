@@ -1,10 +1,11 @@
 /**
- * Speichert hochgeladene Buchpakete nur im Browser (IndexedDB). Nichts davon geht an einen Server oder ins Repo.
+ * Speichert hochgeladene Grimoires nur im Browser (IndexedDB). Nichts davon geht an einen Server oder ins Repo.
  * Ohne IndexedDB (privates Fenster, gesperrte Website-Daten, Tests) bleiben die Pakete nur bis zum Neuladen erhalten.
  */
 export interface GespeichertesPaket { id: string; titel: string; text: string; gespeichertAm: string }
 
 const DB_NAME = 'fokus-regelpakete';
+/** interner Speichername (unverändert, damit bereits gespeicherte Grimoires erhalten bleiben) */
 const STORE = 'buecher';
 const fluechtig = new Map<string, GespeichertesPaket>();
 

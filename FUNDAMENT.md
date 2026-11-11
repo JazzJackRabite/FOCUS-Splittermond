@@ -14,10 +14,11 @@ Gemini in Google AI Studio – liest diese Datei zuerst und hält sich daran.
 
 ## 1. Grundsätze
 
-1. **Nur das Grundregelwerk ist eingebaut.** Alle anderen Bücher lädt jeder Nutzer selbst als Buchpaket hoch; sie bleiben
+1. **Nur das Grundregelwerk ist eingebaut.** Die Erweiterungsbände heißen im Editor **Grimoires** (Einzahl: das Grimoire,
+   Dateiendung `.grim`). Jeder Nutzer lädt sie selbst hoch; sie bleiben
    in seinem Browser. Buchinhalte kommen nicht ins Repository und nicht auf den Server.
 2. **Regeln kommen aus den Regelpaketen.** Was im Grundregelwerk steht, steht im GRW-Paket, alles andere in den
-   Buchpaketen. Der Editor legt keine Regel selbst fest: keine Tabellen nach Zauber-, Meisterschafts- oder Stärkennamen,
+   Grimoires. Der Editor legt keine Regel selbst fest: keine Tabellen nach Zauber-, Meisterschafts- oder Stärkennamen,
    keine Zahlen aus dem Gedächtnis. Fehlt ein Wert, kommt er zuerst ins Paket (Datenseite, Ordner `Werkzeuge`), dann liest
    ihn der Editor.
 3. **Kein Regeltext aus Erweiterungen im Code.** Werkzeuge, Tests und Editor enthalten zu Erweiterungen nur IDs, Zahlen,
@@ -36,7 +37,7 @@ Gemini in Google AI Studio – liest diese Datei zuerst und hält sich daran.
 
 ## 2. Regelquellen
 
-Welche Regel der Editor woher liest. „Paket“ meint das GRW-Paket und die hochgeladenen Buchpakete gleichermaßen;
+Welche Regel der Editor woher liest. „Paket“ meint das GRW-Paket und die hochgeladenen Grimoires gleichermaßen;
 Felder stehen unter `daten` des jeweiligen Eintrags. **Was hier nicht steht, darf der Editor nicht selbst festlegen.**
 
 | Bereich | Quelle im Paket | Liest im Editor |
@@ -49,8 +50,8 @@ Felder stehen unter `daten` des jeweiligen Eintrags. **Was hier nicht steht, dar
 | Wirkungen von Stärken und Meisterschaften (feste Boni, Boni beim Würfeln) | `wirkungen_strukturiert` mit `fertigkeit_refs`, `alle_proben`, `gilt`, `traeger` | `regelwerk/wirkungen.ts` |
 | Kosten und Zauberdauer aus Meisterschaften | `wirkungen_strukturiert`, Gruppe B | `regelwerk/wirkungen.ts` |
 | Wirkung aktiver Zauber (Kampfwerte, Proben, Zusatzschaden, Lebenspunkte, unterdrückte Zustände) | `spielwerte`, `typus`, `reichweite` | `regelwerk/zauberwerte.ts`, `utils/magicRules.ts` |
-| Zauber, Meisterschaften, Stärken, Ressourcen aus Büchern in den Auswahllisten | `schulen`, `kosten`, `zauberdauer`, `reichweite`, `wirkungsdauer`, `wirkung`, `erfolgsgrade`, `schwelle`, `stufe`, `fertigkeit`, `manoever` | `regelwerk/bruecke.ts` |
-| Ausrüstung aus Büchern | Ausrüstungseinträge; `modus` (ersetzt, ergänzt) | `regelwerk/ausruestung.ts` |
+| Zauber, Meisterschaften, Stärken, Ressourcen aus Grimoires in den Auswahllisten | `schulen`, `kosten`, `zauberdauer`, `reichweite`, `wirkungsdauer`, `wirkung`, `erfolgsgrade`, `schwelle`, `stufe`, `fertigkeit`, `manoever` | `regelwerk/bruecke.ts` |
+| Ausrüstung aus Grimoires | Ausrüstungseinträge; `modus` (ersetzt, ergänzt) | `regelwerk/ausruestung.ts` |
 | Relikte | `relikt_baukasten`, `baustein` | `regelwerk/relikte.ts` |
 | Begleiter: Tiere, beschworene Wesen, Dienste | `werte_berechnet`, `tabellenzeile`, `beschwoerbares_wesen_stufe`, `immer_verfuegbar` | `regelwerk/begleiter.ts`, `regelwerk/dienste.ts` |
 | Begleiter: Gefolge, erhobene Untote, Golems | `attribute`, `modulwerte`, `modifikationen`, `kosten_ep`, `baustein`, `felder`, `tabellen` | `regelwerk/gefolge.ts`, `regelwerk/untote.ts`, `regelwerk/golem.ts`, `regelwerk/modifikationen.ts` |

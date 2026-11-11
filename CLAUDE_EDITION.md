@@ -7,20 +7,20 @@ Repository `JazzJackRabite/FOKUS-1.0-claudeedition` (Branch `main`; entstanden a
 
 - **Eingebaut ist nur das Grundregelwerk:** `public/regelpakete/manifest.json` und `grw.srp.json`
   (erzeugt mit `Werkzeuge/regelpakete/editor_export.py`, Ordner `Regelpakete/editor/basis`). Andere Bücher liegen nicht im Repo.
-- **Weitere Bücher lädt man selbst:** Einstellungen → Regelpakete → „Buchpakete auswählen“, Dateien aus
-  `Regelpakete/editor/buecher` (z. B. `magie.srp.json`). Sie bleiben im Browser (IndexedDB), werden beim nächsten Start wieder
-  geladen und nie an einen Server geschickt. Jedes Buchpaket bringt seine Ladeangaben mit (`ladeinfo`: Ladereihenfolge,
+- **Grimoires lädt man selbst:** Einstellungen → Regelpakete → „Grimoires auswählen“, Dateien aus
+  `Regelpakete/editor/buecher` (z. B. `magie.grim`). Sie bleiben im Browser (IndexedDB), werden beim nächsten Start wieder
+  geladen und nie an einen Server geschickt. Jedes Grimoire bringt seine Ladeangaben mit (`ladeinfo`: Ladereihenfolge,
   Abhängigkeiten, Regelgruppen, Umbenennungen).
 - **Lader in TypeScript** (`src/regelwerk/`): Portierung von `Pruefsuite/lader.py`
   - `Katalog` – Lade-Algorithmus, Ergänzungen/Ersetzungen, Regelgruppen (geltende Fassung), Referenzprüfung
   - `erfuellt` – alle Bedingungsarten der Voraussetzungen
   - `abgeleiteteWerte` – Formeln, Heldengrad, Stärken, Ausrüstung, Höchstbonus, Wunden (GRW S. 13–15)
   - `pruefeErschaffung` – alle Schritte und Budgets der Erschaffung (GRW S. 22–30)
-  - `verfuegbareDienste` – Dienste beschworener Wesen (nur mit Buchpaket „Die Magie“)
+  - `verfuegbareDienste` – Dienste beschworener Wesen (nur mit Grimoire „Die Magie“)
   - `RegelwerkProvider` / `useRegelwerk()` – Katalog für die ganze App
 - **Abgleich mit der Python-Referenz:** `src/regelwerk/__tests__/regelwerk.test.ts` vergleicht 161 Voraussetzungen ×
   13 Charaktere, 120 Berechnungen abgeleiteter Werte und 150 Erschaffungen mit den Ergebnissen des Python-Laders.
-  Mit allen Büchern lokal: `FOKUS_BUECHER=<Regelpakete/editor/buecher> FOKUS_REFERENZ_VOLL=<referenz_voll.json> npx vitest run src/regelwerk`.
+  Mit allen Büchern lokal: `FOKUS_GRIMOIRES=<Regelpakete/editor/buecher> FOKUS_REFERENZ_VOLL=<referenz_voll.json> npx vitest run src/regelwerk`.
 
 ## Stand 2 (05.11.2026): Regeln aus den Daten, Bücher im Editor
 
@@ -33,7 +33,7 @@ Repository `JazzJackRabite/FOKUS-1.0-claudeedition` (Branch `main`; entstanden a
   4. Halbe Behinderung auf GSW kaufmännisch gerundet (S. 11); VTD-Bonus der Ausrüstung bis zum Höchstbonus (S. 18)
   Ohne geladene Regelpakete (z. B. in alten Tests) rechnet der Editor wie bisher.
 - **Voraussetzungen über den Katalog** (`utils/prerequisiteValidator.ts` → `voraussetzungAusKatalog`): Jede Meisterschaft, die im Katalog
-  steht (GRW und hochgeladene Bücher), wird formal geprüft; „Entscheidung der Spielleitung“ wird als Hinweis angezeigt.
+  steht (GRW und hochgeladene Grimoires), wird formal geprüft; „Entscheidung der Spielleitung“ wird als Hinweis angezeigt.
 - **Hochgeladene Bücher im Editor:** Zauber, Meisterschaften (mit Schwelle, Manöver-Kennzeichen, Voraussetzung), Stärken, Schwächen und
   Ressourcen erscheinen in allen Auswahllisten (über `getActivePackages` im `gameResourceManager`). Allgemeine Kampf- und
   Magiemeisterschaften der Bücher stehen bei den passenden Fertigkeiten.
@@ -84,7 +84,7 @@ Repository `JazzJackRabite/FOKUS-1.0-claudeedition` (Branch `main`; entstanden a
 - **Angezeigt:** Karte „Wirkungen“ unter „Spielen“ mit Eingerechnet / Dauerhaft (Resistenzen, Immunitäten) / In bestimmten Lagen /
   Bei Manövern; grünes Kästchen am Fertigkeitswert zeigt den Bonus und seine Quellen.
 - Datenkorrektur dabei: Wirkungen der Beschwörer-Meisterschaften aus „Die Magie“ betreffen das Wesen, nicht den Zauberer
-  (neues Buchpaket `magie.srp.json` nötig).
+  (neues Grimoire `magie.grim` nötig).
 
 ## Stand 7 (05.11.2026): Charaktere mit Regel-IDs
 
@@ -116,18 +116,18 @@ Repository `JazzJackRabite/FOKUS-1.0-claudeedition` (Branch `main`; entstanden a
   Angriff nur als Hinweis; Manöver-Wirkungen stecken weiter in der Manöverauswahl.
 - Ohne Regelpakete oder ohne passende Wirkung erscheint der Abschnitt nicht.
 
-## Stand 10 (06.11.2026): Ausrüstung aus den Buchpaketen
+## Stand 10 (06.11.2026): Ausrüstung aus den Grimoires
 
 - Vorher kam die Ausrüstung nur aus der eingebauten GRW-Liste (`data/equipment.ts`); Gegenstände, Waffen, Rüstungen usw. der
-  hochgeladenen Bücher fehlten. Jetzt liefert `regelwerk/ausruestung.ts` → `alleAusruestung()` die GRW-Liste plus alle
+  hochgeladenen Grimoires fehlten. Jetzt liefert `regelwerk/ausruestung.ts` → `alleAusruestung()` die GRW-Liste plus alle
   Ausrüstungs-Einträge der Bücher (mit allen Büchern rund 820): Waffen, Rüstungen, Schilde, Gegenstände, Kleidung, Projektile,
   Ausrüstungssätze, Alchemika, Kräuter, Gifte, Material, Verbesserungen und magische Gegenstände – mit Werten, Quelle und Seite.
 - Inventar („Gegenstand hinzufügen“, Filter nach Quelle) und Kampf-Tab (Waffe bzw. Rüstung/Schild auswählen) nutzen diese Liste.
   Bei mehr als 50 Treffern weist das Inventar darauf hin, die Suche zu verfeinern.
-- Änderungen der Bücher an GRW-Ausrüstung: „ersetzt“ übernimmt die neuen Werte (z. B. Waffenlos mit Freihändig, Mondstahlklingen
+- Änderungen der Grimoires an GRW-Ausrüstung: „ersetzt“ übernimmt die neuen Werte (z. B. Waffenlos mit Freihändig, Mondstahlklingen
   S. 111) und nennt die Änderung in der Beschreibung; Beschreibungen aus „ergaenzt“ (vor allem Mondstahlklingen) werden angehängt.
 - Doppelte Einträge mehrerer Bücher fasst der Lader über die Regelgruppen zusammen; sie erscheinen einmal.
-- Tests: `regelwerk/__tests__/ausruestung.test.ts` (Testbuch; mit `FOKUS_BUECHER` zusätzlich: jeder Ausrüstungs-Eintrag aller
+- Tests: `regelwerk/__tests__/ausruestung.test.ts` (Testbuch; mit `FOKUS_GRIMOIRES` zusätzlich: jeder Ausrüstungs-Eintrag aller
   Bücher genau einmal in der Liste).
 - Noch nicht im Editor: Nachschlage-Inhalte wie Gottheiten, Reliktkräfte, Abrichtungen, Golembausteine, Feenwelten.
 
@@ -140,7 +140,7 @@ Repository `JazzJackRabite/FOKUS-1.0-claudeedition` (Branch `main`; entstanden a
   gegen den Charakter), Werte auch als Attributkürzel (z. B. „VER“ bei Begabter Alchemist).
 - Editor: Meisterschaften mit dauerhaften Wirkungen auf abgeleitete Werte werden eingerechnet (z. B. Sprinter GSW +1, Gute Reflexe
   VTD +1, Blitzreflexe INI −3); situative Boni in Höhe eines Attributs werden mit dem Attributwert angeboten.
-- Buchpakete neu erzeugt: Wer Bücher schon hochgeladen hat, lädt sie neu hoch.
+- Grimoires neu erzeugt: Wer Bücher schon hochgeladen hat, lädt sie neu hoch.
 
 ## Nächste Schritte
 
@@ -184,11 +184,11 @@ anwenden) oder Werte der Begleiter im Kampf.
 - Alle Regeln kommen aus den Paketen (`daten.relikt_baukasten`, `daten.baustein`), nichts davon steht im Code. Nur mit dem
   Grundregelwerk: 8 Verbesserungen (S. 142) und 3 Strukturgeber-Wirkungen (S. 254). Mondstahlklingen bringt weitere
   Verbesserungen und legendäre Kräfte, Die Götter göttliche Kräfte und besondere Materialien.
-- Neues GRW-Paket in `public/regelpakete` (Herstellung, Verbesserungen, Artefaktwirkungen; 1539 Einträge). Buchpakete neu hochladen.
+- Neues GRW-Paket in `public/regelpakete` (Herstellung, Verbesserungen, Artefaktwirkungen; 1539 Einträge). Grimoires neu hochladen.
 - Noch nicht: Wertänderungen der Bausteine auf Waffe/Rüstung, GW/KW und Zauberverankerung im Magie-Bereich (nächster Stand);
   Wachsen mit Chronik und beseelte Gegenstände (danach).
 - Tests: `regelwerk/__tests__/relikte.test.tsx` (Baukasten, Kosten wie im GRW-Beispiel S. 142, Warnungen, Inventareintrag,
-  Reducer, Werkstatt; mit `FOKUS_BUECHER` die Bausteine der Erweiterungen). Referenz des Python-Laders für den Katalog neu erzeugt.
+  Reducer, Werkstatt; mit `FOKUS_GRIMOIRES` die Bausteine der Erweiterungen). Referenz des Python-Laders für den Katalog neu erzeugt.
   251 Tests grün (mit Büchern).
 
 ## Tab „Begleiter“, Teil 1: Tiere (Branch `begleiter-tab`)
@@ -199,7 +199,7 @@ anwenden) oder Werte der Begleiter im Kampf.
   Rufname, zugeordnete Ressource Kreatur (beim Hinzufügen die kleinste freie, die reicht), Qualität, Vertrauter (Stärke
   Tiervertrauter), Notiz. Warnungen: mehr/höhere Kreatur-Zuordnungen als Ressourcen, mehrere Vertraute, Vertrauter ohne Stärke.
   Reittiere werden erkannt (Typus Reittier oder Grundausbildung Reittier I).
-- **Abrichtungen und Potenzial (Bestienmeister S. 15–23, nur mit Buchpaket):** Potenzial = Grundwert/Qualität + 2 je Kreatur +
+- **Abrichtungen und Potenzial (Bestienmeister S. 15–23, nur mit Grimoire):** Potenzial = Grundwert/Qualität + 2 je Kreatur +
   3 Tiervertrauter + Tierspezialist (je 1) + Meister der Bestien (2) + Meisterbändiger (1, nur Kreatur), mit Aufschlüsselung.
   Abrichtungen nach Gruppen wählbar, Kosten in Potenzialpunkten, Mehrfachwahl („maximal viermal“, „einmal pro HG“ …).
   Grundausbildungen (Reittier I, Kampfgefährte …) kosten 1 und brauchen zusätzlich die Voraussetzung der Abrichtung
@@ -214,7 +214,7 @@ anwenden) oder Werte der Begleiter im Kampf.
 ## Tab „Begleiter“, Teil 2: Gefolge (Branch `begleiter-teil2`)
 
 - Neuer Abschnitt **Gefolge** im Tab „Begleiter“ (Ressource Gefolge, GRW S. 77–78), nur Grundregelwerk nötig; Kulturen und Rassen
-  aus geladenen Buchpaketen erscheinen mit.
+  aus geladenen Grimoires erscheinen mit.
 - **Gefolgsmann:** Rasse und Kultur beim Hinzufügen; Rufname, Aufgabe (Leibdiener, Knappe, Leibwächter …), Notiz. Attribute
   2 + Rassenmodifikator mit Wahl der freien Boni (auch „unterschiedlich“, „nicht Stärke“). Werte des Kulturmoduls mit derselben
   Wahl wie bei der Erschaffung (Fertigkeitspunkte inkl. „eine Magieschule“, Stärke, Meisterschaft). Rassenstärken kommen dazu.
@@ -242,7 +242,7 @@ anwenden) oder Werte der Begleiter im Kampf.
   und Angriff (BEW + STÄ); Pseudo-Fertigkeit „Angriff (Waffen)“. Grenze der neuen Punkte nach Zaubergrad (1–2 → HG 1 …),
   freie Meisterschaft ab 6/9/12/15 Punkten, keine Magieschulen, kein Arkane Kunde/Geschichte und Mythen. Abnormität (5 EP,
   Meister der Abnormitäten) mit ihren Modifikationen.
-- **Golems** (Die Magie S. 197–207, nur mit Buchpaket): Korpus (Klein/Mittel/Groß), Material (Schritt 2, mit Schwachpunkt),
+- **Golems** (Die Magie S. 197–207, nur mit Grimoire): Korpus (Klein/Mittel/Groß), Material (Schritt 2, mit Schwachpunkt),
   Zusätzliche Fähigkeiten, Rollen (Kämpfer braucht Aggressiv), Applikationen (zwei frei bzw. eine je Stufe über die Ressource
   Golem; jede weitere +1 Schwierigkeit, +3 Fortschrittspunkte und ein Schwachpunkt), Schwachpunkte (Anfällig, Feingliedrig,
   Langsam auch in Zahlen), Instruktionen (Folge/Warte immer, eine weitere + „Zusätzliche Instruktion“), Verfügungen,
@@ -326,7 +326,7 @@ aus echtem Schaden; Würfelformeln zusammenfassen. Die Funktionen aus Stand 9–
 
 **Technik:** Die Zauberwerte standen in Stand 16 als geprüfte Tabelle im Code; seit Stand 17 kommen sie aus den Regelpaketen. 314 Tests grün, Build läuft.
 
-**Offen:** Die Tabellen gelten nur für GRW-Zauber (Namen fest im Code); Zauber aus Buchpaketen wirken nicht automatisch.
+**Offen:** Die Tabellen gelten nur für GRW-Zauber (Namen fest im Code); Zauber aus Grimoires wirken nicht automatisch.
 Wiederherstellung entfernt eine feste Liste von Zuständen statt „Zustände, die Folge von Angriffen sind“. Unbenutzte
 Dateien aus AI Studio im Repository: `public/assets/aistudio/*.png`, `.aistudio/`, leere `src/data/splittermond_grw.sqlite`.
 
@@ -345,20 +345,20 @@ Dateien aus AI Studio im Repository: `public/assets/aistudio/*.png`, `.aistudio/
   Schaden. „Schaden erleiden“ und „Heilen“ öffnen TakeDamageModal bzw. HealModal (neu: optionale Props `stufen` und `begleiter`
   – ohne Splitterpunkte, temporäre LP und Zustände des Helden). Fokus: erschöpfen/kanalisieren/verzehren, Kanalisierung beenden,
   Zauber ziehen Fokus automatisch ab. Verschnaufpause, Zurücksetzen. Kurzanzeige ♥/FO im Kopf jedes Begleiters. Feld `zustand`.
-- Tests: `begleiterSpiel.test.tsx` (7). 334 grün mit allen Büchern (bekannter Relikte-Test mit älteren Buchpaketen ausgenommen).
+- Tests: `begleiterSpiel.test.tsx` (7). 334 grün mit allen Büchern (bekannter Relikte-Test mit älteren Grimoires ausgenommen).
 
 ## Stand 17 (10.11.2026): Zauberwerte aus den Regelpaketen statt aus dem Code
 
 - Die Tabellen nach Zaubernamen aus Stand 15/16 (`ZAUBER_KAMPFWERTE`, Probenboni, Zusatzschaden, Heilwerte, Liste der
   Waffenzauber) sind entfernt. Was ein aktiver Zauber ändert, steht jetzt im Regelpaket am Zauber (`daten.spielwerte`:
   Bezug, Wert, verstärkter Wert, Fertigkeiten, Attribut, Lage, Ziel, Schadensart; `nicht_kombinierbar` nach Typus) und gilt
-  damit auch für Zauber aus hochgeladenen Büchern.
+  damit auch für Zauber aus hochgeladenen Grimoires.
 - Neu `src/regelwerk/zauberwerte.ts` (Kampfwerte, Probenboni, Waffenschaden, Heilung/zusätzliche Lebenspunkte aus dem
   Katalog; Höchstbonus, „nicht kombinierbar“, Verstärkung). `utils/magicRules.ts` reicht nur noch durch. Ob ein Zauber ein
   Ausrüstungsstück verzaubert, ergibt sich aus Typus und Reichweite; die Schadensformel einer Verstärkung aus ihrem Text.
 - Datenseite: `Werkzeuge/regelpakete/zauber_spielwerte.py` + `zauber_spielwerte.json` (nur IDs, Zahlen, Kennwörter);
   89 Zauber mit Spielwerten (57 GRW, 32 aus Büchern). Die Prüfsuite prüft jede Zahl gegen den Zaubertext.
-  Neues GRW-Paket in `public/regelpakete`; Buchpakete neu hochladen.
+  Neues GRW-Paket in `public/regelpakete`; Grimoires neu hochladen.
 - Ohne geladenes Regelpaket haben Zauber keine automatische Wirkung (kein Rückfall auf eine Tabelle im Code).
 - Erfrischung und Giftbann standen noch nach Zaubername im Code – behoben in Stand 18.
 - Die Zauber aus den Büchern sind nur automatisch abgeleitet, nicht einzeln gesichtet; Werte, die nur in einer Lage gelten,
@@ -493,7 +493,7 @@ Alle Begleiter bleiben im Tab „Begleiter“ (Entscheidung 11.11.2026: kein Ber
   freie Meisterschaft („[Schwelle 1]“ bzw. „[Schwelle siehe Schritt 5]“ nach Stufe), Fertigkeit („auf 6 oder +3“), Punkte verteilen
   („8 freie Fertigkeitspunkte, max. +2“). Feste Meisterschaften aus den Bausteinen erscheinen im Wertekasten. Feld `feinschliff`.
 - Tests: `begleiter`, `begleiterSpiel`, `gefolge`, `untoteGolems` angepasst und erweitert. 354 grün mit allen Büchern
-  (bekannter Relikte-Test mit älteren Buchpaketen ausgenommen), FUNDAMENT-Prüfungen grün, Build gelingt, im Browser geprüft.
+  (bekannter Relikte-Test mit älteren Grimoires ausgenommen), FUNDAMENT-Prüfungen grün, Build gelingt, im Browser geprüft.
 - **Offen (Datenseite, Ordner `Werkzeuge`):** Zahlenwerte für Abrichtungen (Boni im Wertekasten), Vertraute aus „Die Magie“ (im Paket
   nur Verweise), Regelwerte von Gefolge/Untoten/Golems in `strukturiert`, fehlende Bestiarium-Werte. **Offen (Entscheidung):**
   Baukasten für beschwörbare Wesen und Bestien braucht eine neue Zeile in der Tabelle „Regelquellen“.
@@ -524,10 +524,28 @@ Entscheidung 11.11.2026: neue Zeile „Begleiter: Wesen-Baukasten“ in FUNDAMEN
   (`aenderungGesperrt`, mit Hausregeln Warnung). Gebaute Kreaturen haben Abrichtungen, Potenzial, Lebenspunkte und Würfeln wie
   andere Tiere. Felder `dienste`, `basisdienst` am Begleiter (Speichern, Laden, Import).
 - **Korrektur:** Die Liste der beschwörbaren Wesen zeigte die drei Korpusse des Baukastens als fertige Wesen (65 statt 62).
-- Tests: `wesenBaukasten.test.tsx` (5). Alle Tests grün mit allen Büchern außer dem bekannten Relikte-Test (ältere Buchpakete in
+- Tests: `wesenBaukasten.test.tsx` (5). Alle Tests grün mit allen Büchern außer dem bekannten Relikte-Test (ältere Grimoires in
   dieser Umgebung).
 - Offen (Datenseite): Regeln zum Zusammenführen doppelter Merkmale (Die Magie S. 196) und Verbesserte Angriffe (S. 196–197)
   stehen nur als Text im Paket; Zahl der Dienste ist Text („halbe Stufe“), keine Zahl.
+
+## Stand 24 (11.11.2026): Erweiterungsbände heißen Grimoires (.grim)
+
+Entscheidung des Projektinhabers 11.11.2026: Die nachladbaren Erweiterungsbände heißen im Editor **Grimoires** (das Grimoire,
+die Grimoires), Dateiendung `.grim`. Das Grundregelwerk ist kein Grimoire; es bleibt eingebaut (`public/regelpakete/grw.srp.json`).
+
+- **Begriffe** in Oberfläche, Meldungen, Kommentaren, FUNDAMENT.md (Grundsatz 1 nennt den Begriff), README und `manifest.json`:
+  „Buchpaket(e)“ und „Bücher“ im Sinn der nachladbaren Pakete → „Grimoire(s)“. „Buch“ für das gedruckte Werk („laut Buch“,
+  „Buch S. 196“) bleibt.
+- **Code:** `grimoireLesen` (vorher `buchpaketLesen`), `grimoireModule`, `grimoireAusruestung`, `grwMitGrimoireAenderungen`;
+  im Regelwerk-Kontext `grimoires` statt `buecher`.
+- **Dateien:** Die Dateiauswahl in Einstellungen → Regelpakete nimmt `.grim`; ältere Exporte mit `.srp.json` werden weiter
+  gelesen. Der Dateiinhalt ist unverändert (`format: splittermond-regelpaket`). Der interne Speichername im Browser (IndexedDB)
+  bleibt, damit bereits gespeicherte Grimoires erhalten bleiben.
+- **Tests:** Ordner der Grimoires über `FOKUS_GRIMOIRES` (`FOKUS_BUECHER` gilt weiter); `<id>.grim`, sonst `<id>.srp.json`
+  (`hilfen.ts`: `GRIMOIRE_ORDNER`, `grimoireDatei`, `istGrimoireDatei`). Mit `.grim`-Kopien aller Bücher geprüft.
+- **Offen (Datenseite):** Der Export in `Werkzeuge` schreibt noch `<id>.srp.json` in den Ordner `Regelpakete/editor/buecher`;
+  dort Endung `.grim` und ggf. Ordnername umstellen.
 
 ## Google AI Studio
 

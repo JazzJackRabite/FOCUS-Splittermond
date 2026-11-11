@@ -45,7 +45,7 @@ describe('Zauberwerte kommen aus dem Regelpaket (daten.spielwerte), nicht aus de
   it('ohne Regelpaket gibt es keine Zauberwirkungen (kein Rückfall auf eine Tabelle im Code)', () => {
     expect(getActiveSpellModifiers([zauber('Steinhaut')], undefined, null).vtdBonus).toBe(0);
   });
-  it('ein Zauber aus einem Buchpaket wirkt genauso (Beispielpaket mit erfundenem Zauber)', () => {
+  it('ein Zauber aus einem Grimoire wirkt genauso (Beispielpaket mit erfundenem Zauber)', () => {
     const buch = { info: { id: 'test', datei: 't.json', eintraege: 1, abhaengigkeiten: ['grw'] }, erwarteteEintraege: 1, paket: { paket: { id: 'test', titel: 'Test' }, eintraege: [{
       id: 'test:zauber:probehaut', typ: 'zauber', name: 'Probehaut', aktion: 'neu', quelle: { buch: 'Test' },
       daten: { typus: ['Haut'], spielwerte: { werte: [{ bezug: 'VTD', wert: 3 }, { bezug: 'SR', wert: 1, verstaerkt: 2 }], nicht_kombinierbar: ['Haut'] } },

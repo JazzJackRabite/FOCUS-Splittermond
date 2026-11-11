@@ -488,7 +488,7 @@ export function checkMasteryPrerequisites(
     }
   };
 
-  // Regelpakete (falls geladen): Voraussetzung formal über den Katalog prüfen (GRW und hochgeladene Bücher)
+  // Regelpakete (falls geladen): Voraussetzung formal über den Katalog prüfen (GRW und hochgeladene Grimoires)
   let spielleitung: string | undefined;
   const regelId = (mastery as MasteryEntry & { regelId?: string }).regelId ?? (mastery.id && /^[a-z0-9]+:[a-z_]+:/.test(mastery.id) ? mastery.id : undefined);
   const ausKatalog = voraussetzungAusKatalog(mastery.name, mastery.skill || currentSkillName, regelId, () => bedingungsCharakter(aktiverKatalog()!, {

@@ -1,11 +1,11 @@
 /**
- * Stellt den Regel-Katalog (Grundregelwerk + hochgeladene Bücher) für den ganzen Editor bereit.
+ * Stellt den Regel-Katalog (Grundregelwerk + hochgeladene Grimoires) für den ganzen Editor bereit.
  * Hochgeladene Bücher bleiben im Browser (IndexedDB) und werden beim nächsten Start automatisch wieder geladen.
  */
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { Katalog } from './katalog';
 import type { LadePaket } from './typen';
-import { buchpaketLesen, erstelleKatalog, ladeBasis, type Basis } from './laden';
+import { grimoireLesen, erstelleKatalog, ladeBasis, type Basis } from './laden';
 import { alleGespeichertenPakete, paketEntfernen, paketSpeichern } from './paketSpeicher';
 import { setzeAktivenKatalog } from './bruecke';
 
@@ -15,7 +15,7 @@ export interface Regelwerk {
   status: RegelwerkStatus;
   katalog: Katalog | null;
   basis: Basis | null;
-  buecher: LadePaket[];
+  grimoires: LadePaket[];
   ausgelassen: { id: string; grund: string }[];
   meldungen: string[];
   fehler: string | null;
@@ -26,7 +26,7 @@ export interface Regelwerk {
 }
 
 const NICHT_VERFUEGBAR: Regelwerk = {
-  status: 'nicht_verfuegbar', katalog: null, basis: null, buecher: [], ausgelassen: [], meldungen: [], fehler: null, dauerhaft: true,
+  status: 'nicht_verfuegbar', katalog: null, basis: null, grimoires: [], ausgelassen: [], meldungen: [], fehler: null, dauerhaft: true,
   hochladen: async () => ({ geladen: [], fehler: ['Regelwerk ist nicht geladen.'] }), entfernen: async () => {},
 };
 
@@ -34,7 +34,7 @@ const RegelwerkKontext = createContext<Regelwerk>(NICHT_VERFUEGBAR);
 
 export const RegelwerkProvider: React.FC<{ children: React.ReactNode; basisUrl?: string }> = ({ children, basisUrl }) => {
   const [basis, setBasis] = useState<Basis | null>(null);
-  const [buecher, setBuecher] = useState<LadePaket[]>([]);
+  const [grimoires, setGrimoires] = useState<LadePaket[]>([]);
   const [status, setStatus] = useState<RegelwerkStatus>('laedt');
   const [fehler, setFehler] = useState<string | null>(null);
   const [meldungen, setMeldungen] = useState<string[]>([]);
@@ -48,10 +48,10 @@ export const RegelwerkProvider: React.FC<{ children: React.ReactNode; basisUrl?:
         const gespeichert = await alleGespeichertenPakete();
         const geladen: LadePaket[] = []; const m = [...b.warnungen];
         for (const g of gespeichert) {
-          try { geladen.push(buchpaketLesen(g.text, b.manifest)); } catch (e) { m.push(`${g.titel}: ${(e as Error).message}`); }
+          try { geladen.push(grimoireLesen(g.text, b.manifest)); } catch (e) { m.push(`${g.titel}: ${(e as Error).message}`); }
         }
         if (!aktiv) return;
-        setBasis(b); setBuecher(geladen); setMeldungen(m); setStatus('bereit');
+        setBasis(b); setGrimoires(geladen); setMeldungen(m); setStatus('bereit');
       } catch (e) {
         if (!aktiv) return;
         setFehler((e as Error).message); setStatus('fehler');
@@ -62,10 +62,10 @@ export const RegelwerkProvider: React.FC<{ children: React.ReactNode; basisUrl?:
 
   const { katalog, ausgelassen } = useMemo(() => {
     if (!basis) return { katalog: null, ausgelassen: [] };
-    const r = erstelleKatalog(basis, buecher);
+    const r = erstelleKatalog(basis, grimoires);
     setzeAktivenKatalog(r.katalog, false); // sofort für Berechnungen im selben Render verfügbar
     return r;
-  }, [basis, buecher]);
+  }, [basis, grimoires]);
 
   // Katalog für Berechnungen und Auswahllisten außerhalb von React bereitstellen (regelwerk/bruecke.ts)
   useEffect(() => { if (katalog) setzeAktivenKatalog(katalog); }, [katalog]);
@@ -78,7 +78,7 @@ export const RegelwerkProvider: React.FC<{ children: React.ReactNode; basisUrl?:
     for (const d of dateien) {
       try {
         const text = await d.text();
-        const p = buchpaketLesen(text, basis.manifest);
+        const p = grimoireLesen(text, basis.manifest);
         const persistent = await paketSpeichern({ id: p.info.id, titel: p.info.titel, text, gespeichertAm: new Date().toISOString() });
         if (!persistent) setDauerhaft(false);
         neu.push(p); ok.push(p.info.titel);
@@ -86,17 +86,17 @@ export const RegelwerkProvider: React.FC<{ children: React.ReactNode; basisUrl?:
         err.push(`${d.name}: ${(e as Error).message}`);
       }
     }
-    if (neu.length) setBuecher(alt => [...alt.filter(b => !neu.some(n => n.info.id === b.info.id)), ...neu]);
+    if (neu.length) setGrimoires(alt => [...alt.filter(b => !neu.some(n => n.info.id === b.info.id)), ...neu]);
     return { geladen: ok, fehler: err };
   }, [basis]);
 
   const entfernen = useCallback(async (id: string) => {
     await paketEntfernen(id);
-    setBuecher(alt => alt.filter(b => b.info.id !== id));
+    setGrimoires(alt => alt.filter(b => b.info.id !== id));
   }, []);
 
-  const wert = useMemo<Regelwerk>(() => ({ status, katalog, basis, buecher, ausgelassen, meldungen, fehler, dauerhaft, hochladen, entfernen }),
-    [status, katalog, basis, buecher, ausgelassen, meldungen, fehler, dauerhaft, hochladen, entfernen]);
+  const wert = useMemo<Regelwerk>(() => ({ status, katalog, basis, grimoires, ausgelassen, meldungen, fehler, dauerhaft, hochladen, entfernen }),
+    [status, katalog, basis, grimoires, ausgelassen, meldungen, fehler, dauerhaft, hochladen, entfernen]);
   return <RegelwerkKontext.Provider value={wert}>{children}</RegelwerkKontext.Provider>;
 };
 

@@ -1,6 +1,6 @@
 /**
  * Relikte: Baukasten aus den Regelpaketen (GRW S. 79 Ressource Relikt, S. 142 Verbesserungen, S. 254 Strukturgeber),
- * Prüfung, Inventareintrag, Zustand und Werkstatt. Mit FOKUS_BUECHER zusätzlich die Bausteine der Erweiterungen.
+ * Prüfung, Inventareintrag, Zustand und Werkstatt. Mit FOKUS_GRIMOIRES zusätzlich die Bausteine der Erweiterungen.
  */
 import React from 'react';
 import fs from 'fs';
@@ -11,8 +11,8 @@ import { baseCharacterReducer, DEFAULT_STATE } from '../../hooks/useCharacterSta
 import { CharacterContext } from '../../context/CharacterContext';
 import { ReliktKarte } from '../../components/relikte/ReliktKarte';
 import { Katalog } from '../katalog';
-import { basisAusDateien } from './hilfen';
-import { buchpaketLesen, erstelleKatalog } from '../laden';
+import { basisAusDateien, GRIMOIRE_ORDNER, grimoireDatei } from './hilfen';
+import { grimoireLesen, erstelleKatalog } from '../laden';
 import { alleAusruestung } from '../ausruestung';
 import { artVon, kostenVon, passtZu, pruefeRelikt, reliktAlsInventar, reliktBaukasten, reliktBausteine, ressourcePunkte } from '../relikte';
 import type { Relikt } from '../../types';
@@ -131,10 +131,10 @@ describe('Relikte im Zustand und in der Werkstatt', () => {
   });
 });
 
-const ORDNER = process.env.FOKUS_BUECHER;
+const ORDNER = GRIMOIRE_ORDNER || undefined;
 describe.skipIf(!ORDNER || !fs.existsSync(ORDNER))('Relikt-Bausteine der Erweiterungen (lokal)', () => {
   it('Mondstahlklingen und Götter erweitern den Baukasten', () => {
-    const lade = (n: string) => buchpaketLesen(fs.readFileSync(path.join(ORDNER!, `${n}.srp.json`), 'utf-8'), b.manifest);
+    const lade = (n: string) => grimoireLesen(fs.readFileSync(grimoireDatei(n), 'utf-8'), b.manifest);
     const { katalog: KB } = erstelleKatalog(b, [lade('mondstahl'), lade('goetter')]);
     const bk = reliktBaukasten(KB)!;
     expect(bk.typen).toEqual(['verbesserung', 'artefaktwirkung', 'legendaere_kraft', 'goettliche_kraft', 'material']);

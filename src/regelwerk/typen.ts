@@ -23,7 +23,7 @@ export interface Eintrag {
   ziel?: string | null;
   aenderungen?: Record<string, { alt: unknown; neu: unknown }>;
   daten: Daten;
-  /** vom Lader gesetzt: weitere Bücher, in denen der Eintrag steht */
+  /** vom Lader gesetzt: weitere Grimoires, in denen der Eintrag steht */
   _quellen?: Quelle[];
 }
 
@@ -55,7 +55,7 @@ export interface RegelPaket {
   abhaengigkeiten: { paket: string; pflicht: boolean }[] | string[];
   statistik: { eintraege: number; [k: string]: unknown };
   eintraege: Eintrag[];
-  /** nur in Buchpaketen für den Editor (Werkzeuge/regelpakete/editor_export.py) */
+  /** nur in Grimoires für den Editor (Werkzeuge/regelpakete/editor_export.py) */
   ladeinfo?: Ladeinfo;
 }
 

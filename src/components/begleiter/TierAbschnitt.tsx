@@ -98,7 +98,7 @@ const TierEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; f: Fuehre
         {b.vertrauter && <Marke klein>Vertrauter</Marke>}
         <span>{b.kreatur ? `Kreatur ${b.kreatur}` : 'ohne Ressource'}</span>
         {liste.length > 0 && <Marke klein ton={verbraucht > pot.gesamt ? 'schaden' : 'neutral'}>Potenzial {verbraucht}/{pot.gesamt}</Marke>}
-        {!e && <Marke klein ton="erschoepft">nicht im Katalog (Buch nicht geladen?)</Marke>}
+        {!e && <Marke klein ton="erschoepft">nicht im Katalog (Grimoire nicht geladen?)</Marke>}
         {bk && <Marke klein>Baukasten, Kreatur {bk.stufe}</Marke>}
         {bk && bk.hinweise.length > 0 && <Marke klein ton="erschoepft">{bk.hinweise.length} Hinweis{bk.hinweise.length > 1 ? 'e' : ''}</Marke>}
         {b.kreatur !== undefined && b.kreatur > 0 && st !== null && st > b.kreatur && <Marke klein ton="erschoepft">braucht Kreatur {st}</Marke>}
@@ -125,7 +125,7 @@ const TierEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; f: Fuehre
       <div className="space-y-2">
         <Abschnittstitel als="h3" className="text-[15px]">Abrichtungen</Abschnittstitel>
         {liste.length === 0 ? (
-          <p className="text-leise">Abrichtungen und Potenzial stehen im Buchpaket „Bestienmeister“ (Einstellungen → Regelpakete).</p>
+          <p className="text-leise">Abrichtungen und Potenzial stehen im Grimoire „Bestienmeister“ (Einstellungen → Regelpakete).</p>
         ) : (
           <>
             <p className="text-leise">

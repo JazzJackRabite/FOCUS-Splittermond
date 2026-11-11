@@ -60,7 +60,7 @@ const GefolgeEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; maxFer
         {b.rasse && <span>{k.get(b.rasse)?.name}</span>}
         <Marke klein>{g.punkte} {g.punkte === 1 ? 'Punkt' : 'Punkte'}</Marke>
         {g.hinweise.length > 0 && <Marke klein ton="erschoepft" title={g.hinweise.join('\n')}>{g.hinweise.length} Hinweis{g.hinweise.length > 1 ? 'e' : ''}</Marke>}
-        {!kultur && <Marke klein ton="erschoepft">Kultur nicht im Katalog (Buch nicht geladen?)</Marke>}
+        {!kultur && <Marke klein ton="erschoepft">Kultur nicht im Katalog (Grimoire nicht geladen?)</Marke>}
       </>}>
       <div className="flex flex-wrap gap-3 items-end">
         <Eingabe beschriftung="Rufname" value={b.rufname ?? ''} onChange={ev => aendern({ rufname: ev.target.value || undefined })} placeholder="Name" />

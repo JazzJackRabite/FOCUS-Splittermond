@@ -2,7 +2,7 @@
  * Spielwerte aktiver Zauber aus den Regelpaketen (daten.spielwerte am Zauber, siehe Werkzeuge/regelpakete/zauber_spielwerte.py).
  *
  * Der Editor führt keine eigene Tabelle der Zauberwirkungen: Was ein gewirkter Zauber an Kampfwerten, Proben, Zusatzschaden und
- * Lebenspunkten ändert, steht im Paket – auch für Zauber aus hochgeladenen Büchern.
+ * Lebenspunkten ändert, steht im Paket – auch für Zauber aus hochgeladenen Grimoires.
  *
  *   werte              – je Wert: bezug, wert, verstaerkt (Wert mit gewählter Verstärkung), fertigkeiten (IDs), attribut,
  *                        lage (gilt nur in einer Lage → nicht vorausgewählt bzw. nicht fest eingerechnet), ziel, schadensart

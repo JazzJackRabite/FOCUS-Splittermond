@@ -167,7 +167,7 @@ const GolemEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; besitzer
   );
 };
 
-/** Golems: Baukasten aus „Die Magie“ (S. 197–207); ohne das Buchpaket nur ein Hinweis */
+/** Golems: Baukasten aus „Die Magie“ (S. 197–207); ohne das Grimoire nur ein Hinweis */
 export const GolemAbschnitt: React.FC<{ k: Katalog }> = ({ k }) => {
   const { state, dispatch } = useCharacter();
   const [wahl, setWahl] = useState('');
@@ -186,7 +186,7 @@ export const GolemAbschnitt: React.FC<{ k: Katalog }> = ({ k }) => {
         <Abschnittstitel>Golems</Abschnittstitel>
       </div>
       {liste.length === 0 ? (
-        <p className="text-sm text-leise">Der Golem-Baukasten steht im Buchpaket „Die Magie“ (Einstellungen → Regelpakete).</p>
+        <p className="text-sm text-leise">Der Golem-Baukasten steht im Grimoire „Die Magie“ (Einstellungen → Regelpakete).</p>
       ) : (
         <>
           <p className="text-sm text-leise">

@@ -6,7 +6,7 @@
  * `regelIds` zu jedem Namen die ID aus den Regelpaketen. Beim Laden mit geladenen Paketen gilt:
  *   - Name wird gefunden → nichts zu tun.
  *   - Name wird nicht gefunden, aber die gespeicherte ID (auch über Umbenennungen und Regelgruppen) → Name auf den aktuellen setzen.
- *   - Beides nicht gefunden (z. B. Buch nicht geladen) → Eintrag bleibt unverändert, die ID bleibt gespeichert.
+ *   - Beides nicht gefunden (z. B. Grimoire nicht geladen) → Eintrag bleibt unverändert, die ID bleibt gespeichert.
  * Ohne Regelpakete werden vorhandene `regelIds` unverändert weitergespeichert.
  */
 import type { Katalog } from './katalog';

@@ -2,7 +2,7 @@
  * Relikte (Ressource Relikt, GRW S. 79) als Baukasten.
  * Alle Regeln kommen aus den Regelpaketen:
  * - daten.relikt_baukasten: welche Bausteintypen ein Relikt nutzen darf, Budget und Höchstpunkte (GRW: Ressource Relikt;
- *   Bücher ergänzen Typen, z. B. legendäre Kräfte, göttliche Kräfte, besondere Materialien)
+ *   Grimoires ergänzen Typen, z. B. legendäre Kräfte, göttliche Kräfte, besondere Materialien)
  * - daten.baustein: Kosten, Höchstzahl, Gegenstandsart, Auswahl, Bedingungen und Wertänderungen je Baustein
  * Der Editor prüft nur und warnt; er sperrt nichts (viele Relikt-Regeln sind Spielleiterentscheid).
  */
@@ -120,7 +120,7 @@ export function reliktBausteine(k: Katalog | null, bk: Baukasten | null = relikt
     const d = e.daten as D;
     if (e.typ === 'material') {
       if (!bk.material) continue;
-      // Qualität im Eintrag oder in einer Ergänzung (z. B. GRW-Material mit Materialqualität aus einem Buch)
+      // Qualität im Eintrag oder in einer Ergänzung (z. B. GRW-Material mit Materialqualität aus einem Grimoire)
       const q = [d, ...(k.erweiterungen[e.id] ?? []).map(x => x.daten as D)].map(x => Number(x[bk.material!.mindestAus])).find(n => Number.isFinite(n) && n > 0) ?? NaN;
       if (!Number.isFinite(q) || q <= 0) continue;
       out.push({ id: e.id, typ: e.typ, name: e.name, kosten: bk.material.kosten, maxAnzahl: 1, giltFuer: ['alle'], mindestPunkte: q,
@@ -180,7 +180,7 @@ export function pruefeRelikt(relikt: Relikt, bausteine: BausteinInfo[], bk: Bauk
   const varianten = new Map<string, string[]>();
   for (const w of relikt.bausteine) {
     const b = nachId.get(w.id);
-    if (!b) { W.push(`${w.name ?? w.id}: Baustein nicht geladen (Buch fehlt?) – Kosten nicht gezählt.`); continue; }
+    if (!b) { W.push(`${w.name ?? w.id}: Baustein nicht geladen (Grimoire fehlt?) – Kosten nicht gezählt.`); continue; }
     verwendet += kostenVon(b, w);
     anzahl.set(b.id, (anzahl.get(b.id) ?? 0) + Math.max(1, w.anzahl || 1));
     if (b.variante) varianten.set(b.variante, [...(varianten.get(b.variante) ?? []), b.name]);

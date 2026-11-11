@@ -40,7 +40,7 @@ const WesenEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number }> = ({ k
         <span>Stufe {bk ? bk.stufe : wesenStufe(e) ?? '?'}</span>
         {bk && <Marke klein>Baukasten</Marke>}
         {bk && bk.hinweise.length > 0 && <Marke klein ton="erschoepft">{bk.hinweise.length} Hinweis{bk.hinweise.length > 1 ? 'e' : ''}</Marke>}
-        {!e && <Marke klein ton="erschoepft">nicht im Katalog (Buch nicht geladen?)</Marke>}
+        {!e && <Marke klein ton="erschoepft">nicht im Katalog (Grimoire nicht geladen?)</Marke>}
       </>}>
       {e && <>
         <BegleiterVitals spiel={spiel} daten={daten} />
@@ -70,7 +70,7 @@ export const WesenAbschnitt: React.FC<{ k: Katalog }> = ({ k }) => {
         <Abschnittstitel>Beschworene Wesen</Abschnittstitel>
       </div>
       {!wesen.length && !liste.length && (
-        <p className="text-sm text-leise">Beschwörbare Wesen und ihre Dienste stehen im Buchpaket „Die Magie“ (Einstellungen → Regelpakete).</p>
+        <p className="text-sm text-leise">Beschwörbare Wesen und ihre Dienste stehen im Grimoire „Die Magie“ (Einstellungen → Regelpakete).</p>
       )}
       {liste.length > 0 && (
         <ul className="space-y-3">

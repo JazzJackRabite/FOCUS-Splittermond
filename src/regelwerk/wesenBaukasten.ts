@@ -35,7 +35,7 @@ export function basen(k: Katalog, art: BaukastenArt): Eintrag[] {
   return Object.values(k.eintraege).filter(e => baukastenArt(e) === art).sort((a, b) => a.name.localeCompare(b.name, 'de'));
 }
 
-/** Module und Rollen desselben Buchs wie die Basis */
+/** Module und Rollen desselben Grimoires wie die Basis */
 export function bausteineFuer(k: Katalog, basis: Eintrag): Eintrag[] {
   return Object.values(k.eintraege)
     .filter(e => (e.typ === MODUL_TYP || e.typ === ROLLE_TYP) && e.quelle.paket === basis.quelle.paket)

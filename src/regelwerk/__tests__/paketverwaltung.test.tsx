@@ -35,7 +35,7 @@ describe('Paketverwaltung', () => {
     await waitFor(() => expect(screen.getByText('Splittermond: Die Regeln (3. erratierte Neuauflage)')).toBeTruthy());
     const vorher = Number(screen.getByTestId('anzahl').textContent);
     expect(vorher).toBe(1539);
-    const datei = new File([JSON.stringify(TESTBUCH)], 'testbuch.srp.json', { type: 'application/json' });
+    const datei = new File([JSON.stringify(TESTBUCH)], 'testbuch.grim', { type: 'application/json' });
     await act(async () => { fireEvent.change(screen.getByTestId('regelpakete-upload'), { target: { files: [datei] } }); });
     await waitFor(() => expect(screen.getByText('Testbuch der Prüfung')).toBeTruthy());
     expect(Number(screen.getByTestId('anzahl').textContent)).toBe(vorher + 1);

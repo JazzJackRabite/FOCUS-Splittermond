@@ -1,10 +1,10 @@
 /**
  * Ausrüstung aus den Regelpaketen im Format des Editors (src/data/equipment.ts).
- * - buchAusruestung(k): alle Ausrüstungs-Einträge der hochgeladenen Bücher (Waffen, Rüstungen, Schilde, Gegenstände, Kleidung,
+ * - grimoireAusruestung(k): alle Ausrüstungs-Einträge der hochgeladenen Grimoires (Waffen, Rüstungen, Schilde, Gegenstände, Kleidung,
  *   Projektile, Ausrüstungssätze, Alchemika, Kräuter, Gifte, Material, Verbesserungen, magische Gegenstände).
- * - grwMitBuchAenderungen(k, liste): GRW-Liste mit den Änderungen der Bücher (aktion „ersetzt“ überschreibt Werte,
+ * - grwMitGrimoireAenderungen(k, liste): GRW-Liste mit den Änderungen der Grimoires (aktion „ersetzt“ überschreibt Werte,
  *   „ergaenzt“ mit Beschreibung hängt den Text an).
- * - alleAusruestung(): eingebaute GRW-Liste plus Bücher des aktiven Katalogs; ohne Katalog nur die GRW-Liste.
+ * - alleAusruestung(): eingebaute GRW-Liste plus Grimoires des aktiven Katalogs; ohne Katalog nur die GRW-Liste.
  */
 import { ALL_EQUIPMENT, type ArmorItem, type GearItem, type ShieldItem, type WeaponItem } from '../data/equipment';
 import type { Katalog } from './katalog';
@@ -119,8 +119,8 @@ const kuerzel = (k: Katalog, pid: string) => k.pakete[pid]?.kuerzel ?? (k.manife
 
 const CACHE = new WeakMap<Katalog, { buch: AusruestungsItem[]; grw: AusruestungsItem[] }>();
 
-/** Ausrüstung der hochgeladenen Bücher (ohne Grundregelwerk), nach Ladereihenfolge und Name */
-export function buchAusruestung(k: Katalog): AusruestungsItem[] {
+/** Ausrüstung der hochgeladenen Grimoires (ohne Grundregelwerk), nach Ladereihenfolge und Name */
+export function grimoireAusruestung(k: Katalog): AusruestungsItem[] {
   const basis = k.manifest.basis_paket;
   const out: Array<{ r: number; item: AusruestungsItem }> = [];
   for (const e of Object.values(k.eintraege)) {
@@ -138,8 +138,8 @@ function grwEintrag(k: Katalog, item: AusruestungsItem, nachName: Map<string, Ei
   return kandidaten[0];
 }
 
-/** Eingebaute GRW-Liste mit den Änderungen der geladenen Bücher */
-export function grwMitBuchAenderungen(k: Katalog, liste: AusruestungsItem[] = ALL_EQUIPMENT as AusruestungsItem[]): AusruestungsItem[] {
+/** Eingebaute GRW-Liste mit den Änderungen der geladenen Grimoires */
+export function grwMitGrimoireAenderungen(k: Katalog, liste: AusruestungsItem[] = ALL_EQUIPMENT as AusruestungsItem[]): AusruestungsItem[] {
   const basis = k.manifest.basis_paket;
   const nachName = new Map<string, Eintrag[]>();
   for (const e of Object.values(k.eintraege)) {
@@ -183,10 +183,10 @@ export function grwMitBuchAenderungen(k: Katalog, liste: AusruestungsItem[] = AL
   });
 }
 
-/** Alle Ausrüstung für Auswahllisten: GRW (mit Änderungen der Bücher) plus Bücher des aktiven Katalogs */
+/** Alle Ausrüstung für Auswahllisten: GRW (mit Änderungen der Grimoires) plus Grimoires des aktiven Katalogs */
 export function alleAusruestung(k: Katalog | null = aktiverKatalog()): AusruestungsItem[] {
   if (!k) return ALL_EQUIPMENT as AusruestungsItem[];
   let c = CACHE.get(k);
-  if (!c) { c = { grw: grwMitBuchAenderungen(k), buch: buchAusruestung(k) }; CACHE.set(k, c); }
+  if (!c) { c = { grw: grwMitGrimoireAenderungen(k), buch: grimoireAusruestung(k) }; CACHE.set(k, c); }
   return [...c.grw, ...c.buch];
 }

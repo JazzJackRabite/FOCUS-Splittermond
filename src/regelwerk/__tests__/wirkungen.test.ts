@@ -6,10 +6,10 @@ import fs from 'fs';
 import path from 'path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { Katalog } from '../katalog';
-import { buchpaketLesen, erstelleKatalog } from '../laden';
+import { grimoireLesen, erstelleKatalog } from '../laden';
 import { setzeAktivenKatalog, wirkungenFuerCharakter } from '../bruecke';
 import { fertigkeitsBoni, wirkungenDesCharakters, wirkungKurz } from '../wirkungen';
-import { basisAusDateien } from './hilfen';
+import { basisAusDateien, grimoireDatei } from './hilfen';
 import { calculateCharacter } from '../../utils/characterCalculations';
 import type { CharacterState, Mastery } from '../../types';
 
@@ -70,9 +70,9 @@ describe('Wirkungen im Editor', () => {
   });
 });
 
-const MAGIE = process.env.FOKUS_BUECHER ? path.join(process.env.FOKUS_BUECHER, 'magie.srp.json') : '';
+const MAGIE = grimoireDatei('magie');
 describe.skipIf(!MAGIE || !fs.existsSync(MAGIE))('Wirkungen mit „Die Magie“ (lokal)', () => {
-  const { katalog: KM } = erstelleKatalog(basis, MAGIE ? [buchpaketLesen(fs.readFileSync(MAGIE, 'utf-8'), basis.manifest)] : []);
+  const { katalog: KM } = erstelleKatalog(basis, MAGIE ? [grimoireLesen(fs.readFileSync(MAGIE, 'utf-8'), basis.manifest)] : []);
   beforeAll(() => setzeAktivenKatalog(KM, false));
   afterAll(() => setzeAktivenKatalog(null, false));
   it('Wasserbeschwörer: Boni und Initiative gehören dem Wesen, nicht dem Zauberer', () => {

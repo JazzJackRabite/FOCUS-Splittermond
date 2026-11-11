@@ -48,7 +48,7 @@ export class Katalog {
       for (const a of p.info.abhaengigkeiten) if (!ids.has(a)) this.b('fehler', p.info.id, '-', `Abhängigkeit ${a} nicht gewählt`);
       this.lade(p);
     }
-    // Regelgruppen: Manifest (falls vorhanden) plus ladeinfo der geladenen Bücher
+    // Regelgruppen: Manifest (falls vorhanden) plus ladeinfo der geladenen Grimoires
     Object.assign(this.regelgruppen, manifest.regelgruppen?.gruppen ?? {});
     for (const p of wahl) Object.assign(this.regelgruppen, p.regelgruppen ?? {});
     this.wendeRegelgruppenAn();

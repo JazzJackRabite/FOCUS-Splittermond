@@ -1,6 +1,6 @@
 /**
- * Vollabgleich mit allen Büchern – läuft nur lokal, weil die Buchpakete nicht im Repo liegen.
- * Aufruf: FOKUS_BUECHER=<Regelpakete/editor/buecher> FOKUS_REFERENZ_VOLL=<referenz_voll.json> npx vitest run src/regelwerk
+ * Vollabgleich mit allen Büchern – läuft nur lokal, weil die Grimoires nicht im Repo liegen.
+ * Aufruf: FOKUS_GRIMOIRES=<Regelpakete/editor/buecher> FOKUS_REFERENZ_VOLL=<referenz_voll.json> npx vitest run src/regelwerk
  * Die Referenz erzeugt der Python-Lader der Prüfsuite (Katalog mit allen Paketen).
  */
 import fs from 'fs';
@@ -9,10 +9,10 @@ import { describe, expect, it } from 'vitest';
 import { erfuellt } from '../bedingungen';
 import { abgeleiteteWerte } from '../abgeleitet';
 import { verfuegbareDienste } from '../dienste';
-import { buchpaketLesen, erstelleKatalog } from '../laden';
-import { basisAusDateien, charAusJson } from './hilfen';
+import { grimoireLesen, erstelleKatalog } from '../laden';
+import { basisAusDateien, charAusJson, GRIMOIRE_ORDNER, istGrimoireDatei } from './hilfen';
 
-const ORDNER = process.env.FOKUS_BUECHER;
+const ORDNER = GRIMOIRE_ORDNER || undefined;
 const REF_DATEI = process.env.FOKUS_REFERENZ_VOLL;
 const aktiv = !!(ORDNER && REF_DATEI && fs.existsSync(ORDNER) && fs.existsSync(REF_DATEI));
 
@@ -20,8 +20,8 @@ describe.skipIf(!aktiv)('Vollabgleich mit allen Büchern (lokal)', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const REF: any = aktiv ? JSON.parse(fs.readFileSync(REF_DATEI!, 'utf-8')) : null;
   const basis = basisAusDateien();
-  const buecher = aktiv ? fs.readdirSync(ORDNER!).filter(f => f.endsWith('.srp.json')).map(f => buchpaketLesen(fs.readFileSync(path.join(ORDNER!, f), 'utf-8'), basis.manifest)) : [];
-  const { katalog: K, ausgelassen } = aktiv ? erstelleKatalog(basis, buecher) : ({} as ReturnType<typeof erstelleKatalog>);
+  const grimoires = aktiv ? fs.readdirSync(ORDNER!).filter(istGrimoireDatei).map(f => grimoireLesen(fs.readFileSync(path.join(ORDNER!, f), 'utf-8'), basis.manifest)) : [];
+  const { katalog: K, ausgelassen } = aktiv ? erstelleKatalog(basis, grimoires) : ({} as ReturnType<typeof erstelleKatalog>);
 
   it('Katalog: Einträge, Aliasse, geltende Fassungen, Daten und Quellen wie in Python', () => {
     expect(ausgelassen).toEqual([]);
@@ -38,7 +38,7 @@ describe.skipIf(!aktiv)('Vollabgleich mit allen Büchern (lokal)', () => {
     expect(K.angeboteneVerweise().map(v => v.id).sort()).toEqual(REF.katalog.verweise_angeboten);
   });
   it('Referenzprüfung wie in Python', () => {
-    const { katalog } = erstelleKatalog(basis, buecher);
+    const { katalog } = erstelleKatalog(basis, grimoires);
     katalog.pruefeReferenzen();
     expect(katalog.befunde).toEqual(REF.katalog.referenzbefunde);
   });

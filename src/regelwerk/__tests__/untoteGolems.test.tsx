@@ -1,5 +1,5 @@
 /**
- * Begleiter Teil 3: Modifikationen-Texte, erhobene Untote und Golems (Die Magie S. 182–184, 197–207; lokal mit FOKUS_BUECHER).
+ * Begleiter Teil 3: Modifikationen-Texte, erhobene Untote und Golems (Die Magie S. 182–184, 197–207; lokal mit FOKUS_GRIMOIRES).
  */
 import { setzeHausregeln } from '../../fundament/hausregeln';
 import React from 'react';
@@ -12,8 +12,8 @@ import { CharacterContext } from '../../context/CharacterContext';
 import { BegleiterView } from '../../features/begleiter/BegleiterView';
 import { validateCharacterImport } from '../../utils/importValidation';
 import { Katalog } from '../katalog';
-import { basisAusDateien } from './hilfen';
-import { erstelleKatalog, buchpaketLesen } from '../laden';
+import { basisAusDateien, grimoireDatei } from './hilfen';
+import { erstelleKatalog, grimoireLesen } from '../laden';
 import { anwenden, iniPlus, leseModifikationen, mehrfachAusText, schadenPlus, werteblock } from '../modifikationen';
 import { attributKosten, erhebungen, fertigkeitKosten, freieSchwelle, grenzHeldengrad, untotWerte, ANGRIFF } from '../untote';
 import { golemWerte, korpusse } from '../golem';
@@ -71,12 +71,11 @@ describe('Untote: Regeln', () => {
   });
 });
 
-const BUECHER = process.env.FOKUS_BUECHER ?? '';
-const MAGIE = BUECHER ? path.join(BUECHER, 'magie.srp.json') : '';
+const MAGIE = grimoireDatei('magie');
 
 describe.skipIf(!MAGIE || !fs.existsSync(MAGIE))('Untote und Golems mit „Die Magie“ (lokal)', () => {
   let KM = K;
-  beforeAll(() => { KM = erstelleKatalog(b, [buchpaketLesen(fs.readFileSync(MAGIE, 'utf-8'), b.manifest)]).katalog; });
+  beforeAll(() => { KM = erstelleKatalog(b, [grimoireLesen(fs.readFileSync(MAGIE, 'utf-8'), b.manifest)]).katalog; });
 
   it('Erhebungszauber, Gruftkatze: Verstand 0, Steigerung wirkt auf abgeleitete Werte, Abnormität', () => {
     expect(erhebungen(KM).map(x => x.zauber.name)).toEqual(['Totentier', 'Untote erheben', 'Grabesbestie', 'Der letzte Ruf']);

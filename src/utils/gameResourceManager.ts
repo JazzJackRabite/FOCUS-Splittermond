@@ -12,7 +12,7 @@ import { LANGUAGES_DATA } from '../data/languages';
 import type { CharacterState, Mastery, AdvancementLogEntry } from '../types';
 import { generateId } from './id';
 import type { RulebookModulePackage, RulebookMastery } from '../types/rulebookSchema';
-import { buchModule } from '../regelwerk/bruecke';
+import { grimoireModule } from '../regelwerk/bruecke';
 
 export type StrengthEntry = (typeof STRENGTHS_DATA)[number];
 export type ResourceEntry = (typeof PREDEFINED_RESOURCES)[number];
@@ -24,7 +24,7 @@ export type ResourceEntry = (typeof PREDEFINED_RESOURCES)[number];
 // ---------------------------------------------------------------------------
 
 function getActivePackages(): RulebookModulePackage[] {
-  return buchModule();
+  return grimoireModule();
 }
 
 // ---------------------------------------------------------------------------

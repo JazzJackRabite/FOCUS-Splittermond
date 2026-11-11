@@ -1,15 +1,15 @@
 /**
- * Ausrüstung aus Buchpaketen: Bücher bringen Waffen, Rüstungen, Gegenstände usw. in die Auswahllisten,
+ * Ausrüstung aus Grimoires: Bücher bringen Waffen, Rüstungen, Gegenstände usw. in die Auswahllisten,
  * Ersetzungen und Ergänzungen von GRW-Ausrüstung erscheinen in der eingebauten Liste.
  */
 import fs from 'fs';
 import path from 'path';
 import { describe, expect, it } from 'vitest';
 import { Katalog } from '../katalog';
-import { buchpaketLesen, erstelleKatalog } from '../laden';
-import { AUSRUESTUNGS_TYPEN, alleAusruestung, buchAusruestung } from '../ausruestung';
+import { grimoireLesen, erstelleKatalog } from '../laden';
+import { AUSRUESTUNGS_TYPEN, alleAusruestung, grimoireAusruestung } from '../ausruestung';
 import { ALL_EQUIPMENT } from '../../data/equipment';
-import { basisAusDateien } from './hilfen';
+import { basisAusDateien, GRIMOIRE_ORDNER, istGrimoireDatei } from './hilfen';
 import type { LadePaket, RegelPaket } from '../typen';
 
 const basis = basisAusDateien();
@@ -40,16 +40,16 @@ function testbuch(): LadePaket {
         daten: { beschreibung: 'Der Dolch ist die häufigste Waffe.' } },
     ],
     ladeinfo: { format: 'splittermond-editor-ladeinfo', format_version: '1.0', ladereihenfolge: 50, abhaengigkeiten: ['grw'], optionale_pakete: [],
-      regelgruppen: {}, umbenannt: {}, begleiter: {}, original: { datei: 'testbuch.srp.json', sha256: '', bytes: 0, eintraege: 6 } },
+      regelgruppen: {}, umbenannt: {}, begleiter: {}, original: { datei: 'testbuch.grim', sha256: '', bytes: 0, eintraege: 6 } },
   } as unknown as RegelPaket;
-  return buchpaketLesen(JSON.stringify(paket), basis.manifest);
+  return grimoireLesen(JSON.stringify(paket), basis.manifest);
 }
 
-describe('Ausrüstung aus Buchpaketen', () => {
+describe('Ausrüstung aus Grimoires', () => {
   it('ohne Bücher: genau die eingebaute GRW-Liste', () => {
     expect(alleAusruestung(null)).toBe(ALL_EQUIPMENT);
     expect(alleAusruestung(K0)).toEqual(ALL_EQUIPMENT);
-    expect(buchAusruestung(K0)).toEqual([]);
+    expect(grimoireAusruestung(K0)).toEqual([]);
   });
 
   const { katalog: K } = erstelleKatalog(basis, [testbuch()]);
@@ -83,11 +83,11 @@ describe('Ausrüstung aus Buchpaketen', () => {
   });
 });
 
-const ORDNER = process.env.FOKUS_BUECHER;
+const ORDNER = GRIMOIRE_ORDNER || undefined;
 describe.skipIf(!ORDNER || !fs.existsSync(ORDNER))('Ausrüstung aller Bücher (lokal)', () => {
   it('jeder geladene Ausrüstungs-Eintrag der Bücher steht genau einmal in der Liste', () => {
-    const buecher = fs.readdirSync(ORDNER!).filter(f => f.endsWith('.srp.json')).map(f => buchpaketLesen(fs.readFileSync(path.join(ORDNER!, f), 'utf-8'), basis.manifest));
-    const { katalog: K } = erstelleKatalog(basis, buecher);
+    const grimoires = fs.readdirSync(ORDNER!).filter(istGrimoireDatei).map(f => grimoireLesen(fs.readFileSync(path.join(ORDNER!, f), 'utf-8'), basis.manifest));
+    const { katalog: K } = erstelleKatalog(basis, grimoires);
     const soll = Object.values(K.eintraege).filter(e => e.quelle.paket !== 'grw' && e.aktion === 'neu' && e.typ in AUSRUESTUNGS_TYPEN).map(e => e.id).sort();
     const liste = alleAusruestung(K);
     const ids = liste.map(i => i.id).filter((i): i is string => !!i && !i.includes('|')).sort();

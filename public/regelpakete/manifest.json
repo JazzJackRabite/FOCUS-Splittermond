@@ -2,7 +2,7 @@
  "format": "splittermond-regelpaket-manifest",
  "format_version": "1.0",
  "erzeugt": "2026-11-02",
- "beschreibung": "Editor-Manifest: enthält nur das Grundregelwerk. Weitere Bücher lädt der Editor als eigenständige Buchpakete (<id>.srp.json mit \"ladeinfo\") aus Regelpakete/editor/buecher.",
+ "beschreibung": "Editor-Manifest: enthält nur das Grundregelwerk. Die Erweiterungsbände lädt der Editor als eigenständige Grimoires (<id>.grim mit \"ladeinfo\").",
  "basis_paket": "grw",
  "id_schema": {
   "muster": "<paket>:<typ>:<slug>[:<slug>...]",
@@ -568,7 +568,7 @@
  ],
  "lade_algorithmus": [
   "1. manifest.json und das Basispaket (grw.srp.json, sha256 prüfen) laden.",
-  "2. Hochgeladene Buchpakete nach ladeinfo.ladereihenfolge laden; ladeinfo.abhaengigkeiten müssen geladen sein.",
+  "2. Hochgeladene Grimoires nach ladeinfo.ladereihenfolge laden; ladeinfo.abhaengigkeiten müssen geladen sein.",
   "3. Einträge mit aktion \"neu\" aufnehmen; \"ergaenzt\"/\"ersetzt\" auf den Zieleintrag anwenden (bei \"ersetzt\" aenderungen[feld].neu übernehmen).",
   "4. Regelgruppen aus ladeinfo.regelgruppen aller geladenen Bücher vereinigen; je Gruppe gilt die erste Fassung, deren Paket geladen ist.",
   "5. \"verweis\" nur anbieten, wenn das Ziel geladen ist.",
