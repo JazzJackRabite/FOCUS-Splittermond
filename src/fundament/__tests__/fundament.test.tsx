@@ -11,7 +11,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { FARBEN_ERLAUBT, WURZEL, farbwerte, paketzugriffe, regelnamenImCode, regelquellen, regelquellenBefunde } from './pruefen';
+import { FARBEN_ERLAUBT, WURZEL, farbtabelle, farbwerte, kontrast, kontrastBefunde, paketzugriffe, regelnamenImCode, regelquellen, regelquellenBefunde } from './pruefen';
 import { Abschnittstitel, Auswahl, Dialog, Eingabe, Karte, Knopf, Marke, Rollbereich } from '..';
 
 const ALTLASTEN = path.join(WURZEL, 'src/fundament/altlasten.json');
@@ -48,6 +48,19 @@ describe('Fundament: Altlasten dürfen nur weniger werden', () => {
   it('nur die Dateien aus der Tabelle „Regelquellen“ lesen Paketdaten', () => {
     const neu = ist.paketzugriffe.filter((x) => !soll.paketzugriffe.includes(x));
     expect(neu, 'Eine Datei greift selbst in die Paketdaten (…daten.feld). Das gehört in ein Modul unter src/regelwerk, das in FUNDAMENT.md (Regelquellen) eingetragen ist.').toEqual([]);
+  });
+
+  it('Schrift und Hintergrund eines Elements haben genug Kontrast (mindestens 4,5 : 1)', () => {
+    expect(kontrastBefunde(4.5), 'Dunkle Schrift auf dunklem Grund oder helle auf hellem. Auf dunklen Flächen und gedämpften Grundtönen text-schrift (oder text-leise), auf Gold text-seite verwenden – siehe FUNDAMENT.md, Gestaltung, Regel 6.').toEqual([]);
+  });
+
+  it('die Farben des Fundaments selbst sind miteinander lesbar', () => {
+    const f = farbtabelle();
+    for (const grund of ['seite', 'flaeche', 'erhoeht', 'unverletzt-grund', 'erschoepft-grund', 'schaden-grund', 'kanalisiert-grund', 'magie-grund', 'temporaer-grund']) {
+      expect(kontrast(f[grund], f.schrift), `schrift auf ${grund}`).toBeGreaterThanOrEqual(7);
+    }
+    for (const grund of ['seite', 'flaeche', 'erhoeht']) expect(kontrast(f[grund], f.leise), `leise auf ${grund}`).toBeGreaterThanOrEqual(4.5);
+    for (const grund of ['gold', 'gold-hell']) expect(kontrast(f[grund], f.seite), `seite auf ${grund}`).toBeGreaterThanOrEqual(4.5);
   });
 
   it('die Bausteine selbst enthalten keinen Farbwert', () => {

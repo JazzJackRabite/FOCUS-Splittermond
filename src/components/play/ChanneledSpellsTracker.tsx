@@ -111,7 +111,7 @@ export const ChanneledSpellsTracker: React.FC<ChanneledSpellsTrackerProps> = ({
                         {spell.name}
                       </span>
                       {buff && (
-                        <span className="text-[11px] font-bold text-magie bg-magie-grund border border-magie px-1.5 py-0.5 rounded-knopf shadow-2xs">
+                        <span className="text-[11px] font-bold text-schrift bg-magie-grund border border-magie px-1.5 py-0.5 rounded-knopf shadow-2xs">
                           {buff.description}
                         </span>
                       )}

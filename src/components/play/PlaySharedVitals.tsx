@@ -309,7 +309,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
     let title = 'Frei';
 
     if (slot.type === 'consumed') {
-      styleClass = 'bg-schaden border border-schaden';
+      styleClass = 'bg-schaden-grund border border-schaden';
       title = isMinimal ? 'Echter Schaden' : 'Echter Schaden (■) – Klick zum Entfernen';
     } else if (slot.type === 'exhausted') {
       styleClass = 'bg-gold border border-gold-hell';
@@ -353,7 +353,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
     let title = 'Frei';
 
     if (type === 'consumed') {
-      styleClass = 'bg-schaden border border-schaden';
+      styleClass = 'bg-schaden-grund border border-schaden';
       title = isMinimal ? 'Verzehrter Fokus' : 'Verzehrter Fokus – Klick zum Regenerieren';
     } else if (type === 'channeled') {
       styleClass = 'bg-kanalisiert border border-kanalisiert';
@@ -515,7 +515,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                   {consumedLP > 0 && (
                     <div
                       style={{ width: `${(consumedLP / Math.max(1, totalLP)) * 100}%` }}
-                      className="bg-schaden h-full transition-all duration-300"
+                      className="bg-schaden-grund h-full transition-all duration-300"
                       title={`Echter Schaden: ${consumedLP}`}
                     />
                   )}
@@ -524,7 +524,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                 {/* Damage breakdown text */}
                 <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[11px] sm:text-[11px] text-leise pt-0.5">
                   <span className="flex items-center gap-1">
-                    <span className="w-2 h-2 rounded-full bg-schaden inline-block" />
+                    <span className="w-2 h-2 rounded-full bg-schaden-grund inline-block" />
                     Echt: <strong className="tabular-nums text-schrift">{consumedLP}</strong>
                   </span>
                   <span className="flex items-center gap-1">
@@ -562,7 +562,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                       className={`w-4.5 h-4.5 rounded-knopf text-[11px] font-bold flex items-center justify-center transition-all cursor-pointer border ${
                         showMinimalConditionPicker
                           ? 'border-gold bg-gold text-seite '
-                          : 'border-rahmen bg-seite hover:border-gold text-seite hover:text-gold'
+                          : 'border-rahmen bg-seite hover:border-gold text-schrift hover:text-gold'
                       }`}
                       title={showMinimalConditionPicker ? 'Schnellmenü schließen' : 'Zustand schnell hinzufügen'}
                       aria-label="Zustand hinzufügen"
@@ -1033,7 +1033,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                   {focus.consumed > 0 && (
                     <div
                       style={{ width: `${(focus.consumed / Math.max(1, maxFO)) * 100}%` }}
-                      className="bg-schaden h-full transition-all duration-300"
+                      className="bg-schaden-grund h-full transition-all duration-300"
                       title={`Verzehrter Fokus: ${focus.consumed}`}
                     />
                   )}
@@ -1054,7 +1054,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                     Kanalisiert: <strong className="tabular-nums text-schrift">{focus.channeled}</strong>
                   </span>
                   <span className="flex items-center gap-1">
-                    <span className="w-2 h-2 rounded-full bg-schaden inline-block" />
+                    <span className="w-2 h-2 rounded-full bg-schaden-grund inline-block" />
                     Verzehrt: <strong className="tabular-nums text-schrift">{focus.consumed}</strong>
                   </span>
                 </div>
@@ -1127,7 +1127,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
 
                   <div className="flex flex-wrap items-center gap-3 text-[11px] text-schrift pt-0.5">
                     <span className="flex items-center gap-1">
-                      <span className="w-2.5 h-2.5 rounded-full bg-schaden inline-block" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-schaden-grund inline-block" />
                       Verzehrt
                     </span>
                     <span className="flex items-center gap-1">
@@ -1244,7 +1244,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                           <button
                             type="button"
                             onClick={() => session.handleCancelChanneledSpell(s)}
-                            className="ml-1 text-[11px] font-bold text-leise hover:text-schaden bg-flaeche hover:bg-seite px-1.5 py-0.5 rounded-knopf transition-all cursor-pointer flex items-center gap-0.5"
+                            className="ml-1 text-[11px] font-bold text-leise hover:text-schrift bg-flaeche hover:bg-seite px-1.5 py-0.5 rounded-knopf transition-all cursor-pointer flex items-center gap-0.5"
                             title={`'${s.name}' aufheben (${s.channeledFocus} K-Fokus wird zu erschöpftem Fokus)`}
                           >
                             <span>×</span>
@@ -1414,7 +1414,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                     className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs transition-all ${
                       isAvailable
                         ? 'bg-gold text-seite border border-erschoepft'
-                        : 'bg-seite text-seite border border-rahmen'
+                        : 'bg-seite text-schrift border border-rahmen'
                     }`}
                   >
                     ★

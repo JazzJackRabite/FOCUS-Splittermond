@@ -414,7 +414,7 @@ export const RollModal: React.FC<RollModalProps> = ({
                     title={`${b.description} (Klicken zum ${isActive ? 'Abwählen' : 'Aktivieren'})`}
                     className={`flex items-center gap-1.5 px-2.5 py-1 rounded-knopf text-xs font-bold transition-all border shadow-2xs cursor-pointer ${
                       isActive
-                        ? 'bg-magie-grund text-schrift border-magie hover:bg-magie active:scale-98'
+                        ? 'bg-magie-grund text-schrift border-magie hover:bg-magie hover:text-seite active:scale-98'
                         : 'bg-flaeche text-leise border-rahmen line-through hover:opacity-100'
                     }`}
                   >
@@ -426,7 +426,7 @@ export const RollModal: React.FC<RollModalProps> = ({
                     <span>{b.source}</span>
                     <span
                       className={`px-1.5 py-0.5 rounded-knopf text-[11px] tabular-nums font-bold ${
-                        isActive ? 'bg-black/25 text-schrift' : 'bg-rahmen text-leise'
+                        isActive ? 'bg-black/25 text-schrift' : 'bg-rahmen text-schrift'
                       }`}
                     >
                       +{b.bonus}
@@ -473,9 +473,9 @@ export const RollModal: React.FC<RollModalProps> = ({
                     className={`flex items-center gap-1.5 px-2.5 py-1 rounded-knopf text-xs font-bold transition-all border shadow-2xs cursor-pointer ${
                       m.active
                         ? isWound
-                          ? 'bg-schaden-grund text-schrift border-schaden hover:bg-schaden-grund active:scale-98'
+                          ? 'bg-schaden-grund text-schrift border-schaden hover:bg-schaden-grund hover:text-schrift active:scale-98'
                           : isBehinderung
-                            ? 'bg-schaden text-schrift border-schaden hover:bg-schaden active:scale-98'
+                            ? 'bg-schaden-grund text-schrift border-schaden hover:bg-schaden-grund hover:text-schrift active:scale-98'
                             : 'bg-erhoeht text-schrift border-rahmen hover:bg-rahmen active:scale-98'
                         : 'bg-flaeche text-leise border-rahmen line-through hover:opacity-100'
                     }`}
@@ -496,7 +496,7 @@ export const RollModal: React.FC<RollModalProps> = ({
                           ? isWound || isBehinderung
                             ? 'bg-black/25 text-schrift'
                             : 'bg-flaeche text-schrift'
-                          : 'bg-rahmen text-leise'
+                          : 'bg-rahmen text-schrift'
                       }`}
                     >
                       {m.malus > 0 ? `+${m.malus}` : m.malus}
@@ -654,10 +654,10 @@ export const RollModal: React.FC<RollModalProps> = ({
                   }
                   className={`min-h-11 flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-knopf text-xs font-bold transition-all border ${
                     splinterBonusSpent
-                      ? 'bg-erhoeht text-seite border-gold opacity-90 cursor-default'
+                      ? 'bg-erhoeht text-schrift border-gold opacity-90 cursor-default'
                       : splitterPoints >= 1
-                      ? 'bg-gold hover:bg-gold-hell text-seite border-erschoepft active:scale-98'
-                      : 'bg-seite text-seite border-rahmen cursor-not-allowed dark-theme-slot-inactive'
+                      ? 'bg-gold hover:bg-gold-hell hover:text-seite text-seite border-erschoepft active:scale-98'
+                      : 'bg-seite text-schrift border-rahmen cursor-not-allowed dark-theme-slot-inactive'
                   }`}
                 >
                   <Sparkles size={14} />

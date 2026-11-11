@@ -18,7 +18,7 @@ const KNOPF: Record<KnopfArt, string> = {
   /** alles Übrige */
   neutral: 'bg-erhoeht border-rahmen text-schrift hover:border-leise',
   /** Schaden, Löschen, Abbrechen mit Verlust */
-  gefahr: 'bg-schaden-grund border-schaden text-schrift font-bold hover:bg-schaden',
+  gefahr: 'bg-schaden-grund border-schaden text-schrift font-bold hover:bg-erhoeht',
   /** Heilen, Erholen */
   erholung: 'bg-unverletzt-grund border-unverletzt text-schrift font-bold hover:bg-unverletzt hover:text-seite',
 };

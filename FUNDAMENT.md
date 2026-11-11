@@ -127,7 +127,21 @@ Rundungen: Karten und Dialoge 12 (`rounded-karte`), Knöpfe und Felder 8 (`round
 4. **Schaltflächen sind mindestens 44 Pixel hoch** und echte `<button>`- bzw. `<a>`-Elemente. Knöpfe nur mit Symbol
    brauchen eine Beschriftung für Vorleseprogramme (`aria-label`). Eingabefelder haben immer eine Beschriftung.
 5. **Keine Verläufe, keine Leuchteffekte, keine Emojis.** Flächen sind einfarbig; Symbole kommen aus `lucide-react`.
-6. **Scrollbalken:** Spur `seite`, Griff `leise`, unter dem Mauszeiger `gold`, 10 Pixel breit. Gilt überall von selbst.
+6. **Lesbarkeit geht vor.** Schrift und Hintergrund desselben Elements haben ein Kontrastverhältnis von mindestens
+   4,5 : 1. Verboten sind damit dunkle Schrift auf dunklem Grund und helle Schrift auf hellem Grund. Erlaubte Paare:
+
+   | Hintergrund | Schrift |
+   |---|---|
+   | `seite`, `flaeche`, `erhoeht` | `schrift`, `leise`, `gold`, `gold-hell` |
+   | `rahmen` (z. B. unter dem Mauszeiger) | `schrift`, `gold-hell` |
+   | gedämpfte Grundtöne (`schaden-grund`, `magie-grund` …) | `schrift` |
+   | `gold`, `gold-hell` | `seite` |
+   | kräftige Bedeutungsfarben (`schaden`, `magie` …) | gar nicht als Fläche hinter Text – nur als Rahmen, Balken, Punkt |
+
+   Ändert ein Zustand (Mauszeiger, gewählt, gesperrt) den Hintergrund, muss die Schriftfarbe dazu passen. Eine Prüfung
+   rechnet das für jede Klassenliste nach und schlägt bei einem Verstoß fehl. Sie sieht nur Schrift und Hintergrund am
+   selben Element; Schrift, die ihre Farbe von außen erbt, erfasst sie nicht.
+7. **Scrollbalken:** Spur `seite`, Griff `leise`, unter dem Mauszeiger `gold`, 10 Pixel breit. Gilt überall von selbst.
 7. **Am Handy brauchbar:** Bereiche stapeln sich, Leisten brechen um, breite Tabellen rollen in ihrem eigenen Kasten.
 
 ### Bausteine

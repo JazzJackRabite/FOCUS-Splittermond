@@ -562,7 +562,7 @@ export const CombatMagicTab: React.FC = () => {
                           onClick={() => dispatch({ type: 'TOGGLE_EQUIP_ITEM', payload: { id: w.id } })}
                           className={`px-2.5 py-1 rounded-knopf border text-xs cursor-pointer transition-all whitespace-nowrap font-medium ${
                             w.equipped
-                              ? 'bg-erschoepft-grund text-erschoepft border-erschoepft hover:bg-erschoepft'
+                              ? 'bg-erschoepft-grund text-erschoepft border-erschoepft hover:bg-erschoepft hover:text-seite'
                               : 'bg-erhoeht text-schrift border-rahmen hover:bg-rahmen'
                           }`}
                           title={w.equipped ? 'Waffe wegstecken (in Rucksack)' : 'Waffe ziehen / ausrüsten'}
@@ -575,7 +575,7 @@ export const CombatMagicTab: React.FC = () => {
                             dispatch({ type: 'REMOVE_INVENTORY_ITEM', payload: { id: w.id } });
                             toast.success(`'${w.name}' entfernt`);
                           }}
-                          className="p-1 rounded-knopf text-leise hover:text-schaden hover:bg-schaden-grund transition-all cursor-pointer"
+                          className="p-1 rounded-knopf text-leise hover:text-schrift hover:bg-schaden-grund transition-all cursor-pointer"
                           title="Waffe löschen"
                         >
                           <Trash2 size={15} />
@@ -841,7 +841,7 @@ export const CombatMagicTab: React.FC = () => {
                           onClick={() => dispatch({ type: 'TOGGLE_EQUIP_ITEM', payload: { id: a.id } })}
                           className={`min-h-11 px-3 py-1 rounded-knopf border text-xs font-bold cursor-pointer transition-all whitespace-nowrap ${
                             a.equipped
-                              ? 'bg-erschoepft-grund text-erschoepft border-erschoepft hover:bg-erschoepft'
+                              ? 'bg-erschoepft-grund text-erschoepft border-erschoepft hover:bg-erschoepft hover:text-seite'
                               : 'bg-erhoeht text-schrift border-gold hover:bg-rahmen'
                           }`}
                         >
@@ -853,7 +853,7 @@ export const CombatMagicTab: React.FC = () => {
                             dispatch({ type: 'REMOVE_INVENTORY_ITEM', payload: { id: a.id } });
                             toast.success(`'${a.name}' entfernt`);
                           }}
-                          className="p-1.5 rounded-knopf text-leise hover:text-schaden hover:bg-schaden-grund transition-all cursor-pointer"
+                          className="p-1.5 rounded-knopf text-leise hover:text-schrift hover:bg-schaden-grund transition-all cursor-pointer"
                           title="Löschen"
                         >
                           <Trash2 size={15} />

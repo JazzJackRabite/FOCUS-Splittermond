@@ -86,7 +86,7 @@ export const PlayTab: React.FC = () => {
                         )}
                         {beh > 0 && (
                           <span
-                            className="text-xs font-bold tabular-nums px-1.5 py-0.5 rounded-knopf bg-schaden text-schrift border border-schaden tracking-tight"
+                            className="text-xs font-bold tabular-nums px-1.5 py-0.5 rounded-knopf bg-schaden-grund text-schrift border border-schaden tracking-tight"
                             title={`Behinderung: −${beh} (Effektiver Wert: ${Number(total) - beh})`}
                           >
                             −{beh}

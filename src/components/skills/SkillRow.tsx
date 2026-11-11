@@ -141,7 +141,7 @@ export const SkillRow: React.FC<SkillRowProps> = ({
           )}
           {freeSpellSlotsCount > 0 && isMagic && (
             <span
-              className="ml-2 text-[11px] tabular-nums font-bold px-2 py-0.5 rounded-full shrink-0 shadow-2xs border bg-erhoeht text-kanalisiert border-kanalisiert badge-free-spell"
+              className="ml-2 text-[11px] tabular-nums font-bold px-2 py-0.5 rounded-full shrink-0 shadow-2xs border bg-erhoeht text-schrift border-kanalisiert badge-free-spell"
               title={`Verfügbare Gratis-Zauber: ${freeSpellSlotsCount}`}
             >
               {freeSpellSlotsCount}
@@ -227,7 +227,7 @@ export const SkillRow: React.FC<SkillRowProps> = ({
           {isMagic && val >= 1 && (
             <button
               onClick={onAddSpell}
-              className="min-h-11 text-xs bg-erhoeht hover:bg-rahmen active:scale-[0.98] px-3 py-2 md:py-1.5 rounded-knopf w-full text-center no-print border border-kanalisiert text-kanalisiert hover:text-schrift font-bold touch-manipulation transition-colors cursor-pointer "
+              className="min-h-11 text-xs bg-erhoeht hover:bg-rahmen active:scale-[0.98] px-3 py-2 md:py-1.5 rounded-knopf w-full text-center no-print border border-kanalisiert text-schrift hover:text-schrift font-bold touch-manipulation transition-colors cursor-pointer "
             >
               + Zauber hinzufügen
             </button>

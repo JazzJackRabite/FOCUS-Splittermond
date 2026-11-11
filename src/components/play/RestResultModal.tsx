@@ -96,7 +96,7 @@ export const RestResultModal: React.FC<RestResultModalProps> = ({ data, onClose 
 
                 if (item.type === 'hp') {
                   icon = <Heart size={16} className="text-schaden" />;
-                  badgeClass = 'bg-schaden-grund text-schaden border-magie font-bold';
+                  badgeClass = 'bg-schaden-grund text-schrift border-magie font-bold';
                 } else if (item.type === 'fo') {
                   icon = <Sparkles size={16} className="text-schrift" />;
                   badgeClass = 'bg-flaeche text-schrift border-rahmen font-bold';

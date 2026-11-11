@@ -622,12 +622,12 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
           </div>
           <span className="text-leise">→</span>
           <div className={`flex items-center gap-1.5 shrink-0 ${hasRolled ? 'text-schrift' : 'text-leise'}`}>
-            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold ${hasRolled ? 'bg-gold text-seite' : 'bg-seite text-seite'}`}>2</span>
+            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold ${hasRolled ? 'bg-gold text-seite' : 'bg-seite text-schrift'}`}>2</span>
             <span>Zauberprobe (2W10)</span>
           </div>
           <span className="text-leise">→</span>
           <div className={`flex items-center gap-1.5 shrink-0 ${hasRolled && egCalculation?.isSuccess ? 'text-schrift' : 'text-leise'}`}>
-            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold ${hasRolled && egCalculation?.isSuccess ? 'bg-gold text-seite' : 'bg-seite text-seite'}`}>3</span>
+            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold ${hasRolled && egCalculation?.isSuccess ? 'bg-gold text-seite' : 'bg-seite text-schrift'}`}>3</span>
             <span>EG-Modifikationen</span>
           </div>
           <span className="text-leise">→</span>
@@ -945,12 +945,12 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                   FW +{schoolSkillTotal}
                 </span>
                 {woundPenalty !== 0 && (
-                  <span className="bg-schaden text-schrift border border-schaden px-2 py-0.5 rounded-knopf tabular-nums font-bold shadow-2xs">
+                  <span className="bg-schaden-grund text-schrift border border-schaden px-2 py-0.5 rounded-knopf tabular-nums font-bold shadow-2xs">
                     Wundabzug {woundPenalty}
                   </span>
                 )}
                 {totalConditionPenalty !== 0 && (
-                  <span className="bg-erhoeht text-schaden border border-magie px-2 py-0.5 rounded-knopf tabular-nums">
+                  <span className="bg-erhoeht text-schrift border border-magie px-2 py-0.5 rounded-knopf tabular-nums">
                     Zustände {totalConditionPenalty}
                   </span>
                 )}
@@ -1183,9 +1183,9 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                       </div>
                     ) : (
                       /* Failure Box */
-                      <div className="bg-erhoeht border border-schaden text-schaden rounded-karte p-3.5 space-y-3">
+                      <div className="bg-erhoeht border border-schaden text-schrift rounded-karte p-3.5 space-y-3">
                         <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-full bg-schaden text-schrift flex items-center justify-center font-bold shrink-0">
+                          <div className="w-8 h-8 rounded-full bg-schaden-grund text-schrift flex items-center justify-center font-bold shrink-0">
                             <AlertTriangle className="w-5 h-5" />
                           </div>
                           <div>
@@ -1208,7 +1208,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                                     Math.max(0, (prev !== null ? prev : egCalculation.exhaustedFocusLostOnFailure) - 1)
                                   )
                                 }
-                                className="px-1 font-bold text-schaden hover:bg-rahmen"
+                                className="px-1 font-bold text-schaden hover:bg-rahmen hover:text-schrift"
                               >
                                 -
                               </button>
@@ -1222,7 +1222,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                                     (prev !== null ? prev : egCalculation.exhaustedFocusLostOnFailure) + 1
                                   )
                                 }
-                                className="px-1 font-bold text-schaden hover:bg-rahmen"
+                                className="px-1 font-bold text-schaden hover:bg-rahmen hover:text-schrift"
                               >
                                 +
                               </button>
@@ -1232,7 +1232,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                           <button
                             type="button"
                             onClick={handleApplyFailure}
-                            className="min-h-11 py-1.5 px-3 bg-schaden hover:bg-schaden text-schrift rounded-knopf font-bold shadow-2xs border border-schaden transition-colors cursor-pointer"
+                            className="min-h-11 py-1.5 px-3 bg-schaden-grund hover:bg-schaden-grund hover:text-schrift text-schrift rounded-knopf font-bold shadow-2xs border border-schaden transition-colors cursor-pointer"
                           >
                             Fehlschlag anwenden (-{customFailureFocus !== null ? customFailureFocus : egCalculation.exhaustedFocusLostOnFailure} FO)
                           </button>
@@ -1385,7 +1385,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                     <div className="min-w-0 pr-2">
                       <div className="font-bold text-sm text-schrift flex items-center gap-1.5">
                         <span>Fokus einsparen (Verzehrt)</span>
-                        <span className="text-[11px] bg-erhoeht text-schaden border border-magie font-semibold px-1.5 py-0.5 rounded-knopf">
+                        <span className="text-[11px] bg-erhoeht text-schrift border border-magie font-semibold px-1.5 py-0.5 rounded-knopf">
                           je 3 EG = -1 FO
                         </span>
                       </div>
@@ -1425,7 +1425,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                     <div className="min-w-0 pr-2">
                       <div className="font-bold text-sm text-schrift flex items-center gap-1.5">
                         <span>Schaden erhöhen</span>
-                        <span className="text-[11px] bg-erhoeht text-schaden border border-magie font-semibold px-1.5 py-0.5 rounded-knopf">
+                        <span className="text-[11px] bg-erhoeht text-schrift border border-magie font-semibold px-1.5 py-0.5 rounded-knopf">
                           je 1 EG = +1 Schaden
                         </span>
                       </div>
@@ -1637,7 +1637,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                                   {enh.egCost} EG
                                 </span>
                                 {enh.focusCostRaw && (
-                                  <span className="font-semibold text-xs bg-erhoeht text-schaden border border-magie px-1.5 py-0.5 rounded-knopf tabular-nums">
+                                  <span className="font-semibold text-xs bg-erhoeht text-schrift border border-magie px-1.5 py-0.5 rounded-knopf tabular-nums">
                                     Kosten {enh.focusCostRaw}
                                   </span>
                                 )}
@@ -1751,13 +1751,13 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                 <div className="bg-flaeche rounded-karte border border-rahmen p-4 space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="p-1.5 bg-erhoeht text-schaden rounded-knopf border border-magie">
+                      <span className="p-1.5 bg-erhoeht text-schrift rounded-knopf border border-magie">
                         <Flame className="w-4 h-4" />
                       </span>
                       <div>
                         <h4 className="font-bold text-sm text-gold-hell flex items-center gap-1.5">
                           <span>Zauberschaden würfeln</span>
-                          <span className="text-[11px] bg-erhoeht text-schaden font-semibold px-2 py-0.5 rounded-knopf border border-magie">
+                          <span className="text-[11px] bg-erhoeht text-schrift font-semibold px-2 py-0.5 rounded-knopf border border-magie">
                             {customDamageType}
                           </span>
                         </h4>
@@ -1935,7 +1935,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
 
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-leise">Schaden:</span>
-                        <span className="text-2xl font-black tabular-nums text-schaden px-2.5 py-0.5 bg-flaeche rounded-knopf border border-rahmen">
+                        <span className="text-2xl font-black tabular-nums text-schrift px-2.5 py-0.5 bg-flaeche rounded-knopf border border-rahmen">
                           {currentDamageResult.total}
                         </span>
                         <span className="text-xs font-semibold text-schaden">
