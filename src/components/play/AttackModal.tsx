@@ -638,13 +638,13 @@ export const AttackModal: React.FC<AttackModalProps> = ({
 
             {/* Splittermond GRW: Aktive Zauber-Wirkungen (Aura des Anführers, Beflügelte Waffe, Flammende Waffe, etc.) */}
             {(spellAttackBonuses.length > 0 || spellWeaponDamage.totalDamage > 0) && (
-              <div className="bg-unverletzt-grund border border-unverletzt rounded-karte p-3 text-xs space-y-2">
+              <div className="bg-magie-grund border border-magie rounded-karte p-3 text-xs space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="font-bold text-unverletzt flex items-center gap-1.5 uppercase tracking-wide text-[11px]">
-                    <Sparkles size={13} className="text-unverletzt" /> Aktive Zauber-Wirkungen
+                  <span className="font-bold text-magie flex items-center gap-1.5 uppercase tracking-wide text-[11px]">
+                    <Sparkles size={13} className="text-magie" /> Aktive Zauber-Wirkungen
                   </span>
                   {spellAttackBonusTotal > 0 && (
-                    <span className="tabular-nums font-bold px-2 py-0.5 rounded-knopf bg-unverletzt-grund text-unverletzt border border-unverletzt">
+                    <span className="tabular-nums font-bold px-2 py-0.5 rounded-knopf bg-magie-grund text-magie border border-magie">
                       AT-Bonus: +{spellAttackBonusTotal}
                       {spellAttackBonusRoh > spellAttackBonusTotal && ` (von +${spellAttackBonusRoh}, Höchstbonus GRW S. 18)`}
                     </span>
@@ -660,14 +660,14 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                         onClick={() => toggleSpellBonus(b.id)}
                         className={`flex items-center gap-1 px-2.5 py-1 rounded-knopf text-xs font-semibold border transition-all cursor-pointer ${
                           isActive
-                            ? 'bg-unverletzt-grund text-schrift border-unverletzt '
+                            ? 'bg-magie-grund text-schrift border-magie '
                             : 'bg-seite text-leise border-rahmen line-through'
                         }`}
                         title={`${b.description} (Klicken zum ${isActive ? 'Abwählen' : 'Aktivieren'})`}
                       >
-                        {isActive ? <Check size={12} className="text-unverletzt" /> : <X size={12} className="text-leise" />}
+                        {isActive ? <Check size={12} className="text-magie" /> : <X size={12} className="text-leise" />}
                         <span>{b.source}</span>
-                        <span className="tabular-nums font-bold text-unverletzt">+{b.bonus} AT</span>
+                        <span className="tabular-nums font-bold text-magie">+{b.bonus} AT</span>
                       </button>
                     );
                   })}
@@ -688,7 +688,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                 onClick={() => setTargetLying((prev) => !prev)}
                 className={`px-2.5 py-1 rounded-knopf border transition-all flex items-center gap-1.5 cursor-pointer font-semibold ${
                   targetLying
-                    ? 'bg-unverletzt-grund text-unverletzt border-unverletzt'
+                    ? 'bg-magie-grund text-magie border-magie'
                     : 'bg-seite text-leise border-rahmen hover:bg-seite'
                 }`}
               >
@@ -701,7 +701,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                 onClick={() => setAdvantageFlank((prev) => !prev)}
                 className={`px-2.5 py-1 rounded-knopf border transition-all flex items-center gap-1.5 cursor-pointer font-semibold ${
                   advantageFlank
-                    ? 'bg-unverletzt-grund text-unverletzt border-unverletzt'
+                    ? 'bg-magie-grund text-magie border-magie'
                     : 'bg-seite text-leise border-rahmen hover:bg-seite'
                 }`}
               >
@@ -951,7 +951,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                   egCalculation.isSuccess
                     ? isCrit
                       ? 'bg-erschoepft-grund border-erschoepft shadow-amber-950/20'
-                      : 'bg-unverletzt-grund border-unverletzt shadow-emerald-950/20'
+                      : 'bg-unverletzt-grund border-unverletzt'
                     : 'bg-schaden-grund border-schaden'
                 }`}
               >

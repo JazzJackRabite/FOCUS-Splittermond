@@ -434,6 +434,11 @@ Dateien aus AI Studio im Repository: `public/assets/aistudio/*.png`, `.aistudio/
   Würfelbanner, Druck – nur mit benannten Werten.
 - Offen: Die übrigen Dialoge und Ansichten bauen Knöpfe und Rahmen noch selbst statt mit den Bausteinen; Knöpfe sind dort
   teils kleiner als 44 Pixel. Zauberwirkungen erscheinen an einigen Stellen grün statt lila.
+- **Nachtrag (b1b278d und folgend):** keine Emojis mehr in der Oberfläche (Symbole kommen aus lucide-react), Knöpfe in
+  Dialogen und Kopfzeilen mit 44 Pixel Mindesthöhe, Bestätigungsdialog aus den Bausteinen, Zauberwirkungen im Angriffs-
+  und Würfeldialog sowie bei kanalisierten Zaubern in Lila. Im Browser geprüft: alle fünf Reiter, Erschaffung,
+  Einstellungen, Würfel-, Schadens-, Heil- und Angriffsdialog, dazu Spielen und Kampf in Handybreite (390 Pixel, kein
+  seitliches Rollen). Nicht geöffnet: Zauberdialog, Meisterschafts- und Zauberauswahl, Relikt-Werkstatt.
 
 ## Google AI Studio
 
