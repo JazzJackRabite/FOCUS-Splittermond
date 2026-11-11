@@ -22,17 +22,15 @@ export function charAusJson(c: any): BedingungsCharakter {
 }
 
 /**
- * Ordner mit den Grimoires für lokale Volltests (FOKUS_GRIMOIRES; FOKUS_BUECHER gilt als alter Name weiter).
+ * Ordner mit den Grimoires für lokale Volltests (FOKUS_GRIMOIRES).
  * Leer: die Tests mit Grimoires werden übersprungen.
  */
-export const GRIMOIRE_ORDNER = process.env.FOKUS_GRIMOIRES ?? process.env.FOKUS_BUECHER ?? '';
+export const GRIMOIRE_ORDNER = process.env.FOKUS_GRIMOIRES ?? '';
 
-/** Ist das eine Grimoire-Datei? `.grim`; `.srp.json` aus älteren Exporten der Datenseite wird weiter gelesen */
-export const istGrimoireDatei = (f: string) => f.endsWith('.grim') || (f.endsWith('.srp.json') && !f.startsWith('grw.'));
+/** Ist das eine Grimoire-Datei (`.grim`)? */
+export const istGrimoireDatei = (f: string) => f.endsWith('.grim');
 
-/** Pfad eines Grimoires im Ordner (`<id>.grim`, sonst die ältere Endung); leer ohne Ordner */
+/** Pfad eines Grimoires im Ordner (`<id>.grim`); leer ohne Ordner */
 export function grimoireDatei(id: string): string {
-  if (!GRIMOIRE_ORDNER) return '';
-  const grim = path.join(GRIMOIRE_ORDNER, `${id}.grim`);
-  return fs.existsSync(grim) ? grim : path.join(GRIMOIRE_ORDNER, `${id}.srp.json`);
+  return GRIMOIRE_ORDNER ? path.join(GRIMOIRE_ORDNER, `${id}.grim`) : '';
 }

@@ -544,8 +544,22 @@ die Grimoires), Dateiendung `.grim`. Das Grundregelwerk ist kein Grimoire; es bl
   bleibt, damit bereits gespeicherte Grimoires erhalten bleiben.
 - **Tests:** Ordner der Grimoires über `FOKUS_GRIMOIRES` (`FOKUS_BUECHER` gilt weiter); `<id>.grim`, sonst `<id>.srp.json`
   (`hilfen.ts`: `GRIMOIRE_ORDNER`, `grimoireDatei`, `istGrimoireDatei`). Mit `.grim`-Kopien aller Bücher geprüft.
-- **Offen (Datenseite):** Der Export in `Werkzeuge` schreibt noch `<id>.srp.json` in den Ordner `Regelpakete/editor/buecher`;
-  dort Endung `.grim` und ggf. Ordnername umstellen.
+- **Erledigt in Stand 25:** Der Export der Datenseite schreibt `.grim`; die Übergangsregeln sind entfernt.
+
+## Stand 25 (11.11.2026): Datenseite schreibt Grimoires, Übergang beendet
+
+- **Datenseite (`Werkzeuge`, auf der Platte des Projektinhabers, nicht im Repo):** `regelpakete/editor_export.py` schreibt je
+  Erweiterungsband `Regelpakete/editor/grimoires/<id>.grim` (vorher `editor/buecher/<id>.srp.json`), Inhalt unverändert.
+  Beschreibung und Lade-Algorithmus im Editor-Manifest sprechen von Grimoires, gleich dem Stand in `public/regelpakete/manifest.json`.
+  Liegen im alten Ordner `editor/buecher/` noch `.srp.json`-Dateien, meldet der Export das (löscht nichts).
+  `LIESMICH.md` in `Werkzeuge`, `Werkzeuge/regelpakete` und `Regelpakete/editor` nachgezogen. Die zwölf Grimoires liegen bereits
+  als `.grim` in `Regelpakete/editor/grimoires/` (Kopien des Exports vom 10.11.2026). Das Grundregelwerk bleibt `grw.srp.json`;
+  auch die internen Pakete `Regelpakete/pakete/<id>.srp.json` (Regelbrowser, Prüfsuite) behalten ihre Endung.
+- **Editor:** Dateiauswahl nimmt nur noch `.grim`; der Hinweis auf `.srp.json` ist weg. Tests lesen nur `<id>.grim` aus
+  `FOKUS_GRIMOIRES` (`FOKUS_BUECHER` und die `.srp.json`-Ausweichregel entfallen). Bereits im Browser gespeicherte Grimoires
+  bleiben erhalten (IndexedDB-Speicher unverändert).
+- **Geprüft:** alle Tests mit `FOKUS_GRIMOIRES` auf die neuen `.grim`-Dateien grün (370 bestanden), auch der bisher mit älteren
+  Paketen fehlschlagende Relikte-Test.
 
 ## Google AI Studio
 

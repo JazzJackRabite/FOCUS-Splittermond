@@ -31,7 +31,7 @@ export const RegelpaketeTab: React.FC = () => {
 
   return (
     <div className="overflow-y-auto space-y-4 pr-1.5 flex-1 custom-scrollbar modal-body-scroll">
-      <input ref={eingabe} type="file" accept=".grim,.json,application/json" multiple className="hidden" onChange={beiDateien} data-testid="regelpakete-upload" />
+      <input ref={eingabe} type="file" accept=".grim" multiple className="hidden" onChange={beiDateien} data-testid="regelpakete-upload" />
       <div className="bg-flaeche p-4 rounded-karte border border-rahmen">
         <h3 className="font-bold text-sm text-gold-hell mb-1 flex items-center gap-2"><BookOpen size={18} className="text-gold" /><span>Geladene Regelwerke</span></h3>
         <p className="text-xs text-leise mb-3">{anzahl} Regeleinträge im Katalog.</p>
@@ -63,8 +63,7 @@ export const RegelpaketeTab: React.FC = () => {
       <div className="bg-flaeche p-4 rounded-karte border border-rahmen">
         <h3 className="font-bold text-sm text-gold-hell mb-1 flex items-center gap-2"><Upload size={18} className="text-gold" /><span>Grimoires laden</span></h3>
         <p className="text-xs text-leise leading-relaxed mb-3">
-          Wähle Grimoires aus (Dateien mit der Endung <code>.grim</code>, z. B. <code>magie.grim</code>; ältere Exporte mit
-          <code>.srp.json</code> werden auch gelesen). Sie werden nur in diesem Browser gespeichert, nicht hochgeladen und nicht mit anderen geteilt.
+          Wähle Grimoires aus (Dateien mit der Endung <code>.grim</code>, z. B. <code>magie.grim</code>, aus dem Ordner <code>Regelpakete/editor/grimoires</code>). Sie werden nur in diesem Browser gespeichert, nicht hochgeladen und nicht mit anderen geteilt.
           {!rw.dauerhaft && <strong className="block text-erschoepft mt-1">Dieser Browser erlaubt keine dauerhafte Speicherung; die Grimoires bleiben nur bis zum Neuladen.</strong>}
         </p>
         <button type="button" disabled={laeuft} onClick={() => eingabe.current?.click()}
