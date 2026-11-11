@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { toast } from 'react-hot-toast';
+import { regelverstoss } from '../fundament/hausregeln';
 import { generateId } from '../utils/id';
 import type React from 'react';
 import type { CharacterAction, Mastery, AppMode } from '../types';
@@ -18,9 +19,7 @@ export function useMasteryHandlers({ xpAvailable, activeSkillForMastery, mode = 
     page: number | undefined, desc: string | undefined, isCreationBonus: boolean, source: string,
     userNote?: string,
   ) => {
-    if (!isFree && !isCreationBonus && xpAvailable < cost) {
-      toast.error('Nicht genügend EP!'); return;
-    }
+    if ((!isFree && !isCreationBonus && xpAvailable < cost) && regelverstoss('Nicht genügend EP!')) return;
     if (!activeSkillForMastery) return;
     const newMastery: Mastery = {
       id: generateId(), name: mName, tier, cost, isFree, isCreationBonus,
@@ -35,10 +34,7 @@ export function useMasteryHandlers({ xpAvailable, activeSkillForMastery, mode = 
     if (mode === 'xp') {
       const list = masteries[skill] ?? [];
       const target = list[idx];
-      if (target?.isCreationBonus || target?.source === 'Erschaffung') {
-        toast.error('In der Steigerung können bei der Erschaffung gewählte Meisterschaften nicht entfernt werden.');
-        return;
-      }
+      if ((target?.isCreationBonus || target?.source === 'Erschaffung') && regelverstoss('In der Steigerung können bei der Erschaffung gewählte Meisterschaften nicht entfernt werden.')) return;
     }
     dispatch({ type: 'REMOVE_MASTERY_BY_IDX', payload: { skill, idx } });
   }, [mode, masteries, dispatch]);
@@ -47,10 +43,7 @@ export function useMasteryHandlers({ xpAvailable, activeSkillForMastery, mode = 
     if (mode === 'xp') {
       const list = masteries[skill] ?? [];
       const target = list.find((m) => m.id === id);
-      if (target?.isCreationBonus || target?.source === 'Erschaffung') {
-        toast.error('In der Steigerung können bei der Erschaffung gewählte Meisterschaften nicht entfernt werden.');
-        return;
-      }
+      if ((target?.isCreationBonus || target?.source === 'Erschaffung') && regelverstoss('In der Steigerung können bei der Erschaffung gewählte Meisterschaften nicht entfernt werden.')) return;
     }
     dispatch({ type: 'REMOVE_MASTERY_BY_ID', payload: { skill, id } });
     toast.success('Meisterschaft entfernt');

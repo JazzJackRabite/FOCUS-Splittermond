@@ -1,3 +1,4 @@
+import { useHausregeln } from '../../fundament/hausregeln';
 import React, { useState, useEffect, useMemo } from 'react';
 import {
   MASTERIES_DB,
@@ -249,12 +250,13 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
 
   const cost = isFree || isCreationBonus ? 0 : tier * 5;
 
+  const hausregeln = useHausregeln();
   const isCustom = selectedName === 'custom';
   const isSelectionInvalid = isCustom
-    ? !customName.trim() || !(currentValidation?.canLearn ?? true)
+    ? !customName.trim() || (!(currentValidation?.canLearn ?? true) && !hausregeln)
     : !selectedName ||
       (existingMasteries.some((m) => m.name === selectedName) && !isMasteryRepeatable(selectedName)) ||
-      (currentValidation ? !currentValidation.canLearn && !(isFree && freiTrotzVoraussetzung(selectedName)) : false);
+      (currentValidation ? !currentValidation.canLearn && !hausregeln && !(isFree && freiTrotzVoraussetzung(selectedName)) : false);
 
   const handleAdd = () => {
     const finalName = isCustom ? customName.trim() : selectedName;
@@ -370,7 +372,7 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
                 const check = masteryCheckMap.get(m.name);
                 const isTierTooHigh = check ? !check.thresholdMet : false;
                 const isMissingPrereqs = check ? !check.prerequisitesMet : false;
-                const disabled = (isTaken && !isRepeatable) || (!check?.canLearn && !freiTrotzVoraussetzung(m.name));
+                const disabled = (isTaken && !isRepeatable) || (!check?.canLearn && !hausregeln && !freiTrotzVoraussetzung(m.name));
 
                 let label = m.name;
                 if (m.manoever) {
@@ -425,7 +427,7 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
                   >
                     {[1, 2, 3, 4].map((t) => {
                       const reqVal = getRequiredSkillValue(t);
-                      const disabled = creationMode ? t > 1 : t > maxTier;
+                      const disabled = !hausregeln && (creationMode ? t > 1 : t > maxTier);
                       return (
                         <option key={t} value={t} disabled={disabled}>
                           Schwelle {t} (S{t}){t > maxTier ? ` (ab FW ${reqVal})` : ''}

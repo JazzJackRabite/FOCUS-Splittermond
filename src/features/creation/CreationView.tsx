@@ -1,3 +1,4 @@
+import { regelverstoss, useHausregeln } from '../../fundament/hausregeln';
 import React, { useState, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
 import { ChevronsDownUp } from 'lucide-react';
@@ -95,17 +96,20 @@ export function CreationView() {
     dispatch,
   });
 
+  const hausregeln = useHausregeln();
+
   const modSkill = useCallback((key: string, delta: number) => {
     if (mode === 'creation') {
       const newVal = (skillsBase[key] ?? 0) + delta;
-      if (newVal < 0 || newVal > 6) return;
-      if (delta > 0 && creationUsage.skill >= 55) return;
+      if (newVal < 0) return;
+      if (newVal > 6 && regelverstoss('Fertigkeiten lassen sich bei der Erschaffung höchstens auf 6 setzen.')) return;
+      if (delta > 0 && creationUsage.skill >= 55 && regelverstoss('Alle 55 Fertigkeitspunkte sind verteilt.')) return;
     } else {
       const totalVal = (skillsBase[key] ?? 0) + (skillsXp[key] ?? 0);
       if (delta > 0) {
-        if (totalVal >= heldengrad.maxSkill) return;
+        if (totalVal >= heldengrad.maxSkill && regelverstoss('Höher lässt sich die Fertigkeit auf diesem Heldengrad nicht steigern.')) return;
         const cost = getSkillXpCost(totalVal + 1);
-        if (xpAvailable < cost) return;
+        if (xpAvailable < cost && regelverstoss('Nicht genügend EP!')) return;
       } else {
         if ((skillsXp[key] ?? 0) <= 0) return;
       }
@@ -427,7 +431,7 @@ export function CreationView() {
                     key={key} attrKey={key} total={total} startValue={startValue}
                     onIncrease={() => mode === 'creation' ? modAttrBase(key, 1) : modAttrXP(key, 1)}
                     onDecrease={() => mode === 'creation' ? modAttrBase(key, -1) : modAttrXP(key, -1)}
-                    canIncrease={mode === 'creation' ? base < 3 && creationUsage.attr < 18 : currentInc < heldengrad.maxAttrMod && xpAvailable >= nextCost}
+                    canIncrease={hausregeln || (mode === 'creation' ? base < 3 && creationUsage.attr < 18 : currentInc < heldengrad.maxAttrMod && xpAvailable >= nextCost)}
                     canDecrease={canDecrease}
                     cost={mode === 'xp' && currentInc < heldengrad.maxAttrMod ? nextCost : 0}
                     mode={mode}
@@ -516,7 +520,7 @@ export function CreationView() {
                   <SkillRow
                     key={skill} name={skill} val={val} totalValue={totalValue}
                     onIncrease={() => modSkill(skill, 1)} onDecrease={() => modSkill(skill, -1)}
-                    canIncrease={mode === 'creation' ? val < 6 && creationUsage.skill < 55 : val < heldengrad.maxSkill && xpAvailable >= cost}
+                    canIncrease={hausregeln || (mode === 'creation' ? val < 6 && creationUsage.skill < 55 : val < heldengrad.maxSkill && xpAvailable >= cost)}
                     canDecrease={mode === 'creation' ? (skillsBase[skill] ?? 0) > 0 : (skillsXp[skill] ?? 0) > 0}
                     cost={mode === 'xp' && val < heldengrad.maxSkill ? cost : 0}
                     masteries={currentMasteries}

@@ -1,3 +1,4 @@
+import { useHausregeln } from '../../fundament/hausregeln';
 import React, { useState, useEffect, useMemo } from 'react';
 import { RESOURCE_DESCRIPTIONS } from '../../data/resources';
 import { WEAKNESS_DESCRIPTIONS, WEAKNESS_PAGES } from '../../data/weaknesses';
@@ -159,10 +160,11 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({
     }
   }, [filteredItems, selectedName, isStrength, isLanguage, existingItems, mode]);
 
+  const hausregeln = useHausregeln();
   const hasFreeMotherTongue =
     isLanguage && existingItems.some((i) => i.isFree && i.name !== 'Basargnomisch');
   const isLanguageLimitReached =
-    isLanguage && mode === 'creation' && existingItems.length >= 2;
+    isLanguage && mode === 'creation' && existingItems.length >= 2 && !hausregeln;
 
   const currentItemData = useMemo(() => {
     return normalizedItems.find((i) => i.name === selectedName) || null;
@@ -486,7 +488,7 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({
           </button>
           <button
             onClick={handleAdd}
-            disabled={!isAffordable || !isSelectionValid || isLanguageLimitReached}
+            disabled={(!isAffordable && !hausregeln) || !isSelectionValid || isLanguageLimitReached}
             className="px-5 py-2 bg-[#1B365D] hover:bg-[#2a4f7e] text-white rounded-lg font-bold text-sm shadow-xs border border-[#10233f] disabled:opacity-50 disabled:cursor-not-allowed transition-all cursor-pointer shrink-0"
           >
             Hinzufügen

@@ -1,3 +1,4 @@
+import { useHausregeln } from '../../fundament/hausregeln';
 import React, { useState, useEffect, useMemo } from 'react';
 import { SPELLS_DB } from '../../data/spells';
 import { getSpellDescription } from '../../utils/gameResourceManager';
@@ -99,6 +100,7 @@ export const SpellModal: React.FC<SpellModalProps> = ({
   }, [selectedSpellName, canBeFree, customGrade]);
 
   const finalCost = isFree ? 0 : xpCost;
+  const hausregeln = useHausregeln();
   const isAffordable = isFree || finalCost <= budget;
   const isValid =
     selectedSpell && (isCustom ? customName.trim() !== '' : !!selectedSpell.name);
@@ -321,7 +323,7 @@ export const SpellModal: React.FC<SpellModalProps> = ({
           </button>
           <button
             onClick={handleAdd}
-            disabled={!isAffordable || !isValid}
+            disabled={(!isAffordable && !hausregeln) || !isValid}
             className="px-5 py-2 bg-[#1B365D] hover:bg-[#2a4f7e] text-white rounded-lg font-bold text-sm shadow-xs border border-[#C5A059]/60 disabled:opacity-50 disabled:cursor-not-allowed shrink-0 transition-all cursor-pointer"
           >
             Hinzufügen

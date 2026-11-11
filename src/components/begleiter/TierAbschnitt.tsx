@@ -1,3 +1,4 @@
+import { regelverstoss } from '../../fundament/hausregeln';
 import React, { useMemo, useState } from 'react';
 import { PawPrint, Plus, Trash2, ChevronDown, ChevronRight, X, Check, AlertTriangle, HelpCircle } from 'lucide-react';
 import { useCharacter } from '../../context/CharacterContext';
@@ -167,7 +168,7 @@ const TierEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; f: Fuehre
                       </optgroup>
                     ))}
                   </select>
-                  <button type="button" disabled={!wahl} className={knopf} onClick={() => { aendern({ abrichtungen: [...gewaehlt, wahl] }); setWahl(''); }}>
+                  <button type="button" disabled={!wahl} className={knopf} onClick={() => { if (angebot.find(x => x.a.id === wahl)?.ergebnis === false && regelverstoss('Die Voraussetzung dieser Abrichtung ist nicht erfüllt.')) return; aendern({ abrichtungen: [...gewaehlt, wahl] }); setWahl(''); }}>
                     <Plus size={12} />Abrichtung hinzufügen
                   </button>
                 </div>

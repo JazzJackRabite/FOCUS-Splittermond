@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { toast } from 'react-hot-toast';
+import { regelverstoss } from '../fundament/hausregeln';
 import type React from 'react';
 import type { CharacterAction, ItemEntry, AppMode, Spell, CreationUsage } from '../types';
 
@@ -41,14 +42,10 @@ export function useItemHandlers({ state, calc, dispatch }: ItemHandlersParams) {
       cost = type === 'language' ? 5 : level * pointCost * multiplier;
     }
     if (mode === 'creation') {
-      if (type === 'strength' && creationUsage.strength + cost > creationUsage.strengthLimit) {
-        toast.error('Nicht genügend Punkte!'); return;
-      }
-      if (type === 'resource' && creationUsage.resource + cost > creationUsage.resourceLimit) {
-        toast.error('Nicht genügend Punkte!'); return;
-      }
+      if (type === 'strength' && creationUsage.strength + cost > creationUsage.strengthLimit && regelverstoss('Nicht genügend Punkte!')) return;
+      if (type === 'resource' && creationUsage.resource + cost > creationUsage.resourceLimit && regelverstoss('Nicht genügend Punkte!')) return;
     } else {
-      if (xpAvailable < cost) { toast.error('Nicht genügend EP!'); return; }
+      if (xpAvailable < cost && regelverstoss('Nicht genügend EP!')) return;
     }
     const newItem: ItemEntry = { name, level, source: sourceMode, desc, pointCost, isFree, sourceRef: source, page };
     if (type === 'strength') dispatch({ type: 'ADD_STRENGTH', payload: newItem });
@@ -61,41 +58,26 @@ export function useItemHandlers({ state, calc, dispatch }: ItemHandlersParams) {
     let itemName = '';
     if (type === 'strength') {
       const item = strengthsList[idx];
-      if (mode === 'xp' && item?.source !== 'xp') {
-        toast.error('In der Steigerung können bei der Erschaffung gewählte Stärken nicht entfernt werden.');
-        return;
-      }
+      if (mode === 'xp' && item?.source !== 'xp' && regelverstoss('In der Steigerung können bei der Erschaffung gewählte Stärken nicht entfernt werden.')) return;
       itemName = item?.name ?? '';
       dispatch({ type: 'REMOVE_STRENGTH', payload: idx });
     } else if (type === 'resource') {
       const item = resourcesList[idx];
-      if (mode === 'xp' && item?.source !== 'xp') {
-        toast.error('In der Steigerung können bei der Erschaffung gewählte Ressourcen nicht entfernt werden.');
-        return;
-      }
+      if (mode === 'xp' && item?.source !== 'xp' && regelverstoss('In der Steigerung können bei der Erschaffung gewählte Ressourcen nicht entfernt werden.')) return;
       itemName = item?.name ?? '';
       dispatch({ type: 'REMOVE_RESOURCE', payload: idx });
     } else if (type === 'weakness') {
-      if (mode === 'xp') {
-        toast.error('In der Steigerung können Schwächen nicht entfernt werden.');
-        return;
-      }
+      if (mode === 'xp' && regelverstoss('In der Steigerung können Schwächen nicht entfernt werden.')) return;
       itemName = weaknessesList[idx]?.name ?? '';
       dispatch({ type: 'REMOVE_WEAKNESS', payload: idx });
     } else if (type === 'language') {
       const item = languagesList[idx];
-      if (mode === 'xp' && item?.source !== 'xp') {
-        toast.error('In der Steigerung können bei der Erschaffung gewählte Sprachen nicht entfernt werden.');
-        return;
-      }
+      if (mode === 'xp' && item?.source !== 'xp' && regelverstoss('In der Steigerung können bei der Erschaffung gewählte Sprachen nicht entfernt werden.')) return;
       itemName = item?.name ?? '';
       dispatch({ type: 'REMOVE_LANGUAGE', payload: idx });
     } else if (type === 'spell') {
       const item = spellsList[idx];
-      if (mode === 'xp' && item?.sourceMode !== 'xp') {
-        toast.error('In der Steigerung können bei der Erschaffung gelernte Zauber nicht entfernt werden.');
-        return;
-      }
+      if (mode === 'xp' && item?.sourceMode !== 'xp' && regelverstoss('In der Steigerung können bei der Erschaffung gelernte Zauber nicht entfernt werden.')) return;
       itemName = item?.name ?? '';
       dispatch({ type: 'REMOVE_SPELL_BY_IDX', payload: idx });
     }

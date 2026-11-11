@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { toast } from 'react-hot-toast';
+import { regelverstoss, useHausregeln } from '../fundament/hausregeln';
 import { getResolvedSpells } from '../utils/gameResourceManager';
 import type React from 'react';
 import type { CharacterAction, Spell, AppMode } from '../types';
@@ -15,8 +16,9 @@ interface SpellHandlersParams {
 }
 
 export function useSpellHandlers({ xpAvailable, spellsList, activeSkillForSpell, skillsBase, skillsXp, mode = 'creation', dispatch }: SpellHandlersParams) {
+  const hausregeln = useHausregeln();
   const addSpell = useCallback((spell: Spell, isFree: boolean, cost: number) => {
-    if (!isFree && xpAvailable < cost) { toast.error('Nicht genügend EP!'); return; }
+    if ((!isFree && xpAvailable < cost) && regelverstoss('Nicht genügend EP!')) return;
     dispatch({
       type: 'ADD_SPELL',
       payload: {
@@ -32,10 +34,7 @@ export function useSpellHandlers({ xpAvailable, spellsList, activeSkillForSpell,
   }, [xpAvailable, mode, dispatch]);
 
   const removeSpellByObj = useCallback((spellObj: Spell) => {
-    if (mode === 'xp' && spellObj.sourceMode !== 'xp') {
-      toast.error('In der Steigerung können bei der Erschaffung gelernte Zauber nicht entfernt werden.');
-      return;
-    }
+    if ((mode === 'xp' && spellObj.sourceMode !== 'xp') && regelverstoss('In der Steigerung können bei der Erschaffung gelernte Zauber nicht entfernt werden.')) return;
     const idx = spellsList.indexOf(spellObj);
     if (idx !== -1) {
       dispatch({ type: 'REMOVE_SPELL_BY_IDX', payload: idx });
@@ -49,12 +48,12 @@ export function useSpellHandlers({ xpAvailable, spellsList, activeSkillForSpell,
     const req = [1, 3, 6, 9, 12, 15];
     return getResolvedSpells(activeSkillForSpell)
       .filter((spell) => {
-        if (magicVal < req[spell.grade]) return false;
+        if (magicVal < req[spell.grade] && !hausregeln) return false;
         if (spellsList.some((s) => s.name === spell.name && s.school === spell.school)) return false;
         return true;
       })
       .sort((a, b) => a.grade - b.grade || a.name.localeCompare(b.name)) as Spell[];
-  }, [activeSkillForSpell, skillsBase, skillsXp, spellsList]);
+  }, [activeSkillForSpell, skillsBase, skillsXp, spellsList, hausregeln]);
 
   return { addSpell, removeSpellByObj, contextSpells };
 }

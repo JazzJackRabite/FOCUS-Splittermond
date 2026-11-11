@@ -1,3 +1,4 @@
+import { regelverstoss } from '../fundament/hausregeln';
 import { useCallback } from 'react';
 import { RACES } from '../data/rules';
 import type React from 'react';
@@ -25,17 +26,18 @@ export function useAttributeHandlers({ state, calc, dispatch }: AttributeHandler
 
   const modAttrBase = useCallback((key: string, delta: number) => {
     const newVal = (attrBase[key as keyof AttrMap] ?? 0) + delta;
-    if (newVal < 1 || newVal > 3) return;
-    if (delta > 0 && creationUsage.attr >= 18) return;
+    if (newVal < 1) return;
+    if (newVal > 3 && regelverstoss('Attribute lassen sich bei der Erschaffung höchstens auf 3 setzen.')) return;
+    if (delta > 0 && creationUsage.attr >= 18 && regelverstoss('Alle 18 Attributspunkte sind verteilt.')) return;
     dispatch({ type: 'MOD_ATTR_BASE', payload: { key: key as keyof AttrMap, delta } });
   }, [attrBase, creationUsage.attr, dispatch]);
 
   const modAttrXP = useCallback((key: string, delta: number) => {
     const currentInc = attrIncrements[key as keyof AttrMap] ?? 0;
     if (delta > 0) {
-      if (currentInc >= heldengrad.maxAttrMod) return;
+      if (currentInc >= heldengrad.maxAttrMod && regelverstoss('Mehr Steigerungen dieses Attributs erlaubt der Heldengrad nicht.')) return;
       const cost = 10 + currentInc * 5;
-      if (xpAvailable < cost) return;
+      if (xpAvailable < cost && regelverstoss('Nicht genügend EP!')) return;
     } else {
       if (currentInc <= 0) return;
     }
@@ -48,7 +50,7 @@ export function useAttributeHandlers({ state, calc, dispatch }: AttributeHandler
     if (race === 'Varg' && attr === 'STA') return;
     if (raceBonusAttrs.includes(attr)) {
       dispatch({ type: 'TOGGLE_RACE_BONUS', payload: attr });
-    } else if (raceBonusAttrs.length < max) {
+    } else if (raceBonusAttrs.length < max || !regelverstoss('Alle freien Attributspunkte der Rasse sind vergeben.')) {
       dispatch({ type: 'TOGGLE_RACE_BONUS', payload: attr });
     }
   }, [mode, race, raceBonusAttrs, dispatch]);

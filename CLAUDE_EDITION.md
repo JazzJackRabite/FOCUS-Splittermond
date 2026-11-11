@@ -405,6 +405,13 @@ Dateien aus AI Studio im Repository: `public/assets/aistudio/*.png`, `.aistudio/
   `conditionModifiers.ts`, Heldengrad-Schwellen, Fertigkeitswert je Zaubergrad. Dritte Prüfung eingebaut: Tabelle passt
   zum Code; Paketdaten lesen nur die dort genannten Dateien (7 Ansichten als Altlast `paketzugriffe`). Grundsatz 7 als
   „noch nicht entschieden“ gekennzeichnet.
+- **Nachtrag 11.11.2026 – Hausregeln (Grundsatz 7 entschieden):** Sperren ist der Standard; der Schalter „Hausregeln
+  erlauben“ (Einstellungen → Allgemein) macht aus Sperren Warnungen. Zentral in `src/fundament/hausregeln.ts`
+  (`regelverstoss()`, `useHausregeln()`, Einstellung im Browser unter `fokus_hausregeln`). Umgestellt: Erfahrungspunkte
+  und Punktegrenzen bei Stärken, Ressourcen, Sprachen, Meisterschaften, Zaubern, Attributen und Fertigkeiten; Grenzen des
+  Heldengrads; Entfernen von Erschaffungswahlen in der Steigerung; Zauber über dem Fertigkeitswert; Voraussetzungen und
+  Schwellen der Meisterschaften. Neu gesperrt (vorher nur Warnung): Relikt mit Regelverstoß speichern, Abrichtung mit
+  nicht erfüllter Voraussetzung. Offen: Gefolge, Untote, Golems warnen weiterhin nur.
 
 ## Google AI Studio
 

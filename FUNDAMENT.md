@@ -27,10 +27,11 @@ Gemini in Google AI Studio – liest diese Datei zuerst und hält sich daran.
 5. **Die App bleibt in Google AI Studio lauffähig:** Vite und React, `metadata.json` im Wurzelordner, Daten unter
    `public/`, keine neuen Abhängigkeiten ohne Rücksprache.
 6. **Ein Erscheinungsbild.** Es gibt genau ein Design: das dunkle CI aus Teil 3. Kein helles Design, kein Farbschema-Menü.
-7. **Warnen statt sperren – noch nicht entschieden.** Vorschlag: Verstößt eine Eingabe gegen eine Regel, zeigt der Editor
-   das an, lässt sie aber zu. Heute ist das uneinheitlich: Relikt-Werkstatt und Begleiter warnen nur; Steigerung und
-   Erschaffung sperren (zu wenig Erfahrungspunkte, Zauber über dem Fertigkeitswert, Entfernen von Erschaffungswahlen).
-   Bis zur Entscheidung bleibt jede Ansicht, wie sie ist.
+7. **Sperren als Standard, Hausregeln auf Wunsch** (Entscheidung 11.11.2026). Verstößt eine Eingabe gegen eine Regel,
+   sperrt der Editor sie und sagt, warum. Mit dem Schalter „Hausregeln erlauben“ (Einstellungen → Allgemein, Standard:
+   aus) wird aus jeder Sperre eine Warnung. Keine Ansicht entscheidet das selbst: Regelprüfungen laufen über
+   `regelverstoss()` und `useHausregeln()` aus `src/fundament/hausregeln.ts`. Noch nicht umgestellt (warnen immer nur):
+   Gefolge, erhobene Untote und Golems im Tab „Begleiter“.
 
 ## 2. Regelquellen
 

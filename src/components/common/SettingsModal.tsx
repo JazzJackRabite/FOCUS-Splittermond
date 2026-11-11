@@ -1,3 +1,4 @@
+import { setzeHausregeln, useHausregeln } from '../../fundament/hausregeln';
 import React, { useState, useEffect } from 'react';
 import {
   X,
@@ -19,6 +20,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onClose,
 }) => {
   const [activeTab, setActiveTab] = useState<SettingsTab>('general');
+  const hausregeln = useHausregeln();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -129,6 +131,24 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 Deine Helden und Charakterzustände werden automatisch im lokalen Browser-Speicher gesichert.
                 Hochgeladene Regelpakete bleiben ebenfalls nur in diesem Browser (Reiter <strong>Regelpakete</strong>).
               </p>
+            </div>
+            <div className="bg-erhoeht p-4 rounded-karte border border-rahmen">
+              <label className="flex items-start gap-3 cursor-pointer min-h-11">
+                <input
+                  type="checkbox"
+                  className="mt-1 h-5 w-5 accent-gold cursor-pointer"
+                  checked={hausregeln}
+                  onChange={(e) => setzeHausregeln(e.target.checked)}
+                />
+                <span>
+                  <span className="block font-bold text-sm text-schrift">Hausregeln erlauben</span>
+                  <span className="block text-xs text-leise leading-relaxed">
+                    Aus: Der Editor sperrt Eingaben, die gegen die Regeln verstoßen (zu wenig Erfahrungspunkte, Grenzen
+                    des Heldengrads, nicht erfüllte Voraussetzungen). An: Solche Eingaben sind möglich; der Editor
+                    zeigt nur eine Warnung.
+                  </span>
+                </span>
+              </label>
             </div>
           </div>
         )}

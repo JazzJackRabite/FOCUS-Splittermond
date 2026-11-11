@@ -1,3 +1,4 @@
+import { regelverstoss } from '../../fundament/hausregeln';
 import React, { useMemo, useState } from 'react';
 import { Gem, Plus, Minus, Trash2, Pencil, X, Info, AlertTriangle } from 'lucide-react';
 import { useCharacter } from '../../context/CharacterContext';
@@ -69,6 +70,7 @@ const Werkstatt: React.FC<{ k: Katalog; start: Relikt; frei: number; schliessen:
   const entferneW = (i: number) => setR(x => ({ ...x, bausteine: x.bausteine.filter((_, j) => j !== i) }));
 
   const speichern = () => {
+    if (pruefung.warnungen.length && regelverstoss(`Das Relikt verstößt gegen die Regeln: ${pruefung.warnungen[0]}`)) return;
     const relikt: Relikt = { ...r, name: r.name.trim() || basis?.name || 'Relikt', basisName: basis?.name ?? (basisSuche.trim() || undefined) };
     const alt = (state.inventory ?? []).find(it => it.id === relikt.inventarId);
     dispatch({ type: 'RELIKT_SPEICHERN', payload: { relikt, inventar: reliktAlsInventar(relikt, bausteine, basis, alt) } });
