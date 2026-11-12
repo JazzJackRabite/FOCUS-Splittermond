@@ -1,3 +1,4 @@
+import { mindestpunkteZauber } from '../regelwerk/steigerungsregeln';
 import { useCallback, useMemo } from 'react';
 import { toast } from 'react-hot-toast';
 import { regelverstoss, useHausregeln } from '../fundament/hausregeln';
@@ -45,7 +46,7 @@ export function useSpellHandlers({ xpAvailable, spellsList, activeSkillForSpell,
   const contextSpells: Spell[] = useMemo(() => {
     if (!activeSkillForSpell) return [];
     const magicVal = (skillsBase[activeSkillForSpell] ?? 0) + (skillsXp[activeSkillForSpell] ?? 0);
-    const req = [1, 3, 6, 9, 12, 15];
+    const req = [1, 3, 6, 9, 12, 15].map((rueckfall, grad) => mindestpunkteZauber(grad) ?? rueckfall);
     return getResolvedSpells(activeSkillForSpell)
       .filter((spell) => {
         if (magicVal < req[spell.grade] && !hausregeln) return false;

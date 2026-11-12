@@ -1,3 +1,4 @@
+import { getAttrXpCost } from '../utils/costCalculations';
 import { regelverstoss } from '../fundament/hausregeln';
 import { useCallback } from 'react';
 import { RACES } from '../data/rules';
@@ -36,7 +37,7 @@ export function useAttributeHandlers({ state, calc, dispatch }: AttributeHandler
     const currentInc = attrIncrements[key as keyof AttrMap] ?? 0;
     if (delta > 0) {
       if (currentInc >= heldengrad.maxAttrMod && regelverstoss('Mehr Steigerungen dieses Attributs erlaubt der Heldengrad nicht.')) return;
-      const cost = 10 + currentInc * 5;
+      const cost = getAttrXpCost(currentInc);
       if (xpAvailable < cost && regelverstoss('Nicht genügend EP!')) return;
     } else {
       if (currentInc <= 0) return;

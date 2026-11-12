@@ -35,7 +35,7 @@ function useFuehrer(k: Katalog): Fuehrer {
       meisterschaften: ms, fertigkeiten, ressourcen: state.resourcesList, zauber: state.spellsList, staerken: state.strengthsList, rasse: state.race,
     });
     const msIds = ms.map(m => meisterschaftId(k, m.name, m.skill, (m as { regelId?: string }).regelId)).filter((x): x is string => !!x);
-    const hg = calc?.heldengrad ? HELDENGRADE.indexOf(calc.heldengrad) + 1 : 1;
+    const hg = calc?.heldengrad?.nr ?? 1;
     const kreatur = state.resourcesList.filter(r => /^Kreatur\b/.test(r.name)).map(r => Number(r.level) || 0).sort((a, b) => b - a);
     const tiervertrauter = state.strengthsList.some(s => /^Tiervertrauter\b/.test(s.name));
     return { char, msIds, heldengrad: Math.max(1, hg), kreatur, tiervertrauter };

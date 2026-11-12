@@ -14,7 +14,8 @@ import {
   HELDENGRADE,
   getStrengthBudget,
 } from '../data/rules';
-import { getSkillXpCost, getAttrXpCost } from './costCalculations';
+import { getSkillXpCost, getAttrXpCost, calculateItemCost } from './costCalculations';
+import { heldengrade } from '../regelwerk/steigerungsregeln';
 import { abgeleiteteFuerCharakter, wirkungenFuerCharakter, type CharakterWirkungen, type KatalogWerte } from '../regelwerk/bruecke';
 import { reliktWiderstandFuerCharakter } from '../regelwerk/relikte';
 
@@ -124,10 +125,10 @@ export function calculateCharacter(state: CharacterState): CharacterCalculationR
     .filter((r) => r.source === 'xp')
     .reduce((a, b) => a + (Number(b.level) || 1), 0);
 
-  xpSpent += strengthXpPoints * 7 + resourceXpPoints * 7;
+  xpSpent += strengthXpPoints * calculateItemCost('strength', 1) + resourceXpPoints * calculateItemCost('resource', 1);
 
   const languageCountXP = languagesList.filter((l) => l.source === 'xp').length;
-  xpSpent += languageCountXP * 5;
+  xpSpent += languageCountXP * calculateItemCost('language', 1);
 
   Object.values(masteries).forEach((list) => {
     list.forEach((m) => {
@@ -138,7 +139,7 @@ export function calculateCharacter(state: CharacterState): CharacterCalculationR
     if (s.sourceMode === 'xp') {
       const cost = s.isFree
         ? 0
-        : (s.xpCost ?? (typeof s.cost === 'number' ? s.cost : (s.grade === 0 ? 1 : s.grade * 3)));
+        : (s.xpCost ?? (typeof s.cost === 'number' ? s.cost : calculateItemCost('spell', s.grade)));
       xpSpent += cost;
     } else if (typeof s.cost === 'number') {
       xpSpent += s.cost;
@@ -148,10 +149,10 @@ export function calculateCharacter(state: CharacterState): CharacterCalculationR
   if (isNaN(xpSpent)) xpSpent = 0;
 
   // 3. Heldengrad
-  let heldengrad = HELDENGRADE[0];
-  if (xpSpent >= 600) heldengrad = HELDENGRADE[3];
-  else if (xpSpent >= 300) heldengrad = HELDENGRADE[2];
-  else if (xpSpent >= 100) heldengrad = HELDENGRADE[1];
+  // Schwellen und Grenzen aus den Kernregeln des Pakets; die eingebaute Liste ist nur der Rückfall
+  const grade: (typeof HELDENGRADE)[number][] = heldengrade() ?? HELDENGRADE;
+  let heldengrad = grade[0];
+  for (const g of grade) if (xpSpent >= g.minXP) heldengrad = g;
 
   // 4. Derived stats
   const raceData = RACES[race as keyof typeof RACES] as { gk: number } | undefined;
@@ -233,7 +234,7 @@ export function calculateCharacter(state: CharacterState): CharacterCalculationR
 
   // 5a. Regelpakete geladen: Formeln, Heldengrad-Boni (VTD/GW/KW, Splitterpunkte), Stärken, Höchstbonus der Ausrüstung
   //     und kaufmännische Rundung der Behinderung aus den Regeldaten (GRW S. 11–18, 88–89)
-  const heldengradNr = HELDENGRADE.indexOf(heldengrad) + 1;
+  const heldengradNr = heldengrad.nr;
   const regelwerk = abgeleiteteFuerCharakter(state, currentAttributes, heldengradNr, { vtdBonus: gearVtdBonus, behinderung: totalHandicap });
   if (regelwerk) {
     derived.GSW = regelwerk.GSW;

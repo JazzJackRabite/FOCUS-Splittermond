@@ -1,3 +1,4 @@
+import { calculateItemCost } from '../../utils/costCalculations';
 import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import { useHausregeln } from '../../fundament/hausregeln';
 import React, { useState, useEffect, useMemo } from 'react';
@@ -249,7 +250,7 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
     }
   }, [searchedMasteries, selectedName, existingMasteries, masteryCheckMap]);
 
-  const cost = isFree || isCreationBonus ? 0 : tier * 5;
+  const cost = isFree || isCreationBonus ? 0 : calculateItemCost('mastery', tier);
 
   const hausregeln = useHausregeln();
   const isCustom = selectedName === 'custom';

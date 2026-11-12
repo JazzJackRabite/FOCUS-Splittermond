@@ -55,10 +55,10 @@ export const SKILL_DATA: Record<string, string[] | null> = {
 };
 
 export const HELDENGRADE = [
-    { name: 'Heldengrad 1 (Suchender)', minXP: 0, maxAttrMod: 1, maxSkill: 6, resistBonus: 0 }, 
-    { name: 'Heldengrad 2 (Wanderer)', minXP: 100, maxAttrMod: 2, maxSkill: 9, resistBonus: 2 }, 
-    { name: 'Heldengrad 3 (Veteran)', minXP: 300, maxAttrMod: 3, maxSkill: 12, resistBonus: 4 }, 
-    { name: 'Heldengrad 4 (Heroe)', minXP: 600, maxAttrMod: 4, maxSkill: 15, resistBonus: 6 }
+    { nr: 1, name: 'Heldengrad 1 (Suchender)', minXP: 0, maxAttrMod: 1, maxSkill: 6, resistBonus: 0 }, 
+    { nr: 2, name: 'Heldengrad 2 (Wanderer)', minXP: 100, maxAttrMod: 2, maxSkill: 9, resistBonus: 2 }, 
+    { nr: 3, name: 'Heldengrad 3 (Veteran)', minXP: 300, maxAttrMod: 3, maxSkill: 12, resistBonus: 4 }, 
+    { nr: 4, name: 'Heldengrad 4 (Heroe)', minXP: 600, maxAttrMod: 4, maxSkill: 15, resistBonus: 6 }
 ];
 
 

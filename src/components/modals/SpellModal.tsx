@@ -1,3 +1,4 @@
+import { calculateItemCost } from '../../utils/costCalculations';
 import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import { useHausregeln } from '../../fundament/hausregeln';
 import React, { useState, useEffect, useMemo } from 'react';
@@ -82,7 +83,7 @@ export const SpellModal: React.FC<SpellModalProps> = ({
   let usedSlotGrade: number | null = null;
 
   if (selectedSpell) {
-    xpCost = selectedSpell.grade === 0 ? 1 : selectedSpell.grade * 3;
+    xpCost = calculateItemCost('spell', selectedSpell.grade);
     const school = selectedSpell.school || schoolName || ''; 
     const schoolSlots = freeSlots[school] ?? [];
     const validSlotIndex = schoolSlots.findIndex(

@@ -17,7 +17,7 @@ import { mitRegelIds } from '../regelwerk/bruecke';
 import { saveToLocalStorage, loadFromLocalStorage } from './useLocalStorage';
 import { STRENGTHS_DATA } from '../data/strengths';
 import { generateId } from '../utils/id';
-import { getSkillXpCost, getAttrXpCost } from '../utils/costCalculations';
+import { getSkillXpCost, getAttrXpCost, calculateItemCost } from '../utils/costCalculations';
 import { referenceCharacterResources } from '../utils/gameResourceManager';
 import { aktiverKatalog } from '../regelwerk/bruecke';
 import { spielwerteDesZaubers } from '../regelwerk/zauberwerte';
@@ -397,7 +397,7 @@ export function baseCharacterReducer(
     case 'ADD_MASTERY': {
       const { skill, mastery } = action.payload;
       const current = state.masteries[skill] ?? [];
-      const cost = mastery.isFree || mastery.isCreationBonus ? 0 : Number(mastery.cost) || (mastery.tier * 5);
+      const cost = mastery.isFree || mastery.isCreationBonus ? 0 : Number(mastery.cost) || calculateItemCost('mastery', mastery.tier);
       let newLog = state.advancementLog ?? [];
       if (state.mode === 'xp') {
         const entry = createLogEntry(
@@ -419,7 +419,7 @@ export function baseCharacterReducer(
       const { skill, id } = action.payload;
       const current = state.masteries[skill] ?? [];
       const target = current.find((m) => m.id === id);
-      const cost = target ? (target.isFree || target.isCreationBonus ? 0 : Number(target.cost) || (target.tier * 5)) : 0;
+      const cost = target ? (target.isFree || target.isCreationBonus ? 0 : Number(target.cost) || calculateItemCost('mastery', target.tier)) : 0;
       let newLog = state.advancementLog ?? [];
       if (state.mode === 'xp' && target) {
         const entry = createLogEntry(
@@ -444,7 +444,7 @@ export function baseCharacterReducer(
       const { skill, idx } = action.payload;
       const current = [...(state.masteries[skill] ?? [])];
       const target = current[idx];
-      const cost = target ? (target.isFree || target.isCreationBonus ? 0 : Number(target.cost) || (target.tier * 5)) : 0;
+      const cost = target ? (target.isFree || target.isCreationBonus ? 0 : Number(target.cost) || calculateItemCost('mastery', target.tier)) : 0;
       current.splice(idx, 1);
       let newLog = state.advancementLog ?? [];
       if (state.mode === 'xp' && target) {
@@ -467,7 +467,7 @@ export function baseCharacterReducer(
       const spell = action.payload;
       const cost = spell.isFree
         ? 0
-        : (spell.xpCost ?? (typeof spell.cost === 'number' ? spell.cost : (spell.grade === 0 ? 1 : spell.grade * 3)));
+        : (spell.xpCost ?? (typeof spell.cost === 'number' ? spell.cost : calculateItemCost('spell', spell.grade)));
       let newLog = state.advancementLog ?? [];
       if (state.mode === 'xp') {
         const entry = createLogEntry(
@@ -486,7 +486,7 @@ export function baseCharacterReducer(
       const cost = target
         ? (target.isFree
             ? 0
-            : (target.xpCost ?? (typeof target.cost === 'number' ? target.cost : (target.grade === 0 ? 1 : target.grade * 3))))
+            : (target.xpCost ?? (typeof target.cost === 'number' ? target.cost : calculateItemCost('spell', target.grade))))
         : 0;
       const newList = [...state.spellsList];
       newList.splice(action.payload, 1);
@@ -505,7 +505,7 @@ export function baseCharacterReducer(
 
     case 'ADD_STRENGTH': {
       const item = action.payload;
-      const cost = item.isFree ? 0 : (item.level ?? 1) * (item.pointCost ?? 1) * 7;
+      const cost = item.isFree ? 0 : (item.level ?? 1) * (item.pointCost ?? 1) * calculateItemCost('strength', 1);
       let newLog = state.advancementLog ?? [];
       if (state.mode === 'xp') {
         const entry = createLogEntry(
@@ -521,7 +521,7 @@ export function baseCharacterReducer(
 
     case 'REMOVE_STRENGTH': {
       const target = state.strengthsList[action.payload];
-      const cost = target ? (target.isFree ? 0 : (target.level ?? 1) * (target.pointCost ?? 1) * 7) : 0;
+      const cost = target ? (target.isFree ? 0 : (target.level ?? 1) * (target.pointCost ?? 1) * calculateItemCost('strength', 1)) : 0;
       const newList = [...state.strengthsList];
       newList.splice(action.payload, 1);
       let newLog = state.advancementLog ?? [];
@@ -539,7 +539,7 @@ export function baseCharacterReducer(
 
     case 'ADD_RESOURCE': {
       const item = action.payload;
-      const cost = item.isFree ? 0 : (item.level ?? 1) * (item.pointCost ?? 1) * 7;
+      const cost = item.isFree ? 0 : (item.level ?? 1) * (item.pointCost ?? 1) * calculateItemCost('strength', 1);
       let newLog = state.advancementLog ?? [];
       if (state.mode === 'xp') {
         const entry = createLogEntry(
@@ -555,7 +555,7 @@ export function baseCharacterReducer(
 
     case 'REMOVE_RESOURCE': {
       const target = state.resourcesList[action.payload];
-      const cost = target ? (target.isFree ? 0 : (target.level ?? 1) * (target.pointCost ?? 1) * 7) : 0;
+      const cost = target ? (target.isFree ? 0 : (target.level ?? 1) * (target.pointCost ?? 1) * calculateItemCost('strength', 1)) : 0;
       const newList = [...state.resourcesList];
       newList.splice(action.payload, 1);
       let newLog = state.advancementLog ?? [];

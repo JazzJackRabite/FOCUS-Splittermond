@@ -42,6 +42,7 @@ Felder stehen unter `daten` des jeweiligen Eintrags. **Was hier nicht steht, dar
 
 | Bereich | Quelle im Paket | Liest im Editor |
 |---|---|---|
+| Kosten in Erfahrungspunkten, Heldengrade (Schwellen, Grenzen, Widerstandsbonus), Fertigkeitspunkte je Zaubergrad | Kernregeln: `strukturiert` mit `steigerungskosten`, `heldengrade` | `regelwerk/steigerungsregeln.ts` |
 | Pakete laden und im Browser speichern | Paketkopf, Einträge | `regelwerk/laden.ts`, `regelwerk/paketSpeicher.ts` |
 | Einträge finden, Namen und IDs, Umbenennungen | Einträge mit `id`, `typ`, `name`; ID-Register | `regelwerk/katalog.ts`, `regelwerk/bruecke.ts`, `regelwerk/ids.ts` |
 | Abgeleitete Werte, Heldengrade, Höchstbonus | Kernregeln: `strukturiert`; an Stärken: `abgeleitete_werte_modifikatoren`; `groessenklasse`; an Ausrüstung: `behinderung`, `vtd_bonus`, `mindest_staerke` | `regelwerk/abgeleitet.ts` |
@@ -71,8 +72,6 @@ Datenseite wandern. Neue kommen nicht hinzu.
 | Eingebaute Listen des Grundregelwerks: Zauber, Meisterschaften, Stärken, Schwächen, Ressourcen, Ausrüstung, Sprachen | `src/data/*.ts` | Der Editor liest diese Listen aus dem GRW-Paket; `src/data` entfällt |
 | Attribute, Fertigkeiten mit ihren Attributen, Rassen, Mondzeichen, Heldengrade (Grenzen, Boni), Zustandslisten, Wundabzüge | `src/data/rules.ts` | Kernregeln und Einträge des GRW-Pakets |
 | Beispielcharaktere (Archetypen) mit Namen von Stärken, Meisterschaften und Zaubern | `src/data/presets.ts` | Auf IDs umstellen |
-| Kosten in Erfahrungspunkten (Attribute, Fertigkeiten, Stärken, Meisterschaften, Zauber), GRW S. 25 und 87 | `utils/costCalculations.ts` | Kernregeln `strukturiert` |
-| Heldengrad-Schwellen (100/300/600), Fertigkeitswert je Zaubergrad | `utils/characterCalculations.ts`, `hooks/useSpellHandlers.ts` | Kernregeln `strukturiert` |
 | Abzüge und Beschreibungen der Zustände | `utils/conditionModifiers.ts` | Zustandseinträge des Pakets |
 | Würfelmechanik (Standard-, Sicherheits-, Risikowurf, Patzer, Triumph, Erfolgsgrade), GRW S. 16–19 | `utils/wuerfeln.ts` | Kernregeln `strukturiert` |
 | Fokuskosten, Erfolgsgrade beim Zaubern, GRW S. 221–222 | `utils/magicRules.ts` | Kernregeln `strukturiert` |
@@ -82,7 +81,9 @@ Datenseite wandern. Neue kommen nicht hinzu.
 | Schadens- und Heildialog: Zustandsliste, Verschnaufpause | `components/play/TakeDamageModal.tsx`, `HealModal.tsx` | Zustände und Kernregeln des Pakets |
 
 Die genaue Liste der geduldeten Regelnamen steht in `src/fundament/altlasten.json` (`regelnamen`).
-Ohne geladenes Regelpaket rechnet der Editor mit diesen eingebauten Werten weiter (Rückfall).
+Ohne geladenes Regelpaket rechnet der Editor mit diesen eingebauten Werten weiter (Rückfall). Das gilt auch für die Kosten in
+Erfahrungspunkten und die Heldengrade: Maßgeblich ist das Paket; `utils/costCalculations.ts` und die Liste in
+`src/data/rules.ts` enthalten dieselben Zahlen nur noch als Rückfall, und ein Test hält beide gleich.
 
 ## 3. Gestaltung
 
