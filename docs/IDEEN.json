@@ -1,8 +1,8 @@
 {
   "format": "fokus-ideen-v1",
-  "exportiert": "2026-11-12T15:03:59+01:00",
+  "exportiert": "2026-11-12T15:34:11+01:00",
   "quelle": "Ideen-Seite https://claude.ai/artifact/TSG9wGyzXasCUaGmNeTV2s (Sammlung ideen)",
-  "anzahl": 16,
+  "anzahl": 15,
   "ideen": [
     {
       "id": "idee-1",
@@ -24,17 +24,6 @@
       "umsetzung": "teilweise",
       "prio": "",
       "stand": "Splitterpunkte steigen mit dem Heldengrad und werden als Rauten angezeigt. Von den Mondzeichen wirkt bisher nur „Segen der Mondkraft“ (beim Rasten).",
-      "notiz": false
-    },
-    {
-      "id": "idee-3",
-      "n": 3,
-      "titel": "Ggf. Erschaffung und Steigerung zu einem Tab zusammenführen",
-      "bereich": "Erschaffung & Steigerung",
-      "datum": "2026-11-06",
-      "umsetzung": "erledigt",
-      "prio": "",
-      "stand": "Beides läuft im gemeinsamen Tab „Charakter“.",
       "notiz": false
     },
     {
@@ -181,6 +170,21 @@
       "notiz": false,
       "erstellt": "2026-11-12T09:55:22.841Z",
       "geaendert": "2026-11-12T09:55:22.842Z"
+    }
+  ],
+  "papierkorb": [
+    {
+      "id": "idee-3",
+      "n": 3,
+      "titel": "Ggf. Erschaffung und Steigerung zu einem Tab zusammenführen",
+      "bereich": "Erschaffung & Steigerung",
+      "datum": "2026-11-06",
+      "umsetzung": "erledigt",
+      "prio": "",
+      "stand": "Beides läuft im gemeinsamen Tab „Charakter“.",
+      "notiz": false,
+      "geaendert": "2026-11-12T14:25:36.205Z",
+      "geloescht": "2026-11-12T14:25:36.205Z"
     }
   ]
 }

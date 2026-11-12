@@ -1,14 +1,14 @@
 # Ideensammlung FOKUS / SCR4P3
 
-> Automatisch erzeugt aus der Ideen-Seite · Stand 12.11.2026, 15:03 Uhr · Nicht von Hand bearbeiten – Änderungen bitte in der Ideen-Seite vornehmen.
+> Automatisch erzeugt aus der Ideen-Seite · Stand 12.11.2026, 15:34 Uhr · Nicht von Hand bearbeiten – Änderungen bitte in der Ideen-Seite vornehmen.
 
 ## Überblick
 
 | Ideen | 🟢 erledigt | 🔵 zu testen | 🟡 teilweise | ⚪ offen |
 |:-----:|:----------:|:-----------:|:-----------:|:-------:|
-| **16** | 1 | 1 | 5 | 9 |
+| **15** | 0 | 1 | 5 | 9 |
 
-Fortschritt: **6 %** erledigt
+Fortschritt: **0 %** erledigt
 
 ## Als Nächstes
 
@@ -23,7 +23,6 @@ Offene Ideen mit Priorität *hoch* oder *mittel*:
 |--:|------|---------|-----------|:---------:|------:|
 | 1 | Thema Schaden/Fokus umbauen (Splitterpunkte usw. berücksichtigen) | Charakterwerte & Regeln | 🟡 teilweise | – | 06.11.2026 |
 | 2 | Mondzeichen-Gabe des Helden und Splitterpunkte erweitern | Charakterwerte & Regeln | 🟡 teilweise | – | 06.11.2026 |
-| 3 | Ggf. Erschaffung und Steigerung zu einem Tab zusammenführen | Erschaffung & Steigerung | 🟢 erledigt | – | 06.11.2026 |
 | 4 | Mehr Regeltexte bei Erschaffung/Steigerung anzeigen | Erschaffung & Steigerung | 🟡 teilweise | – | 06.11.2026 |
 | 5 | Regel-Browser implementieren | Regelwissen | ⚪ offen | – | 06.11.2026 |
 | 6 | Schnellleiste für Alchemika & Verbrauchsgegenstände | Ausrüstung & Handel | ⚪ offen | – | 06.11.2026 |
@@ -53,11 +52,6 @@ Offene Ideen mit Priorität *hoch* oder *mittel*:
 > Splitterpunkte steigen mit dem Heldengrad und werden als Rauten angezeigt. Von den Mondzeichen wirkt bisher nur „Segen der Mondkraft“ (beim Rasten).
 
 ### Erschaffung & Steigerung
-
-**#3 · Ggf. Erschaffung und Steigerung zu einem Tab zusammenführen**  
-🟢 erledigt · Priorität – · 06.11.2026
-
-> Beides läuft im gemeinsamen Tab „Charakter“.
 
 **#4 · Mehr Regeltexte bei Erschaffung/Steigerung anzeigen**  
 🟡 teilweise · Priorität – · 06.11.2026
