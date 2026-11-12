@@ -3,6 +3,7 @@
  * Die Modale bekommen die Werte und Wundabzüge des Begleiters; Boni aus Stärken und Meisterschaften des Charakters gelten
  * nicht (der Charakter-Kontext wird für die Modale ohne Wirkungen weitergegeben), Splitterpunkte hat nur der Abenteurer.
  */
+import { fokusDurchZustaende, zustandsErklaerung, zustandswerte } from '../../regelwerk/zustandswerte';
 import { alleZustaende, zustandHatStufe, zustandQuelle } from '../../regelwerk/zustaende';
 import React, { useContext, useMemo, useState } from 'react';
 import { toast } from 'react-hot-toast';
@@ -121,7 +122,7 @@ export function useBegleiterSpiel(b: Begleiter, index: number, angaben: Begleite
       )}
       {zauber && (
         <CastSpellModal spell={zauber.spell} conditions={z.zustaende ?? []} schoolSkillTotal={zauber.wert} schoolSkillName={zauber.spell.school}
-          availableFocus={fokusFrei(angaben.fo, z)} maxFO={angaben.fo}
+          availableFocus={Math.max(0, fokusFrei(angaben.fo, z) - fokusDurchZustaende(angaben.fo, zustandswerte(z.zustaende ?? [])))} maxFO={angaben.fo}
           focusState={{ exhausted: fokus.erschoepft ?? 0, channeled: fokus.kanalisiert ?? 0, consumed: fokus.verzehrt ?? 0 }}
           woundPenalty={lage.wundabzug} splitterpunkte={0} onSpendSplitterpunkt={() => {}} onClose={() => setZauber(null)} onRecordRoll={wurfLog}
           onCastSuccess={r => {
@@ -196,6 +197,14 @@ const BegleiterZustaende: React.FC<{ spiel: ReturnType<typeof useBegleiterSpiel>
           );
         })}
       </div>
+      {(() => {
+        // Wirkung der Zustände auf die abgeleiteten Werte des Begleiters (Zahlen aus den Paketeinträgen)
+        const zw = zustandswerte(liste);
+        const teile = (['VTD', 'GW', 'KW', 'GSW', 'INI', 'SR'] as const).map((w) => zustandsErklaerung(w, zw) && `${w}: ${zw.erklaerung[w]!.join(', ')}`).filter(Boolean);
+        if (zw.erklaerung.FO) teile.push(`Fokus: ${zw.erklaerung.FO.join(', ')}`);
+        teile.push(...zw.hinweise);
+        return teile.length ? <p className="text-xs text-leise" data-testid="begleiter-zustandswerte">Wirkung auf die Werte – {teile.join(' · ')}</p> : null;
+      })()}
       <div className="flex flex-wrap gap-2 items-end">
         <Auswahl beschriftung="Zustand hinzufügen" beschriftungVerborgen value={wahl} onChange={e => setWahl(e.target.value)}>
           <option value="">Zustand wählen …</option>
@@ -215,7 +224,7 @@ export const BegleiterVitals: React.FC<{ spiel: ReturnType<typeof useBegleiterSp
   const k = aktiverKatalog();
   const immun = betaeubungsimmun(k, angaben.merkmale);
   const f = z.fokus ?? {};
-  const frei = fokusFrei(angaben.fo, z);
+  const frei = Math.max(0, fokusFrei(angaben.fo, z) - fokusDurchZustaende(angaben.fo, zustandswerte(z.zustaende ?? [])));
   const aendern = (neu: BegleiterZustand, titel: string, art: 'damage' | 'heal' | 'focus', badge: string) => {
     setze(neu); log(art, titel, undefined, { text: badge, variant: art === 'damage' ? 'danger' : art === 'heal' ? 'success' : 'info' });
   };

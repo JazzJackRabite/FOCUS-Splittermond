@@ -75,7 +75,7 @@ function liegendEigeneAngriffe(): number {
  * null = der Zustand ändert den Probenwert nicht (z. B. Benommen: verlangsamt nur; Angsterfüllt: nur Sicherheitswürfe).
  * „Liegend“ ist eine Kampfposition (GRW S. 170) und kommt aus der Tabelle der Kampfpositionen im Paket.
  */
-export function getConditionMalus(condition: StatusCondition, kontext: Zustandskontext = {}): { label: string; malus: number; description?: string } | null {
+export function getConditionMalus(condition: StatusCondition, kontext: Zustandskontext = {}): { label: string; malus: number; description?: string; vorausgewaehlt?: boolean } | null {
   const level = condition.level || 1;
   const bereich = kontext.bereich ?? 'allgemein';
 
@@ -106,7 +106,9 @@ export function getConditionMalus(condition: StatusCondition, kontext: Zustandsk
   }
   const stufe = Math.min(level, p.hoechststufe ?? level);
   const malus = (p.fest ?? 0) + (p.pro_stufe ?? 0) * stufe;
-  return malus === 0 ? null : { label, malus, description: kurz };
+  // „nur bei Sicht“ (Geblendet): bei Angriffen und Zaubern gesetzt; bei Fertigkeitsproben abwählbar und nicht vorausgewählt
+  const vorausgewaehlt = p.nur !== 'sicht' || bereich !== 'allgemein';
+  return malus === 0 ? null : { label, malus, description: kurz, vorausgewaehlt };
 }
 
 /** Beschreibung eines Zustands aus dem Regelpaket (ohne Paket leer; „Liegend“: Text der Kampfposition) */
@@ -166,7 +168,7 @@ export function getActiveRollModifiers(
         source: 'condition',
         label: mod.label,
         malus: mod.malus,
-        active: true,
+        active: mod.vorausgewaehlt !== false,
         description: mod.description,
       });
     }

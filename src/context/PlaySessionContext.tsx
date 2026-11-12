@@ -1,3 +1,4 @@
+import { fokusDurchZustaende, zustandswerte } from '../regelwerk/zustandswerte';
 import { alleZustaende } from '../regelwerk/zustaende';
 import React, { createContext, useContext, useState, useMemo, ReactNode } from 'react';
 import { toast } from 'react-hot-toast';
@@ -751,7 +752,8 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
     toast.success(`Ruhephase: ${summary}`, { duration: 4500 });
   };
 
-  const focusAvailable = maxFO - focus.exhausted - focus.channeled - focus.consumed;
+  // Zustände wie Verstoßen halten einen Teil des Fokus dauerhaft kanalisiert
+  const focusAvailable = Math.max(0, maxFO - focus.exhausted - focus.channeled - focus.consumed - fokusDurchZustaende(maxFO, zustandswerte(conditions)));
   const isPlayOrCombat = mode === 'play' || mode === 'combat' || mode === 'begleiter';
   const activeSpellMods = useMemo(() => getActiveSpellModifiers(playState.channeledSpells), [playState.channeledSpells]);
   // Zustände, von denen ein aktiver Zauber Stufen unterdrückt (z. B. Erfrischung), wirken beim Würfeln nur mit der Reststufe

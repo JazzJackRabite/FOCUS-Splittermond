@@ -1,3 +1,4 @@
+import { mitZustaenden, zustandsErklaerung, zustandswerte } from '../../regelwerk/zustandswerte';
 import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import React, { useState, useMemo, useRef, useLayoutEffect } from 'react';
 import { Knopf, Dialog } from '../../fundament';
@@ -206,6 +207,7 @@ export const CombatMagicTab: React.FC = () => {
 
   const channeledSpells = state.playState?.channeledSpells ?? [];
   const hoechstbonusZauber = zauberHoechstbonus(calc);
+  const zw = useMemo(() => zustandswerte(state.playState?.conditions ?? []), [state.playState?.conditions]);
   const activeSpellMods = useMemo(() => getActiveSpellModifiers(channeledSpells, hoechstbonusZauber), [channeledSpells, hoechstbonusZauber]);
 
   // Modals for adding weapon and armor
@@ -712,7 +714,8 @@ export const CombatMagicTab: React.FC = () => {
                   Verteidigung
                 </span>
                 <span className="text-lg sm:text-xl font-bold text-schrift tabular-nums mt-0.5">
-                  {derived.VTD + activeSpellMods.vtdBonus}
+                  {mitZustaenden('VTD', derived.VTD + activeSpellMods.vtdBonus, zw)}
+                  {zw.plus.VTD !== 0 && <span className="text-xs text-schaden ml-1 font-semibold" title={zustandsErklaerung('VTD', zw)}>{zw.plus.VTD} Zustand</span>}
                   {gearVtdBonus > 0 && <span className="text-xs text-unverletzt ml-1 font-semibold">+{gearVtdBonus}</span>}
                   {activeSpellMods.vtdBonus > 0 && (
                     <span

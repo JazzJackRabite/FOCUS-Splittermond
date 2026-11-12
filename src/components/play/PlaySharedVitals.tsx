@@ -1,3 +1,4 @@
+import { fokusDurchZustaende, mitZustaenden, zustandsErklaerung, zustandswerte } from '../../regelwerk/zustandswerte';
 import { alleZustaende, zustandHatStufe, zustandQuelle } from '../../regelwerk/zustaende';
 import { Rauten, Knopf } from '../../fundament';
 import React, { useState, useMemo } from 'react';
@@ -193,29 +194,23 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
   const totalLP = healthSlots.length || maxLP * 5;
   const totalDamage = consumedLP + exhaustedLP + channeledLP;
 
-  const focusAvailable = maxFO - focus.exhausted - focus.channeled - focus.consumed;
+  const zwFokus = useMemo(() => zustandswerte(conditions), [conditions]);
+  const fokusGesperrt = fokusDurchZustaende(maxFO, zwFokus);
+  const focusAvailable = Math.max(0, maxFO - focus.exhausted - focus.channeled - focus.consumed - fokusGesperrt);
   // Zauberboni auf abgeleitete Werte sind auf den Höchstbonus aus Zauberei begrenzt (GRW S. 18–19)
   const hoechstbonusZauber = zauberHoechstbonus(calc);
   const activeSpellMods = useMemo(() => getActiveSpellModifiers(channeledSpells, hoechstbonusZauber), [channeledSpells, hoechstbonusZauber]);
   const effectiveWoundPenalty = Math.min(0, currentWoundPenalty + activeSpellMods.woundPenaltyReduction);
   const woundPenaltyDisplay = effectiveWoundPenalty;
 
-  const isLahm = conditions.some((c) => c.key === 'Lahm');
-  const isRingend = conditions.some((c) => c.key === 'Ringend');
-  const isBewusstlos = conditions.some((c) => c.key === 'Bewusstlos');
-  const isLiegend = conditions.some((c) => c.key === 'Liegend');
-
-  const effectiveGSW = isRingend ? 0 : isLahm ? Math.floor((derived.GSW + activeSpellMods.gswBonus) / 2) : (derived.GSW + activeSpellMods.gswBonus);
-  const effectiveVTD = isBewusstlos
-    ? 0
-    : isRingend
-      ? Math.max(0, derived.VTD + activeSpellMods.vtdBonus - 3)
-      : isLiegend
-        ? Math.max(0, derived.VTD + activeSpellMods.vtdBonus - 2)
-        : (derived.VTD + activeSpellMods.vtdBonus);
-  const effectiveSR = (derived.SR || 0) + activeSpellMods.srBonus;
-  const effectiveGW = (derived.GW || 0) + activeSpellMods.gwBonus;
-  const effectiveKW = (derived.KW || 0) + activeSpellMods.kwBonus;
+  // Zustände wirken auf die abgeleiteten Werte (Zahlen aus den Paketeinträgen, regelwerk/zustandswerte.ts)
+  const zw = useMemo(() => zustandswerte(conditions), [conditions]);
+  const effectiveGSW = mitZustaenden('GSW', derived.GSW + activeSpellMods.gswBonus, zw);
+  const effectiveINI = mitZustaenden('INI', derived.INI, zw);
+  const effectiveVTD = mitZustaenden('VTD', derived.VTD + activeSpellMods.vtdBonus, zw);
+  const effectiveSR = mitZustaenden('SR', (derived.SR || 0) + activeSpellMods.srBonus, zw);
+  const effectiveGW = mitZustaenden('GW', (derived.GW || 0) + activeSpellMods.gwBonus, zw);
+  const effectiveKW = mitZustaenden('KW', (derived.KW || 0) + activeSpellMods.kwBonus, zw);
 
   const formatConditionLabel = (c: StatusCondition) => {
     let lbl = c.key;
@@ -1015,11 +1010,11 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                       title={`Erschöpfter Fokus: ${focus.exhausted}`}
                     />
                   )}
-                  {focus.channeled > 0 && (
+                  {focus.channeled + fokusGesperrt > 0 && (
                     <div
-                      style={{ width: `${(focus.channeled / Math.max(1, maxFO)) * 100}%` }}
+                      style={{ width: `${((focus.channeled + fokusGesperrt) / Math.max(1, maxFO)) * 100}%` }}
                       className="bg-kanalisiert h-full transition-all duration-300"
-                      title={`Kanalisierter Fokus: ${focus.channeled}`}
+                      title={[`Kanalisierter Fokus: ${focus.channeled + fokusGesperrt}`, zustandsErklaerung('FO', zw)].filter(Boolean).join('\n')}
                     />
                   )}
                   {focus.consumed > 0 && (
@@ -1043,7 +1038,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                   </span>
                   <span className="flex items-center gap-1">
                     <span className="w-3 h-3 rounded-[3px] bg-kanalisiert inline-block" />
-                    Kanalisiert: <strong className="tabular-nums text-schrift">{focus.channeled}</strong>
+                    Kanalisiert: <strong className="tabular-nums text-schrift">{focus.channeled + fokusGesperrt}</strong>
                   </span>
                   <span className="flex items-center gap-1">
                     <span className="w-3 h-3 rounded-[3px] bg-schaden inline-block" />
@@ -1110,8 +1105,8 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                     {Array.from({ length: maxFO }, (_, i) => {
                       let slotType: 'consumed' | 'channeled' | 'exhausted' | 'empty' = 'empty';
                       if (i < focus.consumed) slotType = 'consumed';
-                      else if (i < focus.consumed + focus.channeled) slotType = 'channeled';
-                      else if (i < focus.consumed + focus.channeled + focus.exhausted) slotType = 'exhausted';
+                      else if (i < focus.consumed + focus.channeled + fokusGesperrt) slotType = 'channeled';
+                      else if (i < focus.consumed + focus.channeled + fokusGesperrt + focus.exhausted) slotType = 'exhausted';
                       return renderFocusSlot(slotType, i);
                     })}
                   </div>
@@ -1270,23 +1265,17 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
             <div className="grid grid-cols-3 @[480px]:grid-cols-6 gap-2 text-center derived-stats-grid">
               <div
                 className="bg-erhoeht rounded-knopf px-2 py-3 border border-rahmen"
-                title={
-                  isRingend
-                    ? 'Geschwindigkeit: 0 (Zustand: Ringend)'
-                    : isLahm
-                      ? `Geschwindigkeit: ${effectiveGSW} (halbiert durch Zustand Lahm)`
-                      : totalHandicap > 0
-                        ? `Geschwindigkeit: ${derived.GSW} (reduziert um ${Math.floor(totalHandicap / 2)} durch halbe Behinderung von ${totalHandicap})`
-                        : 'Geschwindigkeit (GSW)'
-                }
+                title={[
+                  'Geschwindigkeit (GSW)',
+                  totalHandicap > 0 ? `reduziert um ${Math.floor(totalHandicap / 2)} durch halbe Behinderung von ${totalHandicap}` : '',
+                  zustandsErklaerung('GSW', zw),
+                ].filter(Boolean).join('\n')}
               >
                 <span className="text-[11px] uppercase tracking-widest text-leise block mb-1">GSW</span>
                 <span className="font-titel text-2xl font-bold text-schrift tabular-nums">
                   {effectiveGSW}
-                  {isRingend ? (
-                    <span className="text-[11px] text-schaden font-bold ml-1 tabular-nums">(0)</span>
-                  ) : isLahm ? (
-                    <span className="text-[11px] text-schaden font-bold ml-1 tabular-nums">(½)</span>
+                  {zw.erklaerung.GSW ? (
+                    <span className="text-[11px] text-schaden font-bold ml-1 tabular-nums">(Zustand)</span>
                   ) : totalHandicap > 0 && Math.floor(totalHandicap / 2) > 0 ? (
                     <span className="text-[11px] text-schaden font-bold ml-1 tabular-nums">
                       (-{Math.floor(totalHandicap / 2)})
@@ -1294,34 +1283,29 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                   ) : null}
                 </span>
               </div>
-              <div className="bg-erhoeht rounded-knopf px-2 py-3 border border-rahmen">
+              <div className="bg-erhoeht rounded-knopf px-2 py-3 border border-rahmen" title={['Initiative (INI)', zustandsErklaerung('INI', zw)].filter(Boolean).join('\n')}>
                 <span className="text-[11px] uppercase tracking-widest text-leise block mb-1">INI</span>
-                <span className="font-titel text-2xl font-bold text-schrift tabular-nums">{derived.INI}</span>
+                <span className="font-titel text-2xl font-bold text-schrift tabular-nums">
+                  {effectiveINI}
+                  {zw.plus.INI !== 0 && <span className="text-[11px] text-schaden font-bold ml-1 tabular-nums">({zw.plus.INI > 0 ? '+' : ''}{zw.plus.INI})</span>}
+                </span>
               </div>
               <div
                 className="bg-erhoeht rounded-knopf px-2 py-3 border border-rahmen"
-                title={
-                  isBewusstlos
-                    ? 'Verteidigung: 0 (Zustand: Bewusstlos/Wehrlos)'
-                    : isRingend
-                      ? `Verteidigung: ${effectiveVTD} (−3 durch Zustand Ringend)`
-                      : isLiegend
-                        ? `Verteidigung: ${effectiveVTD} (−2 Nahkampf-VTD durch Zustand Liegend)`
-                        : gearVtdBonus > 0 || activeSpellMods.vtdBonus > 0
+                title={[
+                  gearVtdBonus > 0 || activeSpellMods.vtdBonus > 0
                           ? `VTD: Basis ${derived.VTD - gearVtdBonus} + Ausrüstung +${gearVtdBonus}${activeSpellMods.vtdBonus > 0 ? ` + Zauber +${activeSpellMods.vtdBonus} (${activeSpellMods.breakdown.filter((b) => b.vtd).map((b) => b.spellName).join(', ')})` : ''}`
-                          : 'Verteidigung'
-                }
+                          : 'Verteidigung',
+                  zustandsErklaerung('VTD', zw),
+                  ...zw.hinweise,
+                ].filter(Boolean).join('\n')}
               >
                 <span className="text-[11px] uppercase tracking-widest text-leise block mb-1">VTD</span>
                 <span className="font-titel text-2xl font-bold text-schrift tabular-nums">
                   {effectiveVTD}
-                  {isBewusstlos ? (
-                    <span className="text-[11px] text-schaden font-bold ml-1">(=0)</span>
-                  ) : isRingend ? (
-                    <span className="text-[11px] text-schaden font-bold ml-1">(-3)</span>
-                  ) : isLiegend ? (
-                    <span className="text-[11px] text-schaden font-bold ml-1">(-2)</span>
-                  ) : (
+                  {zw.plus.VTD !== 0 && <span className="text-[11px] text-schaden font-bold ml-1">({zw.plus.VTD > 0 ? '+' : ''}{zw.plus.VTD})</span>}
+                  {zw.hinweise.length > 0 && <span className="text-[11px] text-erschoepft font-bold ml-1">(liegend)</span>}
+                  {zw.plus.VTD === 0 && zw.hinweise.length === 0 && (
                     <>
                       {gearVtdBonus > 0 && <span className="text-[11px] text-unverletzt font-bold ml-0.5">+{gearVtdBonus}</span>}
                       {activeSpellMods.vtdBonus > 0 && (
@@ -1354,10 +1338,11 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                   )}
                 </span>
               </div>
-              <div className="bg-erhoeht rounded-knopf px-2 py-3 border border-rahmen" title={activeSpellMods.gwBonus > 0 ? `Geistiger Widerstand (+${activeSpellMods.gwBonus} Zauber)` : 'Geistiger Widerstand'}>
+              <div className="bg-erhoeht rounded-knopf px-2 py-3 border border-rahmen" title={[activeSpellMods.gwBonus > 0 ? `Geistiger Widerstand (+${activeSpellMods.gwBonus} Zauber)` : 'Geistiger Widerstand', zustandsErklaerung('GW', zw)].filter(Boolean).join('\n')}>
                 <span className="text-[11px] uppercase tracking-widest text-leise block mb-1">GW</span>
                 <span className="font-titel text-2xl font-bold text-schrift tabular-nums">
                   {effectiveGW}
+                  {zw.plus.GW !== 0 && <span className="text-[11px] text-schaden font-bold ml-1">({zw.plus.GW})</span>}
                   {activeSpellMods.gwBonus > 0 && (
                     <span className="text-[11px] text-schrift font-bold ml-0.5 bg-magie-grund px-1 py-0.2 rounded-knopf border border-magie">
                       +{activeSpellMods.gwBonus}
@@ -1365,10 +1350,11 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                   )}
                 </span>
               </div>
-              <div className="bg-erhoeht rounded-knopf px-2 py-3 border border-rahmen" title={activeSpellMods.kwBonus > 0 ? `Körperlicher Widerstand (+${activeSpellMods.kwBonus} Zauber)` : 'Körperlicher Widerstand'}>
+              <div className="bg-erhoeht rounded-knopf px-2 py-3 border border-rahmen" title={[activeSpellMods.kwBonus > 0 ? `Körperlicher Widerstand (+${activeSpellMods.kwBonus} Zauber)` : 'Körperlicher Widerstand', zustandsErklaerung('KW', zw)].filter(Boolean).join('\n')}>
                 <span className="text-[11px] uppercase tracking-widest text-leise block mb-1">KW</span>
                 <span className="font-titel text-2xl font-bold text-schrift tabular-nums">
                   {effectiveKW}
+                  {zw.plus.KW !== 0 && <span className="text-[11px] text-schaden font-bold ml-1">({zw.plus.KW})</span>}
                   {activeSpellMods.kwBonus > 0 && (
                     <span className="text-[11px] text-schrift font-bold ml-0.5 bg-magie-grund px-1 py-0.2 rounded-knopf border border-magie">
                       +{activeSpellMods.kwBonus}

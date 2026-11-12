@@ -96,13 +96,18 @@ describe('Condition Modifiers & Roll Integration (Splittermond GRW)', () => {
     const woundPenalty = -4;
     const healthLevelName = 'Schwer verletzt';
 
-    const activeMods = getActiveRollModifiers(conditions, woundPenalty, healthLevelName);
+    // Angriff: Geblendet zählt immer (GRW S. 168)
+    const activeMods = getActiveRollModifiers(conditions, woundPenalty, healthLevelName, 0, false, 'kampf');
 
     expect(activeMods).toHaveLength(2);
 
     const totalMalus = activeMods.filter((m) => m.active).reduce((sum, m) => sum + m.malus, 0);
     // -4 (Schwer verletzt) + -4 (Geblendet 2) = -8
     expect(totalMalus).toBe(-8);
+
+    // Fertigkeitsprobe: Geblendet steht zur Wahl, ist aber nicht vorausgewählt (nur wenn die Sicht zählt)
+    const probe = getActiveRollModifiers(conditions, woundPenalty, healthLevelName);
+    expect(probe.find((m) => m.label === 'Geblendet 2')?.active).toBe(false);
   });
 
   it('returns empty list when character is Unverletzt and has no restricting conditions', () => {

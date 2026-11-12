@@ -10,6 +10,8 @@ export type Probenbereich = 'allgemein' | 'kampf' | 'magie';
 export interface Zustandswirkung {
   probe?: { bereiche?: Probenbereich[]; attribute?: string[]; pro_stufe?: number; fest?: number; hoechststufe?: number; nur?: 'sicht'; art?: 'wundstufe' };
   werte?: Record<string, { pro_stufe?: number; fest?: number; faktor?: number; setzen?: number; kanalisiert_anteil_pro_stufe?: number }>;
+  /** gilt als anderer Zustand bzw. Kampfposition, z. B. Bewusstlos: „liegend“ */
+  gilt_als?: 'liegend';
 }
 
 export interface GrwZustand { stufe: boolean; seite: number; wirkung?: Zustandswirkung }
@@ -19,7 +21,7 @@ const ALLE: Probenbereich[] = ['kampf', 'allgemein', 'magie'];
 export const GRW_ZUSTAENDE: Record<string, GrwZustand> = {
   Angsterfüllt: { stufe: false, seite: 168 },
   Benommen: { stufe: true, seite: 168 },
-  Bewusstlos: { stufe: false, seite: 168 },
+  Bewusstlos: { stufe: false, seite: 168, wirkung: { gilt_als: 'liegend' } },
   Blutend: { stufe: true, seite: 168 },
   Brennend: { stufe: true, seite: 168 },
   Erschöpft: { stufe: true, seite: 168, wirkung: { probe: { bereiche: ['kampf', 'allgemein'], pro_stufe: -1 }, werte: { GSW: { pro_stufe: -1 }, INI: { pro_stufe: 1 } } } },
@@ -30,7 +32,7 @@ export const GRW_ZUSTAENDE: Record<string, GrwZustand> = {
   Panisch: { stufe: false, seite: 169 },
   Rasend: { stufe: false, seite: 169 },
   Ringend: { stufe: false, seite: 169, wirkung: { probe: { bereiche: ALLE, fest: -3 }, werte: { VTD: { fest: -3 }, GSW: { setzen: 0 } } } },
-  Schlafend: { stufe: false, seite: 169 },
+  Schlafend: { stufe: false, seite: 169, wirkung: { gilt_als: 'liegend' } },
   Siechtum: { stufe: true, seite: 169 },
   Sterbend: { stufe: true, seite: 169 },
   Verwundet: { stufe: true, seite: 169, wirkung: { probe: { art: 'wundstufe' } } },

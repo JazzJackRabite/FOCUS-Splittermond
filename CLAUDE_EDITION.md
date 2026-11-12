@@ -629,8 +629,18 @@ die Grimoires), Dateiendung `.grim`. Das Grundregelwerk ist kein Grimoire; es bl
   Verstoßen („Die Götter“ S. 147, mit Stufe; ein Viertel des Fokus je Stufe dauerhaft kanalisiert) als Einträge in den
   Grimoires und schreibt `zustandswirkung` für GRW-, Schleier-, Jenseits- und Götter-Zustände. Prüfsuite: 0 neue
   Befunde. Nach dem Bauen auf D: Grimoires neu hochladen.
-- Offen: Verorkt („Ungebrochen“ S. 123) – das Buch ist nicht im Bestand. Wirkung auf abgeleitete Werte steht in den
-  Paketen, wird im Editor noch nicht eingerechnet. Hinweis: „Verstoßen“ war bisher ausgeschlossen (Verstoßene/Gefallene
+- **Zustände wirken auf alle Werte** (`regelwerk/zustandswerte.ts`, Zahlen aus `daten.zustandswirkung.werte`):
+  Geschwindigkeit, Initiative, Verteidigung, Geistiger und Körperlicher Widerstand, Schadensreduktion und Fokus –
+  in „Spielen“, „Kampf & Magie“ (VTD), im Zauberdialog (verfügbarer Fokus) und bei Begleitern (Hinweiszeile, Fokus).
+  Reihenfolge: Zu- und Abschläge, dann Faktor (abgerundet), dann gesetzter Wert. Erschöpft: GSW −1, INI +1 je Stufe;
+  Ringend: VTD −3, GSW 0; Lahm: halbe GSW; Schwermut: GW −2; Erschaudert: GW −Stufe; Übergangsschock: VTD und GW
+  −Stufe; Verstoßen: ein Viertel des Fokus je Stufe dauerhaft kanalisiert. Bewusstlos und Schlafend gelten als liegend
+  (`gilt_als`): Hinweis „Nahkampf gegen den Charakter +6, Fernkampf −6“. Entfernt, weil nicht im Regelwerk: VTD 0 bei
+  Bewusstlos, VTD −2 bei Liegend.
+- **Geblendet** gilt laut GRW nur für Handlungen, bei denen die Sicht zählt: bei Angriffen und Zaubern gesetzt, bei
+  Fertigkeitsproben abwählbar und nicht vorausgewählt.
+- Offen: Verorkt („Ungebrochen“ S. 123) – das Buch ist nicht im Bestand. Begleiter: Die Wertetabellen der Abschnitte
+  zeigen die Grundwerte; die Änderung durch Zustände steht darunter als Hinweiszeile. Hinweis: „Verstoßen“ war bisher ausgeschlossen (Verstoßene/Gefallene
   aus „Die Götter“); aufgenommen ist nur der Zustand, nicht das übrige Kapitel.
 
 ## Google AI Studio

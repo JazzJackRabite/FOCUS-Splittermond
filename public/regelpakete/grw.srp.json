@@ -68569,7 +68569,10 @@
     "beschreibung": "Der Abenteurer ist handlungsunfähig und gilt als liegend. Kontinuierliche Handlungen werden unterbrochen, kanalisierte Zauber enden. Angreifer erhalten gegen ihn einen Taktischen Vorteil. Der Zustand wird im Normalfall nach 30 Minuten aufgehoben.",
     "hinweise": [
      "Ergänzt am 02.11.2026 (Zustände als Verweisziel; „Liste der Zustände“)."
-    ]
+    ],
+    "zustandswirkung": {
+     "gilt_als": "liegend"
+    }
    },
    "hinweise": [
     "Ergänzt am 02.11.2026 (Zustände als Verweisziel; „Liste der Zustände“)."
@@ -68929,7 +68932,10 @@
     "beschreibung": "Der Abenteurer ist handlungsunfähig und gilt als liegend. Kontinuierliche Handlungen werden unterbrochen, kanalisierte Zauber enden. Angreifer erhalten gegen ihn einen Taktischen Vorteil. Der Zustand wird im Normalfall nach einigen Stunden aufgehoben. Lärm oder Störungen können den Abenteurer aber auch vorzeitig wecken, wenn ihm eine Wahrnehmung-Probe gegen Schwierigkeit 10 bis 35, je nach Grad des Lärms, gelingt. Ebenfalls erwacht er sofort, wenn ihm Schaden zugefügt wird.",
     "hinweise": [
      "Ergänzt am 02.11.2026 (Zustände als Verweisziel; „Liste der Zustände“)."
-    ]
+    ],
+    "zustandswirkung": {
+     "gilt_als": "liegend"
+    }
    },
    "hinweise": [
     "Ergänzt am 02.11.2026 (Zustände als Verweisziel; „Liste der Zustände“)."

@@ -43,7 +43,7 @@ Felder stehen unter `daten` des jeweiligen Eintrags. **Was hier nicht steht, dar
 | Bereich | Quelle im Paket | Liest im Editor |
 |---|---|---|
 | Kosten in Erfahrungspunkten, Heldengrade (Schwellen, Grenzen, Widerstandsbonus), Fertigkeitspunkte je Zaubergrad | Kernregeln: `strukturiert` mit `steigerungskosten`, `heldengrade` | `regelwerk/steigerungsregeln.ts` |
-| Zustände: welche es gibt, Stufe, Abzüge auf Proben und Werte, Beschreibung, Quelle (Anzeige beim Überfahren mit der Maus) | Einträge vom Typ `zustand`: `hat_stufe`/`parameter`, `zustandswirkung`, `beschreibung`, `quelle` – Grundregelwerk aus dem GRW-Paket, alle anderen aus den Grimoires | `regelwerk/zustaende.ts`, `utils/conditionModifiers.ts` |
+| Zustände: welche es gibt, Stufe, Abzüge auf Proben und Werte, Beschreibung, Quelle (Anzeige beim Überfahren mit der Maus) | Einträge vom Typ `zustand`: `hat_stufe`/`parameter`, `zustandswirkung`, `beschreibung`, `quelle` – Grundregelwerk aus dem GRW-Paket, alle anderen aus den Grimoires | `regelwerk/zustaende.ts`, `regelwerk/zustandswerte.ts`, `utils/conditionModifiers.ts` |
 | Pakete laden und im Browser speichern | Paketkopf, Einträge | `regelwerk/laden.ts`, `regelwerk/paketSpeicher.ts` |
 | Einträge finden, Namen und IDs, Umbenennungen | Einträge mit `id`, `typ`, `name`; ID-Register | `regelwerk/katalog.ts`, `regelwerk/bruecke.ts`, `regelwerk/ids.ts` |
 | Abgeleitete Werte, Heldengrade, Höchstbonus | Kernregeln: `strukturiert`; an Stärken: `abgeleitete_werte_modifikatoren`; `groessenklasse`; an Ausrüstung: `behinderung`, `vtd_bonus`, `mindest_staerke` | `regelwerk/abgeleitet.ts` |
