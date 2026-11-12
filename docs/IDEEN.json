@@ -1,8 +1,8 @@
 {
   "format": "fokus-ideen-v1",
-  "exportiert": "2026-11-12T10:23:54+01:00",
+  "exportiert": "2026-11-12T15:03:59+01:00",
   "quelle": "Ideen-Seite https://claude.ai/artifact/TSG9wGyzXasCUaGmNeTV2s (Sammlung ideen)",
-  "anzahl": 15,
+  "anzahl": 16,
   "ideen": [
     {
       "id": "idee-1",
@@ -168,6 +168,19 @@
       "prio": "",
       "stand": "Bei normalen Proben geht +3 nur einmal pro Wurf, „Schaden −5“ gibt es. Beim Angriff und Zaubern lässt sich +3 noch mehrfach drücken. Verteidigung +3 und Resonanz fehlen.",
       "notiz": true
+    },
+    {
+      "id": "imwddgrx5n8hj",
+      "n": 16,
+      "titel": "Kampfpositionen umsetzen",
+      "bereich": "Kampf & Spielleitung",
+      "datum": "2026-11-12",
+      "umsetzung": "offen",
+      "prio": "hoch",
+      "stand": "https://splitterwiki.de/wiki/Kampfposition#Boni_und_Mali_von_Kampfpositionen",
+      "notiz": false,
+      "erstellt": "2026-11-12T09:55:22.841Z",
+      "geaendert": "2026-11-12T09:55:22.842Z"
     }
   ]
 }
