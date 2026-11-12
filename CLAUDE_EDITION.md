@@ -644,6 +644,13 @@ die Grimoires), Dateiendung `.grim`. Das Grundregelwerk ist kein Grimoire; es bl
 - Offen: Verorkt („Ungebrochen“ S. 123) – das Buch ist nicht im Bestand. Begleiter: Die Wertetabellen der Abschnitte
   zeigen die Grundwerte; die Änderung durch Zustände steht darunter als Hinweiszeile. Hinweis: „Verstoßen“ war bisher ausgeschlossen (Verstoßene/Gefallene
   aus „Die Götter“); aufgenommen ist nur der Zustand, nicht das übrige Kapitel.
+- **Gesamtprüfung nach den parallelen Sitzungen (12.11.2026, spät):** Aus den aktuellen Werkzeugen und Datenbanken
+  auf D: neu gebaut. Ergebnis: Alle Einträge in Paketen und Grimoires sind inhaltlich gleich mit D:. Prüfsuite
+  0 neue Befunde, Praxistest 109 von 109, Wirkungsprüfung ohne Hinweise. Der Handpatch der Zustände-Lieferung hatte aber Metadaten
+  nicht nachgezogen: Eintragszahl in `ladeinfo` der Grimoires „goetter“ und „jenseits“ (Editor meldete beim
+  Hochladen „Anzahl ≠ manifest“), Bytezahlen in den Manifesten, zwei IDs im ID-Register, `zustandswirkung` im
+  Schema, Regelbrowser und LIESMICH. Die neu gebauten Dateien liegen jetzt auf D:. Im Editor die Bytezahl des
+  GRW-Pakets im Manifest korrigiert. Tests: 393 grün mit allen 12 Grimoires, 368 ohne Bücher; Build läuft.
 
 ## Google AI Studio
 
