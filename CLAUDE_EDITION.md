@@ -623,7 +623,7 @@ die Grimoires), Dateiendung `.grim`. Das Grundregelwerk ist kein Grimoire; es bl
   bzw. Buchkürzel und Seite; „Liegend“: „GRW S. 170 (Kampfposition)“.
 - **GRW-Paket:** `daten.zustandswirkung` an Erschöpft, Geblendet, Glaubenskrise, Lahm, Ringend, Verwundet ergänzt
   (Zahlen gegen den Beschreibungstext geprüft), Prüfsumme im Manifest angepasst.
-- **Datenseite (vorbereitet, noch nicht auf D: geliefert):** neues Modul `Werkzeuge/regelpakete/zustaende.py` mit
+- **Datenseite (am 12.11.2026 abends auf D: geliefert, Pakete und Grimoires dort aktualisiert):** neues Modul `Werkzeuge/regelpakete/zustaende.py` mit
   Tabelle `zustaende.json` (nur IDs, Seiten, Zahlen, Kennwörter), Aufruf in `export.py` nach `zauber_spielwerte.py`,
   Schema in `write.py`. Ergänzt Schwermut („Jenseits der Grenzen“ S. 51, aus der Tabelle „Wandel der Umwelt“) und
   Verstoßen („Die Götter“ S. 147, mit Stufe; ein Viertel des Fokus je Stufe dauerhaft kanalisiert) als Einträge in den
