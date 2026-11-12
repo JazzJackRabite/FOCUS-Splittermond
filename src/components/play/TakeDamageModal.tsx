@@ -1,4 +1,4 @@
-import { alleZustaende, zustandHatStufe } from '../../regelwerk/zustaende';
+import { alleZustaende, zustandHatStufe, zustandQuelle } from '../../regelwerk/zustaende';
 import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import React, { useState, useMemo } from 'react';
 import { Knopf, Dialog } from '../../fundament';
@@ -519,7 +519,7 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
                 className="bg-seite border border-rahmen rounded-knopf px-2 py-1 text-xs text-schrift font-medium focus:outline-none focus:border-gold flex-1 min-w-[120px]"
               >
                 {alleZustaende().map((cond) => (
-                  <option key={cond} value={cond}>
+                  <option key={cond} value={cond} title={`Quelle: ${zustandQuelle(cond)}`}>
                     {cond}
                   </option>
                 ))}

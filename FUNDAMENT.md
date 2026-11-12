@@ -43,7 +43,7 @@ Felder stehen unter `daten` des jeweiligen Eintrags. **Was hier nicht steht, dar
 | Bereich | Quelle im Paket | Liest im Editor |
 |---|---|---|
 | Kosten in Erfahrungspunkten, Heldengrade (Schwellen, Grenzen, Widerstandsbonus), Fertigkeitspunkte je Zaubergrad | Kernregeln: `strukturiert` mit `steigerungskosten`, `heldengrade` | `regelwerk/steigerungsregeln.ts` |
-| Zustände: welche es gibt, ob sie eine Stufe haben, Beschreibung | Einträge vom Typ `zustand`: `parameter`, `beschreibung`; dazu die Zustandsdaten `src/data/zustaende.ts` (siehe Ausnahme unten) | `regelwerk/zustaende.ts`, `utils/conditionModifiers.ts` |
+| Zustände: welche es gibt, Stufe, Abzüge auf Proben und Werte, Beschreibung, Quelle (Anzeige beim Überfahren mit der Maus) | Einträge vom Typ `zustand`: `hat_stufe`/`parameter`, `zustandswirkung`, `beschreibung`, `quelle` – Grundregelwerk aus dem GRW-Paket, alle anderen aus den Grimoires | `regelwerk/zustaende.ts`, `utils/conditionModifiers.ts` |
 | Pakete laden und im Browser speichern | Paketkopf, Einträge | `regelwerk/laden.ts`, `regelwerk/paketSpeicher.ts` |
 | Einträge finden, Namen und IDs, Umbenennungen | Einträge mit `id`, `typ`, `name`; ID-Register | `regelwerk/katalog.ts`, `regelwerk/bruecke.ts`, `regelwerk/ids.ts` |
 | Abgeleitete Werte, Heldengrade, Höchstbonus | Kernregeln: `strukturiert`; an Stärken: `abgeleitete_werte_modifikatoren`; `groessenklasse`; an Ausrüstung: `behinderung`, `vtd_bonus`, `mindest_staerke` | `regelwerk/abgeleitet.ts` |
@@ -63,13 +63,6 @@ Felder stehen unter `daten` des jeweiligen Eintrags. **Was hier nicht steht, dar
 Ansichten (`components/`) greifen nicht selbst in die Paketdaten, sondern fragen die Module aus `regelwerk/`. Wo eine
 Ansicht das heute noch tut, steht sie in `src/fundament/altlasten.json` (`paketzugriffe`).
 
-### Ausnahme: Zustände
-
-Die 23 Zustände und ihre Abzüge auf Proben stehen als Daten in `src/data/zustaende.ts` (Entscheidung vom 12.11.2026:
-Zustände brauchen keine Quellenangabe und müssen nicht aus den Regelwerken extrahiert werden; Grundlage ist die Übersicht
-im Splitterwiki). Die Datei enthält Namen, Zahlen und eigene Kurzbeschreibungen, keine Regeltexte. Ausführliche
-Beschreibungen kommen weiter aus den Paketen, wenn sie geladen sind. Ein Test hält Daten und Grundregelwerk-Paket gleich.
-
 ### Regeln, die noch im Code stehen (Altlasten)
 
 Diese Stellen verstoßen gegen Grundsatz 2. Sie sind bekannt, werden von den Prüfungen vorerst geduldet und sollen auf die
@@ -88,7 +81,8 @@ Datenseite wandern. Neue kommen nicht hinzu.
 | Schadens- und Heildialog: Zustandsliste, Verschnaufpause | `components/play/TakeDamageModal.tsx`, `HealModal.tsx` | Zustände und Kernregeln des Pakets |
 
 Die genaue Liste der geduldeten Regelnamen steht in `src/fundament/altlasten.json` (`regelnamen`).
-Ohne geladenes Regelpaket rechnet der Editor mit diesen eingebauten Werten weiter (Rückfall). Das gilt auch für die Kosten in
+Ohne geladenes Regelpaket rechnet der Editor mit diesen eingebauten Werten weiter (Rückfall). Für die Zustände des Grundregelwerks liegt der Rückfall in
+`src/data/zustaende.ts`; Zustände aus anderen Bänden stehen nicht im Code. Das gilt auch für die Kosten in
 Erfahrungspunkten und die Heldengrade: Maßgeblich ist das Paket; `utils/costCalculations.ts` und die Liste in
 `src/data/rules.ts` enthalten dieselben Zahlen nur noch als Rückfall, und ein Test hält beide gleich.
 

@@ -2,7 +2,8 @@ import type { StatusCondition } from '../types';
 import { aktiverKatalog } from '../regelwerk/bruecke';
 import { gesundheitsstufen } from '../regelwerk/vitals';
 import { SKILL_CATEGORIES, SKILL_DATA } from '../data/rules';
-import { ZUSTAENDE, type Probenbereich } from '../data/zustaende';
+import type { Probenbereich } from '../data/zustaende';
+import { zustand, zustandQuelle } from '../regelwerk/zustaende';
 
 export interface ActiveRollModifier {
   id: string;
@@ -84,16 +85,18 @@ export function getConditionMalus(condition: StatusCondition, kontext: Zustandsk
     return { label: 'Liegend', malus, description: `${malus} auf eigene Angriffe im Nahkampf und Fernkampf (Armbrust: kein Abzug). Angriffe gegen Liegende: Nahkampf +6, Fernkampf −6` };
   }
 
-  const z = ZUSTAENDE[condition.key];
-  const p = z?.probe;
+  // Zahlen aus dem Regelpaket (daten.zustandswirkung); ohne Paket der Grundregelwerk-Rückfall
+  const z = zustand(condition.key);
+  const p = z?.wirkung?.probe;
   if (!z || !p) return null;
-  const label = z.stufe ? `${condition.key} ${level}` : condition.key;
+  const kurz = getConditionDescription(condition);
+  const label = z.mitStufe ? `${condition.key} ${level}` : condition.key;
 
   if (p.art === 'wundstufe') {
     const stufen = wundabzuege();
     const jetzt = Math.max(0, stufen.indexOf(kontext.wundabzug ?? 0));
     const malus = stufen[Math.min(stufen.length - 1, jetzt + level)] - stufen[jetzt];
-    return malus === 0 ? null : { label, malus, description: `${z.kurz} (${malus} zusätzlich)` };
+    return malus === 0 ? null : { label, malus, description: `${kurz} (${malus} zusätzlich)` };
   }
   if (p.bereiche && !p.bereiche.includes(bereich)) return null;
   if (p.attribute) {
@@ -101,24 +104,22 @@ export function getConditionMalus(condition: StatusCondition, kontext: Zustandsk
     const attribute = kontext.fertigkeit ? SKILL_DATA[kontext.fertigkeit] : null;
     if (!attribute || !attribute.some((x) => p.attribute!.includes(x))) return null;
   }
-  const stufe = Math.min(level, p.hoechststufe ?? z.hoechststufe ?? level);
+  const stufe = Math.min(level, p.hoechststufe ?? level);
   const malus = (p.fest ?? 0) + (p.pro_stufe ?? 0) * stufe;
-  return malus === 0 ? null : { label, malus, description: z.kurz };
+  return malus === 0 ? null : { label, malus, description: kurz };
 }
 
-/** Beschreibung eines Zustands: aus dem Regelpaket, sonst die Kurzbeschreibung aus den Zustandsdaten */
+/** Beschreibung eines Zustands aus dem Regelpaket (ohne Paket leer; „Liegend“: Text der Kampfposition) */
 export function getConditionDescription(condition: StatusCondition): string {
-  const k = aktiverKatalog();
-  if (k) {
-    for (const e of k.nachTyp('zustand')) {
-      if (e.name === condition.key) {
-        const text = (e.daten as { beschreibung?: string } | undefined)?.beschreibung;
-        if (text) return text;
-      }
-    }
-  }
   if (condition.key === 'Liegend') return getConditionMalus(condition, { bereich: 'kampf' })?.description ?? '';
-  return ZUSTAENDE[condition.key]?.kurz ?? '';
+  return zustand(condition.key)?.beschreibung ?? '';
+}
+
+/** Text für die Anzeige beim Überfahren mit der Maus: Beschreibung und Quelle mit Seite */
+export function zustandTooltip(condition: StatusCondition): string {
+  const q = zustandQuelle(condition.key);
+  const b = getConditionDescription(condition);
+  return [b, q && `Quelle: ${q}`].filter(Boolean).join('\n\n');
 }
 
 export function getActiveRollModifiers(

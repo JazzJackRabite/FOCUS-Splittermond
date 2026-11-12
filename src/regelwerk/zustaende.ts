@@ -1,37 +1,45 @@
 /**
- * Zustände aus den Regelpaketen (FUNDAMENT.md, Regelquellen): Welche Zustände es gibt und ob sie eine Stufe haben,
- * steht in den Einträgen vom Typ `zustand` (Grundregelwerk und geladene Bücher), nicht im Programmcode.
+ * Zustände aus den Regelpaketen (FUNDAMENT.md, Regelquellen): Die Zustände des Grundregelwerks kommen aus dem
+ * Grundregelwerk-Paket, alle anderen (z. B. Schwermut, Verstoßen, Erschaudert) aus den hochgeladenen Grimoires.
+ * Stufe, Abzüge und Quelle stehen im Eintrag vom Typ `zustand` (`hat_stufe`/`parameter`, `zustandswirkung`, `quelle`).
  * „Liegend“ ist kein Zustand, sondern eine Kampfposition (GRW S. 170); der Editor führt sie in derselben Auswahl,
  * weil sie am Spieltisch genauso an- und abgelegt wird.
+ * Ohne geladenes Paket gilt der Rückfall für das Grundregelwerk aus data/zustaende.ts.
  */
 import { aktiverKatalog } from './bruecke';
 import type { Katalog } from './katalog';
-import { ZUSTAENDE } from '../data/zustaende';
+import type { Eintrag } from './typen';
+import { GRW_ZUSTAENDE, type Zustandswirkung } from '../data/zustaende';
+import { quelleText } from './relikte';
 
 export const KAMPFPOSITION_LIEGEND = 'Liegend';
 
-export interface Zustandsangabe { name: string; mitStufe: boolean; id?: string }
+export interface Zustandsangabe { name: string; mitStufe: boolean; quelle: string; id?: string; wirkung?: Zustandswirkung; beschreibung?: string }
 
 let cache: { k: Katalog | null; liste: Zustandsangabe[] } | null = null;
 
-/** Alle wählbaren Zustände, alphabetisch: aus den Paketen, ergänzt um die Zustandsdaten (data/zustaende.ts) */
+function ausEintrag(k: Katalog, e: Eintrag): Zustandsangabe {
+  const d = (e.daten ?? {}) as { hat_stufe?: boolean; parameter?: unknown; zustandswirkung?: Zustandswirkung; beschreibung?: string };
+  const p = Array.isArray(d.parameter) ? d.parameter.join(',') : String(d.parameter ?? '');
+  return { name: e.name, mitStufe: d.hat_stufe ?? /\bStufe\b/.test(p), quelle: quelleText(k, e), id: e.id, wirkung: d.zustandswirkung, beschreibung: d.beschreibung };
+}
+
+/** Alle wählbaren Zustände, alphabetisch: aus den geladenen Paketen (ohne Paket: Grundregelwerk-Rückfall) */
 export function zustandsliste(k: Katalog | null = aktiverKatalog()): Zustandsangabe[] {
   if (cache && cache.k === k) return cache.liste;
   const nachName = new Map<string, Zustandsangabe>();
-  if (k) {
-    for (const e of k.nachTyp('zustand')) {
-      const parameter = (e.daten as { parameter?: unknown } | undefined)?.parameter;
-      // im Paket als Text wie „[Stufe]“ oder „[Krankheit, Phase]“
-      const p = Array.isArray(parameter) ? parameter.join(',') : String(parameter ?? '');
-      nachName.set(e.name, { name: e.name, mitStufe: /\bStufe\b/.test(p), id: e.id });
-    }
+  if (k) for (const e of k.nachTyp('zustand')) if (!nachName.has(e.name)) nachName.set(e.name, ausEintrag(k, e));
+  if (!nachName.size) {
+    for (const [name, z] of Object.entries(GRW_ZUSTAENDE)) nachName.set(name, { name, mitStufe: z.stufe, quelle: `GRW S. ${z.seite}`, wirkung: z.wirkung });
   }
-  // Zustände, die in keinem geladenen Paket stehen (z. B. aus nicht geladenen Büchern), kommen aus den Zustandsdaten
-  for (const [name, z] of Object.entries(ZUSTAENDE)) if (!nachName.has(name)) nachName.set(name, { name, mitStufe: !!z.stufe });
-  nachName.set(KAMPFPOSITION_LIEGEND, { name: KAMPFPOSITION_LIEGEND, mitStufe: false });
+  nachName.set(KAMPFPOSITION_LIEGEND, { name: KAMPFPOSITION_LIEGEND, mitStufe: false, quelle: 'GRW S. 170 (Kampfposition)' });
   const liste = [...nachName.values()].sort((a, b) => a.name.localeCompare(b.name, 'de'));
   cache = { k, liste };
   return liste;
+}
+
+export function zustand(name: string, k: Katalog | null = aktiverKatalog()): Zustandsangabe | undefined {
+  return zustandsliste(k).find((z) => z.name === name);
 }
 
 export function alleZustaende(k: Katalog | null = aktiverKatalog()): string[] {
@@ -39,9 +47,14 @@ export function alleZustaende(k: Katalog | null = aktiverKatalog()): string[] {
 }
 
 export function zustandHatStufe(name: string, k: Katalog | null = aktiverKatalog()): boolean {
-  return zustandsliste(k).find((z) => z.name === name)?.mitStufe ?? false;
+  return zustand(name, k)?.mitStufe ?? false;
 }
 
 export function istZustand(name: string, k: Katalog | null = aktiverKatalog()): boolean {
-  return zustandsliste(k).some((z) => z.name === name);
+  return !!zustand(name, k);
+}
+
+/** Quellenangabe für die Anzeige beim Überfahren mit der Maus, z. B. „GRW S. 168“ */
+export function zustandQuelle(name: string, k: Katalog | null = aktiverKatalog()): string {
+  return zustand(name, k)?.quelle ?? '';
 }

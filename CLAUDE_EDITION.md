@@ -615,14 +615,23 @@ die Grimoires), Dateiendung `.grim`. Das Grundregelwerk ist kein Grimoire; es bl
   Prüfsuite ohne neue Befunde. **Noch nicht auf D: übertragen** (Rechner war nicht verbunden); dort müssen die
   Werkzeuge mit dem Grimoire-Stand zusammengeführt und die Pakete neu gebaut werden.
 - Tests der Relikte laden Bücher jetzt über die Grimoire-Hilfen (`FOKUS_GRIMOIRES`).
-- **Alle 23 Zustände als Daten** (`src/data/zustaende.ts`, Entscheidung 12.11.2026: Grundlage Splitterwiki, keine
-  Quellenangabe nötig): Stufe, Abzug auf Proben nach Fertigkeitsgruppe oder Attribut, Wirkung auf abgeleitete Werte,
-  eigene Kurzbeschreibung. `utils/conditionModifiers.ts` enthält keine Zahlen mehr, nur noch die Auswertung. Neu
-  wählbar: Schwermut, Verorkt, Verstoßen; Erschaudert, Geistreisend und Übergangsschock auch ohne geladenes Buch.
-  Gerechnet werden jetzt auch Schwermut (−2 auf Proben mit Willenskraft), Erschaudert (Stufe, Verstand) und
-  Übergangsschock (Stufe; Beweglichkeit, Konstitution, Stärke) – bei Fertigkeits- und Zauberproben; im Angriffsdialog
-  nicht, weil dort die Attribute der Waffe nicht übergeben werden. Ohne Zahlen: Verorkt und Verstoßen (das Wiki nennt
-  keine). Wirkung auf abgeleitete Werte steht in den Daten, wird aber noch nicht eingerechnet.
+- **Zustände aus den Paketen statt aus dem Code (Korrektur, 12.11.2026):** Die Zustände des Grundregelwerks kommen
+  aus dem GRW-Paket, alle anderen ausschließlich aus den Grimoires. Die Zustände aus anderen Bänden und ihre Zahlen
+  sind wieder aus dem Code entfernt; `src/data/zustaende.ts` enthält nur noch den Rückfall für die 17 Zustände des
+  Grundregelwerks. Stufe (`hat_stufe`), Abzüge (`daten.zustandswirkung`) und Quelle stehen im Paketeintrag.
+- **Quelle beim Überfahren mit der Maus:** Zustandsmarken, Auswahllisten und Schnellwahl zeigen „Quelle: GRW S. 168“
+  bzw. Buchkürzel und Seite; „Liegend“: „GRW S. 170 (Kampfposition)“.
+- **GRW-Paket:** `daten.zustandswirkung` an Erschöpft, Geblendet, Glaubenskrise, Lahm, Ringend, Verwundet ergänzt
+  (Zahlen gegen den Beschreibungstext geprüft), Prüfsumme im Manifest angepasst.
+- **Datenseite (vorbereitet, noch nicht auf D: geliefert):** neues Modul `Werkzeuge/regelpakete/zustaende.py` mit
+  Tabelle `zustaende.json` (nur IDs, Seiten, Zahlen, Kennwörter), Aufruf in `export.py` nach `zauber_spielwerte.py`,
+  Schema in `write.py`. Ergänzt Schwermut („Jenseits der Grenzen“ S. 51, aus der Tabelle „Wandel der Umwelt“) und
+  Verstoßen („Die Götter“ S. 147, mit Stufe; ein Viertel des Fokus je Stufe dauerhaft kanalisiert) als Einträge in den
+  Grimoires und schreibt `zustandswirkung` für GRW-, Schleier-, Jenseits- und Götter-Zustände. Prüfsuite: 0 neue
+  Befunde. Nach dem Bauen auf D: Grimoires neu hochladen.
+- Offen: Verorkt („Ungebrochen“ S. 123) – das Buch ist nicht im Bestand. Wirkung auf abgeleitete Werte steht in den
+  Paketen, wird im Editor noch nicht eingerechnet. Hinweis: „Verstoßen“ war bisher ausgeschlossen (Verstoßene/Gefallene
+  aus „Die Götter“); aufgenommen ist nur der Zustand, nicht das übrige Kapitel.
 
 ## Google AI Studio
 

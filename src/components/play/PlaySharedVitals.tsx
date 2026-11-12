@@ -1,4 +1,4 @@
-import { alleZustaende, zustandHatStufe } from '../../regelwerk/zustaende';
+import { alleZustaende, zustandHatStufe, zustandQuelle } from '../../regelwerk/zustaende';
 import { Rauten, Knopf } from '../../fundament';
 import React, { useState, useMemo } from 'react';
 import {
@@ -16,7 +16,7 @@ import {
   HEALTH_LEVEL_LABELS,
   WOUND_PENALTIES,
 } from '../../data/rules';
-import { getConditionDescription } from '../../utils/conditionModifiers';
+import { zustandTooltip } from '../../utils/conditionModifiers';
 import { toast } from 'react-hot-toast';
 import { generateId } from '../../utils/id';
 import type { StatusCondition, HealthSlot, ChanneledSpell } from '../../types';
@@ -602,7 +602,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                                 ? 'bg-erschoepft-grund border-gold text-schrift hover:bg-erschoepft-grund'
                                 : 'bg-erhoeht border-rahmen text-schrift hover:border-gold hover:text-schrift'
                             }`}
-                            title={existing ? `${key} aktiv (Klick erhöht Stufe)` : `${key} hinzufügen`}
+                            title={`${existing ? `${key} aktiv (Klick erhöht Stufe)` : `${key} hinzufügen`}\nQuelle: ${zustandQuelle(key)}`}
                           >
                             <span>{key}</span>
                             {existing && existing.level && (
@@ -624,7 +624,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                         className="bg-erhoeht border border-rahmen rounded-knopf px-2 py-1 text-xs text-schrift font-medium focus:outline-none focus:border-gold cursor-pointer flex-1 min-w-[110px]"
                       >
                         {alleZustaende().map((cond: string) => (
-                          <option key={cond} value={cond} className="bg-erhoeht text-schrift">
+                          <option key={cond} value={cond} className="bg-erhoeht text-schrift" title={`Quelle: ${zustandQuelle(cond)}`}>
                             {cond}
                           </option>
                         ))}
@@ -662,7 +662,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                     {conditions.map((c) => (
                       <span
                         key={c.id}
-                        title={getConditionDescription(c)}
+                        title={zustandTooltip(c)}
                         className="inline-flex items-center gap-1.5 bg-erhoeht hover:bg-rahmen text-schrift border border-rahmen hover:border-gold rounded-full px-2 py-0.5 text-xs font-medium transition-colors"
                       >
                         <span>{c.key}</span>
@@ -871,7 +871,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                     className="bg-erhoeht border border-rahmen rounded-knopf px-2 py-1 text-xs text-schrift font-medium focus:outline-none focus:border-gold cursor-pointer flex-1 min-w-[120px]"
                   >
                     {alleZustaende().map((cond: string) => (
-                      <option key={cond} value={cond} className="bg-erhoeht text-schrift">
+                      <option key={cond} value={cond} className="bg-erhoeht text-schrift" title={`Quelle: ${zustandQuelle(cond)}`}>
                         {cond}
                       </option>
                     ))}
@@ -918,7 +918,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                     {conditions.map((c) => (
                       <span
                         key={c.id}
-                        title={getConditionDescription(c)}
+                        title={zustandTooltip(c)}
                         className="inline-flex items-center gap-1.5 bg-erhoeht hover:bg-rahmen text-schrift border border-rahmen hover:border-gold rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors"
                       >
                         <span>{c.key}</span>

@@ -68653,7 +68653,24 @@
      "Ergänzt am 02.11.2026 (Zustände als Verweisziel; „Liste der Zustände“)."
     ],
     "parameter": "[Stufe]",
-    "hat_stufe": true
+    "hat_stufe": true,
+    "zustandswirkung": {
+     "probe": {
+      "bereiche": [
+       "kampf",
+       "allgemein"
+      ],
+      "pro_stufe": -1
+     },
+     "werte": {
+      "GSW": {
+       "pro_stufe": -1
+      },
+      "INI": {
+       "pro_stufe": 1
+      }
+     }
+    }
    },
    "hinweise": [
     "Ergänzt am 02.11.2026 (Zustände als Verweisziel; „Liste der Zustände“)."
@@ -68681,7 +68698,19 @@
      "Ergänzt am 02.11.2026 (Zustände als Verweisziel; „Liste der Zustände“)."
     ],
     "parameter": "[Stufe]",
-    "hat_stufe": true
+    "hat_stufe": true,
+    "zustandswirkung": {
+     "probe": {
+      "bereiche": [
+       "kampf",
+       "allgemein",
+       "magie"
+      ],
+      "pro_stufe": -2,
+      "hoechststufe": 4,
+      "nur": "sicht"
+     }
+    }
    },
    "hinweise": [
     "Ergänzt am 02.11.2026 (Zustände als Verweisziel; „Liste der Zustände“)."
@@ -68709,7 +68738,15 @@
      "Ergänzt am 02.11.2026 (Zustände als Verweisziel; „Liste der Zustände“)."
     ],
     "parameter": "[Stufe]",
-    "hat_stufe": true
+    "hat_stufe": true,
+    "zustandswirkung": {
+     "probe": {
+      "bereiche": [
+       "magie"
+      ],
+      "pro_stufe": -1
+     }
+    }
    },
    "hinweise": [
     "Ergänzt am 02.11.2026 (Zustände als Verweisziel; „Liste der Zustände“)."
@@ -68763,7 +68800,14 @@
     "beschreibung": "Der Betroffene kann sich nur noch mit halber Geschwindigkeit fortbewegen. Der Zustand wird im Normalfall nach einer Verschnaufpause aufgehoben.",
     "hinweise": [
      "Ergänzt am 02.11.2026 (Zustände als Verweisziel; „Liste der Zustände“)."
-    ]
+    ],
+    "zustandswirkung": {
+     "werte": {
+      "GSW": {
+       "faktor": 0.5
+      }
+     }
+    }
    },
    "hinweise": [
     "Ergänzt am 02.11.2026 (Zustände als Verweisziel; „Liste der Zustände“)."
@@ -68841,7 +68885,25 @@
     "beschreibung": "Ein Charakter mit dem Zustand Ringend kann sich nicht frei bewegen. Seine Geschwindigkeit wird auf 0 gesetzt und er kann keine Bewegungshandlungen oder die freie Bewegung nutzen. Zudem ist seine Verteidigung um 3 Punkte gesenkt. Alle seine Proben erhalten einen Malus in Höhe von 3 Punkten. Aus dem Zustand Ringend kann man sich normalerweise befreien, indem man sich aus der Umklammerung befreit (siehe S. 164).",
     "hinweise": [
      "Ergänzt am 02.11.2026 (Zustände als Verweisziel; „Liste der Zustände“)."
-    ]
+    ],
+    "zustandswirkung": {
+     "probe": {
+      "bereiche": [
+       "kampf",
+       "allgemein",
+       "magie"
+      ],
+      "fest": -3
+     },
+     "werte": {
+      "VTD": {
+       "fest": -3
+      },
+      "GSW": {
+       "setzen": 0
+      }
+     }
+    }
    },
    "hinweise": [
     "Ergänzt am 02.11.2026 (Zustände als Verweisziel; „Liste der Zustände“)."
@@ -68951,7 +69013,12 @@
      "Ergänzt am 02.11.2026 (Zustände als Verweisziel; „Liste der Zustände“)."
     ],
     "parameter": "[Stufe]",
-    "hat_stufe": true
+    "hat_stufe": true,
+    "zustandswirkung": {
+     "probe": {
+      "art": "wundstufe"
+     }
+    }
    },
    "hinweise": [
     "Ergänzt am 02.11.2026 (Zustände als Verweisziel; „Liste der Zustände“)."

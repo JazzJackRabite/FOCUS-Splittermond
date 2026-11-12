@@ -3,7 +3,7 @@
  * Die Modale bekommen die Werte und Wundabzüge des Begleiters; Boni aus Stärken und Meisterschaften des Charakters gelten
  * nicht (der Charakter-Kontext wird für die Modale ohne Wirkungen weitergegeben), Splitterpunkte hat nur der Abenteurer.
  */
-import { alleZustaende, zustandHatStufe } from '../../regelwerk/zustaende';
+import { alleZustaende, zustandHatStufe, zustandQuelle } from '../../regelwerk/zustaende';
 import React, { useContext, useMemo, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { Heart, Sparkles, RotateCcw, Coffee, HeartCrack, HeartPulse, Plus } from 'lucide-react';
@@ -22,7 +22,7 @@ import type { Begleiter, Spell, StatusCondition } from '../../types';
 import type { Wertekasten } from '../../regelwerk/begleiter';
 import { generateId } from '../../utils/id';
 import { Auswahl, Eingabe, Knopf, Marke, TON } from '../../fundament';
-import { getConditionDescription, getConditionMalus } from '../../utils/conditionModifiers';
+import { getConditionDescription, getConditionMalus, zustandTooltip } from '../../utils/conditionModifiers';
 
 export interface Waffe { name: string; wert: string | number; schaden: string; wgs: string; ini?: string; merkmale?: string }
 export interface Aktionen {
@@ -189,7 +189,7 @@ const BegleiterZustaende: React.FC<{ spiel: ReturnType<typeof useBegleiterSpiel>
         {liste.map(c => {
           const m = getConditionMalus(c);
           return (
-            <MarkeMitEntfernen key={c.id} ton="erschoepft" titel={getConditionDescription(c)} label={`Zustand ${c.key} beenden`}
+            <MarkeMitEntfernen key={c.id} ton="erschoepft" titel={zustandTooltip(c)} label={`Zustand ${c.key} beenden`}
               onEntfernen={() => { setze({ ...z, zustaende: liste.filter(x => x.id !== c.id) }); log('misc', `Zustand ${c.key} beendet`); }}>
               {c.key}{c.level ? ` ${c.level}` : ''}{m && m.malus ? ` (${m.malus})` : ''}
             </MarkeMitEntfernen>
@@ -199,7 +199,7 @@ const BegleiterZustaende: React.FC<{ spiel: ReturnType<typeof useBegleiterSpiel>
       <div className="flex flex-wrap gap-2 items-end">
         <Auswahl beschriftung="Zustand hinzufügen" beschriftungVerborgen value={wahl} onChange={e => setWahl(e.target.value)}>
           <option value="">Zustand wählen …</option>
-          {alleZustaende().map(c => <option key={c} value={c}>{c}</option>)}
+          {alleZustaende().map(c => <option key={c} value={c} title={`Quelle: ${zustandQuelle(c)}`}>{c}</option>)}
         </Auswahl>
         {mitStufe && <Eingabe beschriftung="Stufe" beschriftungVerborgen type="number" min={1} max={5} className="w-20" value={stufe} onChange={e => setStufe(Number(e.target.value) || 1)} />}
         <Knopf disabled={!wahl} onClick={hinzu}><Plus size={14} aria-hidden />Zustand</Knopf>
