@@ -585,6 +585,13 @@ die Grimoires), Dateiendung `.grim`. Das Grundregelwerk ist kein Grimoire; es bl
   sein Wert ist unverändert.
 - **Liegend** ist eine Kampfposition (GRW S. 170), kein Eintrag der Zustandsliste: −6 auf eigene Angriffe (aus der
   Tabelle der Kampfpositionen im Paket), kein Abzug auf andere Proben. Vorher −2 auf alles. Begleiter-Regeln und die Listen in `src/data` stehen weiter im Code.
+- **Zustandsauswahl aus den Paketen** (`regelwerk/zustaende.ts`): Wählbar sind die Einträge vom Typ `zustand` aus dem
+  Grundregelwerk und aus geladenen Büchern, mit Stufe laut Paket. Damit ist „Krank“ wählbar (fehlte), und die drei
+  Zustände aus „Hinter dem Schleier“ erscheinen, sobald das Buch geladen ist. „Verwirrt“ ist entfernt (kein Zustand in
+  Splittermond). „Liegend“ bleibt als Kampfposition in der Auswahl.
+- Offen bei den Zuständen: Schwermut, Verorkt und Verstoßen stehen in keinem Paket. Die Abzüge der Zustände aus den
+  Büchern (Erschaudert, Übergangsschock) rechnet der Editor nicht – sie müssten im Paket strukturiert vorliegen;
+  Zahlen aus Erweiterungen gehören nicht in den Code.
 
 ## Google AI Studio
 

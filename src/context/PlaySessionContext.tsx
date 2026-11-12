@@ -1,3 +1,4 @@
+import { alleZustaende } from '../regelwerk/zustaende';
 import React, { createContext, useContext, useState, useMemo, ReactNode } from 'react';
 import { toast } from 'react-hot-toast';
 import type {
@@ -12,7 +13,7 @@ import { aktiverKatalog } from '../regelwerk/bruecke';
 import { lpWirkung, wirksameZustaende } from '../regelwerk/zauberwerte';
 import { grossmeisterAb } from '../regelwerk/bruecke';
 import { generateId } from '../utils/id';
-import { SKILL_CATEGORIES, SKILL_DATA, ALL_CONDITIONS } from '../data/rules';
+import { SKILL_CATEGORIES, SKILL_DATA } from '../data/rules';
 import { isSkillAffectedByBehinderung } from '../utils/conditionModifiers';
 import {
   executeSpellDamageRoll,
@@ -168,7 +169,7 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
   const [restResultModal, setRestResultModal] = useState<RestResultModalState | null>(null);
   const [spOption, setSpOption] = useState(0);
 
-  const [selectedCondition, setSelectedCondition] = useState(ALL_CONDITIONS[0]);
+  const [selectedCondition, setSelectedCondition] = useState(() => alleZustaende()[0]);
   const [conditionLevel, setConditionLevel] = useState(1);
   const [conditionNote, setConditionNote] = useState('');
   const [damageAmount, setDamageAmount] = useState(1);
@@ -461,7 +462,7 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
         if (exhaustedCount > 0) {
           dispatch({ type: 'PLAY_UNDO_DAMAGE', payload: { kind: 'exhausted', amount: exhaustedCount, maxLP } });
         }
-        const badConditions = ['Erschöpft', 'Blutend', 'Brennend', 'Vergiftet', 'Benommen', 'Verwirrt', 'Geblendet', 'Siechtum', 'Lahm'];
+        const badConditions = ['Erschöpft', 'Blutend', 'Brennend', 'Vergiftet', 'Benommen', 'Geblendet', 'Siechtum', 'Lahm'];
         if (castResult.healSelf.curesPoisonDisease) {
           badConditions.push('Krankheit');
         }

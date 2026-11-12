@@ -65,8 +65,8 @@ export const HELDENGRADE = [
 // ---------------------------------------------------------------
 // Condition categories
 // ---------------------------------------------------------------
-export const CONDITIONS_WITH_LEVELS: string[] = ['Benommen', 'Blutend', 'Brennend', 'Erschöpft', 'Geblendet', 'Glaubenskrise', 'Siechtum', 'Sterbend', 'Verwundet', 'Verwirrt'].sort();
-export const CONDITIONS_WITHOUT_LEVELS: string[] = ['Angsterfüllt', 'Bewusstlos', 'Lahm', 'Liegend', 'Panisch', 'Rasend', 'Ringend', 'Schlafend'];
+export const CONDITIONS_WITH_LEVELS: string[] = ['Benommen', 'Blutend', 'Brennend', 'Erschöpft', 'Geblendet', 'Glaubenskrise', 'Siechtum', 'Sterbend', 'Verwundet'].sort();
+export const CONDITIONS_WITHOUT_LEVELS: string[] = ['Angsterfüllt', 'Bewusstlos', 'Krank', 'Lahm', 'Liegend', 'Panisch', 'Rasend', 'Ringend', 'Schlafend'];
 export const ALL_CONDITIONS: string[] = [...CONDITIONS_WITH_LEVELS, ...CONDITIONS_WITHOUT_LEVELS].sort();
 
 export const HEALTH_LEVEL_LABELS: string[] = ['Gesund', 'Angeschlagen', 'Verletzt', 'Schwer verletzt', 'Todgeweiht'];

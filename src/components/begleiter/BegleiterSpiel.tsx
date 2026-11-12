@@ -3,6 +3,7 @@
  * Die Modale bekommen die Werte und Wundabzüge des Begleiters; Boni aus Stärken und Meisterschaften des Charakters gelten
  * nicht (der Charakter-Kontext wird für die Modale ohne Wirkungen weitergegeben), Splitterpunkte hat nur der Abenteurer.
  */
+import { alleZustaende, zustandHatStufe } from '../../regelwerk/zustaende';
 import React, { useContext, useMemo, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { Heart, Sparkles, RotateCcw, Coffee, HeartCrack, HeartPulse, Plus } from 'lucide-react';
@@ -21,7 +22,6 @@ import type { Begleiter, Spell, StatusCondition } from '../../types';
 import type { Wertekasten } from '../../regelwerk/begleiter';
 import { generateId } from '../../utils/id';
 import { Auswahl, Eingabe, Knopf, Marke, TON } from '../../fundament';
-import { CONDITIONS_WITH_LEVELS, CONDITIONS_WITHOUT_LEVELS } from '../../data/rules';
 import { getConditionDescription, getConditionMalus } from '../../utils/conditionModifiers';
 
 export interface Waffe { name: string; wert: string | number; schaden: string; wgs: string; ini?: string; merkmale?: string }
@@ -173,7 +173,7 @@ const BegleiterZustaende: React.FC<{ spiel: ReturnType<typeof useBegleiterSpiel>
   const [wahl, setWahl] = useState('');
   const [stufe, setStufe] = useState(1);
   const liste = z.zustaende ?? [];
-  const mitStufe = (CONDITIONS_WITH_LEVELS as readonly string[]).includes(wahl);
+  const mitStufe = zustandHatStufe(wahl);
   const hinzu = () => {
     if (!wahl) return;
     const neu: StatusCondition = { id: generateId(), key: wahl, ...(mitStufe ? { level: Math.max(1, stufe) } : {}) };
@@ -199,7 +199,7 @@ const BegleiterZustaende: React.FC<{ spiel: ReturnType<typeof useBegleiterSpiel>
       <div className="flex flex-wrap gap-2 items-end">
         <Auswahl beschriftung="Zustand hinzufügen" beschriftungVerborgen value={wahl} onChange={e => setWahl(e.target.value)}>
           <option value="">Zustand wählen …</option>
-          {[...CONDITIONS_WITH_LEVELS, ...CONDITIONS_WITHOUT_LEVELS].sort((x, y) => x.localeCompare(y, 'de')).map(c => <option key={c} value={c}>{c}</option>)}
+          {alleZustaende().map(c => <option key={c} value={c}>{c}</option>)}
         </Auswahl>
         {mitStufe && <Eingabe beschriftung="Stufe" beschriftungVerborgen type="number" min={1} max={5} className="w-20" value={stufe} onChange={e => setStufe(Number(e.target.value) || 1)} />}
         <Knopf disabled={!wahl} onClick={hinzu}><Plus size={14} aria-hidden />Zustand</Knopf>

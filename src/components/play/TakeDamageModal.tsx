@@ -1,7 +1,7 @@
+import { alleZustaende, zustandHatStufe } from '../../regelwerk/zustaende';
 import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import React, { useState, useMemo } from 'react';
 import { Flame, Shield, Sparkles, X, Plus, Minus, AlertTriangle, Heart, Check } from 'lucide-react';
-import { ALL_CONDITIONS, CONDITIONS_WITH_LEVELS } from '../../data/rules';
 import type { HealthSlot } from '../../types';
 
 export interface TakeDamageModalProps {
@@ -178,7 +178,7 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
 
   const handleAddExtraCondition = () => {
     if (!extraCondition) return;
-    const hasLvl = CONDITIONS_WITH_LEVELS.includes(extraCondition);
+    const hasLvl = zustandHatStufe(extraCondition);
     setExtraConditionsList((prev) => [
       ...prev,
       { key: extraCondition, level: hasLvl ? extraLevel : undefined },
@@ -524,14 +524,14 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
                 onChange={(e) => setExtraCondition(e.target.value)}
                 className="bg-seite border border-rahmen rounded-knopf px-2 py-1 text-xs text-schrift font-medium focus:outline-none focus:border-gold flex-1 min-w-[120px]"
               >
-                {ALL_CONDITIONS.map((cond) => (
+                {alleZustaende().map((cond) => (
                   <option key={cond} value={cond}>
                     {cond}
                   </option>
                 ))}
               </select>
 
-              {CONDITIONS_WITH_LEVELS.includes(extraCondition) && (
+              {zustandHatStufe(extraCondition) && (
                 <input
                   type="number"
                   min={1}
