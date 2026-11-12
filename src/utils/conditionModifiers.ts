@@ -102,9 +102,6 @@ export function getConditionMalus(condition: StatusCondition, kontext: Zustandsk
       const malus = liegendEigeneAngriffe();
       return { label: 'Liegend', malus, description: `${malus} auf eigene Angriffe im Nahkampf und Fernkampf (Armbrust: kein Abzug). Angriffe gegen Liegende: Nahkampf +6, Fernkampf −6` };
     }
-    // Kein Zustand des Grundregelwerks; Wert aus dem bisherigen Editor übernommen
-    case 'Verwirrt':
-      return { label: `Verwirrt ${level}`, malus: -1 * level, description: `−${1 * level} auf geistige Proben und Konzentration` };
     default:
       return null;
   }

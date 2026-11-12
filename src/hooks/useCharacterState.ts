@@ -1,3 +1,4 @@
+import { istZustand, zustandHatStufe } from '../regelwerk/zustaende';
 import { useReducer, useEffect } from 'react';
 import type {
   CharacterState,
@@ -12,7 +13,7 @@ import type {
   StatusCondition,
   AdvancementLogEntry,
 } from '../types';
-import { RACES, CONDITIONS_WITH_LEVELS, CONDITIONS_WITHOUT_LEVELS } from '../data/rules';
+import { RACES } from '../data/rules';
 import { mitRegelIds } from '../regelwerk/bruecke';
 import { saveToLocalStorage, loadFromLocalStorage } from './useLocalStorage';
 import { STRENGTHS_DATA } from '../data/strengths';
@@ -1099,12 +1100,12 @@ export function baseCharacterReducer(
       const currentConditions = state.playState.conditions ?? [];
       const { key, level } = action.payload;
 
-      if (CONDITIONS_WITHOUT_LEVELS.includes(key)) {
+      if ((istZustand(key) && !zustandHatStufe(key))) {
         // Stufenlose Zustände dürfen nur einmal vorkommen
         if (currentConditions.some((c) => c.key === key)) {
           return state;
         }
-      } else if (CONDITIONS_WITH_LEVELS.includes(key) && key !== 'Sterbend') {
+      } else if (zustandHatStufe(key) && key !== 'Sterbend') {
         // Stufenbehaftete Zustände (außer Sterbend): vorhandene Stufe um 1 erhöhen statt neu hinzufügen
         const existingIdx = currentConditions.findIndex((c) => c.key === key);
         if (existingIdx !== -1) {

@@ -1,3 +1,4 @@
+import { alleZustaende, zustandHatStufe } from '../../regelwerk/zustaende';
 import { Rauten, Knopf } from '../../fundament';
 import React, { useState, useMemo } from 'react';
 import {
@@ -12,8 +13,6 @@ import {
 import { useCharacter } from '../../context/CharacterContext';
 import { usePlaySession } from '../../context/PlaySessionContext';
 import {
-  CONDITIONS_WITH_LEVELS,
-  ALL_CONDITIONS,
   HEALTH_LEVEL_LABELS,
   WOUND_PENALTIES,
 } from '../../data/rules';
@@ -226,7 +225,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
   };
 
   const handleAddQuickCondition = (conditionKey: string, customLevel?: number) => {
-    const hasLevels = CONDITIONS_WITH_LEVELS.includes(conditionKey as any);
+    const hasLevels = zustandHatStufe(conditionKey);
     const existing = conditions.find((c) => c.key === conditionKey);
     const levelToSet = hasLevels ? (existing ? (existing.level ?? 1) + 1 : (customLevel ?? 1)) : undefined;
 
@@ -591,7 +590,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
 
                     {/* Häufigste Zustände als Schnell-Chips */}
                     <div className="flex flex-wrap gap-1">
-                      {['Liegend', 'Benommen', 'Verwirrt', 'Erschöpft', 'Blutend', 'Brennend', 'Geblendet', 'Bewusstlos'].map((key) => {
+                      {['Liegend', 'Benommen', 'Erschöpft', 'Blutend', 'Brennend', 'Geblendet', 'Bewusstlos'].map((key) => {
                         const existing = conditions.find((c) => c.key === key);
                         return (
                           <button
@@ -624,14 +623,14 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                         onChange={(e) => setSelectedMinimalCondition(e.target.value)}
                         className="bg-erhoeht border border-rahmen rounded-knopf px-2 py-1 text-xs text-schrift font-medium focus:outline-none focus:border-gold cursor-pointer flex-1 min-w-[110px]"
                       >
-                        {ALL_CONDITIONS.map((cond: string) => (
+                        {alleZustaende().map((cond: string) => (
                           <option key={cond} value={cond} className="bg-erhoeht text-schrift">
                             {cond}
                           </option>
                         ))}
                       </select>
 
-                      {CONDITIONS_WITH_LEVELS.includes(selectedMinimalCondition as any) && (
+                      {zustandHatStufe(selectedMinimalCondition) && (
                         <div className="flex items-center gap-1">
                           <span className="text-[11px] text-leise">Stufe:</span>
                           <input
@@ -871,13 +870,13 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                     onChange={(e) => setSelectedCondition(e.target.value)}
                     className="bg-erhoeht border border-rahmen rounded-knopf px-2 py-1 text-xs text-schrift font-medium focus:outline-none focus:border-gold cursor-pointer flex-1 min-w-[120px]"
                   >
-                    {ALL_CONDITIONS.map((cond: string) => (
+                    {alleZustaende().map((cond: string) => (
                       <option key={cond} value={cond} className="bg-erhoeht text-schrift">
                         {cond}
                       </option>
                     ))}
                   </select>
-                  {CONDITIONS_WITH_LEVELS.includes(selectedCondition as any) && (
+                  {zustandHatStufe(selectedCondition) && (
                     <input
                       type="number"
                       min={1}
@@ -893,7 +892,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                       const newCondition: StatusCondition = {
                         id: generateId(),
                         key: selectedCondition,
-                        level: CONDITIONS_WITH_LEVELS.includes(selectedCondition as any) ? conditionLevel : undefined,
+                        level: zustandHatStufe(selectedCondition) ? conditionLevel : undefined,
                       };
                       session.logAndDispatch(
                         { type: 'PLAY_ADD_CONDITION', payload: newCondition },

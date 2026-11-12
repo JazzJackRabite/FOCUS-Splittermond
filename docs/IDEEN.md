@@ -1,20 +1,21 @@
 # Ideensammlung FOKUS / SCR4P3
 
-> Automatisch erzeugt aus der Ideen-Seite · Stand 12.11.2026, 10:23 Uhr · Nicht von Hand bearbeiten – Änderungen bitte in der Ideen-Seite vornehmen.
+> Automatisch erzeugt aus der Ideen-Seite · Stand 12.11.2026, 15:03 Uhr · Nicht von Hand bearbeiten – Änderungen bitte in der Ideen-Seite vornehmen.
 
 ## Überblick
 
 | Ideen | 🟢 erledigt | 🔵 zu testen | 🟡 teilweise | ⚪ offen |
 |:-----:|:----------:|:-----------:|:-----------:|:-------:|
-| **15** | 1 | 1 | 5 | 8 |
+| **16** | 1 | 1 | 5 | 9 |
 
-Fortschritt: **7 %** erledigt
+Fortschritt: **6 %** erledigt
 
 ## Als Nächstes
 
 Offene Ideen mit Priorität *hoch* oder *mittel*:
 
 - 🟡 **#13 Patzerauswirkungen umsetzen!!!** – Priorität hoch, teilweise
+- ⚪ **#16 Kampfpositionen umsetzen** – Priorität hoch, offen
 
 ## Alle Ideen
 
@@ -35,6 +36,7 @@ Offene Ideen mit Priorität *hoch* oder *mittel*:
 | 13 | Patzerauswirkungen umsetzen!!! | Fehler & Regelprüfung | 🟡 teilweise | **hoch** | 07.11.2026 |
 | 14 | Waffenmerkmale wie „Scharf 2“ werden nicht berücksichtigt | Fehler & Regelprüfung | ⚪ offen | – | 07.11.2026 |
 | 15 | Splittergaben regelkonform umsetzen | Fehler & Regelprüfung | 🟡 teilweise | – | 10.11.2026 |
+| 16 | Kampfpositionen umsetzen | Kampf & Spielleitung | ⚪ offen | **hoch** | 12.11.2026 |
 
 ## Details nach Bereich
 
@@ -104,6 +106,11 @@ Offene Ideen mit Priorität *hoch* oder *mittel*:
 ⚪ offen · Priorität – · 06.11.2026
 
 > Noch nicht vorhanden.
+
+**#16 · Kampfpositionen umsetzen**  
+⚪ offen · Priorität **hoch** · 12.11.2026
+
+> https://splitterwiki.de/wiki/Kampfposition#Boni_und_Mali_von_Kampfpositionen
 
 ### Fehler & Regelprüfung
 
