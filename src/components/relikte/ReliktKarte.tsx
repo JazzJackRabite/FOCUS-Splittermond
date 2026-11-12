@@ -4,20 +4,28 @@
  * (FUNDAMENT.md, Grundsatz 7). Aufgebaut aus den Bausteinen des Fundaments.
  */
 import React, { useEffect, useMemo, useState } from 'react';
-import { Gem, Plus, Minus, Trash2, Pencil, Info, AlertTriangle } from 'lucide-react';
+import { Gem, Plus, Minus, Trash2, Pencil, Info, AlertTriangle, TrendingUp } from 'lucide-react';
 import { useCharacter } from '../../context/CharacterContext';
 import { useRegelwerk } from '../../regelwerk/RegelwerkContext';
 import { alleAusruestung, type AusruestungsItem } from '../../regelwerk/ausruestung';
 import {
   AUSWAHL, GEGENSTANDSARTEN, artVon, auswahlAnzeige, kostenVon, passtZu, pruefeRelikt, reliktAlsInventar, reliktBaukasten, reliktBausteine,
   reliktWerte, reliktWiderstand, veralteteReliktEintraege, ressourcePunkte, wahlText, zauberMitGrad, type BausteinInfo,
+  ANLASS_NAME, aktiveKraefte, beseelungQuelle, beseelungRegeln, domaenen, domaenenKraefte, pruefeChronik, wachsenQuelle, wachsenRegeln,
 } from '../../regelwerk/relikte';
+import { HELDENGRADE } from '../../data/rules';
 import type { Katalog } from '../../regelwerk/katalog';
-import type { Relikt, ReliktBaustein } from '../../types';
+import type { Relikt, ReliktBaustein, ReliktBeseelung } from '../../types';
 import { generateId } from '../../utils/id';
 import { Abschnittstitel, Auswahl, Dialog, Eingabe, Karte, Knopf, Marke, Rollbereich } from '../../fundament';
 import { regelverstoss, useHausregeln } from '../../fundament/hausregeln';
 import { ConfirmDialog } from '../ui/ConfirmDialog';
+
+/** Heldengrad des Charakters (1–4) */
+function useHeldengrad(): number {
+  const { calc } = useCharacter();
+  return calc?.heldengrad ? HELDENGRADE.indexOf(calc.heldengrad) + 1 : 1;
+}
 
 const typName = (k: Katalog, typ: string) => (typ === 'material' ? 'Besondere Materialien' : k.manifest.typen?.[typ]?.bezeichnung ?? typ);
 
@@ -50,6 +58,61 @@ const AuswahlFeld: React.FC<{ k: Katalog; b: BausteinInfo; w: ReliktBaustein; se
   return <Eingabe beschriftung={name} beschriftungVerborgen value={w.auswahl ?? ''} onChange={e => setze({ auswahl: e.target.value })} placeholder={name} className="w-44" />;
 };
 
+/** Beseelter Gegenstand: Domäne, Heiliger, Gebote, Kräfte mit Questen (Regeln aus dem Paket) */
+const BeseelungFeld: React.FC<{ k: Katalog; b: ReliktBeseelung | undefined; setze: (b: ReliktBeseelung | undefined) => void }> = ({ k, b, setze }) => {
+  const R = beseelungRegeln(k);
+  const [wahl, setWahl] = useState('');
+  if (!R) return null;
+  const angebot = b ? domaenenKraefte(k, b.domaene) : [];
+  const aktiv = b ? aktiveKraefte(b) : [];
+  const setzeKraft = (i: number, u: Partial<ReliktBeseelung['kraefte'][number]>) => b && setze({ ...b, kraefte: b.kraefte.map((x, j) => (j === i ? { ...x, ...u } : x)) });
+  return (
+    <div className="border border-rahmen rounded-knopf p-3 flex flex-col gap-2" data-testid="relikt-beseelung">
+      <label className="flex items-center gap-2 text-sm min-h-11">
+        <input type="checkbox" checked={!!b} onChange={e => setze(e.target.checked ? { domaene: '', kraefte: [] } : undefined)} />
+        Beseelter Gegenstand ({R.punkte_beseelung} Punkte, darin die erste Kraft; je weitere Kraft {R.punkte_je_weitere_kraft} Punkt)
+      </label>
+      {b && <>
+        <Auswahl beschriftung="Domäne des Heiligen" value={b.domaene} onChange={e => setze({ ...b, domaene: e.target.value, kraefte: [] })}>
+          <option value="">Domäne wählen …</option>
+          {domaenen(k).map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+        </Auswahl>
+        <div className="grid grid-cols-2 gap-3">
+          <Eingabe beschriftung="Heiliger" value={b.heiliger ?? ''} onChange={e => setze({ ...b, heiliger: e.target.value })} />
+          <Eingabe beschriftung="Gebote und Verbote" value={b.gebote ?? ''} onChange={e => setze({ ...b, gebote: e.target.value })} />
+        </div>
+        <ul className="flex flex-col gap-2 m-0 p-0 list-none">
+          {b.kraefte.map((x, i) => {
+            const kr = angebot.find(a => a.id === x.id);
+            return (
+              <li key={`${x.id}-${i}`} className="border border-rahmen rounded-knopf p-2 bg-erhoeht flex flex-wrap items-center gap-2">
+                <span className="font-bold text-sm">{i + 1}. {kr?.name ?? k.get(x.id)?.name ?? x.id}</span>
+                {kr?.stufe && <Marke klein>{kr.stufe}</Marke>}
+                {x.erfuellt && !aktiv.includes(x.id) && <Marke klein ton="erschoepft">ruht</Marke>}
+                <Eingabe beschriftung={`Queste für ${kr?.name ?? x.id}`} beschriftungVerborgen placeholder="Queste" value={x.queste ?? ''} onChange={e => setzeKraft(i, { queste: e.target.value })} className="w-56" />
+                <label className="flex items-center gap-2 text-sm min-h-11"><input type="checkbox" checked={!!x.erfuellt} onChange={e => setzeKraft(i, { erfuellt: e.target.checked })} />Queste erfüllt</label>
+                <Knopf nurSymbol art="gefahr" className="ml-auto" aria-label={`${kr?.name ?? x.id} entfernen`} onClick={() => setze({ ...b, kraefte: b.kraefte.filter((_, j) => j !== i) })}><Trash2 size={14} /></Knopf>
+              </li>
+            );
+          })}
+        </ul>
+        {b.domaene && (
+          <div className="flex items-end gap-2">
+            <Auswahl beschriftung="Kraft hinzufügen" value={wahl} onChange={e => setWahl(e.target.value)} className="flex-1">
+              <option value="">Kraft wählen …</option>
+              {angebot.filter(a => !b.kraefte.some(x => x.id === a.id)).map(a => <option key={a.id} value={a.id}>{a.name} ({a.stufe})</option>)}
+            </Auswahl>
+            <Knopf art="sekundaer" disabled={!wahl} onClick={() => { setze({ ...b, kraefte: [...b.kraefte, { id: wahl }] }); setWahl(''); }}>Hinzufügen</Knopf>
+          </div>
+        )}
+        <Eingabe beschriftung="Ruhende Kräfte nach Verstoß gegen die Gebote (bis zur Buße)" type="number" min={0} value={b.ruht ?? 0}
+          onChange={e => setze({ ...b, ruht: Math.max(0, parseInt(e.target.value, 10) || 0) || undefined })} className="w-24" />
+        <p className="text-xs text-leise m-0">Regeln: {beseelungQuelle(k)}</p>
+      </>}
+    </div>
+  );
+};
+
 const Werkstatt: React.FC<{ k: Katalog; start: Relikt; frei: number; schliessen: () => void }> = ({ k, start, frei, schliessen }) => {
   const { state, dispatch } = useCharacter();
   const hausregeln = useHausregeln();
@@ -63,7 +126,8 @@ const Werkstatt: React.FC<{ k: Katalog; start: Relikt; frei: number; schliessen:
   const [info, setInfo] = useState<string | null>(null);
 
   const basis: AusruestungsItem | null = useMemo(() => ausruestung.find(i => i.id === r.basisId) ?? null, [ausruestung, r.basisId]);
-  const pruefung = pruefeRelikt(r, bausteine, bk, basis);
+  const heldengrad = useHeldengrad();
+  const pruefung = pruefeRelikt(r, bausteine, bk, basis, { k, heldengrad });
   const warnungen = [...pruefung.warnungen, ...(r.punkte > frei ? [`Das Relikt hat ${r.punkte} Punkte, aus der Ressource Relikt sind noch ${frei} frei.`] : [])];
   const werte = reliktWerte(r, bausteine, basis);
   const widerstand = reliktWiderstand([r], [{ id: r.inventarId }], bausteine);
@@ -170,6 +234,8 @@ const Werkstatt: React.FC<{ k: Katalog; start: Relikt; frei: number; schliessen:
             </div>
           )}
 
+          <BeseelungFeld k={k} b={r.beseelung} setze={b => setR({ ...r, beseelung: b })} />
+
           <label className="flex flex-col gap-1.5">
             <span className="text-xs text-leise">Notiz (Herkunft, legendäre Taten …)</span>
             <textarea value={r.notiz ?? ''} onChange={e => setR({ ...r, notiz: e.target.value })} rows={2}
@@ -225,12 +291,58 @@ function quelleKurz(k: Katalog, paket: string, seiten?: number[]) {
   return seiten?.length ? `${kz} S. ${seiten[0]}` : kz;
 }
 
+/** Relikt wachsen lassen: Anlass, Punkte, Beschreibung; neue Bausteine danach in der Werkstatt */
+const WachsenDialog: React.FC<{ k: Katalog; r: Relikt; frei: number; schliessen: () => void; weiter: (r: Relikt) => void }> = ({ k, r, frei, schliessen, weiter }) => {
+  const { state, dispatch } = useCharacter();
+  const heldengrad = useHeldengrad();
+  const R = wachsenRegeln(k)!;
+  const [art, setArt] = useState(R.anlaesse[0]?.art ?? '');
+  const [punkte, setPunkte] = useState(1);
+  const [text, setText] = useState('');
+  const eintrag = { id: generateId(), art, punkte, text, ...(art === 'heldengrad' ? { heldengrad } : {}), datum: new Date().toISOString().slice(0, 10) };
+  const chronik = [...(r.chronik ?? []), eintrag];
+  const anlass = R.anlaesse.find(a => a.art === art);
+  const warnungen = [
+    ...pruefeChronik(k, chronik, heldengrad),
+    ...(r.punkte + punkte > frei ? [`Die Ressource Relikt hat nur ${frei} Punkte für dieses Relikt frei – erst die Ressource steigern.`] : []),
+  ];
+  const speichern = () => {
+    if (warnungen.length && regelverstoss(`Das Wachsen verstößt gegen die Regeln: ${warnungen[0]}`)) return;
+    const neu: Relikt = { ...r, punkte: r.punkte + punkte, chronik };
+    const alt = (state.inventory ?? []).find(it => it.id === r.inventarId);
+    const basis = alleAusruestung(k).find(i => i.id === neu.basisId) ?? null;
+    dispatch({ type: 'RELIKT_SPEICHERN', payload: { relikt: neu, inventar: reliktAlsInventar(neu, reliktBausteine(k, reliktBaukasten(k)), basis, alt, k) } });
+    weiter(neu);
+  };
+  return (
+    <Dialog titel={`${r.name} wächst`} untertitel={wachsenQuelle(k)} onSchliessen={schliessen} breite="mittel"
+      fuss={<><Knopf onClick={schliessen}>Abbrechen</Knopf><Knopf art="primaer" onClick={speichern}>Wachsen und Bausteine wählen</Knopf></>}>
+      <div className="flex flex-col gap-3">
+        <Auswahl beschriftung="Anlass" value={art} onChange={e => setArt(e.target.value)}>
+          {R.anlaesse.map(a => <option key={a.art} value={a.art}>{ANLASS_NAME[a.art] ?? a.art}</option>)}
+        </Auswahl>
+        <Eingabe beschriftung="Punkte" type="number" min={1} value={punkte} onChange={e => setPunkte(Math.max(1, parseInt(e.target.value, 10) || 1))} className="w-24" />
+        <Eingabe beschriftung={art === 'legendaere_tat' ? 'Die legendäre Tat' : 'Beschreibung'} value={text} onChange={e => setText(e.target.value)} />
+        {anlass?.bausteine === 'bezug_zur_tat' && <p className="text-sm text-leise m-0">Neue Bausteine nur mit Bezug zur Tat.</p>}
+        <p className="text-sm text-leise m-0">Kosten: wie jede Steigerung der Ressource Relikt in Erfahrungspunkten (Ressourcen auf dem Charakterbogen).</p>
+        {warnungen.length > 0 && (
+          <div className="rounded-knopf p-3 border text-sm bg-schaden-grund border-schaden" data-testid="relikt-wachsen-pruefung">
+            {warnungen.map((t, i) => <div key={i} className="flex gap-1.5"><AlertTriangle size={14} className="shrink-0 mt-0.5" aria-hidden="true" />{t}</div>)}
+          </div>
+        )}
+      </div>
+    </Dialog>
+  );
+};
+
 /** Relikte des Charakters im Inventar. Nur mit Regelpaketen, die einen Relikt-Baukasten festlegen (GRW). */
 export const ReliktKarte: React.FC = () => {
   const { katalog: k } = useRegelwerk();
   const { state, dispatch } = useCharacter();
   const [bearbeiten, setBearbeiten] = useState<Relikt | null>(null);
   const [loeschen, setLoeschen] = useState<Relikt | null>(null);
+  const [wachsen, setWachsen] = useState<Relikt | null>(null);
+  const heldengrad = useHeldengrad();
   const bk = useMemo(() => reliktBaukasten(k), [k]);
   const bausteine = useMemo(() => reliktBausteine(k, bk), [k, bk]);
   if (!k || !bk) return null;
@@ -255,7 +367,8 @@ export const ReliktKarte: React.FC = () => {
       {relikte.length > 0 && (
         <ul className="flex flex-col gap-2 m-0 p-0 list-none">
           {relikte.map(r => {
-            const p = pruefeRelikt(r, bausteine, bk, alleAusruestung(k).find(i => i.id === r.basisId) ?? null);
+            const p = pruefeRelikt(r, bausteine, bk, alleAusruestung(k).find(i => i.id === r.basisId) ?? null, { k, heldengrad });
+            const kraefte = r.beseelung ? aktiveKraefte(r.beseelung) : [];
             const imInventar = (state.inventory ?? []).some(it => it.id === r.inventarId);
             return (
               <li key={r.id} className="border border-rahmen rounded-knopf p-3 bg-erhoeht">
@@ -265,6 +378,7 @@ export const ReliktKarte: React.FC = () => {
                   {p.warnungen.length > 0 && <Marke ton="schaden" klein title={p.warnungen.join('\n')}><AlertTriangle size={12} aria-hidden="true" />{p.warnungen.length} Regelverstöße</Marke>}
                   {!imInventar && <Marke ton="erschoepft" klein>nicht im Inventar – „Bearbeiten“ und speichern legt ihn neu an</Marke>}
                   <span className="ml-auto flex gap-1.5">
+                    {wachsenRegeln(k) && <Knopf nurSymbol aria-label={`${r.name} wachsen lassen`} title="Relikt wachsen lassen" onClick={() => setWachsen(r)}><TrendingUp size={14} /></Knopf>}
                     <Knopf nurSymbol aria-label={`${r.name} bearbeiten`} onClick={() => setBearbeiten(r)}><Pencil size={14} /></Knopf>
                     <Knopf nurSymbol art="gefahr" aria-label={`${r.name} löschen`} onClick={() => setLoeschen(r)}><Trash2 size={14} /></Knopf>
                   </span>
@@ -278,12 +392,26 @@ export const ReliktKarte: React.FC = () => {
                     })}
                   </div>
                 )}
+                {r.beseelung && (
+                  <div className="flex flex-wrap items-center gap-1.5 mt-2 text-sm" data-testid="relikt-kraefte">
+                    <span className="text-leise">Beseelt{r.beseelung.heiliger ? ` (${r.beseelung.heiliger})` : ''}:</span>
+                    {kraefte.map(id => <Marke key={id} klein ton="magie">{k.get(id)?.name ?? id}</Marke>)}
+                    {!kraefte.length && <span className="text-leise">noch keine Kraft freigeschaltet</span>}
+                    {(r.beseelung.ruht ?? 0) > 0 && <Marke klein ton="erschoepft">{r.beseelung.ruht} ruhend</Marke>}
+                  </div>
+                )}
+                {(r.chronik?.length ?? 0) > 0 && (
+                  <ol className="mt-2 mb-0 pl-5 text-sm text-leise" data-testid="relikt-chronik">
+                    {r.chronik!.map(c => <li key={c.id}>{c.datum ? `${c.datum}: ` : ''}{ANLASS_NAME[c.art] ?? c.art}{c.heldengrad ? ` ${c.heldengrad}` : ''}, +{c.punkte} {c.punkte === 1 ? 'Punkt' : 'Punkte'}{c.text ? ` – ${c.text}` : ''}</li>)}
+                  </ol>
+                )}
               </li>
             );
           })}
         </ul>
       )}
       {bearbeiten && <Werkstatt k={k} start={bearbeiten} frei={ressource - vergeben + ((state.relikte ?? []).find(x => x.id === bearbeiten.id)?.punkte ?? 0)} schliessen={() => setBearbeiten(null)} />}
+      {wachsen && <WachsenDialog k={k} r={wachsen} frei={ressource - vergeben + wachsen.punkte} schliessen={() => setWachsen(null)} weiter={neu => { setWachsen(null); setBearbeiten(neu); }} />}
       {loeschen && <ConfirmDialog title="Relikt löschen" message={`Relikt „${loeschen.name}“ und seinen Inventareintrag löschen?`}
         onCancel={() => setLoeschen(null)} onConfirm={() => { dispatch({ type: 'RELIKT_LOESCHEN', payload: { id: loeschen.id } }); setLoeschen(null); }} />}
     </Karte>

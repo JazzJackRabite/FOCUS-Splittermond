@@ -2,20 +2,26 @@ import React, { useContext, useMemo, useState } from 'react';
 import { Sparkles } from 'lucide-react';
 import { CharacterContext } from '../../context/CharacterContext';
 import { aktiverKatalog } from '../../regelwerk/bruecke';
+import { bausteineAktiv, reliktSchwerpunktBoni } from '../../regelwerk/relikte';
 import { situativeBoni, zauberAnpassungen, type KostenDelta, type SituativerBonus, type WurfArtKontext, type ZauberAnpassung } from '../../regelwerk/wirkungen';
 
 /**
- * Bedingte Wirkungen aus Stärken und Meisterschaften für einen Wurf: zum Anklicken, wenn die Lage zutrifft.
+ * Bedingte Wirkungen aus Stärken, Meisterschaften und Relikten (Schwerpunkt) für einen Wurf: zum Anklicken, wenn die Lage zutrifft.
  * Ohne Regelpakete oder ohne passende Wirkungen liefert der Hook eine leere Liste.
  */
 export function useSituativeBoni(art: WurfArtKontext, fertigkeit: string) {
   const ctx = useContext(CharacterContext);
   const liste = ctx?.calc?.wirkungen?.liste;
   const attribute = ctx?.calc?.currentAttributes;
+  const relikte = ctx?.state?.relikte;
+  const inventar = ctx?.state?.inventory;
   const boni = useMemo(() => {
     const k = aktiverKatalog();
-    return k && liste ? situativeBoni(k, liste, art, fertigkeit, attribute) : [];
-  }, [liste, art, fertigkeit, attribute]);
+    const aus = k && liste ? situativeBoni(k, liste, art, fertigkeit, attribute) : [];
+    // Schwerpunkt-Boni aus Relikten (Verbesserung der Gegenstandsqualität) für Proben und Angriffe
+    const rel = k && relikte?.length && art !== 'zauber' ? reliktSchwerpunktBoni(relikte, inventar ?? [], bausteineAktiv(k), fertigkeit) : [];
+    return [...aus, ...rel];
+  }, [liste, art, fertigkeit, attribute, relikte, inventar]);
   const [gewaehlt, setGewaehlt] = useState<Set<string>>(new Set());
   const umschalten = (id: string) => setGewaehlt(g => { const n = new Set(g); if (n.has(id)) n.delete(id); else n.add(id); return n; });
   const aktiv = boni.filter(b => gewaehlt.has(b.id) && b.wert !== null);

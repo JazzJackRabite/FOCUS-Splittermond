@@ -292,6 +292,19 @@ export interface Relikt {
   notiz?: string;
   /** ID des zugehörigen Inventareintrags */
   inventarId: string;
+  /** Wachsen des Relikts (Anlass, Punkte, Beschreibung) */
+  chronik?: ReliktChronikEintrag[];
+  /** Beseelter Gegenstand: Domäne des Heiligen, Kräfte mit Questen, ruhende Kräfte nach Verstoß */
+  beseelung?: ReliktBeseelung;
+}
+export interface ReliktChronikEintrag { id: string; art: string; punkte: number; text: string; heldengrad?: number; datum?: string }
+export interface ReliktBeseelung {
+  domaene: string;
+  heiliger?: string;
+  gebote?: string;
+  kraefte: { id: string; queste?: string; erfuellt?: boolean }[];
+  /** so viele der zuletzt erhaltenen Kräfte ruhen (Verstoß gegen Gebote, bis zur Buße) */
+  ruht?: number;
 }
 
 export interface ErschaffungsModulWahl {

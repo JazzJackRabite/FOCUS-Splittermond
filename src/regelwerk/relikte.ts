@@ -8,7 +8,7 @@
  */
 import type { Katalog } from './katalog';
 import type { Eintrag } from './typen';
-import type { InventoryItem, Relikt, ReliktBaustein, Spell } from '../types';
+import type { InventoryItem, Relikt, ReliktBaustein, ReliktBeseelung, ReliktChronikEintrag, Spell } from '../types';
 import { alleAusruestung, type AusruestungsItem } from './ausruestung';
 import { aktiverKatalog } from './bruecke';
 
@@ -172,7 +172,8 @@ const merkmalNamen = (attributes?: string) => String(attributes ?? '').split(/,\
 export interface ReliktPruefung { verwendet: number; warnungen: string[] }
 
 /** Prüft ein Relikt gegen den Baukasten. Nur Warnungen. */
-export function pruefeRelikt(relikt: Relikt, bausteine: BausteinInfo[], bk: Baukasten | null, basis?: AusruestungsItem | null): ReliktPruefung {
+export function pruefeRelikt(relikt: Relikt, bausteine: BausteinInfo[], bk: Baukasten | null, basis?: AusruestungsItem | null,
+  opt: { k?: Katalog | null; heldengrad?: number } = {}): ReliktPruefung {
   const W: string[] = [];
   const nachId = new Map(bausteine.map(b => [b.id, b]));
   let verwendet = 0;
@@ -200,6 +201,12 @@ export function pruefeRelikt(relikt: Relikt, bausteine: BausteinInfo[], bk: Bauk
   for (const [v, namen] of varianten) if (namen.length > 1) W.push(`${v === 'material' ? 'Material' : v}: nur eine Variante wählbar (${namen.join(', ')}).`);
   // Merkmale über ihrem Höchstwert (z. B. Scharf je nach Schadenswürfel)
   if (basis) for (const t of reliktWerte(relikt, bausteine, basis).ueberHoechstwert) W.push(t);
+  // Stufe 3: Beseelung (Punkte und Kräfte) und Chronik des Wachsens
+  if (relikt.beseelung) {
+    const bs = pruefeBeseelung(opt.k ?? null, relikt.beseelung);
+    verwendet += bs.punkte; W.push(...bs.warnungen);
+  }
+  if (relikt.chronik?.length) W.push(...pruefeChronik(opt.k ?? null, relikt.chronik, opt.heldengrad));
   if (verwendet > relikt.punkte) W.push(`Die Bausteine kosten ${verwendet} Punkte, das Relikt hat ${relikt.punkte}.`);
   if (bk?.maxPunkte !== null && bk?.maxPunkte !== undefined && relikt.punkte > bk.maxPunkte) W.push(`Mehr als ${bk.maxPunkte} Punkte in einem Relikt (nur nach Spielleiterentscheid).`);
   return { verwendet, warnungen: W };
@@ -387,7 +394,9 @@ export function reliktAlsInventar(relikt: Relikt, bausteine: BausteinInfo[], bas
   });
   const werte = reliktWerte(relikt, bausteine, basis);
   const kopf = `Relikt mit ${relikt.punkte} Punkten${basis ? ` auf Basis von ${basis.name}` : ''}.`;
-  const desc = [kopf, ...zeilen, werte.zeilen.length ? `Werte: ${werte.zeilen.join('; ')}.` : '', relikt.notiz ?? ''].filter(Boolean).join('\n');
+  const kraefte = relikt.beseelung ? aktiveKraefte(relikt.beseelung).map(id => k?.get(id)?.name ?? id) : [];
+  const beseelt = relikt.beseelung ? `Beseelt${relikt.beseelung.heiliger ? ` (${relikt.beseelung.heiliger})` : ''}: ${kraefte.join(', ') || 'noch keine Kraft'}.` : '';
+  const desc = [kopf, ...zeilen, werte.zeilen.length ? `Werte: ${werte.zeilen.join('; ')}.` : '', beseelt, relikt.notiz ?? ''].filter(Boolean).join('\n');
   const typ = (basis?.type ?? (relikt.art === 'ruestung' ? 'armor' : relikt.art === 'schild' ? 'shield' : relikt.art.endsWith('waffe') ? 'weapon' : 'gear')) as InventoryItem['type'];
   return {
     ...werte.item,
@@ -450,4 +459,109 @@ export function reliktWiderstandFuerCharakter(state: { relikte?: Relikt[]; inven
 export function zauberMitGrad(k: Katalog, grad: number): Array<{ id: string; name: string }> {
   return k.nachTyp('zauber').filter(z => ((z.daten.schulen ?? []) as Array<{ grad: number | null }>).some(s => s.grad === grad))
     .map(z => ({ id: z.id, name: z.name })).sort((a, c) => a.name.localeCompare(c.name, 'de'));
+}
+
+// ---------------------------------------------------------------- Stufe 3: Wachsen und beseelte Gegenstände
+interface WachsenRegeln { kosten?: string; anlaesse: { art: string; punkte_mindestens?: number; punkte_je_heldengrad?: number; bausteine: string; beschreibung_noetig?: boolean }[] }
+interface BeseelungRegeln {
+  punkte_beseelung: number; kraefte_in_beseelung: number; punkte_je_weitere_kraft: number;
+  queste_je_kraft?: boolean; naechste_kraft_nach_queste?: boolean; stufen: { stufe: string; ab_kraft: number }[]; verstoss?: string;
+}
+const STUFE3_CACHE = new WeakMap<Katalog, { wachsen: WachsenRegeln | null; beseelung: BeseelungRegeln | null; qw: string; qb: string }>();
+function stufe3(k: Katalog) {
+  let c = STUFE3_CACHE.get(k);
+  if (!c) {
+    const ew = alleEintraege(k).find(e => e.daten.strukturiert?.relikt_wachsen);
+    const eb = alleEintraege(k).find(e => e.daten.strukturiert?.beseelung);
+    c = { wachsen: ew?.daten.strukturiert.relikt_wachsen ?? null, beseelung: eb?.daten.strukturiert.beseelung ?? null,
+      qw: ew ? quelleText(k, ew) : '', qb: eb ? quelleText(k, eb) : '' };
+    STUFE3_CACHE.set(k, c);
+  }
+  return c;
+}
+/** Regeln zum Wachsen von Relikten (null, wenn der Band nicht geladen ist) */
+export const wachsenRegeln = (k: Katalog | null) => (k ? stufe3(k).wachsen : null);
+export const wachsenQuelle = (k: Katalog | null) => (k ? stufe3(k).qw : '');
+/** Regeln für beseelte Gegenstände (null, wenn der Band nicht geladen ist) */
+export const beseelungRegeln = (k: Katalog | null) => (k ? stufe3(k).beseelung : null);
+export const beseelungQuelle = (k: Katalog | null) => (k ? stufe3(k).qb : '');
+
+export const ANLASS_NAME: Record<string, string> = { legendaere_tat: 'Legendäre Tat', heldengrad: 'Neuer Heldengrad', belohnung: 'Abenteuerbelohnung' };
+
+/** Prüft die Chronik gegen die Regeln zum Wachsen */
+export function pruefeChronik(k: Katalog | null, chronik: ReliktChronikEintrag[], heldengrad?: number): string[] {
+  const R = wachsenRegeln(k);
+  if (!R) return ['Wachsen von Relikten: Regeln nicht geladen (Buchpaket fehlt).'];
+  const W: string[] = [];
+  for (const c of chronik) {
+    const a = R.anlaesse.find(x => x.art === c.art);
+    if (!a) { W.push(`Chronik: Anlass „${c.art}“ kennen die Regeln nicht.`); continue; }
+    if (a.beschreibung_noetig && !c.text.trim()) W.push(`Chronik: ${ANLASS_NAME[c.art] ?? c.art} ohne Beschreibung.`);
+    if (a.punkte_mindestens && c.punkte < a.punkte_mindestens) W.push(`Chronik: ${ANLASS_NAME[c.art] ?? c.art} bringt mindestens ${a.punkte_mindestens} Punkt(e).`);
+    if (a.punkte_je_heldengrad !== undefined && c.punkte > a.punkte_je_heldengrad) W.push(`Chronik: Ein neuer Heldengrad bringt höchstens ${a.punkte_je_heldengrad} Punkt(e).`);
+  }
+  const hg = chronik.filter(c => c.art === 'heldengrad');
+  if (heldengrad !== undefined && hg.length > Math.max(0, heldengrad - 1)) W.push(`Chronik: ${hg.length}× Wachsen durch Heldengrad, erreicht sind aber erst ${Math.max(0, heldengrad - 1)} neue Heldengrade.`);
+  const grade = hg.map(c => c.heldengrad).filter((g): g is number => g !== undefined);
+  if (new Set(grade).size < grade.length) W.push('Chronik: Derselbe Heldengrad zählt nur einmal.');
+  return W;
+}
+
+/** Domänen beseelter Gegenstände */
+export const domaenen = (k: Katalog | null) => (k ? alleEintraege(k).filter(e => e.typ === 'reliktdomaene').sort((a, b) => a.name.localeCompare(b.name, 'de')) : []);
+/** Kräfte einer Domäne mit Stufe (I, II, III+) */
+export function domaenenKraefte(k: Katalog | null, domaene: string): Array<{ id: string; name: string; stufe: string; beschreibung: string }> {
+  const d = k?.get(domaene); if (!k || !d) return [];
+  return (d.daten.kraefte_refs ?? []).map((r: { id: string; text: string }) => k.get(r.id)).filter(Boolean)
+    .map((e: Eintrag) => ({ id: e.id, name: e.name, stufe: String(e.daten.stufe ?? ''), beschreibung: String(e.daten.beschreibung ?? '') }));
+}
+/** Punkte der Beseelung: Grundpunkte (mit der ersten Kraft) und je weitere freigeschaltete Kraft */
+export function beseelungPunkte(R: BeseelungRegeln, b: ReliktBeseelung): number {
+  const frei = b.kraefte.filter(x => x.erfuellt).length;
+  return R.punkte_beseelung + Math.max(0, frei - R.kraefte_in_beseelung) * R.punkte_je_weitere_kraft;
+}
+/** Kräfte, die der Träger nutzen kann: freigeschaltet (Queste erfüllt), ohne die ruhenden letzten */
+export function aktiveKraefte(b: ReliktBeseelung): string[] {
+  const frei = b.kraefte.filter(x => x.erfuellt).map(x => x.id);
+  return frei.slice(0, Math.max(0, frei.length - (b.ruht ?? 0)));
+}
+export function pruefeBeseelung(k: Katalog | null, b: ReliktBeseelung): { punkte: number; warnungen: string[] } {
+  const R = beseelungRegeln(k);
+  if (!R) return { punkte: 0, warnungen: ['Beseelter Gegenstand: Regeln nicht geladen (Buchpaket fehlt).'] };
+  const W: string[] = [];
+  const angebot = domaenenKraefte(k, b.domaene);
+  if (!b.domaene || !k?.get(b.domaene)) W.push('Beseelter Gegenstand: Domäne wählen.');
+  b.kraefte.forEach((x, i) => {
+    const kr = angebot.find(a => a.id === x.id);
+    const name = k?.get(x.id)?.name ?? x.id;
+    if (!kr) W.push(`${name}: gehört nicht zur gewählten Domäne.`);
+    const ab = R.stufen.find(s => s.stufe === kr?.stufe)?.ab_kraft;
+    if (ab && i + 1 < ab) W.push(`${name} (${kr!.stufe}) eignet sich erst als ${ab}. Kraft, hier ist sie die ${i + 1}. (nur nach Spielleiterentscheid).`);
+    if (R.naechste_kraft_nach_queste && x.erfuellt && b.kraefte.slice(0, i).some(y => !y.erfuellt)) W.push(`${name}: Erst die Queste der vorherigen Kraft erfüllen.`);
+    if (R.queste_je_kraft && x.erfuellt && !x.queste?.trim()) W.push(`${name}: Queste angeben.`);
+  });
+  if (new Set(b.kraefte.map(x => x.id)).size < b.kraefte.length) W.push('Beseelter Gegenstand: Jede Kraft nur einmal.');
+  return { punkte: beseelungPunkte(R, b), warnungen: W };
+}
+
+/** Schwerpunkt-Boni aus Relikten im Inventar für eine Probe (zum Anklicken, wenn der Schwerpunkt passt) */
+export function reliktSchwerpunktBoni(relikte: Relikt[], inventar: Array<{ id: string }>, bausteine: BausteinInfo[], fertigkeit: string):
+  Array<{ id: string; quelle: string; wert: number; text: string; bedingung: string; beleg: string }> {
+  const out: Array<{ id: string; quelle: string; wert: number; text: string; bedingung: string; beleg: string }> = [];
+  const f = fertigkeit.toLowerCase();
+  for (const r of relikte) {
+    if (!inventar.some(it => it.id === r.inventarId)) continue;
+    const jeSchwerpunkt = new Map<string, number>();
+    let beleg = '';
+    for (const { a, w, baustein } of reliktAenderungen(r, bausteine)) {
+      if (a.feld !== 'schwerpunkt' || !a.wert) continue;
+      const sp = (w.auswahl ?? '').trim();
+      if (sp && f && !sp.toLowerCase().includes(f)) continue;
+      jeSchwerpunkt.set(sp, (jeSchwerpunkt.get(sp) ?? 0) + a.wert);
+      beleg = baustein.quelle;
+    }
+    for (const [sp, wert] of jeSchwerpunkt)
+      out.push({ id: `relikt:${r.id}:${sp}`, quelle: r.name, wert, text: `Schwerpunkt ${sp || '(nicht gewählt)'}`, bedingung: 'wenn das Relikt eingesetzt wird und der Schwerpunkt passt', beleg });
+  }
+  return out;
 }
