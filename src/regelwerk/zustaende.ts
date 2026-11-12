@@ -6,7 +6,7 @@
  */
 import { aktiverKatalog } from './bruecke';
 import type { Katalog } from './katalog';
-import { CONDITIONS_WITH_LEVELS, CONDITIONS_WITHOUT_LEVELS } from '../data/rules';
+import { ZUSTAENDE } from '../data/zustaende';
 
 export const KAMPFPOSITION_LIEGEND = 'Liegend';
 
@@ -14,7 +14,7 @@ export interface Zustandsangabe { name: string; mitStufe: boolean; id?: string }
 
 let cache: { k: Katalog | null; liste: Zustandsangabe[] } | null = null;
 
-/** Alle wählbaren Zustände, alphabetisch; ohne Paket die eingebaute Liste des Grundregelwerks */
+/** Alle wählbaren Zustände, alphabetisch: aus den Paketen, ergänzt um die Zustandsdaten (data/zustaende.ts) */
 export function zustandsliste(k: Katalog | null = aktiverKatalog()): Zustandsangabe[] {
   if (cache && cache.k === k) return cache.liste;
   const nachName = new Map<string, Zustandsangabe>();
@@ -26,10 +26,8 @@ export function zustandsliste(k: Katalog | null = aktiverKatalog()): Zustandsang
       nachName.set(e.name, { name: e.name, mitStufe: /\bStufe\b/.test(p), id: e.id });
     }
   }
-  if (!nachName.size) {
-    for (const n of CONDITIONS_WITH_LEVELS) nachName.set(n, { name: n, mitStufe: true });
-    for (const n of CONDITIONS_WITHOUT_LEVELS) nachName.set(n, { name: n, mitStufe: false });
-  }
+  // Zustände, die in keinem geladenen Paket stehen (z. B. aus nicht geladenen Büchern), kommen aus den Zustandsdaten
+  for (const [name, z] of Object.entries(ZUSTAENDE)) if (!nachName.has(name)) nachName.set(name, { name, mitStufe: !!z.stufe });
   nachName.set(KAMPFPOSITION_LIEGEND, { name: KAMPFPOSITION_LIEGEND, mitStufe: false });
   const liste = [...nachName.values()].sort((a, b) => a.name.localeCompare(b.name, 'de'));
   cache = { k, liste };

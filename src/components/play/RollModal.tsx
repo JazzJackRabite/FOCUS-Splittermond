@@ -175,7 +175,8 @@ export const RollModal: React.FC<RollModalProps> = ({
       healthLevelName,
       behinderung,
       isAffected,
-      probenbereich(skillName)
+      probenbereich(skillName),
+      skillName
     );
   }, [activeModifiers, conditions, woundPenalty, healthLevelName, behinderung, skillName]);
 

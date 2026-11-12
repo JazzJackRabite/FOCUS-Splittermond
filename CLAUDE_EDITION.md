@@ -615,6 +615,14 @@ die Grimoires), Dateiendung `.grim`. Das Grundregelwerk ist kein Grimoire; es bl
   Prüfsuite ohne neue Befunde. **Noch nicht auf D: übertragen** (Rechner war nicht verbunden); dort müssen die
   Werkzeuge mit dem Grimoire-Stand zusammengeführt und die Pakete neu gebaut werden.
 - Tests der Relikte laden Bücher jetzt über die Grimoire-Hilfen (`FOKUS_GRIMOIRES`).
+- **Alle 23 Zustände als Daten** (`src/data/zustaende.ts`, Entscheidung 12.11.2026: Grundlage Splitterwiki, keine
+  Quellenangabe nötig): Stufe, Abzug auf Proben nach Fertigkeitsgruppe oder Attribut, Wirkung auf abgeleitete Werte,
+  eigene Kurzbeschreibung. `utils/conditionModifiers.ts` enthält keine Zahlen mehr, nur noch die Auswertung. Neu
+  wählbar: Schwermut, Verorkt, Verstoßen; Erschaudert, Geistreisend und Übergangsschock auch ohne geladenes Buch.
+  Gerechnet werden jetzt auch Schwermut (−2 auf Proben mit Willenskraft), Erschaudert (Stufe, Verstand) und
+  Übergangsschock (Stufe; Beweglichkeit, Konstitution, Stärke) – bei Fertigkeits- und Zauberproben; im Angriffsdialog
+  nicht, weil dort die Attribute der Waffe nicht übergeben werden. Ohne Zahlen: Verorkt und Verstoßen (das Wiki nennt
+  keine). Wirkung auf abgeleitete Werte steht in den Daten, wird aber noch nicht eingerechnet.
 
 ## Google AI Studio
 

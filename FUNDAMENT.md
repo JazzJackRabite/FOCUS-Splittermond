@@ -43,7 +43,7 @@ Felder stehen unter `daten` des jeweiligen Eintrags. **Was hier nicht steht, dar
 | Bereich | Quelle im Paket | Liest im Editor |
 |---|---|---|
 | Kosten in Erfahrungspunkten, Heldengrade (Schwellen, Grenzen, Widerstandsbonus), Fertigkeitspunkte je Zaubergrad | Kernregeln: `strukturiert` mit `steigerungskosten`, `heldengrade` | `regelwerk/steigerungsregeln.ts` |
-| Zustände: welche es gibt, ob sie eine Stufe haben, Beschreibung | Einträge vom Typ `zustand`: `parameter`, `beschreibung` | `regelwerk/zustaende.ts`, `utils/conditionModifiers.ts` |
+| Zustände: welche es gibt, ob sie eine Stufe haben, Beschreibung | Einträge vom Typ `zustand`: `parameter`, `beschreibung`; dazu die Zustandsdaten `src/data/zustaende.ts` (siehe Ausnahme unten) | `regelwerk/zustaende.ts`, `utils/conditionModifiers.ts` |
 | Pakete laden und im Browser speichern | Paketkopf, Einträge | `regelwerk/laden.ts`, `regelwerk/paketSpeicher.ts` |
 | Einträge finden, Namen und IDs, Umbenennungen | Einträge mit `id`, `typ`, `name`; ID-Register | `regelwerk/katalog.ts`, `regelwerk/bruecke.ts`, `regelwerk/ids.ts` |
 | Abgeleitete Werte, Heldengrade, Höchstbonus | Kernregeln: `strukturiert`; an Stärken: `abgeleitete_werte_modifikatoren`; `groessenklasse`; an Ausrüstung: `behinderung`, `vtd_bonus`, `mindest_staerke` | `regelwerk/abgeleitet.ts` |
@@ -63,6 +63,13 @@ Felder stehen unter `daten` des jeweiligen Eintrags. **Was hier nicht steht, dar
 Ansichten (`components/`) greifen nicht selbst in die Paketdaten, sondern fragen die Module aus `regelwerk/`. Wo eine
 Ansicht das heute noch tut, steht sie in `src/fundament/altlasten.json` (`paketzugriffe`).
 
+### Ausnahme: Zustände
+
+Die 23 Zustände und ihre Abzüge auf Proben stehen als Daten in `src/data/zustaende.ts` (Entscheidung vom 12.11.2026:
+Zustände brauchen keine Quellenangabe und müssen nicht aus den Regelwerken extrahiert werden; Grundlage ist die Übersicht
+im Splitterwiki). Die Datei enthält Namen, Zahlen und eigene Kurzbeschreibungen, keine Regeltexte. Ausführliche
+Beschreibungen kommen weiter aus den Paketen, wenn sie geladen sind. Ein Test hält Daten und Grundregelwerk-Paket gleich.
+
 ### Regeln, die noch im Code stehen (Altlasten)
 
 Diese Stellen verstoßen gegen Grundsatz 2. Sie sind bekannt, werden von den Prüfungen vorerst geduldet und sollen auf die
@@ -73,7 +80,6 @@ Datenseite wandern. Neue kommen nicht hinzu.
 | Eingebaute Listen des Grundregelwerks: Zauber, Meisterschaften, Stärken, Schwächen, Ressourcen, Ausrüstung, Sprachen | `src/data/*.ts` | Der Editor liest diese Listen aus dem GRW-Paket; `src/data` entfällt |
 | Attribute, Fertigkeiten mit ihren Attributen, Rassen, Mondzeichen, Heldengrade (Grenzen, Boni), Zustandslisten, Wundabzüge | `src/data/rules.ts` | Kernregeln und Einträge des GRW-Pakets |
 | Beispielcharaktere (Archetypen) mit Namen von Stärken, Meisterschaften und Zaubern | `src/data/presets.ts` | Auf IDs umstellen |
-| Abzüge der Zustände auf Proben (die Beschreibungen kommen schon aus dem Paket) | `utils/conditionModifiers.ts` | Zustandseinträge des Pakets, strukturiert |
 | Würfelmechanik (Standard-, Sicherheits-, Risikowurf, Patzer, Triumph, Erfolgsgrade), GRW S. 16–19 | `utils/wuerfeln.ts` | Kernregeln `strukturiert` |
 | Fokuskosten, Erfolgsgrade beim Zaubern, GRW S. 221–222 | `utils/magicRules.ts` | Kernregeln `strukturiert` |
 | Kampfmanöver nach Namen | `utils/combatRules.ts` | Daten der Meisterschaften |

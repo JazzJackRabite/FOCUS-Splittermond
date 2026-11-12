@@ -220,7 +220,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
 
   // Active condition modifiers
   // Zustände für Magieschulen; der Wundabzug selbst wird gesondert gerechnet
-  const conditionMods = useMemo(() => getActiveRollModifiers(conditions, woundPenalty, '', 0, false, 'magie').filter((m) => m.source === 'condition'), [conditions, woundPenalty]);
+  const conditionMods = useMemo(() => getActiveRollModifiers(conditions, woundPenalty, '', 0, false, 'magie', spell?.school).filter((m) => m.source === 'condition'), [conditions, woundPenalty]);
   const totalConditionPenalty = useMemo(() => {
     return conditionMods.reduce((sum, c) => sum + (c.active ? c.malus : 0), 0);
   }, [conditionMods]);

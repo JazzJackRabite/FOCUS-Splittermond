@@ -62,12 +62,7 @@ export const HELDENGRADE = [
 ];
 
 
-// ---------------------------------------------------------------
-// Condition categories
-// ---------------------------------------------------------------
-export const CONDITIONS_WITH_LEVELS: string[] = ['Benommen', 'Blutend', 'Brennend', 'Erschöpft', 'Geblendet', 'Glaubenskrise', 'Siechtum', 'Sterbend', 'Verwundet'].sort();
-export const CONDITIONS_WITHOUT_LEVELS: string[] = ['Angsterfüllt', 'Bewusstlos', 'Krank', 'Lahm', 'Liegend', 'Panisch', 'Rasend', 'Ringend', 'Schlafend'];
-export const ALL_CONDITIONS: string[] = [...CONDITIONS_WITH_LEVELS, ...CONDITIONS_WITHOUT_LEVELS].sort();
+// Zustände: siehe data/zustaende.ts und regelwerk/zustaende.ts
 
 export const HEALTH_LEVEL_LABELS: string[] = ['Gesund', 'Angeschlagen', 'Verletzt', 'Schwer verletzt', 'Todgeweiht'];
 export const WOUND_PENALTIES: number[] = [0, -1, -2, -4, -8];
