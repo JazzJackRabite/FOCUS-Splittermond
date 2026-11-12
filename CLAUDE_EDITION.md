@@ -581,8 +581,10 @@ die Grimoires), Dateiendung `.grim`. Das Grundregelwerk ist kein Grimoire; es bl
   Wundstufe schwerer je Stufe (statt pauschal −1). Die Beschreibung eines Zustands kommt aus dem Paket.
 - Offen: Die Abzüge der Zustände stehen weiter im Code (`utils/conditionModifiers.ts`), bis sie im Paket strukturiert
   vorliegen – das braucht die Datenseite auf D:. Nicht umgesetzt: Wirkung von Zuständen auf abgeleitete Werte (Erschöpft:
-  GSW −1, INI +1 je Stufe; Ringend: VTD −3, GSW 0; Lahm: halbe GSW). „Liegend“ und „Verwirrt“ sind keine Zustände des
-  Grundregelwerks; ihre Werte sind unverändert. Begleiter-Regeln und die Listen in `src/data` stehen weiter im Code.
+  GSW −1, INI +1 je Stufe; Ringend: VTD −3, GSW 0; Lahm: halbe GSW). „Verwirrt“ ist kein Zustand des Grundregelwerks;
+  sein Wert ist unverändert.
+- **Liegend** ist eine Kampfposition (GRW S. 170), kein Eintrag der Zustandsliste: −6 auf eigene Angriffe (aus der
+  Tabelle der Kampfpositionen im Paket), kein Abzug auf andere Proben. Vorher −2 auf alles. Begleiter-Regeln und die Listen in `src/data` stehen weiter im Code.
 
 ## Google AI Studio
 

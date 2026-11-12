@@ -56,6 +56,17 @@ function wundabzuege(): number[] {
   return liste.length >= 5 ? liste.slice(0, 5) : WUNDABZUEGE_RUECKFALL;
 }
 
+/** Abzug auf eigene Angriffe im Liegen aus der Tabelle der Kampfpositionen (GRW S. 170); Rückfall −6 */
+function liegendEigeneAngriffe(): number {
+  const d = aktiverKatalog()?.get('grw:regel:kampf-regeln:kampfpositionen')?.daten as { tabellen?: { zeilen?: string[][] }[] } | undefined;
+  for (const t of d?.tabellen ?? []) {
+    const zeile = t.zeilen?.find((z) => z[0] === 'Liegend, Nahkampf');
+    const wert = Number(String(zeile?.[1] ?? '').replace('−', '-'));
+    if (zeile && Number.isFinite(wert) && wert !== 0) return wert;
+  }
+  return -6;
+}
+
 /**
  * Abzug eines Zustands auf eine Probe nach dem Grundregelwerk (Liste der Zustände, GRW S. 168–169).
  * null = der Zustand ändert den Probenwert nicht (z. B. Benommen: verlangsamt nur; Angsterfüllt: nur Sicherheitswürfe).
@@ -85,9 +96,13 @@ export function getConditionMalus(condition: StatusCondition, kontext: Zustandsk
     case 'Glaubenskrise':
       if (bereich !== 'magie') return null;
       return { label: `Glaubenskrise ${level}`, malus: -level, description: `−${level} auf Proben auf Magieschulen` };
-    // Keine Zustände des Grundregelwerks; Werte aus dem bisherigen Editor übernommen
-    case 'Liegend':
-      return { label: 'Liegend', malus: -2, description: '−2 auf Nahkampfangriffe, Nahkampfverteidigung & Bewegung' };
+    // Kampfposition (GRW S. 170), kein Eintrag der Zustandsliste: wirkt nur auf Angriffe
+    case 'Liegend': {
+      if (bereich !== 'kampf') return null;
+      const malus = liegendEigeneAngriffe();
+      return { label: 'Liegend', malus, description: `${malus} auf eigene Angriffe im Nahkampf und Fernkampf (Armbrust: kein Abzug). Angriffe gegen Liegende: Nahkampf +6, Fernkampf −6` };
+    }
+    // Kein Zustand des Grundregelwerks; Wert aus dem bisherigen Editor übernommen
     case 'Verwirrt':
       return { label: `Verwirrt ${level}`, malus: -1 * level, description: `−${1 * level} auf geistige Proben und Konzentration` };
     default:

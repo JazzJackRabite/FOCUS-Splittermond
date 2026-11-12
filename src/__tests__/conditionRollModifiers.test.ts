@@ -19,13 +19,15 @@ describe('Condition Modifiers & Roll Integration (Splittermond GRW)', () => {
     expect(mod2?.label).toBe('Geblendet 2');
   });
 
-  it('correctly calculates condition modifier for Liegend (-2)', () => {
+  it('Liegend ist eine Kampfposition (GRW S. 170): −6 auf eigene Angriffe, kein Abzug auf andere Proben', () => {
     const liegend: StatusCondition = { id: 'c3', key: 'Liegend' };
-    const mod = getConditionMalus(liegend);
+    const mod = getConditionMalus(liegend, { bereich: 'kampf' });
 
     expect(mod).not.toBeNull();
-    expect(mod?.malus).toBe(-2);
+    expect(mod?.malus).toBe(-6);
     expect(mod?.label).toBe('Liegend');
+    expect(getConditionMalus(liegend)).toBeNull();
+    expect(getConditionMalus(liegend, { bereich: 'magie' })).toBeNull();
   });
 
   it('Zustände nach GRW S. 168–169: nur Erschöpft, Geblendet, Ringend, Glaubenskrise und Verwundet ändern den Probenwert', () => {
@@ -59,7 +61,7 @@ describe('Condition Modifiers & Roll Integration (Splittermond GRW)', () => {
     const woundPenalty = -1;
     const healthLevelName = 'Angeschlagen';
 
-    const activeMods = getActiveRollModifiers(conditions, woundPenalty, healthLevelName);
+    const activeMods = getActiveRollModifiers(conditions, woundPenalty, healthLevelName, 0, false, 'kampf');
 
     expect(activeMods).toHaveLength(3);
 
@@ -79,12 +81,12 @@ describe('Condition Modifiers & Roll Integration (Splittermond GRW)', () => {
     // Liegend modifier
     const liegendMod = activeMods.find((m) => m.label === 'Liegend');
     expect(liegendMod).toBeDefined();
-    expect(liegendMod?.malus).toBe(-2);
+    expect(liegendMod?.malus).toBe(-6);
     expect(liegendMod?.active).toBe(true);
 
     // Total malus sum
     const totalMalus = activeMods.filter((m) => m.active).reduce((sum, m) => sum + m.malus, 0);
-    expect(totalMalus).toBe(-5);
+    expect(totalMalus).toBe(-9);
   });
 
   it('combines wound penalty for Schwer verletzt (-4) with active conditions', () => {
