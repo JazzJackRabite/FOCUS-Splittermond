@@ -612,8 +612,8 @@ die Grimoires), Dateiendung `.grim`. Das Grundregelwerk ist kein Grimoire; es bl
   Korrekturen in `zauber_spielwerte.json` (Datenseite). Grimoires neu hochladen.
 - Datenseite: `Werkzeuge/regelpakete/begleiter_regeln.json` + `.py` (prüft jede Zahl gegen den Text der Belege),
   `Werkzeuge/grw/ergaenzung9.py` (drei Untote), `relikt_bausteine.json` mit `strukturiert` für Wachsen und Beseelung.
-  Prüfsuite ohne neue Befunde. **Noch nicht auf D: übertragen** (Rechner war nicht verbunden); dort müssen die
-  Werkzeuge mit dem Grimoire-Stand zusammengeführt und die Pakete neu gebaut werden.
+  Prüfsuite ohne neue Befunde. Am Abend mit dem Grimoire-Stand der Werkzeuge zusammengeführt, neu gebaut und auf D:
+  geliefert (Werkzeuge, Regelpakete mit Grimoires, Prüfsuite, GRW-Datenbank).
 - Tests der Relikte laden Bücher jetzt über die Grimoire-Hilfen (`FOKUS_GRIMOIRES`).
 - **Zustände aus den Paketen statt aus dem Code (Korrektur, 12.11.2026):** Die Zustände des Grundregelwerks kommen
   aus dem GRW-Paket, alle anderen ausschließlich aus den Grimoires. Die Zustände aus anderen Bänden und ihre Zahlen
