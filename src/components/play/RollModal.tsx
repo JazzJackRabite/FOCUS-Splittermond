@@ -6,7 +6,7 @@ import type { RollEntry } from './DiceLog';
 import { generateId } from '../../utils/id';
 import type { StatusCondition, ChanneledSpell } from '../../types';
 import {
-  getActiveRollModifiers,
+  getActiveRollModifiers, probenbereich,
   isSkillAffectedByBehinderung,
   type ActiveRollModifier,
 } from '../../utils/conditionModifiers';
@@ -174,7 +174,8 @@ export const RollModal: React.FC<RollModalProps> = ({
       woundPenalty,
       healthLevelName,
       behinderung,
-      isAffected
+      isAffected,
+      probenbereich(skillName)
     );
   }, [activeModifiers, conditions, woundPenalty, healthLevelName, behinderung, skillName]);
 

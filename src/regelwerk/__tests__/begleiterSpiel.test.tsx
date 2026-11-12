@@ -101,19 +101,19 @@ describe('Tab „Begleiter“: würfeln und Lebenspunkte', () => {
     expect(within(v).queryByText(/Wundabzug/)).toBeNull();
     expect(within(v).getByText(`LP ${lp * 3}/${lp * 3}`)).toBeTruthy();
 
-    // Zustand: Benommen 2 → Marke mit Abzug, wirkt in der Probe
-    fireEvent.change(within(v).getByLabelText('Zustand hinzufügen'), { target: { value: 'Benommen' } });
+    // Zustand: Erschöpft 2 → Marke mit Abzug, wirkt in der Probe
+    fireEvent.change(within(v).getByLabelText('Zustand hinzufügen'), { target: { value: 'Erschöpft' } });
     fireEvent.change(within(v).getByLabelText('Stufe'), { target: { value: '2' } });
     fireEvent.click(within(v).getByRole('button', { name: /^Zustand$/ }));
-    expect(within(v).getByText(/Benommen 2 \(-2\)/)).toBeTruthy();
+    expect(within(v).getByText(/Erschöpft 2 \(-2\)/)).toBeTruthy();
 
     fireEvent.click(within(tiere).getByRole('button', { name: /^Probe Wahrnehmung würfeln$/ }));
-    expect(screen.getAllByText(/Benommen/).length).toBeGreaterThan(1); // auch im Probe-Modal
+    expect(screen.getAllByText(/Erschöpft/).length).toBeGreaterThan(1); // auch im Probe-Modal
     expect(screen.getByText(/Grauzahn: Wahrnehmung/)).toBeTruthy();
     fireEvent.click(screen.getByTitle('Schließen'));
     expect(screen.queryByText(/Grauzahn: Wahrnehmung/)).toBeNull();
-    fireEvent.click(within(v).getByRole('button', { name: 'Zustand Benommen beenden' }));
-    expect(within(v).queryByText(/Benommen 2/)).toBeNull();
+    fireEvent.click(within(v).getByRole('button', { name: 'Zustand Erschöpft beenden' }));
+    expect(within(v).queryByText(/Erschöpft 2/)).toBeNull();
     fireEvent.click(within(tiere).getAllByRole('button', { name: /^Angriff .* würfeln$/ })[0]);
     expect(screen.getAllByText(/Grauzahn: /).length).toBeGreaterThan(0);
   });

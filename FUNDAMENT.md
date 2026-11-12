@@ -72,7 +72,7 @@ Datenseite wandern. Neue kommen nicht hinzu.
 | Eingebaute Listen des Grundregelwerks: Zauber, Meisterschaften, Stärken, Schwächen, Ressourcen, Ausrüstung, Sprachen | `src/data/*.ts` | Der Editor liest diese Listen aus dem GRW-Paket; `src/data` entfällt |
 | Attribute, Fertigkeiten mit ihren Attributen, Rassen, Mondzeichen, Heldengrade (Grenzen, Boni), Zustandslisten, Wundabzüge | `src/data/rules.ts` | Kernregeln und Einträge des GRW-Pakets |
 | Beispielcharaktere (Archetypen) mit Namen von Stärken, Meisterschaften und Zaubern | `src/data/presets.ts` | Auf IDs umstellen |
-| Abzüge und Beschreibungen der Zustände | `utils/conditionModifiers.ts` | Zustandseinträge des Pakets |
+| Abzüge der Zustände auf Proben (die Beschreibungen kommen schon aus dem Paket) | `utils/conditionModifiers.ts` | Zustandseinträge des Pakets, strukturiert |
 | Würfelmechanik (Standard-, Sicherheits-, Risikowurf, Patzer, Triumph, Erfolgsgrade), GRW S. 16–19 | `utils/wuerfeln.ts` | Kernregeln `strukturiert` |
 | Fokuskosten, Erfolgsgrade beim Zaubern, GRW S. 221–222 | `utils/magicRules.ts` | Kernregeln `strukturiert` |
 | Kampfmanöver nach Namen | `utils/combatRules.ts` | Daten der Meisterschaften |

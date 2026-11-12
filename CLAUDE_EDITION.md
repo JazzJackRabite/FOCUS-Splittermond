@@ -561,6 +561,29 @@ die Grimoires), Dateiendung `.grim`. Das Grundregelwerk ist kein Grimoire; es bl
 - **Geprüft:** alle Tests mit `FOKUS_GRIMOIRES` auf die neuen `.grim`-Dateien grün (370 bestanden), auch der bisher mit älteren
   Paketen fehlschlagende Relikte-Test.
 
+## Stand 23 (12.11.2026): Oberfläche fertig umgestellt, Steigerungsregeln aus dem Paket, Zustände nach Regelwerk
+
+- **Geprüft im Browser** mit einem zaubernden Beispielcharakter: Zauberdialog, Schadens-, Heil-, Angriffs- und
+  Profildialog, Relikt-Werkstatt, alle Reiter, Spielen und Kampf in Handybreite. Zauberdialog: „Würfeln!“ ist die
+  goldene Hauptaktion.
+- **Charakter, Inventar, Begleiter, Erschaffung** haben Karten und Titel wie im Mockup (Fläche, 20 Pixel Innenrand,
+  Titel 17 Pixel, keine Linie unter Kartentiteln). Anordnung unverändert.
+- **Alle Dialoge** liegen auf den neuen Bausteinen `Dialoghintergrund` und `Dialogfenster` (19 Dialoge in 16 Dateien);
+  Fläche, Rahmen, Rundung, Höhe und Schatten sind nur noch dort festgelegt. Eine Prüfung verhindert eigene Dialograhmen.
+- **Kosten in Erfahrungspunkten und Heldengrade** kommen aus den Kernregeln des Grundregelwerk-Pakets
+  (`regelwerk/steigerungsregeln.ts`): Attribute, Fertigkeitspunkte, Stärken, Ressourcen, Sprachen, Zauber,
+  Meisterschaften, Schwellen und Grenzen der Heldengrade, Fertigkeitspunkte je Zaubergrad. Die eingebauten Zahlen
+  bleiben als Rückfall ohne Paket; ein Test hält sie mit dem Paket gleich. Verstreute Formeln in den Handlern entfernt.
+- **Zustände nach Regelwerk korrigiert** (GRW S. 168–169, Texte aus dem Paket). Vorher zog der Editor Abzüge ab, die
+  es nicht gibt: Benommen (verlangsamt nur um 1 Tick je Stufe), Angsterfüllt (nur Sicherheitswürfe), Panisch, Lahm,
+  Siechtum – jetzt ohne Probenabzug. Erschöpft gilt nur für Kampf- und allgemeine Fertigkeiten, nicht für Magieschulen;
+  Glaubenskrise nur für Magieschulen; Geblendet höchstens bis Stufe 4; Verwundet zählt beim Wundabzug als eine
+  Wundstufe schwerer je Stufe (statt pauschal −1). Die Beschreibung eines Zustands kommt aus dem Paket.
+- Offen: Die Abzüge der Zustände stehen weiter im Code (`utils/conditionModifiers.ts`), bis sie im Paket strukturiert
+  vorliegen – das braucht die Datenseite auf D:. Nicht umgesetzt: Wirkung von Zuständen auf abgeleitete Werte (Erschöpft:
+  GSW −1, INI +1 je Stufe; Ringend: VTD −3, GSW 0; Lahm: halbe GSW). „Liegend“ und „Verwirrt“ sind keine Zustände des
+  Grundregelwerks; ihre Werte sind unverändert. Begleiter-Regeln und die Listen in `src/data` stehen weiter im Code.
+
 ## Google AI Studio
 
 Unverändert eine Vite-/React-App mit `metadata.json` im Wurzelordner; Import über „Import from GitHub“, Hosting über Cloud Run.

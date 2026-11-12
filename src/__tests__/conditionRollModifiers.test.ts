@@ -28,15 +28,27 @@ describe('Condition Modifiers & Roll Integration (Splittermond GRW)', () => {
     expect(mod?.label).toBe('Liegend');
   });
 
-  it('correctly calculates condition modifiers for Benommen, Erschöpft, Verwundet, Angsterfüllt, Panisch, Ringend, Glaubenskrise', () => {
-    expect(getConditionMalus({ id: '1', key: 'Benommen', level: 2 })?.malus).toBe(-2);
+  it('Zustände nach GRW S. 168–169: nur Erschöpft, Geblendet, Ringend, Glaubenskrise und Verwundet ändern den Probenwert', () => {
+    // Erschöpft: Kampffertigkeiten und allgemeine Fertigkeiten, nicht Magieschulen
     expect(getConditionMalus({ id: '2', key: 'Erschöpft', level: 3 })?.malus).toBe(-3);
-    expect(getConditionMalus({ id: '3', key: 'Verwundet', level: 1 })?.malus).toBe(-1);
-    expect(getConditionMalus({ id: '4', key: 'Angsterfüllt' })?.malus).toBe(-2);
-    expect(getConditionMalus({ id: '5', key: 'Panisch' })?.malus).toBe(-4);
+    expect(getConditionMalus({ id: '2', key: 'Erschöpft', level: 3 }, { bereich: 'kampf' })?.malus).toBe(-3);
+    expect(getConditionMalus({ id: '2', key: 'Erschöpft', level: 3 }, { bereich: 'magie' })).toBeNull();
+    // Glaubenskrise: nur Magieschulen
+    expect(getConditionMalus({ id: '8', key: 'Glaubenskrise', level: 2 }, { bereich: 'magie' })?.malus).toBe(-2);
+    expect(getConditionMalus({ id: '8', key: 'Glaubenskrise', level: 2 })).toBeNull();
     expect(getConditionMalus({ id: '6', key: 'Ringend' })?.malus).toBe(-3);
-    expect(getConditionMalus({ id: '7', key: 'Lahm' })?.malus).toBe(-2);
-    expect(getConditionMalus({ id: '8', key: 'Glaubenskrise', level: 2 })?.malus).toBe(-2);
+    // Geblendet zählt höchstens bis Stufe 4
+    expect(getConditionMalus({ id: '9', key: 'Geblendet', level: 6 })?.malus).toBe(-8);
+    // Verwundet: gilt beim Wundabzug als eine Wundstufe schwerer verletzt je Stufe (0, −1, −2, −4, −8)
+    expect(getConditionMalus({ id: '3', key: 'Verwundet', level: 1 }, { wundabzug: 0 })?.malus).toBe(-1);
+    expect(getConditionMalus({ id: '3', key: 'Verwundet', level: 1 }, { wundabzug: -2 })?.malus).toBe(-2);
+    expect(getConditionMalus({ id: '3', key: 'Verwundet', level: 2 }, { wundabzug: -1 })?.malus).toBe(-3);
+    expect(getConditionMalus({ id: '3', key: 'Verwundet', level: 3 }, { wundabzug: -4 })?.malus).toBe(-4);
+    expect(getConditionMalus({ id: '3', key: 'Verwundet', level: 1 }, { wundabzug: -8 })).toBeNull();
+    // kein Abzug auf Proben: Benommen (verlangsamt), Angsterfüllt (nur Sicherheitswürfe), Panisch, Lahm, Siechtum
+    for (const key of ['Benommen', 'Angsterfüllt', 'Panisch', 'Lahm', 'Siechtum', 'Rasend', 'Blutend']) {
+      expect(getConditionMalus({ id: 'x', key, level: 2 }), key).toBeNull();
+    }
   });
 
   it('combines wound penalty (e.g. Angeschlagen -1) and active conditions (Geblendet, Liegend)', () => {

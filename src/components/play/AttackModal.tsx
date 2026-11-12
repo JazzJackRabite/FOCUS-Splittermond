@@ -160,7 +160,8 @@ export const AttackModal: React.FC<AttackModalProps> = ({
   const [attackNote, setAttackNote] = useState<string>('');
 
   // Active condition modifiers
-  const conditionMods = useMemo(() => getActiveRollModifiers(conditions), [conditions]);
+  // Zustände für Kampffertigkeiten; der Wundabzug selbst wird unten gesondert gezeigt
+  const conditionMods = useMemo(() => getActiveRollModifiers(conditions, woundPenalty, '', 0, false, 'kampf').filter((m) => m.source === 'condition'), [conditions, woundPenalty]);
   const [activeConditionsState, setActiveConditionsState] = useState<Record<string, boolean>>(() => {
     const init: Record<string, boolean> = {};
     conditionMods.forEach((c) => {
