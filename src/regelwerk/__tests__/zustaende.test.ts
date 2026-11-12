@@ -1,9 +1,9 @@
 /** Die Zustandsauswahl kommt aus den Paketen: 17 Zustände des Grundregelwerks (S. 168–169) plus Kampfposition Liegend. */
 import { describe, expect, it } from 'vitest';
 import fs from 'node:fs';
-import path from 'node:path';
 import { Katalog } from '../katalog';
-import { basisAusDateien } from './hilfen';
+import { erstelleKatalog, grimoireLesen } from '../laden';
+import { basisAusDateien, grimoireDatei } from './hilfen';
 import { alleZustaende, zustandHatStufe, zustandsliste } from '../zustaende';
 import { getConditionDescription } from '../../utils/conditionModifiers';
 import { setzeAktivenKatalog } from '../bruecke';
@@ -34,9 +34,10 @@ describe('Zustände aus dem Paket', () => {
     setzeAktivenKatalog(null, false);
   });
 
-  const buch = process.env.FOKUS_BUECHER ? path.join(process.env.FOKUS_BUECHER, 'schleier.srp.json') : '';
+  const buch = grimoireDatei('schleier');
   it.skipIf(!buch || !fs.existsSync(buch))('Zustände eines geladenen Buchs erscheinen in der Auswahl', () => {
-    const k = new Katalog(basis.manifest, [basis.basis, JSON.parse(fs.readFileSync(buch, 'utf8'))]);
+    const { katalog: k } = erstelleKatalog(basis, [grimoireLesen(fs.readFileSync(buch, 'utf-8'), basis.manifest)]);
     expect(alleZustaende(k).length).toBeGreaterThan(18);
+    expect(zustandHatStufe('Geistreisend', k)).toBe(false);
   });
 });
