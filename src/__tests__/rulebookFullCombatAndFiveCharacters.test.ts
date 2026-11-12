@@ -291,10 +291,10 @@ describe('Splittermond GRW – Umfassende Regelprüfung, 5 Testcharaktere & Kamp
 
       expect(result.current.state.playState.conditions.some((c) => c.key === 'Liegend')).toBe(true);
 
-      // Zustand 'Liegend' modifiziert Nahkampfangriffe & Nahkampfverteidigung mit -2
-      const conditionInfo = getConditionMalus({ id: 'cond_liegend', key: 'Liegend', level: 1 });
-      expect(conditionInfo?.malus).toBe(-2);
-      expect(conditionInfo?.description).toContain('Nahkampfangriffe');
+      // Kampfposition liegend: eigene Nahkampfangriffe −6 (GRW S. 170)
+      const conditionInfo = getConditionMalus({ id: 'cond_liegend', key: 'Liegend', level: 1 }, { bereich: 'kampf' });
+      expect(conditionInfo?.malus).toBe(-6);
+      expect(conditionInfo?.description).toContain('eigene Angriffe');
     });
 
     it('Schritt 5: Magie im Kampf – Kampfzauber wirken & Fokusverwaltung (GRW S. 192-198)', () => {
