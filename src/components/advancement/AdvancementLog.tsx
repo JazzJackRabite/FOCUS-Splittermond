@@ -1,5 +1,6 @@
 import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import React, { useState, useMemo } from 'react';
+import { Knopf, Dialog } from '../../fundament';
 import {
   History,
   ChevronDown,
@@ -235,7 +236,7 @@ export const AdvancementLog: React.FC<AdvancementLogProps> = ({
             <button
               onClick={onUndo}
               disabled={!canUndo}
-              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-knopf text-xs font-bold transition border ${
+              className={`min-h-11 flex items-center gap-1 px-2.5 py-1.5 rounded-knopf text-xs font-bold transition border ${
                 canUndo
                   ? 'bg-erhoeht text-schrift hover:bg-rahmen border-gold cursor-pointer active:scale-95'
                   : 'bg-rahmen text-schrift border-rahmen cursor-not-allowed opacity-60'
@@ -249,36 +250,34 @@ export const AdvancementLog: React.FC<AdvancementLogProps> = ({
               <RotateCcw size={14} /> Rückgängig
             </button>
           )}
-          <button
+          <Knopf art="sekundaer"
             onClick={() => setShowXpModal(true)}
-            className="flex items-center gap-1 px-2.5 py-1.5 bg-erhoeht text-schrift hover:bg-rahmen border border-gold rounded-knopf text-xs font-bold transition cursor-pointer"
+            className="gap-1 text-xs"
             title="Erfahrungspunkte gutschreiben"
           >
             <Plus size={14} /> EP hinzufügen
-          </button>
-          <button
+          </Knopf>
+          <Knopf art="sekundaer"
             onClick={() => setShowAddNoteModal(true)}
-            className="flex items-center gap-1 px-2.5 py-1.5 bg-erhoeht text-schrift hover:bg-rahmen border border-gold rounded-knopf text-xs font-bold transition cursor-pointer"
+            className="gap-1 text-xs"
             title="Notiz ins Protokoll eintragen"
           >
             <FileText size={14} /> Notiz
-          </button>
+          </Knopf>
           {entries.length > 0 && (
-            <button
+            <Knopf
               onClick={handleCopyLog}
-              className="p-1.5 rounded-knopf text-leise hover:text-gold-hell hover:bg-rahmen transition-colors"
               title="Protokoll in Zwischenablage kopieren"
             >
               {copied ? <Check size={16} className="text-unverletzt" /> : <Copy size={16} />}
-            </button>
+            </Knopf>
           )}
-          <button
+          <Knopf
             onClick={() => setIsExpanded(!isExpanded)}
-            className="p-1.5 rounded-knopf text-leise hover:text-gold-hell hover:bg-rahmen transition-colors"
             title={isExpanded ? 'Einklappen' : 'Ausklappen'}
           >
             {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-          </button>
+          </Knopf>
         </div>
       </div>
 
@@ -329,7 +328,7 @@ export const AdvancementLog: React.FC<AdvancementLogProps> = ({
                 <button
                   key={cat.id}
                   onClick={() => setFilterCategory(cat.id)}
-                  className={`px-2.5 py-1 text-xs rounded-full font-medium transition-all ${
+                  className={`min-h-11 px-2.5 py-1 text-xs rounded-full font-medium transition-all ${
                     filterCategory === cat.id
                       ? 'bg-erhoeht text-schrift '
                       : 'bg-erhoeht text-schrift hover:bg-rahmen border border-rahmen'
@@ -371,12 +370,12 @@ export const AdvancementLog: React.FC<AdvancementLogProps> = ({
                   : 'Passe die Filter an oder setze den Suchbegriff zurück.'}
               </p>
               {entries.length === 0 && (
-                <button
+                <Knopf
                   onClick={() => setShowXpModal(true)}
-                  className="min-h-11 mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 bg-erhoeht text-schrift hover:bg-rahmen rounded-knopf text-xs font-bold transition cursor-pointer"
+                  className="mt-3 gap-1.5 text-xs"
                 >
                   <Sparkles size={14} /> Erste EP gutschreiben
-                </button>
+                </Knopf>
               )}
             </div>
           ) : (
@@ -430,16 +429,16 @@ export const AdvancementLog: React.FC<AdvancementLogProps> = ({
                           {isPositiveXp ? `+${entry.xpDelta}` : entry.xpDelta} EP
                         </div>
                       )}
-                      <button
+                      <Knopf
                         onClick={() => {
                           onDeleteLogEntry(entry.id);
                           toast.success('Eintrag gelöscht');
                         }}
-                        className="text-schaden hover:text-schaden font-bold text-lg px-2 no-print shrink-0 cursor-pointer transition-colors"
+                        className="text-lg no-print shrink-0"
                         title="Löschen"
                       >
                         ×
-                      </button>
+                      </Knopf>
                     </div>
                   </div>
                 );
@@ -470,15 +469,14 @@ export const AdvancementLog: React.FC<AdvancementLogProps> = ({
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <button
-                type="button"
+              <Knopf art="sekundaer"
                 onClick={() => setShowEditTotalXpModal(true)}
-                className="min-h-11 flex items-center gap-1.5 px-3 py-1.5 bg-erhoeht text-schrift hover:bg-rahmen border border-gold rounded-knopf text-xs font-bold transition cursor-pointer"
+                className="gap-1.5 text-xs"
                 title="Gesamt-EP mit Kommentar und Protokolleintrag korrigieren"
               >
                 <Edit3 size={14} className="text-gold" />
                 <span>Gesamt EP editieren</span>
-              </button>
+              </Knopf>
             </div>
           </div>
         </div>
@@ -546,20 +544,19 @@ export const AdvancementLog: React.FC<AdvancementLogProps> = ({
                 />
               </div>
               <div className="flex justify-end space-x-2 pt-2 border-t border-rahmen">
-                <button
-                  type="button"
+                <Knopf
                   onClick={() => setShowAddNoteModal(false)}
-                  className="min-h-11 px-4 py-2 text-schrift hover:bg-rahmen rounded-knopf text-sm font-semibold transition cursor-pointer"
+                  className="text-sm"
                 >
                   Abbrechen
-                </button>
-                <button
+                </Knopf>
+                <Knopf art="primaer"
                   type="submit"
                   disabled={!noteTitle.trim()}
-                  className="min-h-11 px-5 py-2 bg-gold hover:bg-gold-hell text-seite rounded-knopf font-bold text-sm border border-gold disabled:opacity-50 transition cursor-pointer"
+                  className="text-sm"
                 >
                   Eintragen
-                </button>
+                </Knopf>
               </div>
             </form>
           </Dialogfenster>

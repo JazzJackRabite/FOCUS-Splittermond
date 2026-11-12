@@ -139,7 +139,7 @@ export const Rauten: React.FC<{ wert: number; von: number; beschriftung: string;
 // ---------------------------------------------------------------- Dialog
 export interface DialogProps {
   titel: string;
-  untertitel?: string;
+  untertitel?: React.ReactNode;
   onSchliessen: () => void;
   /** Knöpfe unten rechts; die Hauptaktion steht zuletzt */
   fuss?: React.ReactNode;

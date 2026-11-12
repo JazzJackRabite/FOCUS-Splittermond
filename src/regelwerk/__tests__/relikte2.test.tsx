@@ -6,7 +6,7 @@ import React from 'react';
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { Katalog } from '../katalog';
-import { basisAusDateien } from './hilfen';
+import { basisAusDateien, grimoireDatei } from './hilfen';
 import { setzeAktivenKatalog } from '../bruecke';
 import { alleAusruestung } from '../ausruestung';
 import {

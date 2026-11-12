@@ -1,4 +1,5 @@
 import React from 'react';
+import { Knopf } from '../../fundament';
 import { SourceBadge } from '../ui/SourceBadge';
 import type { ItemEntry, AppMode } from '../../types';
 import {
@@ -100,13 +101,13 @@ export const ItemList: React.FC<ItemListProps> = ({
               )}
             </div>
             {canDelete && (
-              <button
+              <Knopf
                 onClick={() => onDelete(idx)}
-                className="text-schaden hover:text-schaden font-bold text-lg px-2 no-print shrink-0 cursor-pointer transition-colors"
+                className="text-lg no-print shrink-0"
                 title="Entfernen"
               >
                 ×
-              </button>
+              </Knopf>
             )}
           </div>
         );

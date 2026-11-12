@@ -1,5 +1,6 @@
 import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import { setzeHausregeln, useHausregeln } from '../../fundament/hausregeln';
+import { Knopf, Dialog } from '../../fundament';
 import React, { useState, useEffect } from 'react';
 import {
   X,
@@ -179,13 +180,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         {/* Footer */}
         <div className="flex items-center justify-between pt-3 mt-3 border-t border-gold shrink-0">
           <span />
-          <button
-            type="button"
+          <Knopf
             onClick={onClose}
-            className="min-h-11 px-4 py-1.5 bg-erhoeht hover:bg-rahmen text-schrift text-xs sm:text-sm font-bold rounded-knopf transition-colors cursor-pointer"
+            className="text-xs sm:text-sm"
           >
             Fertig
-          </button>
+          </Knopf>
         </div>
 
       </Dialogfenster>

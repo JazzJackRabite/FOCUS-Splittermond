@@ -559,7 +559,7 @@ export const RollModal: React.FC<RollModalProps> = ({
                 key={key}
                 type="button"
                 onClick={() => setRollType(key)}
-                className={`flex-1 py-2 text-sm font-bold rounded-knopf border transition-all ${
+                className={`min-h-11 flex-1 py-2 text-sm font-bold rounded-knopf border transition-all ${
                   rollType === key
                     ? 'bg-erhoeht text-schrift border-rahmen '
                     : 'bg-flaeche text-schrift border-rahmen hover:bg-rahmen'
@@ -721,13 +721,12 @@ export const RollModal: React.FC<RollModalProps> = ({
                     {probeOutcomeLabels.success}
                   </div>
                   {onSuccess && successLabel && (
-                    <button
-                      type="button"
+                    <Knopf
                       onClick={() => { onSuccess(); onClose(); }}
-                      className="min-h-11 w-full bg-erhoeht hover:bg-rahmen text-schrift font-bold py-2 px-4 rounded-knopf border border-rahmen transition-all"
+                      className="w-full"
                     >
                       {successLabel}
-                    </button>
+                    </Knopf>
                   )}
                 </div>
               ) : (
@@ -736,25 +735,23 @@ export const RollModal: React.FC<RollModalProps> = ({
                     {probeOutcomeLabels.failure}
                   </div>
                   {onFailure && (
-                    <button
-                      type="button"
+                    <Knopf art="gefahr"
                       onClick={() => { onFailure(); onClose(); }}
-                      className="min-h-11 w-full bg-schaden-grund hover:bg-schaden-grund text-schrift font-bold py-2 px-4 rounded-knopf border border-schaden transition-all"
+                      className="w-full"
                     >
                       Bewusstlos setzen & schließen
-                    </button>
+                    </Knopf>
                   )}
                 </div>
               )
             ) : (
               onSuccess && successLabel && (
-                <button
-                  type="button"
+                <Knopf
                   onClick={() => { onSuccess(); onClose(); }}
-                  className="min-h-11 mt-2 bg-erhoeht hover:bg-rahmen text-schrift font-bold py-2 px-6 rounded-knopf border border-rahmen transition-all"
+                  className="mt-2"
                 >
                   {successLabel}
-                </button>
+                </Knopf>
               )
             )}
           </div>

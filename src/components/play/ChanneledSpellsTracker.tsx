@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { Knopf } from '../../fundament';
 import {
   Sparkles,
   ZapOff,
@@ -39,7 +40,7 @@ export const ChanneledSpellsTracker: React.FC<ChanneledSpellsTrackerProps> = ({
     return (
       <div className={`bg-erhoeht rounded-karte border border-rahmen p-3.5 text-center ${className}`}>
         <div className="flex items-center justify-center gap-2 text-schrift font-bold text-sm">
-          <Sparkles size={16} className="text-gold" />
+          <Sparkles size={16} className="text-magie" />
           <span>Keine aktiven kanalisierten Zauber</span>
         </div>
         <p className="text-xs text-leise mt-1">
@@ -141,15 +142,14 @@ export const ChanneledSpellsTracker: React.FC<ChanneledSpellsTrackerProps> = ({
                   </span>
 
                   {/* Schnell-Button zum Lösen/Fallenlassen der Kanalisierung */}
-                  <button
-                    type="button"
+                  <Knopf
                     onClick={() => onCancelSpell(spell)}
                     className="bg-erhoeht hover:bg-rahmen text-schaden border border-magie rounded-knopf px-2.5 py-1 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 no-print"
                     title="Kanalisierung sofort beenden – überführt den gebundenen Fokus automatisch in den erschöpften Pool"
                   >
                     <ZapOff size={13} />
                     <span>Lösen</span>
-                  </button>
+                  </Knopf>
                 </div>
               </div>
 
@@ -208,25 +208,23 @@ export const ChanneledSpellsTracker: React.FC<ChanneledSpellsTrackerProps> = ({
                       <Plus size={10} />
                     </button>
                   </div>
-                  <button
-                    type="button"
+                  <Knopf
                     onClick={() => onUpdateSpell?.(spell.id, { activeTicks: currentTicks + 3 })}
-                    className="bg-flaeche hover:bg-rahmen text-schrift border border-rahmen text-[11px] font-bold px-1.5 py-0.5 rounded-knopf cursor-pointer"
+                    className="text-[11px]"
                     title="+3 Ticks"
                   >
                     +3
-                  </button>
+                  </Knopf>
                 </div>
 
                 {/* Toggle details */}
                 {(spell.enhancements?.length || spell.notes || spell.target) && (
-                  <button
-                    type="button"
+                  <Knopf
                     onClick={() => setExpandedSpellId(isExpanded ? null : spell.id)}
-                    className="text-[11px] text-schrift hover:text-gold underline ml-auto cursor-pointer"
+                    className="text-[11px] underline ml-auto"
                   >
                     {isExpanded ? 'Details verbergen' : 'Details'}
-                  </button>
+                  </Knopf>
                 )}
               </div>
 

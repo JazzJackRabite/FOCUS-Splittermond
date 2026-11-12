@@ -1,6 +1,7 @@
 import { calculateItemCost } from '../../utils/costCalculations';
 import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import { useHausregeln } from '../../fundament/hausregeln';
+import { Knopf, Dialog } from '../../fundament';
 import React, { useState, useEffect, useMemo } from 'react';
 import {
   MASTERIES_DB,
@@ -625,18 +626,16 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
 
         {/* Action buttons */}
         <div className="px-5 py-3.5 border-t border-rahmen bg-black/20 flex justify-end space-x-2 shrink-0">
-          <button
-            type="button"
+          <Knopf
             onClick={onClose}
-            className="min-h-11 px-4 py-2 bg-seite hover:bg-erhoeht text-leise hover:text-schrift rounded-knopf font-semibold text-xs sm:text-sm transition-colors cursor-pointer border border-rahmen"
+            className="text-xs sm:text-sm"
           >
             Abbrechen
-          </button>
-          <button
-            type="button"
+          </Knopf>
+          <Knopf art="primaer"
             onClick={handleAdd}
             disabled={isSelectionInvalid || (!selectedName && !customName)}
-            className="min-h-11 px-5 py-2 bg-gold hover:bg-gold-hell text-seite rounded-knopf font-bold text-xs sm:text-sm border border-gold disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
+            className="text-xs sm:text-sm disabled:cursor-not-allowed"
             title={
               currentValidation && !currentValidation.canLearn
                 ? `${currentValidation.thresholdReason || ''} ${currentValidation.prerequisiteReason || ''}`.trim()
@@ -644,7 +643,7 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
             }
           >
             + Hinzufügen
-          </button>
+          </Knopf>
         </div>
       </Dialogfenster>
     </Dialoghintergrund>

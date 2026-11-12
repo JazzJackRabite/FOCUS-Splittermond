@@ -1,4 +1,4 @@
-import { Rauten } from '../../fundament';
+import { Rauten, Knopf } from '../../fundament';
 import React, { useState, useMemo } from 'react';
 import {
   AlertTriangle,
@@ -438,7 +438,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                   <span>{currentHealthLevelName || 'Verletzt'}</span>
                   <span className="tabular-nums font-black">{woundPenaltyDisplay}</span>
                   {activeSpellMods.woundPenaltyReduction > 0 && (
-                    <span className="text-unverletzt text-[11px] font-bold">+{activeSpellMods.woundPenaltyReduction} </span>
+                    <span className="text-schrift text-[11px] font-bold bg-magie-grund border border-magie rounded-knopf px-1">+{activeSpellMods.woundPenaltyReduction} </span>
                   )}
                 </span>
               ) : currentWoundPenalty < 0 && activeSpellMods.woundPenaltyReduction > 0 ? (
@@ -549,14 +549,13 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
               <div className="pt-1.5 border-t border-rahmen space-y-1.5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
-                    <button
-                      type="button"
+                    <Knopf
                       onClick={() => setShowMinimalConditionPicker((prev) => !prev)}
-                      className="text-xs uppercase font-bold tracking-wider text-leise hover:text-gold fantasy-font flex items-center gap-1.5 cursor-pointer transition-colors"
+                      className="text-xs uppercase tracking-wider fantasy-font gap-1.5"
                       title="Zustand-Schnellauswahl öffnen/schließen"
                     >
                       <span>Zustände</span>
-                    </button>
+                    </Knopf>
                     <button
                       type="button"
                       onClick={() => setShowMinimalConditionPicker((prev) => !prev)}
@@ -581,14 +580,13 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                   <div className="bg-erhoeht border border-rahmen rounded-knopf p-2 sm:p-2.5 space-y-2 text-xs">
                     <div className="flex items-center justify-between text-[11px] text-leise">
                       <span className="font-semibold text-schrift">Schnellauswahl (1 Klick):</span>
-                      <button
-                        type="button"
+                      <Knopf
                         onClick={() => setShowMinimalConditionPicker(false)}
-                        className="text-leise hover:text-schrift text-xs px-1 cursor-pointer font-bold"
+                        className="text-xs"
                         title="Schließen"
                       >
                         ✕
-                      </button>
+                      </Knopf>
                     </div>
 
                     {/* Häufigste Zustände als Schnell-Chips */}
@@ -600,7 +598,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                             key={key}
                             type="button"
                             onClick={() => handleAddQuickCondition(key)}
-                            className={`px-2 py-0.5 rounded-full text-[11px] font-medium border transition-all cursor-pointer flex items-center gap-1 ${
+                            className={`min-h-11 px-2 py-0.5 rounded-full text-[11px] font-medium border transition-all cursor-pointer flex items-center gap-1 ${
                               existing
                                 ? 'bg-erschoepft-grund border-gold text-schrift hover:bg-erschoepft-grund'
                                 : 'bg-erhoeht border-rahmen text-schrift hover:border-gold hover:text-schrift'
@@ -648,14 +646,13 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                         </div>
                       )}
 
-                      <button
-                        type="button"
+                      <Knopf art="primaer"
                         onClick={() => handleAddQuickCondition(selectedMinimalCondition, minimalConditionLevel)}
-                        className="bg-gold hover:bg-gold-hell text-seite font-bold px-2 py-1 rounded-knopf text-xs transition-colors cursor-pointer shrink-0"
+                        className="text-xs shrink-0"
                         title="Ausgewählten Zustand hinzufügen"
                       >
                         + Hinzufügen
-                      </button>
+                      </Knopf>
                     </div>
                   </div>
                 )}
@@ -680,8 +677,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                             ({c.note})
                           </span>
                         )}
-                        <button
-                          type="button"
+                        <Knopf
                           onClick={() => {
                             session.logAndDispatch(
                               { type: 'PLAY_REMOVE_CONDITION', payload: { id: c.id } },
@@ -693,11 +689,11 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                               }
                             );
                           }}
-                          className="ml-0.5 text-leise hover:text-schaden transition-colors cursor-pointer text-xs leading-none font-bold"
+                          className="ml-0.5 text-xs leading-none"
                           title="Zustand entfernen"
                         >
                           ×
-                        </button>
+                        </Knopf>
                       </span>
                     ))}
                   </div>
@@ -793,26 +789,24 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
               {/* ── Action Buttons Row: + Schaden & + Heilung (Design von "verzehrt" bzw. grün, ohne Mouse-Over-Animation) ── */}
               <div className="pt-1.5 border-t border-rahmen grid grid-cols-2 gap-1.5 sm:gap-2">
                 {/* + Schaden Button (Design von "verzehrt") */}
-                <button
-                  type="button"
+                <Knopf art="gefahr"
                   onClick={() => setShowTakeDamageModal(true)}
                   className="min-h-11 px-4 rounded-knopf font-bold text-[13px] bg-schaden-grund hover:bg-erhoeht text-schrift border border-schaden flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
                   title="Schaden erleiden (Modal öffnen)"
                 >
                   <Flame size={14} className="text-schaden" />
                   <span>+ Schaden</span>
-                </button>
+                </Knopf>
 
                 {/* + Heilung Button (In grün) */}
-                <button
-                  type="button"
+                <Knopf art="erholung"
                   onClick={() => setShowHealModal(true)}
                   className="min-h-11 px-4 rounded-knopf font-bold text-[13px] bg-unverletzt-grund hover:bg-erhoeht text-schrift border border-unverletzt flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
                   title="Heilung anwenden (Modal öffnen)"
                 >
                   <Heart size={14} className="text-unverletzt" />
                   <span>+ Heilung</span>
-                </button>
+                </Knopf>
               </div>
 
               {/* ── Action Stepper Row 2: Temp LP & LP-Modifikator ── */}
@@ -894,8 +888,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                       className="w-10 bg-erhoeht border border-rahmen rounded-knopf px-1.5 py-1 text-center text-xs tabular-nums font-bold text-schrift focus:outline-none focus:border-gold"
                     />
                   )}
-                  <button
-                    type="button"
+                  <Knopf
                     onClick={() => {
                       const newCondition: StatusCondition = {
                         id: generateId(),
@@ -913,11 +906,11 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                       );
                       toast.success(`Zustand ${selectedCondition} hinzugefügt`);
                     }}
-                    className="bg-flaeche hover:bg-erhoeht text-leise hover:text-schrift border border-rahmen px-2.5 py-1 rounded-knopf text-xs font-bold transition-all cursor-pointer shrink-0"
+                    className="text-xs shrink-0"
                     title="Zustand hinzufügen"
                   >
                     +
-                  </button>
+                  </Knopf>
                 </div>
 
                 {/* Active conditions chips if any */}
@@ -940,8 +933,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                             ({c.note})
                           </span>
                         )}
-                        <button
-                          type="button"
+                        <Knopf
                           onClick={() => {
                             session.logAndDispatch(
                               { type: 'PLAY_REMOVE_CONDITION', payload: { id: c.id } },
@@ -953,11 +945,11 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                               }
                             );
                           }}
-                          className="ml-0.5 text-leise hover:text-schaden transition-colors cursor-pointer text-sm leading-none font-bold"
+                          className="ml-0.5 text-sm leading-none"
                           title="Zustand entfernen"
                         >
                           ×
-                        </button>
+                        </Knopf>
                       </span>
                     ))}
                   </div>
@@ -1083,24 +1075,23 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                         >
                           <span className="font-semibold text-schrift">{s.name}</span>
                           {buff && (
-                            <span className="text-[11px] text-temporaer font-bold bg-temporaer-grund px-1.5 py-0.2 rounded-knopf border border-temporaer">
+                            <span className="text-[11px] text-schrift font-bold bg-magie-grund px-1.5 py-0.2 rounded-knopf border border-magie">
                               {buff.description}
                             </span>
                           )}
                           <span
-                            className="text-temporaer tabular-nums font-bold text-[11px] bg-temporaer-grund px-1.5 py-0.2 rounded-knopf border border-temporaer"
+                            className="text-schrift tabular-nums font-bold text-[11px] bg-kanalisiert-grund px-1.5 py-0.2 rounded-knopf border border-kanalisiert"
                             title={`Bindet ${s.channeledFocus} K-Fokus`}
                           >
                             K{s.channeledFocus}
                           </span>
-                          <button
-                            type="button"
+                          <Knopf
                             onClick={() => session.handleCancelChanneledSpell(s)}
-                            className="ml-0.5 text-leise hover:text-schaden transition-colors cursor-pointer text-xs leading-none font-bold"
+                            className="ml-0.5 text-xs leading-none"
                             title={`'${s.name}' aufheben (${s.channeledFocus} K-Fokus wird zu erschöpftem Fokus)`}
                           >
                             ×
-                          </button>
+                          </Knopf>
                         </span>
                       );
                     })}
@@ -1184,8 +1175,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
               {/* Quick Focus Actions */}
               {focus.exhausted > 0 && (
                 <div className="pt-2 border-t border-rahmen flex items-center">
-                  <button
-                    type="button"
+                  <Knopf
                     onClick={() => {
                       session.logAndDispatch(
                         { type: 'PLAY_SPEND_FOCUS', payload: { kind: 'exhausted', amount: -focus.exhausted } },
@@ -1197,10 +1187,10 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                       );
                       toast.success('Alles Erschöpfte erholt');
                     }}
-                    className="w-full bg-erschoepft-grund hover:bg-erschoepft-grund text-gold border border-erschoepft rounded-knopf py-1 px-2 text-xs font-semibold transition-all cursor-pointer text-center"
+                    className="w-full text-xs text-center"
                   >
                     Alles Erschöpfte erholen ({focus.exhausted})
-                  </button>
+                  </Knopf>
                 </div>
               )}
 
@@ -1232,25 +1222,24 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                         >
                           <span className="font-semibold text-schrift">{s.name}</span>
                           {buff && (
-                            <span className="text-[11px] text-temporaer font-bold bg-temporaer-grund px-1.5 py-0.2 rounded-knopf border border-temporaer">
+                            <span className="text-[11px] text-schrift font-bold bg-magie-grund px-1.5 py-0.2 rounded-knopf border border-magie">
                               {buff.description}
                             </span>
                           )}
                           <span
-                            className="text-temporaer tabular-nums font-bold text-[11px] bg-temporaer-grund px-1.5 py-0.2 rounded-knopf border border-temporaer"
+                            className="text-schrift tabular-nums font-bold text-[11px] bg-kanalisiert-grund px-1.5 py-0.2 rounded-knopf border border-kanalisiert"
                             title={`Bindet ${s.channeledFocus} kanalisierte(n) Fokuspunkt(e)`}
                           >
                             K{s.channeledFocus}
                           </span>
-                          <button
-                            type="button"
+                          <Knopf
                             onClick={() => session.handleCancelChanneledSpell(s)}
                             className="ml-1 text-[11px] font-bold text-leise hover:text-schrift bg-flaeche hover:bg-rahmen px-1.5 py-0.5 rounded-knopf transition-all cursor-pointer flex items-center gap-0.5"
                             title={`'${s.name}' aufheben (${s.channeledFocus} K-Fokus wird zu erschöpftem Fokus)`}
                           >
                             <span>×</span>
                             <span>Aufheben</span>
-                          </button>
+                          </Knopf>
                         </span>
                       );
                     })}
@@ -1338,7 +1327,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                       {gearVtdBonus > 0 && <span className="text-[11px] text-unverletzt font-bold ml-0.5">+{gearVtdBonus}</span>}
                       {activeSpellMods.vtdBonus > 0 && (
                         <span
-                          className="text-[11px] text-temporaer font-bold ml-0.5 bg-temporaer-grund px-1 py-0.2 rounded-knopf border border-temporaer"
+                          className="text-[11px] text-schrift font-bold ml-0.5 bg-magie-grund px-1 py-0.2 rounded-knopf border border-magie"
                           title={`+${activeSpellMods.vtdBonus} VTD durch aktive Zauber (${activeSpellMods.breakdown.filter((b) => b.vtd).map((b) => b.spellName).join(', ')})`}
                         >
                           +{activeSpellMods.vtdBonus}
@@ -1358,7 +1347,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                   {armorSR > 0 && <span className="text-[11px] text-gold font-bold ml-0.5">({armorSR})</span>}
                   {activeSpellMods.srBonus > 0 && (
                     <span
-                      className="text-[11px] text-temporaer font-bold ml-0.5 bg-temporaer-grund px-1 py-0.2 rounded-knopf border border-temporaer"
+                      className="text-[11px] text-schrift font-bold ml-0.5 bg-magie-grund px-1 py-0.2 rounded-knopf border border-magie"
                       title={`+${activeSpellMods.srBonus} SR durch aktive Zauber (${activeSpellMods.breakdown.filter((b) => b.sr).map((b) => b.spellName).join(', ')})`}
                     >
                       +{activeSpellMods.srBonus}
@@ -1371,7 +1360,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                 <span className="font-titel text-2xl font-bold text-schrift tabular-nums">
                   {effectiveGW}
                   {activeSpellMods.gwBonus > 0 && (
-                    <span className="text-[11px] text-temporaer font-bold ml-0.5 bg-temporaer-grund px-1 py-0.2 rounded-knopf border border-temporaer">
+                    <span className="text-[11px] text-schrift font-bold ml-0.5 bg-magie-grund px-1 py-0.2 rounded-knopf border border-magie">
                       +{activeSpellMods.gwBonus}
                     </span>
                   )}
@@ -1382,7 +1371,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                 <span className="font-titel text-2xl font-bold text-schrift tabular-nums">
                   {effectiveKW}
                   {activeSpellMods.kwBonus > 0 && (
-                    <span className="text-[11px] text-temporaer font-bold ml-0.5 bg-temporaer-grund px-1 py-0.2 rounded-knopf border border-temporaer">
+                    <span className="text-[11px] text-schrift font-bold ml-0.5 bg-magie-grund px-1 py-0.2 rounded-knopf border border-magie">
                       +{activeSpellMods.kwBonus}
                     </span>
                   )}
@@ -1411,8 +1400,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
 
           {/* SP controls */}
           <div className="flex items-center gap-2 pt-2 border-t border-rahmen mt-3">
-            <button
-              type="button"
+            <Knopf art="primaer"
               disabled={splitterPoints <= 0}
               onClick={() => {
                 const newSP = Math.max(0, splitterPoints - 1);
@@ -1427,13 +1415,12 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                 );
                 toast.success('1 Splitterpunkt eingesetzt');
               }}
-              className="flex-1 bg-gold hover:bg-gold-hell disabled:opacity-40 text-seite font-bold py-1.5 px-2 rounded-knopf text-xs transition-all cursor-pointer whitespace-nowrap text-center"
+              className="flex-1 text-xs whitespace-nowrap text-center"
             >
               1 SP einsetzen
-            </button>
+            </Knopf>
             <div className="flex items-center gap-1 shrink-0">
-              <button
-                type="button"
+              <Knopf nurSymbol
                 disabled={splitterPoints <= 0}
                 onClick={() => {
                   const newSP = Math.max(0, splitterPoints - 1);
@@ -1449,9 +1436,8 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                 className="w-11 h-11 bg-erhoeht hover:bg-rahmen border border-rahmen rounded-knopf flex items-center justify-center font-bold text-schrift disabled:opacity-40 text-xs cursor-pointer"
               >
                 -
-              </button>
-              <button
-                type="button"
+              </Knopf>
+              <Knopf nurSymbol
                 onClick={() => {
                   const newSP = splitterPoints + 1;
                   session.logAndDispatch(
@@ -1466,7 +1452,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                 className="w-11 h-11 bg-erhoeht hover:bg-rahmen border border-rahmen rounded-knopf flex items-center justify-center font-bold text-schrift text-xs cursor-pointer"
               >
                 +
-              </button>
+              </Knopf>
             </div>
           </div>
         </div>

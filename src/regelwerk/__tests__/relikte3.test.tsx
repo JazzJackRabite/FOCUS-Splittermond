@@ -1,13 +1,13 @@
 /**
  * Relikte, Stufe 3: Schwerpunkt-Bonus (GRW), Wachsen mit Chronik (Mondstahlklingen), beseelte Gegenstände (Die Götter).
- * Die Teile mit Erweiterungen laufen nur lokal mit FOKUS_BUECHER.
+ * Die Teile mit Erweiterungen laufen nur lokal mit FOKUS_GRIMOIRES.
  */
 import fs from 'fs';
 import path from 'path';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { Katalog } from '../katalog';
-import { basisAusDateien } from './hilfen';
-import { buchpaketLesen, erstelleKatalog } from '../laden';
+import { basisAusDateien, grimoireDatei } from './hilfen';
+import { grimoireLesen, erstelleKatalog } from '../laden';
 import {
   aktiveKraefte, beseelungPunkte, beseelungRegeln, domaenen, domaenenKraefte, pruefeBeseelung, pruefeChronik, pruefeRelikt,
   reliktBaukasten, reliktBausteine, reliktSchwerpunktBoni, wachsenRegeln,
@@ -36,14 +36,13 @@ describe('Schwerpunkt-Bonus aus Relikten (GRW)', () => {
   });
 });
 
-const BUECHER = process.env.FOKUS_BUECHER ?? '';
-const pfad = (n: string) => (BUECHER ? path.join(BUECHER, `${n}.srp.json`) : '');
-const da = (n: string) => !!BUECHER && fs.existsSync(pfad(n));
+const pfad = (n: string) => grimoireDatei(n);
+const da = (n: string) => !!pfad(n) && fs.existsSync(pfad(n));
 
 describe.skipIf(!da('mondstahl') || !da('goetter'))('Wachsen und Beseelung mit den Buchpaketen (lokal)', () => {
   let KB: Katalog;
   beforeAll(() => {
-    KB = erstelleKatalog(b, ['mondstahl', 'goetter'].map(n => buchpaketLesen(fs.readFileSync(pfad(n), 'utf-8'), b.manifest))).katalog;
+    KB = erstelleKatalog(b, ['mondstahl', 'goetter'].map(n => grimoireLesen(fs.readFileSync(pfad(n), 'utf-8'), b.manifest))).katalog;
   });
 
   it('Chronik: legendäre Tat braucht Beschreibung, je Heldengrad ein Punkt', () => {

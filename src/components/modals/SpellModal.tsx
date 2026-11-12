@@ -1,6 +1,7 @@
 import { calculateItemCost } from '../../utils/costCalculations';
 import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import { useHausregeln } from '../../fundament/hausregeln';
+import { Knopf, Dialog } from '../../fundament';
 import React, { useState, useEffect, useMemo } from 'react';
 import { SPELLS_DB } from '../../data/spells';
 import { getSpellDescription } from '../../utils/gameResourceManager';
@@ -316,19 +317,19 @@ export const SpellModal: React.FC<SpellModalProps> = ({
         </div>
 
         <div className="px-5 py-3.5 border-t border-rahmen bg-black/5 flex justify-end space-x-2 shrink-0">
-          <button
+          <Knopf
             onClick={onClose}
-            className="min-h-11 px-4 py-2 text-schrift hover:bg-rahmen rounded-knopf font-semibold text-sm transition-colors cursor-pointer shrink-0"
+            className="text-sm shrink-0"
           >
             Abbrechen
-          </button>
-          <button
+          </Knopf>
+          <Knopf art="primaer"
             onClick={handleAdd}
             disabled={(!isAffordable && !hausregeln) || !isValid}
-            className="min-h-11 px-5 py-2 bg-gold hover:bg-gold-hell text-seite rounded-knopf font-bold text-sm border border-gold disabled:opacity-50 disabled:cursor-not-allowed shrink-0 transition-all cursor-pointer"
+            className="text-sm disabled:cursor-not-allowed shrink-0"
           >
             Hinzufügen
-          </button>
+          </Knopf>
         </div>
       </Dialogfenster>
     </Dialoghintergrund>

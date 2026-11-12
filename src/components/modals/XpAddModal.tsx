@@ -1,5 +1,6 @@
 import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import React, { useState } from 'react';
+import { Dialog, Knopf } from '../../fundament';
 import { Plus, Minus, Sparkles } from 'lucide-react';
 
 interface XpAddModalProps {
@@ -45,7 +46,7 @@ export const XpAddModal: React.FC<XpAddModalProps> = ({ onClose, onAdd }) => {
                     key={amt}
                     type="button"
                     onClick={() => setVal(amt)}
-                    className={`py-1.5 text-xs font-bold rounded-knopf border transition-colors cursor-pointer ${
+                    className={`min-h-11 py-1.5 text-xs font-bold rounded-knopf border transition-colors cursor-pointer ${
                       val === amt
                         ? 'bg-erhoeht text-schrift border-rahmen '
                         : 'bg-flaeche text-schrift border-rahmen hover:bg-rahmen'
@@ -63,13 +64,12 @@ export const XpAddModal: React.FC<XpAddModalProps> = ({ onClose, onAdd }) => {
                 EP-Menge
               </label>
               <div className="flex items-center justify-center space-x-3">
-                <button
-                  type="button"
+                <Knopf nurSymbol
                   onClick={() => setVal(Math.max(1, val - 1))}
                   className="w-10 h-10 rounded-knopf bg-erhoeht hover:bg-rahmen active:scale-95 font-bold flex items-center justify-center text-schrift border border-rahmen touch-manipulation cursor-pointer transition-all"
                 >
                   <Minus size={18} />
-                </button>
+                </Knopf>
                 <input
                   type="number"
                   min="1"
@@ -78,13 +78,12 @@ export const XpAddModal: React.FC<XpAddModalProps> = ({ onClose, onAdd }) => {
                   className="w-24 text-center text-2xl font-bold bg-flaeche border border-gold rounded-knopf p-2 text-schrift focus:outline-none focus:ring-2 focus:ring-gold"
                   autoFocus
                 />
-                <button
-                  type="button"
+                <Knopf nurSymbol
                   onClick={() => setVal(val + 1)}
                   className="w-10 h-10 rounded-knopf bg-erhoeht hover:bg-rahmen active:scale-95 font-bold flex items-center justify-center text-schrift border border-rahmen touch-manipulation cursor-pointer transition-all"
                 >
                   <Plus size={18} />
-                </button>
+                </Knopf>
               </div>
             </div>
 
@@ -103,21 +102,20 @@ export const XpAddModal: React.FC<XpAddModalProps> = ({ onClose, onAdd }) => {
             </div>
           </div>
 
-          <div className="px-5 py-3.5 border-t border-rahmen bg-black/5 flex justify-end space-x-2 shrink-0">
-            <button
-              type="button"
+          <div className="flex justify-end gap-2.5 pt-3 border-t border-rahmen">
+            <Knopf
               onClick={onClose}
-              className="min-h-11 px-4 py-2 text-schrift hover:bg-rahmen rounded-knopf text-sm font-semibold transition-colors cursor-pointer"
+              className="text-sm"
             >
               Abbrechen
-            </button>
-            <button
+            </Knopf>
+            <Knopf art="primaer"
               type="submit"
               disabled={val <= 0}
-              className="min-h-11 px-5 py-2 bg-gold hover:bg-gold-hell text-seite rounded-knopf font-bold text-sm border border-gold disabled:opacity-50 transition-all cursor-pointer"
+              className="text-sm"
             >
               +{val} EP Hinzufügen
-            </button>
+            </Knopf>
           </div>
         </form>
       </Dialogfenster>

@@ -1,5 +1,6 @@
 import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import React, { useState, useMemo, useEffect, useId, useContext } from 'react';
+import { Knopf, Dialog } from '../../fundament';
 import {
   Sword,
   Shield,
@@ -508,7 +509,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                   onSpendSplitterpunkt();
                   setExtraSPBonus((prev) => prev + 3);
                 }}
-                className="bg-erschoepft-grund hover:bg-erschoepft text-gold-hell border border-erschoepft px-2.5 py-1 rounded-knopf text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
+                className="min-h-11 bg-erschoepft-grund hover:bg-erschoepft text-gold-hell border border-erschoepft px-2.5 py-1 rounded-knopf text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
                 title="Splitterpunkt einsetzen: +3 auf den Wurf"
               >
                 <Sparkles size={13} className="text-gold" />
@@ -518,8 +519,8 @@ export const AttackModal: React.FC<AttackModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="text-leise hover:text-schrift hover:bg-rahmen p-1.5 rounded-knopf transition-colors cursor-pointer"
-              title="Schließen (Esc)"
+              className="min-h-11 min-w-11 inline-flex items-center justify-center text-leise hover:text-schrift hover:bg-rahmen rounded-knopf transition-colors cursor-pointer"
+              title="Schließen (Esc)" aria-label="Schließen"
             >
               <X size={20} />
             </button>
@@ -545,13 +546,11 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                 <label className="text-xs text-leise block mb-1">Gegnerische Verteidigung (VTD):</label>
                 <div className="flex items-center gap-1.5">
                   <div className="flex-1 flex items-center bg-seite border border-rahmen rounded-knopf overflow-hidden">
-                    <button
-                      type="button"
+                    <Knopf
                       onClick={() => setTargetVTD((prev) => Math.max(5, prev - 1))}
-                      className="min-h-11 px-3 py-1.5 hover:bg-rahmen text-schrift font-bold transition-colors cursor-pointer"
                     >
                       −
-                    </button>
+                    </Knopf>
                     <input
                       type="number"
                       value={targetVTD}
@@ -559,13 +558,11 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                       onChange={(e) => setTargetVTD(Math.max(1, parseInt(e.target.value, 10) || 15))}
                       className="w-full text-center bg-transparent text-schrift tabular-nums font-bold text-sm py-1.5 focus:outline-hidden"
                     />
-                    <button
-                      type="button"
+                    <Knopf
                       onClick={() => setTargetVTD((prev) => prev + 1)}
-                      className="min-h-11 px-3 py-1.5 hover:bg-rahmen text-schrift font-bold transition-colors cursor-pointer"
                     >
                       +
-                    </button>
+                    </Knopf>
                   </div>
                   {/* Quick Presets */}
                   <div className="flex gap-1">
@@ -574,7 +571,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                         key={val}
                         type="button"
                         onClick={() => setTargetVTD(val)}
-                        className={`px-2 py-1 text-xs rounded-knopf border transition-all cursor-pointer tabular-nums font-semibold ${
+                        className={`min-h-11 px-2 py-1 text-xs rounded-knopf border transition-all cursor-pointer tabular-nums font-semibold ${
                           targetVTD === val
                             ? 'bg-gold text-seite border-gold-hell'
                             : 'bg-seite text-schrift border-rahmen hover:bg-flaeche hover:text-schrift'
@@ -593,13 +590,11 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                 <label className="text-xs text-leise block mb-1">Gegnerische Rüstung (RS):</label>
                 <div className="flex items-center gap-1.5">
                   <div className="flex-1 flex items-center bg-seite border border-rahmen rounded-knopf overflow-hidden">
-                    <button
-                      type="button"
+                    <Knopf
                       onClick={() => setTargetArmor((prev) => Math.max(0, prev - 1))}
-                      className="min-h-11 px-3 py-1.5 hover:bg-rahmen text-schrift font-bold transition-colors cursor-pointer"
                     >
                       −
-                    </button>
+                    </Knopf>
                     <input
                       type="number"
                       value={targetArmor}
@@ -607,13 +602,11 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                       onChange={(e) => setTargetArmor(Math.max(0, parseInt(e.target.value, 10) || 0))}
                       className="w-full text-center bg-transparent text-schrift tabular-nums font-bold text-sm py-1.5 focus:outline-hidden"
                     />
-                    <button
-                      type="button"
+                    <Knopf
                       onClick={() => setTargetArmor((prev) => prev + 1)}
-                      className="min-h-11 px-3 py-1.5 hover:bg-rahmen text-schrift font-bold transition-colors cursor-pointer"
                     >
                       +
-                    </button>
+                    </Knopf>
                   </div>
                   <div className="flex gap-1">
                     {[0, 2, 4, 6].map((rs) => (
@@ -621,7 +614,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                         key={rs}
                         type="button"
                         onClick={() => setTargetArmor(rs)}
-                        className={`px-2 py-1 text-xs rounded-knopf border transition-all cursor-pointer tabular-nums font-semibold ${
+                        className={`min-h-11 px-2 py-1 text-xs rounded-knopf border transition-all cursor-pointer tabular-nums font-semibold ${
                           targetArmor === rs
                             ? 'bg-erschoepft text-seite border-erschoepft'
                             : 'bg-seite text-schrift border-rahmen hover:bg-flaeche'
@@ -659,7 +652,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                         key={b.id}
                         type="button"
                         onClick={() => toggleSpellBonus(b.id)}
-                        className={`flex items-center gap-1 px-2.5 py-1 rounded-knopf text-xs font-semibold border transition-all cursor-pointer ${
+                        className={`min-h-11 flex items-center gap-1 px-2.5 py-1 rounded-knopf text-xs font-semibold border transition-all cursor-pointer ${
                           isActive
                             ? 'bg-magie-grund text-schrift border-magie '
                             : 'bg-seite text-leise border-rahmen line-through'
@@ -687,7 +680,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
               <button
                 type="button"
                 onClick={() => setTargetLying((prev) => !prev)}
-                className={`px-2.5 py-1 rounded-knopf border transition-all flex items-center gap-1.5 cursor-pointer font-semibold ${
+                className={`min-h-11 px-2.5 py-1 rounded-knopf border transition-all flex items-center gap-1.5 cursor-pointer font-semibold ${
                   targetLying
                     ? 'bg-magie-grund text-schrift border-magie'
                     : 'bg-seite text-leise border-rahmen hover:bg-seite'
@@ -700,7 +693,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
               <button
                 type="button"
                 onClick={() => setAdvantageFlank((prev) => !prev)}
-                className={`px-2.5 py-1 rounded-knopf border transition-all flex items-center gap-1.5 cursor-pointer font-semibold ${
+                className={`min-h-11 px-2.5 py-1 rounded-knopf border transition-all flex items-center gap-1.5 cursor-pointer font-semibold ${
                   advantageFlank
                     ? 'bg-magie-grund text-schrift border-magie'
                     : 'bg-seite text-leise border-rahmen hover:bg-seite'
@@ -713,7 +706,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
               <button
                 type="button"
                 onClick={() => setTargetCover((prev) => !prev)}
-                className={`px-2.5 py-1 rounded-knopf border transition-all flex items-center gap-1.5 cursor-pointer font-semibold ${
+                className={`min-h-11 px-2.5 py-1 rounded-knopf border transition-all flex items-center gap-1.5 cursor-pointer font-semibold ${
                   targetCover
                     ? 'bg-erschoepft-grund text-gold-hell border-erschoepft'
                     : 'bg-seite text-leise border-rahmen hover:bg-seite'
@@ -764,7 +757,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                     onClick={() =>
                       setActiveConditionsState((prev) => ({ ...prev, [c.id]: !prev[c.id] }))
                     }
-                    className={`px-2 py-0.5 rounded-knopf text-[11px] font-bold border transition-colors cursor-pointer ${
+                    className={`min-h-11 px-2 py-0.5 rounded-knopf text-[11px] font-bold border transition-colors cursor-pointer ${
                       activeConditionsState[c.id]
                         ? 'bg-schaden-grund text-schrift border-schaden'
                         : 'bg-seite text-leise border-rahmen line-through'
@@ -798,7 +791,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                     key={m.id}
                     type="button"
                     onClick={() => setSelectedManeuver(m)}
-                    className={`text-left p-2.5 rounded-knopf border transition-all cursor-pointer relative flex flex-col justify-between ${
+                    className={`min-h-11 text-left p-2.5 rounded-knopf border transition-all cursor-pointer relative flex flex-col justify-between ${
                       isSelected
                         ? 'bg-flaeche border-gold ring-1 ring-rahmen'
                         : 'bg-seite border-rahmen hover:bg-seite hover:border-rahmen'
@@ -855,7 +848,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                       setRollType(mode);
                       if (hasRolled) handleExecuteRoll(mode);
                     }}
-                    className={`px-2 py-0.5 text-xs rounded-knopf border transition-all cursor-pointer font-medium ${
+                    className={`min-h-11 px-2 py-0.5 text-xs rounded-knopf border transition-all cursor-pointer font-medium ${
                       rollType === mode
                         ? 'bg-erhoeht text-schrift border-gold'
                         : 'bg-seite text-leise border-rahmen'
@@ -902,24 +895,22 @@ export const AttackModal: React.FC<AttackModalProps> = ({
 
             {/* Roll trigger buttons */}
             <div className="flex items-center gap-2">
-              <button
-                type="button"
+              <Knopf art="primaer"
                 onClick={() => handleExecuteRoll()}
                 disabled={isRolling}
-                className="min-h-11 flex-1 bg-gold hover:bg-gold-hell text-seite border border-gold font-bold py-2.5 px-4 rounded-karte text-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-98"
+                className="flex-1 text-sm gap-2 active:scale-98"
               >
                 <Dice1 size={18} className="text-gold" />
                 <span>{hasRolled ? 'Erneut würfeln' : 'Angriff würfeln'}</span>
-              </button>
+              </Knopf>
 
-              <button
-                type="button"
+              <Knopf
                 onClick={() => setManualInputOpen((prev) => !prev)}
-                className="min-h-11 bg-seite hover:bg-flaeche text-schrift border border-rahmen py-2.5 px-3 rounded-karte text-xs font-semibold transition-all cursor-pointer"
+                className="text-xs"
                 title="Ergebnis vom echten Spieltisch eingeben"
               >
                 Tisch-Wurf
-              </button>
+              </Knopf>
             </div>
 
             {/* Manual table dice input */}
@@ -936,12 +927,12 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                   onChange={(e) => setManualRollVal(e.target.value)}
                   className="w-20 bg-seite text-schrift tabular-nums font-bold text-center px-2 py-1 rounded-knopf border border-rahmen text-xs"
                 />
-                <button
+                <Knopf art="primaer"
                   type="submit"
-                  className="min-h-11 bg-gold hover:bg-gold-hell text-seite font-bold px-3 py-1 rounded-knopf text-xs transition-colors cursor-pointer"
+                  className="text-xs"
                 >
                   Übernehmen
-                </button>
+                </Knopf>
               </form>
             )}
 
@@ -1188,10 +1179,9 @@ export const AttackModal: React.FC<AttackModalProps> = ({
               </div>
 
               {/* Damage Action Button */}
-              <button
-                type="button"
+              <Knopf
                 onClick={handleRollDamage}
-                className="min-h-11 w-full damage-roll-btn font-bold py-2.5 px-4 rounded-karte text-sm transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+                className="w-full damage-roll-btn text-sm gap-2 active:scale-98"
               >
                 <Flame size={16} />
                 <span>
@@ -1203,7 +1193,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                         egDamageSpent > 0 ? ` + ${egDamageSpent * (selectedManeuver.egDamageRate ?? 1)} EG` : ''
                       })`}
                 </span>
-              </button>
+              </Knopf>
 
               {/* Damage Roll Result Details */}
               {damageRollResult && (
@@ -1278,30 +1268,27 @@ export const AttackModal: React.FC<AttackModalProps> = ({
 
         {/* ── FOOTER ACTIONS ── */}
         <div className="bg-seite p-3.5 sm:p-4 border-t border-rahmen flex items-center justify-between gap-2 shrink-0">
-          <button
-            type="button"
+          <Knopf
             onClick={onClose}
-            className="min-h-11 px-4 py-2 rounded-karte text-xs font-semibold bg-seite hover:bg-erhoeht text-schrift transition-colors cursor-pointer"
+            className="text-xs"
           >
             Abbrechen
-          </button>
+          </Knopf>
 
           <div className="flex items-center gap-2">
             {hasRolled && (
               egCalculation?.isSuccess && attackCausesDamage && !damageRollResult ? (
                 <div className="flex items-center gap-2">
-                  <button
-                    type="button"
+                  <Knopf art="primaer"
                     onClick={handleCompleteAttack}
-                    className="min-h-11 bg-gold px-3 py-2 text-xs font-semibold text-seite underline decoration-dotted transition-colors cursor-pointer"
+                    className="text-xs underline decoration-dotted"
                     title="Angriff abschließen ohne Schaden auszuwürfeln"
                   >
                     Ohne Schaden vollenden
-                  </button>
-                  <button
-                    type="button"
+                  </Knopf>
+                  <Knopf art="primaer"
                     onClick={handleRollDamage}
-                    className="min-h-11 bg-gold hover:bg-gold-hell text-seite font-bold px-4 py-2 rounded-karte text-xs sm:text-sm transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+                    className="text-xs sm:text-sm gap-1.5 active:scale-95"
                   >
                     <Flame size={16} className="text-schaden" />
                     <span>
@@ -1309,20 +1296,19 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                       {selectedManeuver.extraDamageFormula ? ` + ${selectedManeuver.extraDamageFormula}` : ''}
                       {egDamageSpent > 0 ? ` + ${egDamageSpent * (selectedManeuver.egDamageRate ?? 1)} EG` : ''})
                     </span>
-                  </button>
+                  </Knopf>
                 </div>
               ) : (
-                <button
-                  type="button"
+                <Knopf art="primaer"
                   onClick={handleCompleteAttack}
-                  className="min-h-11 bg-gold hover:bg-gold-hell text-seite font-bold px-4 py-2 rounded-karte text-xs sm:text-sm transition-all flex items-center gap-1.5 cursor-pointer"
+                  className="text-xs sm:text-sm gap-1.5"
                 >
                   <Check size={16} />
                   <span>
                     Angriff vollenden
                     {damageRollResult ? ` (· ${damageRollResult.netDamage} Schaden)` : ''}
                   </span>
-                </button>
+                </Knopf>
               )
             )}
           </div>

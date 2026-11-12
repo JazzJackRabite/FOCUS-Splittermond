@@ -1,5 +1,6 @@
 import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import React, { useState } from 'react';
+import { Knopf, Dialog } from '../../fundament';
 import { Edit3, Plus, Minus, ArrowRight, Info, AlertTriangle } from 'lucide-react';
 
 interface EditTotalXpModalProps {
@@ -64,22 +65,20 @@ export const EditTotalXpModal: React.FC<EditTotalXpModalProps> = ({
               Neue Gesamt-EP festlegen
             </label>
             <div className="flex items-center justify-center gap-2">
-              <button
-                type="button"
+              <Knopf
                 onClick={() => adjustBy(-10)}
                 className="px-2.5 py-1.5 rounded-knopf bg-flaeche hover:bg-rahmen border border-rahmen text-xs font-bold text-schrift transition cursor-pointer"
                 title="-10 EP"
               >
                 -10
-              </button>
-              <button
-                type="button"
+              </Knopf>
+              <Knopf nurSymbol
                 onClick={() => adjustBy(-1)}
                 className="p-1.5 rounded-knopf bg-flaeche hover:bg-rahmen border border-rahmen text-schrift transition cursor-pointer"
                 title="-1 EP"
               >
                 <Minus size={16} />
-              </button>
+              </Knopf>
               <input
                 type="number"
                 min={0}
@@ -91,22 +90,20 @@ export const EditTotalXpModal: React.FC<EditTotalXpModalProps> = ({
                 className="w-28 text-center text-2xl font-bold bg-flaeche text-schrift border border-gold rounded-knopf py-1 focus:outline-none focus:ring-2 focus:ring-rahmen"
                 autoFocus
               />
-              <button
-                type="button"
+              <Knopf nurSymbol
                 onClick={() => adjustBy(1)}
                 className="p-1.5 rounded-knopf bg-flaeche hover:bg-rahmen border border-rahmen text-schrift transition cursor-pointer"
                 title="+1 EP"
               >
                 <Plus size={16} />
-              </button>
-              <button
-                type="button"
+              </Knopf>
+              <Knopf
                 onClick={() => adjustBy(10)}
                 className="px-2.5 py-1.5 rounded-knopf bg-flaeche hover:bg-rahmen border border-rahmen text-xs font-bold text-schrift transition cursor-pointer"
                 title="+10 EP"
               >
                 +10
-              </button>
+              </Knopf>
             </div>
           </div>
 
@@ -173,21 +170,20 @@ export const EditTotalXpModal: React.FC<EditTotalXpModalProps> = ({
 
         {/* Actions */}
         <div className="px-5 py-3.5 border-t border-rahmen bg-black/5 flex justify-end space-x-2 shrink-0">
-          <button
-            type="button"
+          <Knopf
             onClick={onClose}
-            className="min-h-11 px-4 py-2 text-schrift hover:bg-rahmen rounded-knopf text-sm font-semibold transition cursor-pointer"
+            className="text-sm"
           >
             Abbrechen
-          </button>
-          <button
+          </Knopf>
+          <Knopf art="primaer"
             type="submit"
             disabled={isNaN(newTotal) || newTotal < 0}
-            className="min-h-11 px-5 py-2 bg-gold hover:bg-gold-hell text-seite rounded-knopf font-bold text-sm border border-gold disabled:opacity-50 transition cursor-pointer flex items-center gap-1.5"
+            className="text-sm gap-1.5"
           >
             <span>Korrektur speichern</span>
             <ArrowRight size={15} />
-          </button>
+          </Knopf>
         </div>
       </form>
     </Dialogfenster>

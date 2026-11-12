@@ -1,5 +1,6 @@
 import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import React, { useEffect } from 'react';
+import { Knopf, Dialog } from '../../fundament';
 import { X, Sun, Moon, Heart, Sparkles, Zap, ShieldCheck, CheckCircle2 } from 'lucide-react';
 
 export interface RestDetailItem {
@@ -128,13 +129,13 @@ export const RestResultModal: React.FC<RestResultModalProps> = ({ data, onClose 
 
         {/* Footer */}
         <div className="p-4 bg-erhoeht border-t border-rahmen flex justify-end">
-          <button
+          <Knopf
             id="confirm-rest-result-modal-btn"
             onClick={onClose}
-            className="min-h-11 w-full sm:w-auto px-6 py-2.5 rounded-karte font-bold text-sm text-schrift active:scale-98 transition-all flex items-center justify-center gap-2 bg-erhoeht hover:bg-rahmen border border-rahmen cursor-pointer"
+            className="w-full sm:w-auto text-sm active:scale-98 gap-2"
           >
             Verstanden
-          </button>
+          </Knopf>
         </div>
       </Dialogfenster>
     </Dialoghintergrund>

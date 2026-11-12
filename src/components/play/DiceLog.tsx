@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Knopf } from '../../fundament';
 import {
   Dices,
   Trash2,
@@ -106,7 +107,7 @@ export const DiceLog: React.FC<DiceLogProps> = ({
               id="undo-protocol-btn"
               onClick={onUndo}
               disabled={!canUndo}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded-knopf text-xs font-bold transition border ${
+              className={`min-h-11 flex items-center gap-1 px-2.5 py-1 rounded-knopf text-xs font-bold transition border ${
                 canUndo
                   ? 'bg-erhoeht text-schrift hover:bg-rahmen border-gold cursor-pointer active:scale-95'
                   : 'bg-erhoeht text-leise border-rahmen cursor-not-allowed opacity-60'
@@ -121,22 +122,20 @@ export const DiceLog: React.FC<DiceLogProps> = ({
             </button>
           )}
           {allEntries.length > 0 && (
-            <button
+            <Knopf nurSymbol
               id="clear-protocol-btn"
               onClick={onClearRolls}
-              className="p-1 rounded-knopf text-leise hover:text-schaden transition-colors cursor-pointer"
               title="Protokoll leeren"
             >
               <Trash2 size={16} />
-            </button>
+            </Knopf>
           )}
-          <button
+          <Knopf
             id="toggle-protocol-btn"
             onClick={() => setIsExpanded(!isExpanded)}
-            className="p-1 rounded-knopf text-leise hover:text-gold-hell"
           >
             {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-          </button>
+          </Knopf>
         </div>
       </div>
 
@@ -145,41 +144,41 @@ export const DiceLog: React.FC<DiceLogProps> = ({
         <span className="text-xs font-bold text-schrift mr-1 flex items-center gap-1">
           <Dices size={15} className="text-gold" /> Schnellwurf:
         </span>
-        <button
+        <Knopf
           onClick={() => onQuickRoll(4, 1, '1W4')}
-          className="min-h-11 bg-erhoeht hover:bg-rahmen active:scale-95 text-schrift text-xs md:text-sm font-bold min-w-[44px] py-2 px-3 rounded-knopf transition-all touch-manipulation flex items-center justify-center"
+          className="active:scale-95 text-xs md:text-sm touch-manipulation"
           title="1W4 Würfeln"
         >
           1W4
-        </button>
-        <button
+        </Knopf>
+        <Knopf
           onClick={() => onQuickRoll(6, 1, '1W6')}
-          className="min-h-11 bg-erhoeht hover:bg-rahmen active:scale-95 text-schrift text-xs md:text-sm font-bold min-w-[44px] py-2 px-3 rounded-knopf transition-all touch-manipulation flex items-center justify-center"
+          className="active:scale-95 text-xs md:text-sm touch-manipulation"
           title="1W6 Würfeln"
         >
           1W6
-        </button>
-        <button
+        </Knopf>
+        <Knopf
           onClick={() => onQuickRoll(8, 1, '1W8')}
-          className="min-h-11 bg-erhoeht hover:bg-rahmen active:scale-95 text-schrift text-xs md:text-sm font-bold min-w-[44px] py-2 px-3 rounded-knopf transition-all touch-manipulation flex items-center justify-center"
+          className="active:scale-95 text-xs md:text-sm touch-manipulation"
           title="1W8 Würfeln"
         >
           1W8
-        </button>
-        <button
+        </Knopf>
+        <Knopf
           onClick={() => onQuickRoll(10, 1, '1W10')}
-          className="min-h-11 bg-erhoeht hover:bg-rahmen active:scale-95 text-schrift text-xs md:text-sm font-bold min-w-[44px] py-2 px-3 rounded-knopf transition-all touch-manipulation flex items-center justify-center"
+          className="active:scale-95 text-xs md:text-sm touch-manipulation"
           title="1W10 Würfeln"
         >
           1W10
-        </button>
-        <button
+        </Knopf>
+        <Knopf
           onClick={() => onQuickRoll(12, 1, '1W12')}
-          className="min-h-11 bg-erhoeht hover:bg-rahmen active:scale-95 text-schrift text-xs md:text-sm font-bold min-w-[44px] py-2 px-3 rounded-knopf transition-all touch-manipulation flex items-center justify-center"
+          className="active:scale-95 text-xs md:text-sm touch-manipulation"
           title="1W12 Würfeln"
         >
           1W12
-        </button>
+        </Knopf>
       </div>
 
       {/* Protocol History Feed */}

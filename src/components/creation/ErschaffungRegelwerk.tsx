@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { Knopf } from '../../fundament';
 import { AlertTriangle, CheckCircle2, Info, XCircle } from 'lucide-react';
 import { useCharacter } from '../../context/CharacterContext';
 import { useRegelwerk } from '../../regelwerk/RegelwerkContext';
@@ -103,14 +104,14 @@ const ModulAuswahl: React.FC<{ art: Art; k: Katalog }> = ({ art, k }) => {
           {g.kulturkunde && <div>Kulturkunde: <strong>{g.kulturkunde}</strong> (kostenlos)</div>}
           <div className="pt-1">
             {eingetragen ? (
-              <button type="button" onClick={() => dispatch({ type: 'ERSCHAFFUNG_MODUL_AUSTRAGEN', payload: { art } })}
-                className="px-2 py-1 rounded-knopf border border-rahmen bg-flaeche text-schrift hover:bg-rahmen cursor-pointer">Werte wieder austragen</button>
+              <Knopf onClick={() => dispatch({ type: 'ERSCHAFFUNG_MODUL_AUSTRAGEN', payload: { art } })}
+                >Werte wieder austragen</Knopf>
             ) : (
-              <button type="button" disabled={!ergebnis || ergebnis.fehlend.length > 0 || state.mode !== 'creation'} onClick={eintragen}
-                className="px-2 py-1 rounded-knopf border border-gold bg-erhoeht text-schrift hover:bg-rahmen hover:text-gold-hell cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              <Knopf art="sekundaer" disabled={!ergebnis || ergebnis.fehlend.length > 0 || state.mode !== 'creation'} onClick={eintragen}
+                className="disabled:cursor-not-allowed"
                 title={ergebnis?.fehlend.length ? `Noch wählen: ${ergebnis.fehlend.join(', ')}` : undefined}>
                 Modulwerte eintragen
-              </button>
+              </Knopf>
             )}
             {!eingetragen && ergebnis && ergebnis.fehlend.length > 0 && <span className="ml-2 text-erschoepft">Noch wählen: {ergebnis.fehlend.join(', ')}</span>}
           </div>

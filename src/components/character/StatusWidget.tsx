@@ -1,4 +1,5 @@
 import React from 'react';
+import { Knopf } from '../../fundament';
 import type { AppMode, CreationUsage } from '../../types';
 
 interface StatusWidgetProps {
@@ -41,23 +42,21 @@ export const StatusWidget: React.FC<StatusWidgetProps> = ({
             <h3 className="font-bold text-[17px] fantasy-font tracking-widest text-gold-hell">STATUS</h3>
             {onToggleCreationMode && (
               mode === 'creation' ? (
-                <button
-                  type="button"
+                <Knopf art="primaer"
                   onClick={onToggleCreationMode}
-                  className="px-2.5 py-1 rounded-knopf text-xs font-bold transition bg-gold text-seite hover:bg-gold-hell active:scale-95 cursor-pointer border border-rahmen whitespace-nowrap"
+                  className="text-xs active:scale-95 whitespace-nowrap"
                   title="Charaktererschaffung abschließen und Steigerung freischalten"
                 >
                   Erschaffung abschließen
-                </button>
+                </Knopf>
               ) : (
-                <button
-                  type="button"
+                <Knopf art="sekundaer"
                   onClick={onToggleCreationMode}
-                  className="px-2.5 py-1 rounded-knopf text-xs font-bold transition bg-erhoeht text-schrift hover:bg-rahmen hover:text-gold-hell active:scale-95 cursor-pointer border border-gold whitespace-nowrap"
+                  className="text-xs active:scale-95 whitespace-nowrap"
                   title="Charaktererschaffung wieder bearbeiten"
                 >
                   Erschaffung
-                </button>
+                </Knopf>
               )
             )}
           </div>
@@ -94,14 +93,13 @@ export const StatusWidget: React.FC<StatusWidgetProps> = ({
                 {xpTotal}
               </span>
               {mode === 'xp' && onAddXp && (
-                <button
-                  type="button"
+                <Knopf art="primaer"
                   onClick={onAddXp}
-                  className="px-2 py-0.5 rounded-knopf text-xs font-bold bg-gold text-seite hover:bg-gold-hell active:scale-95 transition-all cursor-pointer leading-none"
+                  className="text-xs active:scale-95 leading-none"
                   title="Erfahrungspunkte hinzufügen"
                 >
                   +EP
-                </button>
+                </Knopf>
               )}
             </div>
           )}

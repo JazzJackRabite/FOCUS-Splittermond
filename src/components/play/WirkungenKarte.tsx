@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Knopf } from '../../fundament';
 import { ChevronDown, ChevronRight, Sparkles } from 'lucide-react';
 import { useCharacter } from '../../context/CharacterContext';
 import { wirkungKurz, type CharakterWirkung, type WirkungsStatus } from '../../regelwerk/wirkungen';
@@ -36,10 +37,10 @@ export const WirkungenKarte: React.FC = () => {
           if (!liste.length) return null;
           return (
             <div key={g.status}>
-              <button type="button" onClick={() => setOffen(o => ({ ...o, [g.status]: !o[g.status] }))} aria-expanded={!!offen[g.status]}
-                className="flex items-center gap-1 text-sm font-bold text-schrift cursor-pointer">
+              <Knopf onClick={() => setOffen(o => ({ ...o, [g.status]: !o[g.status] }))} aria-expanded={!!offen[g.status]}
+                className="gap-1 text-sm">
                 {offen[g.status] ? <ChevronDown size={14} /> : <ChevronRight size={14} />}{g.titel} ({liste.length})
-              </button>
+              </Knopf>
               {offen[g.status] && (
                 <>
                   <p className="text-[11px] text-leise ml-5">{g.hinweis}</p>

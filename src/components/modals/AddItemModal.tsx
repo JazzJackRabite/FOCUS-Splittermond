@@ -1,5 +1,6 @@
 import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import { useHausregeln } from '../../fundament/hausregeln';
+import { Knopf, Dialog } from '../../fundament';
 import React, { useState, useEffect, useMemo } from 'react';
 import { RESOURCE_DESCRIPTIONS } from '../../data/resources';
 import { WEAKNESS_DESCRIPTIONS, WEAKNESS_PAGES } from '../../data/weaknesses';
@@ -419,24 +420,24 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({
               <div>
                 <label className="block text-xs uppercase text-leise mb-1">Stufe / Wert</label>
                 <div className="flex items-center space-x-3">
-                  <button
+                  <Knopf nurSymbol
                     onClick={() => setLevel(Math.max(1, level - 1))}
-                    className="w-8 h-8 rounded-knopf bg-erhoeht font-bold hover:bg-rahmen shrink-0"
+                    className="shrink-0"
                   >
                     -
-                  </button>
+                  </Knopf>
                   <input
                     type="number"
                     value={level}
                     readOnly
                     className="w-12 text-center font-bold p-1 border-none bg-transparent text-schrift"
                   />
-                  <button
+                  <Knopf nurSymbol
                     onClick={() => setLevel(Math.min(maxLevel, level + 1))}
-                    className="w-8 h-8 rounded-knopf bg-erhoeht font-bold hover:bg-rahmen shrink-0"
+                    className="shrink-0"
                   >
                     +
-                  </button>
+                  </Knopf>
                 </div>
               </div>
               <div className="text-right">
@@ -480,19 +481,19 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({
         </div>
 
         <div className="px-5 py-3.5 border-t border-rahmen bg-black/5 flex justify-end space-x-2 shrink-0">
-          <button
+          <Knopf
             onClick={onClose}
-            className="min-h-11 px-4 py-2 text-schrift hover:bg-rahmen rounded-knopf font-semibold text-sm transition-colors cursor-pointer shrink-0"
+            className="text-sm shrink-0"
           >
             Abbrechen
-          </button>
-          <button
+          </Knopf>
+          <Knopf art="primaer"
             onClick={handleAdd}
             disabled={(!isAffordable && !hausregeln) || !isSelectionValid || isLanguageLimitReached}
-            className="min-h-11 px-5 py-2 bg-gold hover:bg-gold-hell text-seite rounded-knopf font-bold text-sm border border-gold disabled:opacity-50 disabled:cursor-not-allowed transition-all cursor-pointer shrink-0"
+            className="text-sm disabled:cursor-not-allowed shrink-0"
           >
             Hinzufügen
-          </button>
+          </Knopf>
         </div>
       </Dialogfenster>
     </Dialoghintergrund>

@@ -1,5 +1,6 @@
 import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
+import { Knopf } from '../../fundament';
 import { X } from 'lucide-react';
 
 interface TooltipStat {
@@ -137,12 +138,12 @@ export const SourceBadge: React.FC<SourceBadgeProps> = ({ source, page, tooltipD
         {tooltipData?.title}
       </h4>
       {isMobile && (
-        <button
+        <Knopf nurSymbol
           onClick={() => setIsOpen(false)}
-          className="absolute top-2 right-2 text-leise hover:text-schaden p-1 cursor-pointer"
+          className="absolute top-2 right-2"
         >
           <X size={16} />
-        </button>
+        </Knopf>
       )}
       {tooltipData?.description && (
         <div className="text-xs text-schrift italic mb-2 leading-snug whitespace-pre-line">

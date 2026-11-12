@@ -1,5 +1,6 @@
 import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import React, { useState, useEffect, useId, useMemo } from 'react';
+import { Knopf, Dialog } from '../../fundament';
 import {
   X,
   Sparkles,
@@ -690,9 +691,9 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                 <span className="font-semibold text-schrift flex items-center gap-1.5">
                   <BookOpen className="w-3.5 h-3.5" /> Zauberwirkung &amp; Verstärkungen
                 </span>
-                <button className="text-leise hover:text-leise">
+                <Knopf >
                   {showSpellDetails ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                </button>
+                </Knopf>
               </div>
               {showSpellDetails && (
                 <div className="mt-2 pt-2 border-t border-rahmen text-leise whitespace-pre-line">
@@ -906,7 +907,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                         setDifficulty(p.val);
                         setSelectedPreset(p.label);
                       }}
-                      className={`px-2.5 py-1 rounded-knopf border text-xs font-medium transition-all ${
+                      className={`min-h-11 px-2.5 py-1 rounded-knopf border text-xs font-medium transition-all ${
                         isActive
                           ? 'bg-erhoeht text-schrift border-gold'
                           : 'bg-flaeche text-schrift border-rahmen hover:bg-rahmen'
@@ -961,21 +962,17 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                 )}
                 <div className="flex items-center gap-1 bg-flaeche border border-rahmen px-1.5 py-0.5 rounded-knopf text-xs">
                   <span className="text-leise">Sit.:</span>
-                  <button
-                    type="button"
+                  <Knopf
                     onClick={() => setSituationalMod((prev) => prev - 1)}
-                    className="hover:text-schaden font-bold px-1 cursor-pointer"
                   >
                     -
-                  </button>
+                  </Knopf>
                   <span className="tabular-nums font-bold text-schrift">{situationalMod >= 0 ? `+${situationalMod}` : situationalMod}</span>
-                  <button
-                    type="button"
+                  <Knopf
                     onClick={() => setSituationalMod((prev) => prev + 1)}
-                    className="hover:text-gold-hell font-bold px-1 cursor-pointer"
                   >
                     +
-                  </button>
+                  </Knopf>
                 </div>
                 <span className="font-bold text-sm text-schrift pl-1">
                   = {totalRollModifier >= 0 ? `+${totalRollModifier}` : totalRollModifier}
@@ -1002,7 +999,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                         type="button"
                         onClick={() => setRollType(key)}
                         disabled={isRolling}
-                        className={`flex-1 py-2 text-sm font-bold rounded-knopf border transition-all ${
+                        className={`min-h-11 flex-1 py-2 text-sm font-bold rounded-knopf border transition-all ${
                           rollType === key
                             ? 'bg-erhoeht text-schrift border-gold'
                             : 'bg-flaeche text-schrift border-rahmen hover:bg-rahmen'
@@ -1015,15 +1012,14 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                 </div>
 
                 {/* Roll button */}
-                <button
-                  type="button"
+                <Knopf
                   onClick={() => performRoll(rollType)}
                   disabled={isRolling}
                   className="w-full min-h-11 bg-gold hover:bg-gold-hell disabled:opacity-60 text-seite font-bold py-3 rounded-knopf text-base transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <DiceIcon size={20} />
                   <span>Würfeln!</span>
-                </button>
+                </Knopf>
 
                 {/* Dice rolling animation */}
                 {isRolling && (
@@ -1038,13 +1034,12 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
 
                 {/* Manual Table Roll Accordion */}
                 <div className="pt-1">
-                  <button
-                    type="button"
+                  <Knopf
                     onClick={() => setManualInputOpen(!manualInputOpen)}
-                    className="text-[11px] text-leise hover:text-leise underline"
+                    className="text-[11px] underline"
                   >
                     {manualInputOpen ? 'Würfeleingabe schließen' : 'Am Tisch mit echten Würfeln gewürfelt? Hier eintragen'}
-                  </button>
+                  </Knopf>
                   {manualInputOpen && (
                     <div className="flex items-center gap-2 mt-2 bg-erhoeht p-2.5 rounded-knopf border border-rahmen">
                       <span className="text-xs text-leise">Reines 2W10-Ergebnis (2–20):</span>
@@ -1058,14 +1053,13 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                         placeholder="z. B. 15"
                         className="w-16 px-2 py-1 text-center font-bold border rounded-knopf"
                       />
-                      <button
-                        type="button"
+                      <Knopf
                         onClick={handleApplyManualRoll}
                         disabled={!manualRollVal}
-                        className="min-h-11 px-3 py-1 bg-erhoeht text-schrift text-xs rounded-knopf font-semibold disabled:opacity-50"
+                        className="text-xs"
                       >
                         Übernehmen
-                      </button>
+                      </Knopf>
                     </div>
                   )}
                 </div>
@@ -1115,8 +1109,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
 
                   {/* Splitterpunkte Action Buttons */}
                   <div className="flex flex-wrap items-center gap-1.5 self-end sm:self-center">
-                    <button
-                      type="button"
+                    <Knopf art="primaer"
                       onClick={handleSpendSPBonus}
                       disabled={splitterpunkte <= 0 || isRolling}
                       title="Kostet 1 Splitterpunkt: +3 Bonus auf das Ergebnis"
@@ -1124,9 +1117,8 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                     >
                       <Sparkles className="w-3.5 h-3.5" />
                       <span>+3 (1 SP)</span>
-                    </button>
-                    <button
-                      type="button"
+                    </Knopf>
+                    <Knopf art="sekundaer"
                       onClick={handleSpendSPReroll}
                       disabled={splitterpunkte <= 0 || isRolling}
                       title="Kostet 1 Splitterpunkt: Neuwurf"
@@ -1134,25 +1126,22 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                     >
                       <RotateCcw className="w-3.5 h-3.5" />
                       <span>Reroll (1 SP)</span>
-                    </button>
-                    <button
-                      type="button"
+                    </Knopf>
+                    <Knopf nurSymbol
                       onClick={() => performRoll(rollType)}
                       disabled={isRolling}
                       title="Erneut würfeln"
-                      className="p-1.5 text-leise hover:text-schrift rounded-knopf cursor-pointer"
                     >
                       <RotateCcw className="w-4 h-4" />
-                    </button>
-                    <button
-                      type="button"
+                    </Knopf>
+                    <Knopf
                       onClick={() => setHasRolled(false)}
                       disabled={isRolling}
                       title="Wurfart ändern / Neu vorbereiten"
-                      className="text-xs text-leise hover:text-gold-hell underline ml-1 cursor-pointer"
+                      className="text-xs underline ml-1"
                     >
                       Wurfart ändern
-                    </button>
+                    </Knopf>
                   </div>
                 </div>
 
@@ -1201,41 +1190,36 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                           <div className="flex items-center gap-2">
                             <span className="font-semibold text-schaden">Zu erschöpfender Fokus:</span>
                             <div className="flex items-center gap-1 bg-flaeche border border-rahmen rounded-knopf px-1 py-0.5">
-                              <button
-                                type="button"
+                              <Knopf
                                 onClick={() =>
                                   setCustomFailureFocus((prev) =>
                                     Math.max(0, (prev !== null ? prev : egCalculation.exhaustedFocusLostOnFailure) - 1)
                                   )
                                 }
-                                className="px-1 font-bold text-schaden hover:bg-rahmen hover:text-schrift"
                               >
                                 -
-                              </button>
+                              </Knopf>
                               <span className="font-bold tabular-nums px-1 text-schrift">
                                 {customFailureFocus !== null ? customFailureFocus : egCalculation.exhaustedFocusLostOnFailure} FO
                               </span>
-                              <button
-                                type="button"
+                              <Knopf
                                 onClick={() =>
                                   setCustomFailureFocus((prev) =>
                                     (prev !== null ? prev : egCalculation.exhaustedFocusLostOnFailure) + 1
                                   )
                                 }
-                                className="px-1 font-bold text-schaden hover:bg-rahmen hover:text-schrift"
                               >
                                 +
-                              </button>
+                              </Knopf>
                             </div>
                           </div>
 
-                          <button
-                            type="button"
+                          <Knopf art="gefahr"
                             onClick={handleApplyFailure}
                             className="min-h-11 py-1.5 px-3 bg-schaden-grund hover:bg-schaden-grund hover:text-schrift text-schrift rounded-knopf font-bold border border-schaden transition-colors cursor-pointer"
                           >
                             Fehlschlag anwenden (-{customFailureFocus !== null ? customFailureFocus : egCalculation.exhaustedFocusLostOnFailure} FO)
-                          </button>
+                          </Knopf>
                         </div>
                       </div>
                     )}
@@ -1268,13 +1252,12 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                     {remainingEG === 0 ? 'Alle EG verteilt' : `Noch ${remainingEG} EG verfügbar`}
                   </span>
                   {spentEG > 0 && (
-                    <button
-                      type="button"
+                    <Knopf
                       onClick={() => setAllocations(INITIAL_EG_ALLOCATIONS)}
-                      className="text-xs text-leise hover:text-gold-hell underline cursor-pointer"
+                      className="text-xs underline"
                     >
                       Zurücksetzen
-                    </button>
+                    </Knopf>
                   )}
                 </div>
               </div>
@@ -1314,27 +1297,24 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                       </p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      <button
-                        type="button"
+                      <Knopf nurSymbol
                         onClick={() => handleModifyAllocation('saveExhaustedFocus', 1, -1)}
                         disabled={allocations.saveExhaustedFocus <= 0}
-                        className="w-7 h-7 rounded-knopf border border-rahmen flex items-center justify-center hover:bg-rahmen disabled:opacity-30"
                       >
                         <Minus className="w-3.5 h-3.5" />
-                      </button>
+                      </Knopf>
                       <span className="font-bold tabular-nums text-sm w-5 text-center">
                         {allocations.saveExhaustedFocus}
                       </span>
-                      <button
-                        type="button"
+                      <Knopf nurSymbol
                         onClick={() =>
                           handleModifyAllocation('saveExhaustedFocus', 1, 1, Math.max(0, baseCost.exhausted - 1))
                         }
                         disabled={remainingEG < 1 || allocations.saveExhaustedFocus >= Math.max(0, baseCost.exhausted - 1)}
-                        className="w-7 h-7 rounded-knopf bg-erhoeht text-schrift flex items-center justify-center hover:brightness-110 disabled:opacity-30"
+                        className="hover:brightness-110"
                       >
                         <Plus className="w-3.5 h-3.5" />
-                      </button>
+                      </Knopf>
                     </div>
                   </div>
                 )}
@@ -1354,27 +1334,24 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                       </p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      <button
-                        type="button"
+                      <Knopf nurSymbol
                         onClick={() => handleModifyAllocation('saveChanneledFocus', 2, -1)}
                         disabled={allocations.saveChanneledFocus <= 0}
-                        className="w-7 h-7 rounded-knopf border border-rahmen flex items-center justify-center hover:bg-rahmen disabled:opacity-30"
                       >
                         <Minus className="w-3.5 h-3.5" />
-                      </button>
+                      </Knopf>
                       <span className="font-bold tabular-nums text-sm w-5 text-center">
                         {allocations.saveChanneledFocus}
                       </span>
-                      <button
-                        type="button"
+                      <Knopf nurSymbol
                         onClick={() =>
                           handleModifyAllocation('saveChanneledFocus', 2, 1, Math.max(0, baseCost.channeled - 1))
                         }
                         disabled={remainingEG < 2 || allocations.saveChanneledFocus >= Math.max(0, baseCost.channeled - 1)}
-                        className="w-7 h-7 rounded-knopf bg-erhoeht text-schrift flex items-center justify-center hover:brightness-110 disabled:opacity-30"
+                        className="hover:brightness-110"
                       >
                         <Plus className="w-3.5 h-3.5" />
-                      </button>
+                      </Knopf>
                     </div>
                   </div>
                 )}
@@ -1394,27 +1371,24 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                       </p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      <button
-                        type="button"
+                      <Knopf nurSymbol
                         onClick={() => handleModifyAllocation('saveConsumedFocus', 3, -1)}
                         disabled={allocations.saveConsumedFocus <= 0}
-                        className="w-7 h-7 rounded-knopf border border-rahmen flex items-center justify-center hover:bg-rahmen disabled:opacity-30"
                       >
                         <Minus className="w-3.5 h-3.5" />
-                      </button>
+                      </Knopf>
                       <span className="font-bold tabular-nums text-sm w-5 text-center">
                         {allocations.saveConsumedFocus}
                       </span>
-                      <button
-                        type="button"
+                      <Knopf nurSymbol
                         onClick={() =>
                           handleModifyAllocation('saveConsumedFocus', 3, 1, maxVerzehrtSparen)
                         }
                         disabled={remainingEG < 3 || allocations.saveConsumedFocus >= maxVerzehrtSparen}
-                        className="w-7 h-7 rounded-knopf bg-erhoeht text-schrift flex items-center justify-center hover:brightness-110 disabled:opacity-30"
+                        className="hover:brightness-110"
                       >
                         <Plus className="w-3.5 h-3.5" />
-                      </button>
+                      </Knopf>
                     </div>
                   </div>
                 )}
@@ -1434,23 +1408,20 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                       </p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      <button
-                        type="button"
+                      <Knopf nurSymbol
                         onClick={() => handleModifyAllocation('increaseDamage', 1, -1)}
                         disabled={allocations.increaseDamage <= 0}
-                        className="w-7 h-7 rounded-knopf border border-rahmen flex items-center justify-center hover:bg-rahmen disabled:opacity-30"
                       >
                         <Minus className="w-3.5 h-3.5" />
-                      </button>
+                      </Knopf>
                       <span className="font-bold tabular-nums text-sm w-5 text-center">{allocations.increaseDamage}</span>
-                      <button
-                        type="button"
+                      <Knopf nurSymbol
                         onClick={() => handleModifyAllocation('increaseDamage', 1, 1)}
                         disabled={remainingEG < 1}
-                        className="w-7 h-7 rounded-knopf bg-erhoeht text-schrift flex items-center justify-center hover:brightness-110 disabled:opacity-30"
+                        className="hover:brightness-110"
                       >
                         <Plus className="w-3.5 h-3.5" />
-                      </button>
+                      </Knopf>
                     </div>
                   </div>
                 )}
@@ -1470,23 +1441,20 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                       </p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      <button
-                        type="button"
+                      <Knopf nurSymbol
                         onClick={() => handleModifyAllocation('increaseRange', 1, -1)}
                         disabled={allocations.increaseRange <= 0}
-                        className="w-7 h-7 rounded-knopf border border-rahmen flex items-center justify-center hover:bg-rahmen disabled:opacity-30"
                       >
                         <Minus className="w-3.5 h-3.5" />
-                      </button>
+                      </Knopf>
                       <span className="font-bold tabular-nums text-sm w-5 text-center">{allocations.increaseRange}</span>
-                      <button
-                        type="button"
+                      <Knopf nurSymbol
                         onClick={() => handleModifyAllocation('increaseRange', 1, 1)}
                         disabled={remainingEG < 1}
-                        className="w-7 h-7 rounded-knopf bg-erhoeht text-schrift flex items-center justify-center hover:brightness-110 disabled:opacity-30"
+                        className="hover:brightness-110"
                       >
                         <Plus className="w-3.5 h-3.5" />
-                      </button>
+                      </Knopf>
                     </div>
                   </div>
                 )}
@@ -1506,23 +1474,20 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                       </p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      <button
-                        type="button"
+                      <Knopf nurSymbol
                         onClick={() => handleModifyAllocation('increaseDuration', 2, -1)}
                         disabled={allocations.increaseDuration <= 0}
-                        className="w-7 h-7 rounded-knopf border border-rahmen flex items-center justify-center hover:bg-rahmen disabled:opacity-30"
                       >
                         <Minus className="w-3.5 h-3.5" />
-                      </button>
+                      </Knopf>
                       <span className="font-bold tabular-nums text-sm w-5 text-center">{allocations.increaseDuration}</span>
-                      <button
-                        type="button"
+                      <Knopf nurSymbol
                         onClick={() => handleModifyAllocation('increaseDuration', 2, 1)}
                         disabled={remainingEG < 2}
-                        className="w-7 h-7 rounded-knopf bg-erhoeht text-schrift flex items-center justify-center hover:brightness-110 disabled:opacity-30"
+                        className="hover:brightness-110"
                       >
                         <Plus className="w-3.5 h-3.5" />
-                      </button>
+                      </Knopf>
                     </div>
                   </div>
                 )}
@@ -1542,23 +1507,20 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                       </p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      <button
-                        type="button"
+                      <Knopf nurSymbol
                         onClick={() => handleModifyAllocation('reduceCastTime', 3, -1)}
                         disabled={allocations.reduceCastTime <= 0}
-                        className="w-7 h-7 rounded-knopf border border-rahmen flex items-center justify-center hover:bg-rahmen disabled:opacity-30"
                       >
                         <Minus className="w-3.5 h-3.5" />
-                      </button>
+                      </Knopf>
                       <span className="font-bold tabular-nums text-sm w-5 text-center">{allocations.reduceCastTime}</span>
-                      <button
-                        type="button"
+                      <Knopf nurSymbol
                         onClick={() => handleModifyAllocation('reduceCastTime', 3, 1, 2)}
                         disabled={remainingEG < 3 || allocations.reduceCastTime >= 2}
-                        className="w-7 h-7 rounded-knopf bg-erhoeht text-schrift flex items-center justify-center hover:brightness-110 disabled:opacity-30"
+                        className="hover:brightness-110"
                       >
                         <Plus className="w-3.5 h-3.5" />
-                      </button>
+                      </Knopf>
                     </div>
                   </div>
                 )}
@@ -1578,23 +1540,20 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                       </p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      <button
-                        type="button"
+                      <Knopf nurSymbol
                         onClick={() => handleModifyAllocation('expandArea', 3, -1)}
                         disabled={allocations.expandArea <= 0}
-                        className="w-7 h-7 rounded-knopf border border-rahmen flex items-center justify-center hover:bg-rahmen disabled:opacity-30"
                       >
                         <Minus className="w-3.5 h-3.5" />
-                      </button>
+                      </Knopf>
                       <span className="font-bold tabular-nums text-sm w-5 text-center">{allocations.expandArea}</span>
-                      <button
-                        type="button"
+                      <Knopf nurSymbol
                         onClick={() => handleModifyAllocation('expandArea', 3, 1)}
                         disabled={remainingEG < 3}
-                        className="w-7 h-7 rounded-knopf bg-erhoeht text-schrift flex items-center justify-center hover:brightness-110 disabled:opacity-30"
+                        className="hover:brightness-110"
                       >
                         <Plus className="w-3.5 h-3.5" />
-                      </button>
+                      </Knopf>
                     </div>
                   </div>
                 )}
@@ -1604,7 +1563,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                   <div className="space-y-2 pt-2 border-t border-rahmen">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-bold uppercase tracking-wider text-schrift flex items-center gap-1.5">
-                        <Sparkles className="w-3.5 h-3.5 text-gold" />
+                        <Sparkles className="w-3.5 h-3.5 text-magie" />
                         <span>Spezifische Zauber-Verstärkung</span>
                         <span className="text-[11px] bg-erhoeht text-schrift border border-rahmen font-semibold px-2 py-0.5 rounded-knopf">
                           Aus Spruchdaten
@@ -1672,13 +1631,12 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
 
                 {/* 10. Eigene / Manuelle Verstärkung hinzufügen (Optional/Erweiterbar) */}
                 <div className="pt-1 border-t border-rahmen">
-                  <button
-                    type="button"
+                  <Knopf
                     onClick={() => setShowCustomEnhancement((prev) => !prev)}
-                    className="text-[11px] text-leise hover:text-gold-hell flex items-center gap-1 font-medium cursor-pointer"
+                    className="text-[11px] gap-1"
                   >
                     <span>{showCustomEnhancement ? '− Eigene Verstärkung verbergen' : '+ Eigene/manuelle Verstärkung eintragen'}</span>
-                  </button>
+                  </Knopf>
 
                   {showCustomEnhancement && (
                     <div className="mt-2 p-3 bg-erhoeht rounded-karte border border-rahmen space-y-2">
@@ -1778,13 +1736,12 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                       </div>
                     </div>
 
-                    <button
-                      type="button"
+                    <Knopf
                       onClick={() => setShowDamageConfig((prev) => !prev)}
-                      className="text-xs text-leise hover:text-schrift underline decoration-dotted cursor-pointer"
+                      className="text-xs underline decoration-dotted"
                     >
                       {showDamageConfig ? 'Formel einklappen' : 'Formel anpassen'}
-                    </button>
+                    </Knopf>
                   </div>
 
                   {/* Damage Formula Configurator */}
@@ -1851,10 +1808,9 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
 
                   {/* Roll Action Area */}
                   <div className="flex flex-wrap items-center gap-2">
-                    <button
-                      type="button"
+                    <Knopf
                       onClick={() => handleRollDamage()}
-                      className="min-h-11 flex-1 min-w-[200px] py-2.5 px-4 bg-erhoeht hover:bg-rahmen text-schrift rounded-karte font-bold text-xs sm:text-sm border border-rahmen flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-98"
+                      className="flex-1 text-xs sm:text-sm gap-2 active:scale-98"
                     >
                       <DiceIcon size={16} />
                       <span>
@@ -1863,16 +1819,15 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                         {customBaseBonus > 0 ? `+${customBaseBonus}` : ''}
                         {allocations.increaseDamage > 0 ? `+${allocations.increaseDamage}` : ''})
                       </span>
-                    </button>
+                    </Knopf>
 
-                    <button
-                      type="button"
+                    <Knopf
                       onClick={() => setManualDamageInputOpen((prev) => !prev)}
-                      className="min-h-11 text-xs px-3 py-2 text-leise hover:text-schrift border border-rahmen rounded-karte hover:bg-rahmen transition-colors cursor-pointer"
+                      className="text-xs"
                       title="Am Tisch mit physischen Würfeln gewürfelt? Hier eintragen"
                     >
                       Tisch-Wurf
-                    </button>
+                    </Knopf>
                   </div>
 
                   {/* Manual Damage Input */}
@@ -1890,13 +1845,11 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                           placeholder={customDiceCount === 2 ? '4, 5' : '5'}
                           className="flex-1 border border-rahmen rounded-knopf px-2 py-1 tabular-nums bg-flaeche text-xs text-schrift"
                         />
-                        <button
-                          type="button"
+                        <Knopf
                           onClick={handleApplyManualDamage}
-                          className="min-h-11 px-3 py-1 bg-erhoeht hover:bg-rahmen text-schrift font-bold rounded-knopf cursor-pointer"
                         >
                           Übernehmen
-                        </button>
+                        </Knopf>
                       </div>
                     </div>
                   )}
@@ -1947,14 +1900,13 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                 </div>
               ) : (
                 <div className="text-center py-1">
-                  <button
-                    type="button"
+                  <Knopf
                     onClick={() => setEnableDamageRoll(true)}
-                    className="text-xs text-schrift hover:text-leise font-semibold flex items-center justify-center gap-1 mx-auto hover:underline cursor-pointer"
+                    className="text-xs gap-1 mx-auto hover:underline"
                   >
                     <Flame className="w-3.5 h-3.5 text-schaden" />
                     <span>+ Zauberschaden für diesen Spruch würfeln</span>
-                  </button>
+                  </Knopf>
                 </div>
               )}
             </>
@@ -2036,28 +1988,25 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
 
         {/* Modal Footer */}
         <div className="bg-erhoeht border-t border-rahmen px-4 sm:px-5 py-3 flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-2.5">
-          <button
-            type="button"
+          <Knopf
             onClick={onClose}
-            className="min-h-11 px-4 py-2 text-xs font-semibold text-schrift hover:text-schrift border border-rahmen rounded-karte hover:bg-rahmen transition-colors cursor-pointer w-full sm:w-auto text-center"
+            className="text-xs w-full sm:w-auto text-center"
           >
             Abbrechen
-          </button>
+          </Knopf>
 
           {hasRolled && egCalculation?.isSuccess && (
             currentHealingInfo?.isHealingSpell ? (
               <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
-                <button
-                  type="button"
+                <Knopf art="primaer"
                   onClick={() => handleCompleteCast()}
                   disabled={!canAffordFocus}
-                  className="min-h-11 bg-gold px-3 py-2 text-xs font-semibold text-seite underline decoration-dotted transition-colors cursor-pointer"
+                  className="text-xs underline decoration-dotted"
                   title="Zauber auf Ziel oder Verbündeten anwenden (ohne Selbstheilung)"
                 >
                   Auf Verbündeten wirken (-{finalCosts.totalFocus} FO)
-                </button>
-                <button
-                  type="button"
+                </Knopf>
+                <Knopf art="erholung"
                   onClick={() => {
                     handleCompleteCast({
                       hp: currentHealingInfo.totalLP,
@@ -2067,7 +2016,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                     });
                   }}
                   disabled={!canAffordFocus}
-                  className="min-h-11 py-2.5 px-5 bg-unverletzt-grund hover:bg-unverletzt text-schrift border border-unverletzt rounded-karte font-bold text-sm transition-transform active:scale-95 disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto"
+                  className="text-sm active:scale-95 disabled:pointer-events-none gap-2 w-full sm:w-auto"
                 >
                   <Heart className="w-4 h-4 fill-schrift shrink-0" />
                   <span>
@@ -2082,21 +2031,19 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                       (EG-verstärkt)
                     </span>
                   )}
-                </button>
+                </Knopf>
               </div>
             ) : currentHealingInfo?.conditionToRemove ? (
               <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
-                <button
-                  type="button"
+                <Knopf art="primaer"
                   onClick={() => handleCompleteCast()}
                   disabled={!canAffordFocus}
-                  className="min-h-11 bg-gold px-3 py-2 text-xs font-semibold text-seite underline decoration-dotted transition-colors cursor-pointer"
+                  className="text-xs underline decoration-dotted"
                   title="Zauber auf Ziel oder Verbündeten anwenden"
                 >
                   Auf Verbündeten wirken (-{finalCosts.totalFocus} FO)
-                </button>
-                <button
-                  type="button"
+                </Knopf>
+                <Knopf art="erholung"
                   onClick={() => {
                     handleCompleteCast({
                       removeCondition: currentHealingInfo.conditionToRemove,
@@ -2104,27 +2051,25 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                     });
                   }}
                   disabled={!canAffordFocus}
-                  className="min-h-11 py-2.5 px-5 bg-unverletzt-grund hover:bg-unverletzt text-schrift border border-unverletzt rounded-karte font-bold text-sm transition-transform active:scale-95 disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto"
+                  className="text-sm active:scale-95 disabled:pointer-events-none gap-2 w-full sm:w-auto"
                 >
                   <Sparkles className="w-4 h-4 text-unverletzt shrink-0" />
                   <span>Zustand aufheben ({currentHealingInfo.conditionToRemove})</span>
-                </button>
+                </Knopf>
               </div>
             ) : spellCausesDamage && !currentDamageResult ? (
               <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-                <button
-                  type="button"
+                <Knopf art="primaer"
                   onClick={() => handleCompleteCast()}
                   disabled={!canAffordFocus}
-                  className="min-h-11 bg-gold px-3 py-2 text-xs font-semibold text-seite underline decoration-dotted transition-colors cursor-pointer"
+                  className="text-xs underline decoration-dotted"
                   title="Zauber abschließen ohne Schaden auszuwürfeln"
                 >
                   Ohne Schaden vollenden
-                </button>
-                <button
-                  type="button"
+                </Knopf>
+                <Knopf art="primaer"
                   onClick={() => handleRollDamage()}
-                  className="min-h-11 py-2.5 px-6 bg-gold hover:bg-gold-hell text-seite border border-erschoepft rounded-karte font-bold text-sm transition-transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto"
+                  className="text-sm active:scale-95 gap-2 w-full sm:w-auto"
                 >
                   <Flame className="w-4 h-4 text-schaden" />
                   <span>
@@ -2133,14 +2078,13 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                     {customBaseBonus > 0 ? `+${customBaseBonus}` : ''}
                     {allocations.increaseDamage > 0 ? `+${allocations.increaseDamage}` : ''})
                   </span>
-                </button>
+                </Knopf>
               </div>
             ) : (
-              <button
-                type="button"
+              <Knopf art="primaer"
                 onClick={() => handleCompleteCast()}
                 disabled={!canAffordFocus}
-                className="min-h-11 py-2.5 px-6 bg-gold hover:bg-gold-hell text-seite border border-erschoepft rounded-karte font-bold text-sm transition-transform active:scale-95 disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto"
+                className="text-sm active:scale-95 disabled:pointer-events-none gap-2 w-full sm:w-auto"
               >
                 <Sparkles className="w-4 h-4 text-schrift" />
                 <span>
@@ -2148,7 +2092,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                   {currentDamageResult ? ` · ${currentDamageResult.total} Schaden` : ''}
                   {activeEnhancementEffects.length > 0 ? ` · ${activeEnhancementEffects.length} Verstärkung(en)` : ''})
                 </span>
-              </button>
+              </Knopf>
             )
           )}
         </div>

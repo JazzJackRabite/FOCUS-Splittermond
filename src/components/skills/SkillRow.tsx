@@ -1,4 +1,5 @@
 import React from 'react';
+import { Knopf } from '../../fundament';
 import { SourceBadge } from '../ui/SourceBadge';
 import { ATTRIBUTES, SKILL_CATEGORIES } from '../../data/rules';
 import { MASTERIES_DB, GENERAL_COMBAT_MASTERIES } from '../../data/masteries';
@@ -160,15 +161,15 @@ export const SkillRow: React.FC<SkillRowProps> = ({
         </div>
         <div className="w-full md:w-1/3 flex justify-end items-center space-x-1 md:space-x-2 no-print mt-1 md:mt-0">
           <div className="flex items-center space-x-1">
-            <button
+            <Knopf nurSymbol
               onClick={onDecrease}
               disabled={!canDecrease}
-              className="w-8 h-8 sm:w-7 sm:h-7 flex items-center justify-center rounded-knopf border border-rahmen bg-seite text-schrift hover:bg-erhoeht hover:border-gold active:scale-95 disabled:opacity-20 disabled:pointer-events-none shrink-0 font-bold text-sm touch-manipulation transition-all cursor-pointer "
+              className="sm:w-7 sm:h-7 active:scale-95 disabled:pointer-events-none shrink-0 text-sm touch-manipulation"
               title="Verringern"
               aria-label={`${name} verringern`}
             >
               -
-            </button>
+            </Knopf>
             <span
               className={`w-8 md:w-6 text-center font-bold tabular-nums text-sm ${
                 val > 0 ? 'text-gold' : 'text-leise'
@@ -176,15 +177,15 @@ export const SkillRow: React.FC<SkillRowProps> = ({
             >
               {val}
             </span>
-            <button
+            <Knopf nurSymbol
               onClick={onIncrease}
               disabled={!canIncrease}
-              className="w-8 h-8 sm:w-7 sm:h-7 flex items-center justify-center rounded-knopf border border-rahmen bg-seite text-schrift hover:bg-erhoeht hover:border-gold active:scale-95 disabled:opacity-20 disabled:pointer-events-none shrink-0 font-bold text-sm touch-manipulation transition-all cursor-pointer "
+              className="sm:w-7 sm:h-7 active:scale-95 disabled:pointer-events-none shrink-0 text-sm touch-manipulation"
               title="Erhöhen"
               aria-label={`${name} erhöhen`}
             >
               +
-            </button>
+            </Knopf>
           </div>
           <span className="w-12 md:w-10 text-[11px] text-right text-gold font-bold shrink-0">
             {cost > 0 ? `${cost} EP` : ''}
@@ -217,20 +218,20 @@ export const SkillRow: React.FC<SkillRowProps> = ({
             </div>
           )}
           {(val >= 6 || (creationMode && creationBudget > 0 && val >= 1)) && (
-            <button
+            <Knopf art="sekundaer"
               onClick={onAddMastery}
-              className="min-h-11 text-xs bg-erhoeht hover:bg-rahmen active:scale-[0.98] px-3 py-2 md:py-1.5 rounded-knopf w-full text-center no-print border border-gold text-schrift font-bold touch-manipulation transition-colors cursor-pointer "
+              className="text-xs active:scale-[0.98] md:py-1.5 w-full text-center no-print touch-manipulation"
             >
               + Meisterschaft hinzufügen
-            </button>
+            </Knopf>
           )}
           {isMagic && val >= 1 && (
-            <button
+            <Knopf
               onClick={onAddSpell}
-              className="min-h-11 text-xs bg-erhoeht hover:bg-rahmen active:scale-[0.98] px-3 py-2 md:py-1.5 rounded-knopf w-full text-center no-print border border-kanalisiert text-schrift hover:text-schrift font-bold touch-manipulation transition-colors cursor-pointer "
+              className="text-xs active:scale-[0.98] md:py-1.5 w-full text-center no-print touch-manipulation"
             >
               + Zauber hinzufügen
-            </button>
+            </Knopf>
           )}
 
           {sortedMasteries.length > 0 && (
@@ -264,15 +265,15 @@ export const SkillRow: React.FC<SkillRowProps> = ({
                       />
                     </div>
                     {canRemoveMastery && (
-                      <button
+                      <Knopf
                         onClick={() =>
                           onRemoveMasteryById ? onRemoveMasteryById(m.id) : onRemoveMastery(idx)
                         }
-                        className="text-schaden hover:text-schaden font-bold px-2 text-base min-h-[28px] min-w-[28px] flex items-center justify-center cursor-pointer transition-colors"
+                        className="text-base"
                         title="Löschen"
                       >
                         ×
-                      </button>
+                      </Knopf>
                     )}
                   </div>
                 );
@@ -316,13 +317,13 @@ export const SkillRow: React.FC<SkillRowProps> = ({
                       />
                     </div>
                     {canRemoveSpell && (
-                      <button
+                      <Knopf
                         onClick={() => onRemoveSpell(s)}
-                        className="text-schaden hover:text-schaden font-bold px-2 text-base min-h-[28px] min-w-[28px] flex items-center justify-center cursor-pointer transition-colors"
+                        className="text-base"
                         title="Löschen"
                       >
                         ×
-                      </button>
+                      </Knopf>
                     )}
                   </div>
                 );

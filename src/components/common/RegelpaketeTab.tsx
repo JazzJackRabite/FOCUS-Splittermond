@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import { Knopf } from '../../fundament';
 import { BookOpen, CheckCircle2, Lock, Trash2, Upload, AlertTriangle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useRegelwerk } from '../../regelwerk/RegelwerkContext';
@@ -50,9 +51,9 @@ export const RegelpaketeTab: React.FC = () => {
                 </span>
                 <span className="flex items-center gap-2 text-xs text-leise">
                   {b.paket.eintraege.length} Einträge
-                  <button type="button" onClick={() => rw.entfernen(b.info.id)} className="p-1 rounded-knopf hover:bg-black/5 text-leise hover:text-schaden cursor-pointer" aria-label={`${b.info.titel} entfernen`} title="Entfernen">
+                  <Knopf nurSymbol onClick={() => rw.entfernen(b.info.id)}  aria-label={`${b.info.titel} entfernen`} title="Entfernen">
                     <Trash2 size={15} />
-                  </button>
+                  </Knopf>
                 </span>
               </li>
             );

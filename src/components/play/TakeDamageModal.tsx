@@ -1,5 +1,6 @@
 import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import React, { useState, useMemo } from 'react';
+import { Knopf, Dialog } from '../../fundament';
 import { Flame, Shield, Sparkles, X, Plus, Minus, AlertTriangle, Heart, Check } from 'lucide-react';
 import { ALL_CONDITIONS, CONDITIONS_WITH_LEVELS } from '../../data/rules';
 import type { HealthSlot } from '../../types';
@@ -255,20 +256,17 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
               1. Eingehender Schaden (Brutto)
             </label>
             <div className="flex items-center gap-2">
-              <button
-                type="button"
+              <Knopf
                 onClick={() => setRawDamage((d) => Math.max(0, d - 5))}
-                className="px-2.5 py-1.5 rounded-knopf bg-erhoeht hover:bg-rahmen text-xs font-bold text-schrift border border-rahmen cursor-pointer"
+                className="text-xs"
               >
                 -5
-              </button>
-              <button
-                type="button"
+              </Knopf>
+              <Knopf nurSymbol
                 onClick={() => setRawDamage((d) => Math.max(0, d - 1))}
-                className="w-8 h-8 rounded-knopf bg-erhoeht hover:bg-rahmen flex items-center justify-center font-bold text-schrift border border-rahmen cursor-pointer"
               >
                 <Minus size={14} />
-              </button>
+              </Knopf>
 
               <div className="flex-1 text-center">
                 <input
@@ -282,27 +280,23 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
                 />
               </div>
 
-              <button
-                type="button"
+              <Knopf nurSymbol
                 onClick={() => setRawDamage((d) => d + 1)}
-                className="w-8 h-8 rounded-knopf bg-erhoeht hover:bg-rahmen flex items-center justify-center font-bold text-schrift border border-rahmen cursor-pointer"
               >
                 <Plus size={14} />
-              </button>
-              <button
-                type="button"
+              </Knopf>
+              <Knopf
                 onClick={() => setRawDamage((d) => d + 5)}
-                className="px-2.5 py-1.5 rounded-knopf bg-erhoeht hover:bg-rahmen text-xs font-bold text-schrift border border-rahmen cursor-pointer"
+                className="text-xs"
               >
                 +5
-              </button>
-              <button
-                type="button"
+              </Knopf>
+              <Knopf
                 onClick={() => setRawDamage((d) => d + 10)}
-                className="px-2.5 py-1.5 rounded-knopf bg-erhoeht hover:bg-rahmen text-xs font-bold text-schrift border border-rahmen cursor-pointer"
+                className="text-xs"
               >
                 +10
-              </button>
+              </Knopf>
             </div>
           </div>
 
@@ -316,7 +310,7 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
               <button
                 type="button"
                 onClick={() => setDamageKind('consumed')}
-                className={`p-2 rounded-knopf border text-left transition-all cursor-pointer ${
+                className={`min-h-11 p-2 rounded-knopf border text-left transition-all cursor-pointer ${
                   damageKind === 'consumed'
                     ? 'bg-schaden-grund border-schaden text-schrift'
                     : 'bg-seite border-rahmen text-schrift hover:bg-seite'
@@ -333,7 +327,7 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
               <button
                 type="button"
                 onClick={() => setDamageKind('exhausted')}
-                className={`p-2 rounded-knopf border text-left transition-all cursor-pointer ${
+                className={`min-h-11 p-2 rounded-knopf border text-left transition-all cursor-pointer ${
                   damageKind === 'exhausted'
                     ? 'bg-erschoepft-grund border-erschoepft text-schrift'
                     : 'bg-seite border-rahmen text-schrift hover:bg-seite'
@@ -350,7 +344,7 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
               <button
                 type="button"
                 onClick={() => setDamageKind('channeled')}
-                className={`p-2 rounded-knopf border text-left transition-all cursor-pointer ${
+                className={`min-h-11 p-2 rounded-knopf border text-left transition-all cursor-pointer ${
                   damageKind === 'channeled'
                     ? 'bg-flaeche border-kanalisiert text-schrift'
                     : 'bg-seite border-rahmen text-schrift hover:bg-seite'
@@ -542,13 +536,12 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
                 />
               )}
 
-              <button
-                type="button"
+              <Knopf
                 onClick={handleAddExtraCondition}
-                className="px-2.5 py-1 rounded-knopf bg-erhoeht hover:bg-rahmen text-xs font-bold text-schrift border border-rahmen cursor-pointer shrink-0"
+                className="text-xs shrink-0"
               >
                 + Zustand
-              </button>
+              </Knopf>
             </div>
 
             {/* Selected extra conditions pills */}
@@ -563,13 +556,12 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
                       {item.key}
                       {item.level ? ` ${item.level}` : ''}
                     </span>
-                    <button
-                      type="button"
+                    <Knopf
                       onClick={() => handleRemoveExtraCondition(idx)}
-                      className="text-leise hover:text-schrift cursor-pointer ml-0.5"
+                      className="ml-0.5"
                     >
                       ×
-                    </button>
+                    </Knopf>
                   </span>
                 ))}
               </div>
@@ -628,24 +620,22 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
 
         {/* Footer Actions */}
         <div className="px-4 sm:px-5 py-3 border-t border-rahmen bg-seite flex items-center justify-between gap-3 shrink-0">
-          <button
-            type="button"
+          <Knopf
             onClick={onClose}
-            className="min-h-11 px-3.5 py-1.5 rounded-knopf text-xs font-semibold text-schrift hover:bg-seite transition-colors cursor-pointer"
+            className="text-xs"
           >
             Abbrechen
-          </button>
+          </Knopf>
 
-          <button
-            type="button"
+          <Knopf art="primaer"
             onClick={() => handleSubmit()}
-            className="min-h-11 px-5 py-2 rounded-knopf text-xs sm:text-sm font-bold bg-gold text-seite hover:bg-gold-hell transition-colors cursor-pointer flex items-center gap-1.5"
+            className="text-xs sm:text-sm gap-1.5"
           >
             <Check size={16} />
             <span>
               {finalDamage} {damageKind === 'consumed' ? 'echten' : damageKind === 'exhausted' ? 'Betäubungs-' : 'kanalis.'} Schaden anwenden
             </span>
-          </button>
+          </Knopf>
         </div>
       </Dialogfenster>
     </Dialoghintergrund>

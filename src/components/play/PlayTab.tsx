@@ -1,4 +1,5 @@
 import React from 'react';
+import { Knopf } from '../../fundament';
 import DiceIcon from '../ui/DiceIcon';
 import { useCharacter } from '../../context/CharacterContext';
 import { usePlaySession } from '../../context/PlaySessionContext';
@@ -61,8 +62,7 @@ export const PlayTab: React.FC = () => {
                 const beh = isAffected ? totalHandicap : 0;
                 return (
                   <div key={skill} className="flex flex-col">
-                    <button
-                      type="button"
+                    <Knopf
                       onClick={() => session.openRollForSkill(skill)}
                       title={
                         beh > 0
@@ -94,7 +94,7 @@ export const PlayTab: React.FC = () => {
                         )}
                         <span className="font-titel font-bold text-lg">{total}</span>
                       </span>
-                    </button>
+                    </Knopf>
                     {skillMasteries.length > 0 && (
                       <ul className="ml-2 mt-1 space-y-1">
                         {skillMasteries.map((m) => {
@@ -293,9 +293,8 @@ export const PlayTab: React.FC = () => {
             </div>
             <div className="grid grid-cols-2 gap-2">
               {Object.entries(ATTRIBUTES).map(([key, label]) => (
-                <button
+                <Knopf
                   key={key}
-                  type="button"
                   onClick={() => session.openRollForAttr(key)}
                   className="min-h-11 flex justify-between items-center bg-erhoeht hover:bg-rahmen rounded-knopf px-3 py-2 text-sm font-bold text-schrift transition-all border border-transparent hover:border-gold cursor-pointer"
                   title={`${label}: Klick für Attributsprobe (2W10 + ${key})`}
@@ -304,7 +303,7 @@ export const PlayTab: React.FC = () => {
                     <DiceIcon size={14} /> {key}
                   </span>
                   <span className="text-lg tabular-nums">{currentAttributes[key] ?? 0}</span>
-                </button>
+                </Knopf>
               ))}
             </div>
           </div>

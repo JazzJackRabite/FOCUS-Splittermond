@@ -175,10 +175,10 @@ const Werkstatt: React.FC<{ k: Katalog; start: Relikt; frei: number; schliessen:
               <ul className="absolute z-10 left-0 right-0 bg-flaeche border border-rahmen rounded-knopf max-h-56 overflow-y-auto m-0 p-0 list-none">
                 {basisTreffer.map(i => (
                   <li key={i.id}>
-                    <button type="button" className="w-full min-h-11 text-left px-3 py-2 text-sm text-schrift hover:bg-erhoeht cursor-pointer"
+                    <Knopf className="w-full text-left text-sm"
                       onClick={() => { setR({ ...r, basisId: i.id, art: artVon(i), name: r.name || i.name }); setBasisSuche(i.name); }}>
                       {i.name} <span className="text-leise">({i.category}, {i.source})</span>
-                    </button>
+                    </Knopf>
                   </li>
                 ))}
               </ul>

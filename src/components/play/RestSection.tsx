@@ -1,5 +1,6 @@
 import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import React, { useState, useEffect } from 'react';
+import { Knopf, Dialog } from '../../fundament';
 import { Sun, Moon, RotateCcw, Settings, Heart, Sparkles, X, Check, Clock } from 'lucide-react';
 import type { ItemEntry, Mastery } from '../../types';
 
@@ -211,36 +212,33 @@ export const RestSection: React.FC<RestSectionProps> = ({
 
           {/* Action Row */}
           <div className="pt-3 mt-2 border-t border-rahmen flex flex-col gap-2">
-            <button
+            <Knopf art="erholung"
               id="btn-execute-verschnaufpause"
-              type="button"
               onClick={handleExecuteVerschnaufpause}
-              className="w-full min-h-[42px] px-4 py-2 rounded-knopf bg-gold hover:bg-gold-hell active:scale-[0.99] text-seite font-bold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer select-none border border-gold"
+              className="w-full active:scale-[0.99] text-sm gap-2 select-none"
             >
               <Sun size={17} className="text-gold" />
               <span>Verschnaufpause durchführen</span>
-            </button>
+            </Knopf>
 
             <div className="flex items-center justify-between text-xs px-0.5">
-              <button
-                type="button"
+              <Knopf
                 onClick={() => setActiveModal('verschnaufpause')}
-                className="text-leise hover:text-gold-hell flex items-center gap-1 font-medium transition-colors hover:underline cursor-pointer py-1"
+                className="gap-1 hover:underline"
               >
                 <Settings size={13} className="text-gold" />
                 <span>Optionen anpassen</span>
-              </button>
+              </Knopf>
 
               {!isVpDefault && (
-                <button
-                  type="button"
+                <Knopf
                   onClick={resetVpToDefault}
-                  className="text-schaden hover:text-schaden flex items-center gap-1 font-bold text-[11px] hover:underline cursor-pointer py-1"
+                  className="gap-1 text-[11px] hover:underline"
                   title="Auf berechnete Regelwerte zurücksetzen"
                 >
                   <RotateCcw size={12} />
                   <span>Standardwerte wiederherstellen</span>
-                </button>
+                </Knopf>
               )}
             </div>
           </div>
@@ -297,36 +295,33 @@ export const RestSection: React.FC<RestSectionProps> = ({
 
           {/* Action Row */}
           <div className="pt-3 mt-2 border-t border-rahmen flex flex-col gap-2">
-            <button
+            <Knopf art="erholung"
               id="btn-execute-ruhephase"
-              type="button"
               onClick={handleExecuteRuhephase}
-              className="w-full min-h-[42px] px-4 py-2 rounded-knopf bg-gold hover:bg-gold-hell active:scale-[0.99] text-seite font-bold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer select-none border border-gold"
+              className="w-full active:scale-[0.99] text-sm gap-2 select-none"
             >
               <Moon size={17} className="text-gold" />
               <span>Ruhephase durchführen</span>
-            </button>
+            </Knopf>
 
             <div className="flex items-center justify-between text-xs px-0.5">
-              <button
-                type="button"
+              <Knopf
                 onClick={() => setActiveModal('ruhephase')}
-                className="text-leise hover:text-gold-hell flex items-center gap-1 font-medium transition-colors hover:underline cursor-pointer py-1"
+                className="gap-1 hover:underline"
               >
                 <Settings size={13} className="text-gold" />
                 <span>Optionen anpassen</span>
-              </button>
+              </Knopf>
 
               {!isRuhephaseDefault && (
-                <button
-                  type="button"
+                <Knopf
                   onClick={resetRuhephaseToDefault}
-                  className="text-schaden hover:text-schaden flex items-center gap-1 font-bold text-[11px] hover:underline cursor-pointer py-1"
+                  className="gap-1 text-[11px] hover:underline"
                   title="Auf berechnete Regelwerte zurücksetzen"
                 >
                   <RotateCcw size={12} />
                   <span>Standardwerte wiederherstellen</span>
-                </button>
+                </Knopf>
               )}
             </div>
           </div>
@@ -441,13 +436,12 @@ export const RestSection: React.FC<RestSectionProps> = ({
                         <div className="flex items-center justify-between pt-1 border-t border-rahmen">
                           <span className="text-xs text-leise">Maximal zu heilende LP:</span>
                           <div className="flex items-center rounded-knopf border border-rahmen bg-erhoeht overflow-hidden h-7">
-                            <button
-                              type="button"
+                            <Knopf
                               onClick={() => setVpStunAmount((prev) => Math.max(0, prev - 1))}
-                              className="w-7 h-full hover:bg-rahmen text-schrift font-bold flex items-center justify-center transition-colors"
+                              className="w-7 h-full"
                             >
                               −
-                            </button>
+                            </Knopf>
                             <input
                               type="number"
                               min={0}
@@ -457,13 +451,12 @@ export const RestSection: React.FC<RestSectionProps> = ({
                               onChange={(e) => setVpStunAmount(Math.max(0, parseInt(e.target.value, 10) || 0))}
                               className="w-12 h-full text-center font-bold text-xs text-schrift bg-transparent border-0 outline-none"
                             />
-                            <button
-                              type="button"
+                            <Knopf
                               onClick={() => setVpStunAmount((prev) => prev + 1)}
-                              className="w-7 h-full hover:bg-rahmen text-schrift font-bold flex items-center justify-center transition-colors"
+                              className="w-7 h-full"
                             >
                               +
-                            </button>
+                            </Knopf>
                           </div>
                         </div>
                       )}
@@ -496,13 +489,12 @@ export const RestSection: React.FC<RestSectionProps> = ({
                         <div className="flex items-center justify-between pt-1 border-t border-rahmen">
                           <span className="text-xs text-leise">Maximal zu heilender FO:</span>
                           <div className="flex items-center rounded-knopf border border-rahmen bg-erhoeht overflow-hidden h-7">
-                            <button
-                              type="button"
+                            <Knopf
                               onClick={() => setVpFocusAmount((prev) => Math.max(0, prev - 1))}
-                              className="w-7 h-full hover:bg-rahmen text-schrift font-bold flex items-center justify-center transition-colors"
+                              className="w-7 h-full"
                             >
                               −
-                            </button>
+                            </Knopf>
                             <input
                               type="number"
                               min={0}
@@ -512,13 +504,12 @@ export const RestSection: React.FC<RestSectionProps> = ({
                               onChange={(e) => setVpFocusAmount(Math.max(0, parseInt(e.target.value, 10) || 0))}
                               className="w-12 h-full text-center font-bold text-xs text-schrift bg-transparent border-0 outline-none"
                             />
-                            <button
-                              type="button"
+                            <Knopf
                               onClick={() => setVpFocusAmount((prev) => prev + 1)}
-                              className="w-7 h-full hover:bg-rahmen text-schrift font-bold flex items-center justify-center transition-colors"
+                              className="w-7 h-full"
                             >
                               +
-                            </button>
+                            </Knopf>
                           </div>
                         </div>
                       )}
@@ -534,13 +525,12 @@ export const RestSection: React.FC<RestSectionProps> = ({
                       <div className="flex items-center justify-between">
                         <span className="font-bold text-schrift text-xs">Erschöpfung abbauen:</span>
                         <div className="flex items-center rounded-knopf border border-rahmen bg-erhoeht overflow-hidden h-7">
-                          <button
-                            type="button"
+                          <Knopf
                             onClick={() => setVpExhaustReduction((prev) => Math.max(0, prev - 1))}
-                            className="w-7 h-full hover:bg-rahmen text-schrift font-bold flex items-center justify-center transition-colors"
+                            className="w-7 h-full"
                           >
                             −
-                          </button>
+                          </Knopf>
                           <input
                             type="number"
                             min={0}
@@ -550,13 +540,12 @@ export const RestSection: React.FC<RestSectionProps> = ({
                             onChange={(e) => setVpExhaustReduction(Math.max(0, parseInt(e.target.value, 10) || 0))}
                             className="w-12 h-full text-center font-bold text-xs text-schrift bg-transparent border-0 outline-none"
                           />
-                          <button
-                            type="button"
+                          <Knopf
                             onClick={() => setVpExhaustReduction((prev) => prev + 1)}
-                            className="w-7 h-full hover:bg-rahmen text-schrift font-bold flex items-center justify-center transition-colors"
+                            className="w-7 h-full"
                           >
                             +
-                          </button>
+                          </Knopf>
                         </div>
                       </div>
 
@@ -651,13 +640,12 @@ export const RestSection: React.FC<RestSectionProps> = ({
                       </div>
 
                       <div className="flex items-center rounded-knopf border border-rahmen bg-flaeche overflow-hidden h-9">
-                        <button
-                          type="button"
+                        <Knopf
                           onClick={() => setCustomLP((prev) => Math.max(0, prev - 1))}
-                          className="w-9 h-full hover:bg-rahmen text-schrift font-bold flex items-center justify-center transition-colors cursor-pointer"
+                          className="w-9 h-full"
                         >
                           −
-                        </button>
+                        </Knopf>
                         <input
                           type="number"
                           min={0}
@@ -667,13 +655,12 @@ export const RestSection: React.FC<RestSectionProps> = ({
                           onChange={(e) => setCustomLP(Math.max(0, parseInt(e.target.value, 10) || 0))}
                           className="flex-1 h-full text-center font-bold text-sm text-schrift bg-transparent border-0 outline-none tabular-nums"
                         />
-                        <button
-                          type="button"
+                        <Knopf
                           onClick={() => setCustomLP((prev) => prev + 1)}
-                          className="w-9 h-full hover:bg-rahmen text-schrift font-bold flex items-center justify-center transition-colors cursor-pointer"
+                          className="w-9 h-full"
                         >
                           +
-                        </button>
+                        </Knopf>
                       </div>
                       <p className="text-[11px] text-leise">
                         Heilt echten Schaden (Verzehrt ■ / Schrägstrich).
@@ -693,13 +680,12 @@ export const RestSection: React.FC<RestSectionProps> = ({
                       </div>
 
                       <div className="flex items-center rounded-knopf border border-rahmen bg-flaeche overflow-hidden h-9">
-                        <button
-                          type="button"
+                        <Knopf
                           onClick={() => setCustomFO((prev) => Math.max(0, prev - 1))}
-                          className="w-9 h-full hover:bg-flaeche text-schrift font-bold flex items-center justify-center transition-colors cursor-pointer"
+                          className="w-9 h-full"
                         >
                           −
-                        </button>
+                        </Knopf>
                         <input
                           type="number"
                           min={0}
@@ -709,13 +695,12 @@ export const RestSection: React.FC<RestSectionProps> = ({
                           onChange={(e) => setCustomFO(Math.max(0, parseInt(e.target.value, 10) || 0))}
                           className="flex-1 h-full text-center font-bold text-sm text-schrift bg-transparent border-0 outline-none tabular-nums"
                         />
-                        <button
-                          type="button"
+                        <Knopf
                           onClick={() => setCustomFO((prev) => prev + 1)}
-                          className="w-9 h-full hover:bg-flaeche text-schrift font-bold flex items-center justify-center transition-colors cursor-pointer"
+                          className="w-9 h-full"
                         >
                           +
-                        </button>
+                        </Knopf>
                       </div>
                       <p className="text-[11px] text-leise">
                         Regeneriert verzehrten Fokus.
@@ -731,56 +716,51 @@ export const RestSection: React.FC<RestSectionProps> = ({
               {/* Reset to standard button (only if modified) */}
               <div>
                 {activeModal === 'verschnaufpause' && !isVpDefault && (
-                  <button
-                    type="button"
+                  <Knopf
                     onClick={resetVpToDefault}
-                    className="text-schaden hover:text-schaden flex items-center gap-1.5 font-bold text-xs hover:underline cursor-pointer py-1"
+                    className="gap-1.5 text-xs hover:underline"
                   >
                     <RotateCcw size={13} />
                     <span>Standardwerte wiederherstellen</span>
-                  </button>
+                  </Knopf>
                 )}
 
                 {activeModal === 'ruhephase' && !isRuhephaseDefault && (
-                  <button
-                    type="button"
+                  <Knopf
                     onClick={resetRuhephaseToDefault}
-                    className="text-schaden hover:text-schaden flex items-center gap-1.5 font-bold text-xs hover:underline cursor-pointer py-1"
+                    className="gap-1.5 text-xs hover:underline"
                   >
                     <RotateCcw size={13} />
                     <span>Standardwerte wiederherstellen</span>
-                  </button>
+                  </Knopf>
                 )}
               </div>
 
               {/* Action buttons */}
               <div className="flex items-center gap-2 ml-auto">
-                <button
-                  type="button"
+                <Knopf
                   onClick={() => setActiveModal(null)}
-                  className="min-h-11 px-3.5 py-2 rounded-knopf border border-rahmen bg-flaeche hover:bg-rahmen text-schrift font-bold text-xs transition-colors cursor-pointer"
+                  className="text-xs"
                 >
                   Übernehmen &amp; Schließen
-                </button>
+                </Knopf>
 
                 {activeModal === 'verschnaufpause' ? (
-                  <button
-                    type="button"
+                  <Knopf art="erholung"
                     onClick={handleExecuteVerschnaufpause}
-                    className="min-h-11 px-4 py-2 rounded-knopf bg-gold hover:bg-gold-hell text-seite font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer border border-gold"
+                    className="text-xs gap-1.5"
                   >
                     <Sun size={14} className="text-gold" />
                     <span>Jetzt durchführen</span>
-                  </button>
+                  </Knopf>
                 ) : (
-                  <button
-                    type="button"
+                  <Knopf art="erholung"
                     onClick={handleExecuteRuhephase}
-                    className="min-h-11 px-4 py-2 rounded-knopf bg-gold hover:bg-gold-hell text-seite font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer border border-gold"
+                    className="text-xs gap-1.5"
                   >
                     <Moon size={14} className="text-gold" />
                     <span>Jetzt durchführen</span>
-                  </button>
+                  </Knopf>
                 )}
               </div>
             </div>

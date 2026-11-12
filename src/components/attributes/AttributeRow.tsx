@@ -1,4 +1,5 @@
 import React from 'react';
+import { Knopf } from '../../fundament';
 import { ATTRIBUTES } from '../../data/rules';
 import type { AttributeRowProps } from '../../types';
 
@@ -28,15 +29,15 @@ export const AttributeRow: React.FC<AttributeRowProps> = ({
       </div>
     </div>
     <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 no-print">
-      <button
+      <Knopf nurSymbol
         onClick={onDecrease}
         disabled={!canDecrease}
-        className="w-8 h-8 sm:w-7 sm:h-7 flex items-center justify-center rounded-knopf border border-rahmen bg-seite text-schrift hover:bg-erhoeht hover:border-gold active:scale-95 disabled:opacity-20 disabled:pointer-events-none shrink-0 font-bold text-sm touch-manipulation transition-all cursor-pointer "
+        className="sm:w-7 sm:h-7 active:scale-95 disabled:pointer-events-none shrink-0 text-sm touch-manipulation"
         aria-label={`${ATTRIBUTES[attrKey as keyof typeof ATTRIBUTES]} verringern`}
         title="Verringern"
       >
         -
-      </button>
+      </Knopf>
       <div className="flex flex-col items-center justify-center min-w-[2.25rem] sm:min-w-[2.5rem] px-0.5">
         <div className="tabular-nums text-lg sm:text-xl font-bold text-gold leading-none">{total}</div>
         {cost > 0 && (
@@ -45,15 +46,15 @@ export const AttributeRow: React.FC<AttributeRowProps> = ({
           </span>
         )}
       </div>
-      <button
+      <Knopf nurSymbol
         onClick={onIncrease}
         disabled={!canIncrease}
-        className="w-8 h-8 sm:w-7 sm:h-7 flex items-center justify-center rounded-knopf border border-rahmen bg-seite text-schrift hover:bg-erhoeht hover:border-gold active:scale-95 disabled:opacity-20 disabled:pointer-events-none shrink-0 font-bold text-sm touch-manipulation transition-all cursor-pointer "
+        className="sm:w-7 sm:h-7 active:scale-95 disabled:pointer-events-none shrink-0 text-sm touch-manipulation"
         aria-label={`${ATTRIBUTES[attrKey as keyof typeof ATTRIBUTES]} erhöhen`}
         title="Erhöhen"
       >
         +
-      </button>
+      </Knopf>
     </div>
   </div>
 );

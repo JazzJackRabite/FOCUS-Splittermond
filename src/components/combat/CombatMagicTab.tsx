@@ -1,5 +1,6 @@
 import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import React, { useState, useMemo, useRef, useLayoutEffect } from 'react';
+import { Knopf, Dialog } from '../../fundament';
 import {
   Swords,
   Shield,
@@ -126,14 +127,13 @@ const QuickSpellCard: React.FC<QuickSpellCardProps> = ({ spell, session }) => {
             ref={buttonsRef}
             className="flex items-center justify-end gap-1.5 shrink-0 pt-1 border-t border-rahmen"
           >
-            <button
-              type="button"
+            <Knopf
               onClick={() => session.handleOpenCastSpell(spell)}
               className="bg-erhoeht hover:bg-rahmen text-schrift text-xs px-2.5 py-1 rounded-knopf font-bold transition-all flex items-center gap-1 border border-rahmen cursor-pointer whitespace-nowrap active:scale-95"
             >
-              <Sparkles size={12} className="text-gold" />
+              <Sparkles size={12} className="text-magie" />
               <span>Zaubern</span>
-            </button>
+            </Knopf>
             <SourceBadge
               source={info.source || 'GRW'}
               page={info.page}
@@ -159,14 +159,13 @@ const QuickSpellCard: React.FC<QuickSpellCardProps> = ({ spell, session }) => {
           </div>
 
           <div ref={buttonsRef} className="flex items-center gap-1.5 shrink-0 ml-auto">
-            <button
-              type="button"
+            <Knopf
               onClick={() => session.handleOpenCastSpell(spell)}
               className="bg-erhoeht hover:bg-rahmen text-schrift text-xs px-2.5 py-1 rounded-knopf font-bold transition-all flex items-center gap-1 border border-rahmen cursor-pointer whitespace-nowrap active:scale-95"
             >
-              <Sparkles size={12} className="text-gold" />
+              <Sparkles size={12} className="text-magie" />
               <span>Zaubern</span>
-            </button>
+            </Knopf>
             <SourceBadge
               source={info.source || 'GRW'}
               page={info.page}
@@ -409,14 +408,13 @@ export const CombatMagicTab: React.FC = () => {
                 <Swords size={20} className="text-gold shrink-0" />
                 <span>Waffen &amp; Angriffe</span>
               </h3>
-              <button
-                type="button"
+              <Knopf art="sekundaer"
                 onClick={() => setShowAddWeaponModal(true)}
-                className="min-h-11 bg-erhoeht hover:bg-rahmen text-schrift border border-gold px-3 py-1.5 rounded-knopf text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap active:scale-95"
+                className="text-xs gap-1.5 shrink-0 whitespace-nowrap active:scale-95"
               >
                 <Plus size={14} className="text-gold" />
                 <span>Waffe</span>
-              </button>
+              </Knopf>
             </div>
 
             {/* List of Weapons */}
@@ -466,24 +464,22 @@ export const CombatMagicTab: React.FC = () => {
 
                 {/* Primary Action Buttons */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-rahmen">
-                  <button
-                    type="button"
+                  <Knopf art="sekundaer"
                     onClick={() => session.openRollForWeapon('Waffenlos', 'Handgemenge', 0, 15, { id: 'waffenlos', damage: '1W6', wgs: 5, attributes: 'Stumpf' })}
-                    className="min-h-11 w-full bg-erhoeht hover:bg-rahmen text-schrift border border-gold px-3 py-2 rounded-knopf text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
+                    className="w-full text-xs gap-1.5 active:scale-95"
                     title="Angriffsprobe & Manöver öffnen (2W10 + AT vs. VTD)"
                   >
                     <DiceIcon size={15} />
                     <span>Angriff (Handgemenge)</span>
-                  </button>
-                  <button
-                    type="button"
+                  </Knopf>
+                  <Knopf
                     onClick={() => session.handleRollDiceFormula(getWeaponEnchantments({ id: 'waffenlos', name: 'Waffenlos', damage: '1W6' }, channeledSpells).damageRollFormula, 'Waffenloser Schaden')}
-                    className="min-h-11 damage-roll-btn w-full px-3 py-2 rounded-knopf text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 active:scale-95"
+                    className="damage-roll-btn w-full text-xs gap-1.5 active:scale-95"
                     title="Schaden würfeln (1W6)"
                   >
                     <span className="text-xs"></span>
                     <span className="tracking-wide text-schrift font-extrabold">1W6 Schaden</span>
-                  </button>
+                  </Knopf>
                 </div>
               </div>
 
@@ -567,7 +563,7 @@ export const CombatMagicTab: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => dispatch({ type: 'TOGGLE_EQUIP_ITEM', payload: { id: w.id } })}
-                          className={`px-2.5 py-1 rounded-knopf border text-xs cursor-pointer transition-all whitespace-nowrap font-medium ${
+                          className={`min-h-11 px-2.5 py-1 rounded-knopf border text-xs cursor-pointer transition-all whitespace-nowrap font-medium ${
                             w.equipped
                               ? 'bg-erschoepft-grund text-erschoepft border-erschoepft hover:bg-erschoepft hover:text-seite'
                               : 'bg-erhoeht text-schrift border-rahmen hover:bg-rahmen'
@@ -576,17 +572,15 @@ export const CombatMagicTab: React.FC = () => {
                         >
                           {w.equipped ? 'Wegstecken' : 'Ziehen'}
                         </button>
-                        <button
-                          type="button"
+                        <Knopf nurSymbol
                           onClick={() => {
                             dispatch({ type: 'REMOVE_INVENTORY_ITEM', payload: { id: w.id } });
                             toast.success(`'${w.name}' entfernt`);
                           }}
-                          className="p-1 rounded-knopf text-leise hover:text-schrift hover:bg-schaden-grund transition-all cursor-pointer"
                           title="Waffe löschen"
                         >
                           <Trash2 size={15} />
-                        </button>
+                        </Knopf>
                       </div>
                     </div>
 
@@ -646,10 +640,9 @@ export const CombatMagicTab: React.FC = () => {
 
                     {/* Primary Combat Action Buttons (Roll Attack & Roll Damage) */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-rahmen">
-                      <button
-                        type="button"
+                      <Knopf art="sekundaer"
                         onClick={() => session.openRollForWeapon(w.name, skillName, 0, 15, w)}
-                        className="min-h-11 w-full bg-erhoeht hover:bg-rahmen text-schrift border border-gold px-3 py-2 rounded-knopf text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
+                        className="w-full text-xs gap-1.5 active:scale-95"
                         title={`Angriff & Manöver mit ${w.name} öffnen (2W10 + AT vs. VTD)`}
                       >
                         <DiceIcon size={15} />
@@ -657,21 +650,20 @@ export const CombatMagicTab: React.FC = () => {
                           Angriff ({skillName})
                           {enchantments.atBonus > 0 && ` +${enchantments.atBonus}`}
                         </span>
-                      </button>
-                      <button
-                        type="button"
+                      </Knopf>
+                      <Knopf
                         onClick={() =>
                           session.handleRollDiceFormula(
                             enchantments.damageRollFormula,
                             `${w.name} Schaden${enchantments.extraDamageText ? ` (${enchantments.extraDamageText})` : ''}`
                           )
                         }
-                        className="min-h-11 damage-roll-btn w-full px-3 py-2 rounded-knopf text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 active:scale-95"
+                        className="damage-roll-btn w-full text-xs gap-1.5 active:scale-95"
                         title={`Schaden würfeln (${enchantments.damageRollFormula})`}
                       >
                         <DiceIcon size={15} />
                         <span className="tracking-wide text-schrift font-extrabold">{enchantments.buttonDamageLabel}</span>
-                      </button>
+                      </Knopf>
                     </div>
                   </div>
                 );
@@ -686,14 +678,13 @@ export const CombatMagicTab: React.FC = () => {
                 <Shield size={20} className="text-gold shrink-0" />
                 <span>Rüstungen &amp; Schilde</span>
               </h3>
-              <button
-                type="button"
+              <Knopf art="sekundaer"
                 onClick={() => setShowAddArmorModal(true)}
-                className="min-h-11 bg-erhoeht hover:bg-rahmen text-schrift border border-gold px-3 py-1.5 rounded-knopf text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap active:scale-95"
+                className="text-xs gap-1.5 shrink-0 whitespace-nowrap active:scale-95"
               >
                 <Plus size={14} className="text-gold" />
                 <span>Rüstung / Schild</span>
-              </button>
+              </Knopf>
             </div>
 
             {/* Defense Summary Strip - Responsive Grid that scales gracefully on all viewport sizes */}
@@ -854,17 +845,15 @@ export const CombatMagicTab: React.FC = () => {
                         >
                           {a.equipped ? 'Ablegen' : 'Anlegen'}
                         </button>
-                        <button
-                          type="button"
+                        <Knopf nurSymbol
                           onClick={() => {
                             dispatch({ type: 'REMOVE_INVENTORY_ITEM', payload: { id: a.id } });
                             toast.success(`'${a.name}' entfernt`);
                           }}
-                          className="p-1.5 rounded-knopf text-leise hover:text-schrift hover:bg-schaden-grund transition-all cursor-pointer"
                           title="Löschen"
                         >
                           <Trash2 size={15} />
-                        </button>
+                        </Knopf>
                       </div>
                     </div>
                   </div>
@@ -886,17 +875,16 @@ export const CombatMagicTab: React.FC = () => {
                 const skillMasteries = masteries[skill] ?? [];
                 return (
                   <div key={skill}>
-                    <button
-                      type="button"
+                    <Knopf
                       onClick={() => session.openRollForCombat(skill)}
-                      className="min-h-11 w-full flex justify-between items-center bg-erhoeht hover:bg-rahmen rounded-knopf px-3 py-2 text-sm font-bold text-schrift transition-all border border-transparent hover:border-gold cursor-pointer"
+                      className="w-full justify-between text-sm"
                     >
                       <span className="flex items-center gap-1.5">
                         <DiceIcon size={14} />
                         <span>{skill}</span>
                       </span>
                       <span className="text-lg tabular-nums">{val}</span>
-                    </button>
+                    </Knopf>
                     {skillMasteries.length > 0 && (
                       <ul className="ml-2 mt-1 space-y-1">
                         {skillMasteries.map((m) => {
@@ -989,18 +977,17 @@ export const CombatMagicTab: React.FC = () => {
                 const schoolSpells = spellsList.filter((s) => s.school === skill);
                 return (
                   <div key={skill}>
-                    <button
-                      type="button"
+                    <Knopf
                       onClick={() => session.openRollForSkill(skill)}
                       className="min-h-11 w-full flex justify-between items-center bg-erhoeht hover:bg-rahmen rounded-knopf px-3 py-2 text-sm font-bold text-schrift transition-all border border-rahmen hover:border-gold cursor-pointer"
                     >
                       <span className="flex items-center gap-1.5">
                         <DiceIcon size={14} />
-                        <Sparkles size={14} className="text-gold" />
+                        <Sparkles size={14} className="text-magie" />
                         <span>{skill}</span>
                       </span>
                       <span className="text-sm tabular-nums font-bold">{total}</span>
-                    </button>
+                    </Knopf>
                     {skillMasteries.length > 0 && (
                       <ul className="ml-2 mt-1 space-y-1">
                         {skillMasteries.map((m) => {
@@ -1041,14 +1028,13 @@ export const CombatMagicTab: React.FC = () => {
                           ].filter((stat) => stat.value);
                           return (
                             <li key={`${s.name}-${s.grade}`}>
-                              <button
-                                type="button"
+                              <Knopf
                                 onClick={() => session.handleOpenCastSpell(s)}
                                 className="w-full flex items-center justify-between text-xs bg-erhoeht hover:bg-rahmen active:bg-erhoeht border border-rahmen hover:border-gold rounded-knopf px-2.5 py-1.5 transition-all cursor-pointer group gap-2 text-left"
                                 title="Zauber wirken"
                               >
                                 <div className="text-schrift group-hover:text-gold-hell font-bold truncate flex items-center gap-1.5 min-w-0 flex-1">
-                                  <Sparkles size={11} className="text-gold shrink-0" />
+                                  <Sparkles size={11} className="text-magie shrink-0" />
                                   <span className="truncate">
                                     {s.name} <span className="text-leise font-medium text-[11px]">(G{s.grade})</span>
                                   </span>
@@ -1060,7 +1046,7 @@ export const CombatMagicTab: React.FC = () => {
                                     tooltipData={{ title: info.name, description: info.description, stats }}
                                   />
                                 </div>
-                              </button>
+                              </Knopf>
                             </li>
                           );
                         })}
@@ -1151,13 +1137,12 @@ export const CombatMagicTab: React.FC = () => {
                       <div className="text-[11px] text-leise italic mt-0.5">{w.attributes}</div>
                     )}
                   </div>
-                  <button
-                    type="button"
+                  <Knopf
                     onClick={() => handleAddCatalogWeapon(w)}
-                    className="bg-erhoeht hover:bg-rahmen text-schrift px-2.5 py-1 rounded-knopf font-bold text-xs shrink-0 cursor-pointer"
+                    className="text-xs shrink-0"
                   >
                     + Hinzufügen
-                  </button>
+                  </Knopf>
                 </div>
               ))}
             </div>
@@ -1229,12 +1214,12 @@ export const CombatMagicTab: React.FC = () => {
                 />
               </div>
               <div className="flex justify-end pt-1">
-                <button
+                <Knopf art="primaer"
                   type="submit"
-                  className="min-h-11 bg-gold hover:bg-gold text-seite font-bold px-4 py-1.5 rounded-knopf text-xs cursor-pointer "
+                  className="text-xs"
                 >
                   Eigene Waffe erstellen
-                </button>
+                </Knopf>
               </div>
             </form>
           </Dialogfenster>
@@ -1345,13 +1330,12 @@ export const CombatMagicTab: React.FC = () => {
                         <div className="text-[11px] text-leise italic mt-0.5">{a.attributes}</div>
                       )}
                     </div>
-                    <button
-                      type="button"
+                    <Knopf
                       onClick={() => handleAddCatalogArmor(a)}
-                      className="bg-erhoeht hover:bg-rahmen text-schrift px-2.5 py-1 rounded-knopf font-bold text-xs shrink-0 cursor-pointer"
+                      className="text-xs shrink-0"
                     >
                       + Anlegen
-                    </button>
+                    </Knopf>
                   </div>
                 );
               })}
@@ -1447,12 +1431,12 @@ export const CombatMagicTab: React.FC = () => {
                 />
               </div>
               <div className="flex justify-end pt-1">
-                <button
+                <Knopf art="primaer"
                   type="submit"
-                  className="min-h-11 bg-gold hover:bg-gold text-seite font-bold px-4 py-1.5 rounded-knopf text-xs cursor-pointer "
+                  className="text-xs"
                 >
                   Erstellen &amp; Anlegen
-                </button>
+                </Knopf>
               </div>
             </form>
           </Dialogfenster>

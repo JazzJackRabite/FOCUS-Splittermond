@@ -586,6 +586,29 @@ die Grimoires), Dateiendung `.grim`. Das Grundregelwerk ist kein Grimoire; es bl
 - **Liegend** ist eine Kampfposition (GRW S. 170), kein Eintrag der Zustandsliste: −6 auf eigene Angriffe (aus der
   Tabelle der Kampfpositionen im Paket), kein Abzug auf andere Proben. Vorher −2 auf alles. Begleiter-Regeln und die Listen in `src/data` stehen weiter im Code.
 
+## Stand 26 (12.11.2026): Begleiter-Regeln aus den Paketen, Relikte Stufe 3, Knöpfe und Zauberfarbe, Buch-Zauber gesichtet
+
+- **Begleiter-Regeln nur noch aus den Paketen** (Grundsatz 2 und 3). Gefolge, erhobene Untote und Golems lesen ihre
+  Regelwerte aus `daten.strukturiert` (Ressource Gefolge im GRW; Regeltexte „Werte und Steigerung von Untoten“ und
+  „Golems – Weitere Regelelemente“ in Die Magie), aus `daten.wertesaetze` an den Erhebungszaubern (Kreatur-IDs oder
+  Fundstelle, EP je Verstärkung) und aus `daten.baustein_werte` an den Schwachpunkten. Steigerungskosten,
+  Meisterschaftsschwellen, Grenzen der Heldengrade und freie Zauber kommen aus den Kernregeln des GRW. Im Code stehen
+  keine Namen, Fundstellen oder Zahlen aus Die Magie mehr. Ohne den Band zeigen die Abschnitte, dass die Regeln fehlen.
+- **Werte für Ghul, Skelett, Wandelnder Leichnam** (GRW S. 272, 279, 282) im GRW-Paket. Mumie und Seuchenbringer
+  stehen in „Bestien & Ungeheuer“, das es nicht als Paket gibt; der Editor nennt dort die Fundstelle.
+- **Relikte, Stufe 3:** Chronik des Relikts (legendäre Tat mit Beschreibung, neuer Heldengrad, Abenteuerbelohnung;
+  Regeln aus Mondstahlklingen), beseelte Gegenstände (Domäne, Kräfte I/II/III+ mit Questen, Gebote, ruhende Kräfte
+  nach Verstoß; Regeln aus Die Götter), Schwerpunkt-Bonus eines Relikts zum Anklicken bei passenden Proben.
+- **Fundament:** Knöpfe der Dialoge und Karten mindestens 44 Pixel hoch, Zauberwirkungen einheitlich in der
+  Magie-Farbe. Mit den Dialog-Bausteinen der parallelen Sitzung zusammengeführt.
+- **Spielwerte der Buch-Zauber:** alle 32 automatisch abgeleiteten Zauber einzeln gegen den Zaubertext gesichtet,
+  Korrekturen in `zauber_spielwerte.json` (Datenseite). Grimoires neu hochladen.
+- Datenseite: `Werkzeuge/regelpakete/begleiter_regeln.json` + `.py` (prüft jede Zahl gegen den Text der Belege),
+  `Werkzeuge/grw/ergaenzung9.py` (drei Untote), `relikt_bausteine.json` mit `strukturiert` für Wachsen und Beseelung.
+  Prüfsuite ohne neue Befunde. **Noch nicht auf D: übertragen** (Rechner war nicht verbunden); dort müssen die
+  Werkzeuge mit dem Grimoire-Stand zusammengeführt und die Pakete neu gebaut werden.
+- Tests der Relikte laden Bücher jetzt über die Grimoire-Hilfen (`FOKUS_GRIMOIRES`).
+
 ## Google AI Studio
 
 Unverändert eine Vite-/React-App mit `metadata.json` im Wurzelordner; Import über „Import from GitHub“, Hosting über Cloud Run.

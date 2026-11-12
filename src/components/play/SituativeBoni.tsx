@@ -56,7 +56,7 @@ export const SituativeBoni: React.FC<{
               const an = gewaehlt.has(b.id);
               return (
                 <button key={b.id} type="button" onClick={() => onToggle(b.id)} aria-pressed={an} title={b.beleg}
-                  className={`text-left px-2.5 py-1 rounded-knopf text-xs border transition-all cursor-pointer ${an
+                  className={`min-h-11 text-left px-2.5 py-1 rounded-knopf text-xs border transition-all cursor-pointer ${an
                     ? 'bg-unverletzt-grund text-schrift border-unverletzt font-bold'
                     : dunkel ? 'bg-seite text-schrift border-rahmen hover:bg-flaeche' : 'bg-flaeche text-schrift border-rahmen hover:bg-rahmen'}`}>
                   <span className="tabular-nums font-bold mr-1">{vorzeichen(b.wert!)}</span>
@@ -132,7 +132,7 @@ export const ZauberAnpassungen: React.FC<{
               const an = gewaehlt.has(a.id);
               return (
                 <button key={a.id} type="button" onClick={() => onToggle(a.id)} aria-pressed={an} title={a.beleg}
-                  className={`text-left px-2.5 py-1 rounded-knopf text-xs border transition-all cursor-pointer ${an
+                  className={`min-h-11 text-left px-2.5 py-1 rounded-knopf text-xs border transition-all cursor-pointer ${an
                     ? 'bg-unverletzt-grund text-schrift border-unverletzt font-bold'
                     : 'bg-flaeche text-schrift border-rahmen hover:bg-rahmen'}`}>
                   <span className="tabular-nums font-bold mr-1">{a.texte.join(', ')}</span>

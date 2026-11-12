@@ -1,5 +1,6 @@
 import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import React, { useState, useMemo } from 'react';
+import { Knopf, Dialog } from '../../fundament';
 import { Heart, X, Plus, Minus, Check, Sparkles, Activity } from 'lucide-react';
 import type { HealthSlot, StatusCondition } from '../../types';
 
@@ -262,7 +263,7 @@ export const HealModal: React.FC<HealModalProps> = ({
               <button
                 type="button"
                 onClick={() => handleSelectMethod('manual')}
-                className={`p-2 rounded-knopf border text-left cursor-pointer transition-colors ${
+                className={`min-h-11 p-2 rounded-knopf border text-left cursor-pointer transition-colors ${
                   method === 'manual'
                     ? 'bg-unverletzt-grund border-unverletzt text-schrift'
                     : 'bg-seite border-rahmen text-schrift hover:bg-seite'
@@ -275,7 +276,7 @@ export const HealModal: React.FC<HealModalProps> = ({
               <button
                 type="button"
                 onClick={() => handleSelectMethod('erste_hilfe')}
-                className={`p-2 rounded-knopf border text-left cursor-pointer transition-colors ${
+                className={`min-h-11 p-2 rounded-knopf border text-left cursor-pointer transition-colors ${
                   method === 'erste_hilfe'
                     ? 'bg-unverletzt-grund border-unverletzt text-schrift'
                     : 'bg-seite border-rahmen text-schrift hover:bg-seite'
@@ -291,7 +292,7 @@ export const HealModal: React.FC<HealModalProps> = ({
               <button
                 type="button"
                 onClick={() => handleSelectMethod('wundversorgung')}
-                className={`p-2 rounded-knopf border text-left cursor-pointer transition-colors ${
+                className={`min-h-11 p-2 rounded-knopf border text-left cursor-pointer transition-colors ${
                   method === 'wundversorgung'
                     ? 'bg-unverletzt-grund border-unverletzt text-schrift'
                     : 'bg-seite border-rahmen text-schrift hover:bg-seite'
@@ -307,7 +308,7 @@ export const HealModal: React.FC<HealModalProps> = ({
               <button
                 type="button"
                 onClick={() => handleSelectMethod('heilmagie')}
-                className={`p-2 rounded-knopf border text-left cursor-pointer transition-colors ${
+                className={`min-h-11 p-2 rounded-knopf border text-left cursor-pointer transition-colors ${
                   method === 'heilmagie'
                     ? 'bg-unverletzt-grund border-unverletzt text-schrift'
                     : 'bg-seite border-rahmen text-schrift hover:bg-seite'
@@ -323,7 +324,7 @@ export const HealModal: React.FC<HealModalProps> = ({
               <button
                 type="button"
                 onClick={() => handleSelectMethod('heiltrank')}
-                className={`p-2 rounded-knopf border text-left cursor-pointer transition-colors ${
+                className={`min-h-11 p-2 rounded-knopf border text-left cursor-pointer transition-colors ${
                   method === 'heiltrank'
                     ? 'bg-unverletzt-grund border-unverletzt text-schrift'
                     : 'bg-seite border-rahmen text-schrift hover:bg-seite'
@@ -336,7 +337,7 @@ export const HealModal: React.FC<HealModalProps> = ({
               <button
                 type="button"
                 onClick={() => handleSelectMethod('verschnaufpause')}
-                className={`p-2 rounded-knopf border text-left cursor-pointer transition-colors ${
+                className={`min-h-11 p-2 rounded-knopf border text-left cursor-pointer transition-colors ${
                   method === 'verschnaufpause'
                     ? 'bg-unverletzt-grund border-unverletzt text-schrift'
                     : 'bg-seite border-rahmen text-schrift hover:bg-seite'
@@ -356,59 +357,53 @@ export const HealModal: React.FC<HealModalProps> = ({
               </label>
               <div className="flex items-center gap-1">
                 {exhaustedCount > 0 && (
-                  <button
-                    type="button"
+                  <Knopf
                     onClick={() => {
                       setPriority('only_exhausted');
                       setHealAmount(exhaustedCount);
                     }}
-                    className="px-2 py-0.5 rounded-knopf bg-erschoepft-grund hover:bg-erschoepft-grund text-[11px] font-bold text-schrift border border-erschoepft cursor-pointer transition-colors"
+                    className="text-[11px]"
                   >
                     Betäubung ({exhaustedCount})
-                  </button>
+                  </Knopf>
                 )}
                 {consumedCount > 0 && (
-                  <button
-                    type="button"
+                  <Knopf art="gefahr"
                     onClick={() => {
                       setPriority('consumed_first');
                       setHealAmount(consumedCount);
                     }}
-                    className="px-2 py-0.5 rounded-knopf bg-schaden-grund hover:bg-schaden-grund text-[11px] font-bold text-schrift border border-schaden cursor-pointer transition-colors"
+                    className="text-[11px]"
                   >
                     Echter ({consumedCount})
-                  </button>
+                  </Knopf>
                 )}
                 {totalDamageCount > 0 && (
-                  <button
-                    type="button"
+                  <Knopf art="erholung"
                     onClick={() => {
                       setPriority('consumed_first');
                       setHealAmount(totalDamageCount);
                     }}
-                    className="px-2 py-0.5 rounded-knopf bg-unverletzt-grund hover:bg-unverletzt-grund text-[11px] font-bold text-unverletzt border border-unverletzt cursor-pointer transition-colors"
+                    className="text-[11px]"
                   >
                     Alles ({totalDamageCount})
-                  </button>
+                  </Knopf>
                 )}
               </div>
             </div>
 
             <div className="flex items-center gap-2">
-              <button
-                type="button"
+              <Knopf
                 onClick={() => setHealAmount((d) => Math.max(0, d - 5))}
-                className="px-2.5 py-1.5 rounded-knopf bg-erhoeht hover:bg-rahmen text-xs font-bold text-schrift border border-rahmen cursor-pointer transition-colors"
+                className="text-xs"
               >
                 -5
-              </button>
-              <button
-                type="button"
+              </Knopf>
+              <Knopf nurSymbol
                 onClick={() => setHealAmount((d) => Math.max(0, d - 1))}
-                className="w-8 h-8 rounded-knopf bg-erhoeht hover:bg-rahmen flex items-center justify-center font-bold text-schrift border border-rahmen cursor-pointer transition-colors"
               >
                 <Minus size={14} />
-              </button>
+              </Knopf>
 
               <div className="flex-1 text-center">
                 <input
@@ -422,27 +417,23 @@ export const HealModal: React.FC<HealModalProps> = ({
                 />
               </div>
 
-              <button
-                type="button"
+              <Knopf nurSymbol
                 onClick={() => setHealAmount((d) => d + 1)}
-                className="w-8 h-8 rounded-knopf bg-erhoeht hover:bg-rahmen flex items-center justify-center font-bold text-schrift border border-rahmen cursor-pointer transition-colors"
               >
                 <Plus size={14} />
-              </button>
-              <button
-                type="button"
+              </Knopf>
+              <Knopf
                 onClick={() => setHealAmount((d) => d + 5)}
-                className="px-2.5 py-1.5 rounded-knopf bg-erhoeht hover:bg-rahmen text-xs font-bold text-schrift border border-rahmen cursor-pointer transition-colors"
+                className="text-xs"
               >
                 +5
-              </button>
-              <button
-                type="button"
+              </Knopf>
+              <Knopf
                 onClick={() => setHealAmount((d) => d + 10)}
-                className="px-2.5 py-1.5 rounded-knopf bg-erhoeht hover:bg-rahmen text-xs font-bold text-schrift border border-rahmen cursor-pointer transition-colors"
+                className="text-xs"
               >
                 +10
-              </button>
+              </Knopf>
             </div>
           </div>
 
@@ -455,7 +446,7 @@ export const HealModal: React.FC<HealModalProps> = ({
               <button
                 type="button"
                 onClick={() => setPriority('consumed_first')}
-                className={`p-2 rounded-knopf border text-left cursor-pointer transition-colors ${
+                className={`min-h-11 p-2 rounded-knopf border text-left cursor-pointer transition-colors ${
                   priority === 'consumed_first'
                     ? 'bg-unverletzt-grund border-unverletzt text-schrift'
                     : 'bg-seite border-rahmen text-schrift hover:bg-seite'
@@ -468,7 +459,7 @@ export const HealModal: React.FC<HealModalProps> = ({
               <button
                 type="button"
                 onClick={() => setPriority('exhausted_first')}
-                className={`p-2 rounded-knopf border text-left cursor-pointer transition-colors ${
+                className={`min-h-11 p-2 rounded-knopf border text-left cursor-pointer transition-colors ${
                   priority === 'exhausted_first'
                     ? 'bg-unverletzt-grund border-unverletzt text-schrift'
                     : 'bg-seite border-rahmen text-schrift hover:bg-seite'
@@ -481,7 +472,7 @@ export const HealModal: React.FC<HealModalProps> = ({
               <button
                 type="button"
                 onClick={() => setPriority('only_consumed')}
-                className={`p-2 rounded-knopf border text-left cursor-pointer transition-colors ${
+                className={`min-h-11 p-2 rounded-knopf border text-left cursor-pointer transition-colors ${
                   priority === 'only_consumed'
                     ? 'bg-unverletzt-grund border-unverletzt text-schrift'
                     : 'bg-seite border-rahmen text-schrift hover:bg-seite'
@@ -494,7 +485,7 @@ export const HealModal: React.FC<HealModalProps> = ({
               <button
                 type="button"
                 onClick={() => setPriority('only_exhausted')}
-                className={`p-2 rounded-knopf border text-left cursor-pointer transition-colors ${
+                className={`min-h-11 p-2 rounded-knopf border text-left cursor-pointer transition-colors ${
                   priority === 'only_exhausted'
                     ? 'bg-unverletzt-grund border-unverletzt text-schrift'
                     : 'bg-seite border-rahmen text-schrift hover:bg-seite'
@@ -507,7 +498,7 @@ export const HealModal: React.FC<HealModalProps> = ({
               <button
                 type="button"
                 onClick={() => setPriority('only_channeled')}
-                className={`p-2 rounded-knopf border text-left cursor-pointer transition-colors ${
+                className={`min-h-11 p-2 rounded-knopf border text-left cursor-pointer transition-colors ${
                   priority === 'only_channeled'
                     ? 'bg-unverletzt-grund border-unverletzt text-schrift'
                     : 'bg-seite border-rahmen text-schrift hover:bg-seite'
@@ -632,19 +623,17 @@ export const HealModal: React.FC<HealModalProps> = ({
 
         {/* Footer Actions */}
         <div className="px-4 sm:px-5 py-3 border-t border-unverletzt bg-seite flex items-center justify-between gap-3 shrink-0">
-          <button
-            type="button"
+          <Knopf
             onClick={onClose}
-            className="min-h-11 px-3.5 py-1.5 rounded-knopf text-xs font-semibold text-schrift hover:bg-seite transition-colors cursor-pointer"
+            className="text-xs"
           >
             Abbrechen
-          </button>
+          </Knopf>
 
-          <button
-            type="button"
+          <Knopf art="erholung"
             onClick={() => handleSubmit()}
             disabled={totalActualHealed === 0 && conditionsToRemove.size === 0}
-            className="min-h-11 px-5 py-2 rounded-knopf text-xs sm:text-sm font-bold bg-unverletzt-grund hover:bg-unverletzt-grund text-unverletzt border border-unverletzt hover:border-unverletzt transition-colors cursor-pointer flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="text-xs sm:text-sm gap-1.5 disabled:cursor-not-allowed"
           >
             <Check size={16} />
             <span>
@@ -654,7 +643,7 @@ export const HealModal: React.FC<HealModalProps> = ({
                 ? `${conditionsToRemove.size} Zustand/Zustände beenden`
                 : 'Heilung anwenden'}
             </span>
-          </button>
+          </Knopf>
         </div>
       </Dialogfenster>
     </Dialoghintergrund>
