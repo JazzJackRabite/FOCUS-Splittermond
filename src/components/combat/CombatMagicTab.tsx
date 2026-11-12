@@ -19,7 +19,7 @@ import { useCharacter } from '../../context/CharacterContext';
 import { usePlaySession } from '../../context/PlaySessionContext';
 import { PlaySharedVitals } from '../play/PlaySharedVitals';
 import { SourceBadge } from '../ui/SourceBadge';
-import { SKILL_CATEGORIES, SKILL_DATA } from '../../data/rules';
+
 import { type WeaponItem, type ArmorItem, type ShieldItem } from '../../data/equipment';
 import { alleAusruestung } from '../../regelwerk/ausruestung';
 import { useRegelwerk } from '../../regelwerk/RegelwerkContext';
@@ -35,6 +35,7 @@ import {
 import { generateId } from '../../utils/id';
 import type { InventoryItem, Spell } from '../../types';
 import { toast } from 'react-hot-toast';
+import { grwFertigkeitsKategorien } from '../../regelwerk/grwListen';
 
 // Helper to resolve authentic source & page for any item
 const getItemSource = (item: { name: string; source?: string; page?: number | string }) => {
@@ -873,7 +874,7 @@ export const CombatMagicTab: React.FC = () => {
               Kampffertigkeiten
             </h3>
             <div className="space-y-2">
-              {SKILL_CATEGORIES.COMBAT.map((skill) => {
+              {grwFertigkeitsKategorien().COMBAT.map((skill) => {
                 const val = getSkillValue(skill);
                 const skillMasteries = masteries[skill] ?? [];
                 return (
@@ -974,7 +975,7 @@ export const CombatMagicTab: React.FC = () => {
               Magieschulen
             </h3>
             <div className="space-y-2">
-              {SKILL_CATEGORIES.MAGIC.map((skill) => {
+              {grwFertigkeitsKategorien().MAGIC.map((skill) => {
                 const total = getSkillTotal(skill);
                 const skillMasteries = masteries[skill] ?? [];
                 const schoolSpells = spellsList.filter((s) => s.school === skill);
@@ -1099,7 +1100,7 @@ export const CombatMagicTab: React.FC = () => {
                 className="bg-erhoeht border border-rahmen rounded-knopf px-2 py-1.5 text-xs text-schrift focus:outline-none focus:border-gold"
               >
                 <option value="Alle">Alle Fertigkeiten</option>
-                {SKILL_CATEGORIES.COMBAT.map((c) => (
+                {grwFertigkeitsKategorien().COMBAT.map((c) => (
                   <option key={c} value={c}>
                     {c}
                   </option>
@@ -1167,7 +1168,7 @@ export const CombatMagicTab: React.FC = () => {
                   onChange={(e) => setCustomWeapon({ ...customWeapon, weaponSkill: e.target.value })}
                   className="bg-flaeche border border-rahmen rounded-knopf px-2 py-1 text-xs"
                 >
-                  {SKILL_CATEGORIES.COMBAT.map((s) => (
+                  {grwFertigkeitsKategorien().COMBAT.map((s) => (
                     <option key={s} value={s}>
                       {s}
                     </option>

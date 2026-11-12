@@ -7,13 +7,12 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Gem, Plus, Minus, Trash2, Pencil, Info, AlertTriangle, TrendingUp } from 'lucide-react';
 import { useCharacter } from '../../context/CharacterContext';
 import { useRegelwerk } from '../../regelwerk/RegelwerkContext';
-import { alleAusruestung, type AusruestungsItem } from '../../regelwerk/ausruestung';
+import { alleAusruestung, findeAusruestung, type AusruestungsItem } from '../../regelwerk/ausruestung';
 import {
   AUSWAHL, GEGENSTANDSARTEN, artVon, auswahlAnzeige, kostenVon, passtZu, pruefeRelikt, reliktAlsInventar, reliktBaukasten, reliktBausteine,
   reliktWerte, reliktWiderstand, veralteteReliktEintraege, ressourcePunkte, wahlText, zauberMitGrad, type BausteinInfo,
   ANLASS_NAME, aktiveKraefte, beseelungQuelle, beseelungRegeln, domaenen, domaenenKraefte, pruefeChronik, wachsenQuelle, wachsenRegeln,
 } from '../../regelwerk/relikte';
-import { HELDENGRADE } from '../../data/rules';
 import type { Katalog } from '../../regelwerk/katalog';
 import type { Relikt, ReliktBaustein, ReliktBeseelung } from '../../types';
 import { generateId } from '../../utils/id';
@@ -24,7 +23,7 @@ import { ConfirmDialog } from '../ui/ConfirmDialog';
 /** Heldengrad des Charakters (1–4) */
 function useHeldengrad(): number {
   const { calc } = useCharacter();
-  return calc?.heldengrad ? HELDENGRADE.indexOf(calc.heldengrad) + 1 : 1;
+  return calc?.heldengrad?.nr ?? 1;
 }
 
 const typName = (k: Katalog, typ: string) => (typ === 'material' ? 'Besondere Materialien' : k.manifest.typen?.[typ]?.bezeichnung ?? typ);
@@ -125,7 +124,7 @@ const Werkstatt: React.FC<{ k: Katalog; start: Relikt; frei: number; schliessen:
   const [alleZeigen, setAlleZeigen] = useState(false);
   const [info, setInfo] = useState<string | null>(null);
 
-  const basis: AusruestungsItem | null = useMemo(() => ausruestung.find(i => i.id === r.basisId) ?? null, [ausruestung, r.basisId]);
+  const basis: AusruestungsItem | null = useMemo(() => findeAusruestung(ausruestung, r.basisId), [ausruestung, r.basisId]);
   const heldengrad = useHeldengrad();
   const pruefung = pruefeRelikt(r, bausteine, bk, basis, { k, heldengrad });
   const warnungen = [...pruefung.warnungen, ...(r.punkte > frei ? [`Das Relikt hat ${r.punkte} Punkte, aus der Ressource Relikt sind noch ${frei} frei.`] : [])];
@@ -310,7 +309,7 @@ const WachsenDialog: React.FC<{ k: Katalog; r: Relikt; frei: number; schliessen:
     if (warnungen.length && regelverstoss(`Das Wachsen verstößt gegen die Regeln: ${warnungen[0]}`)) return;
     const neu: Relikt = { ...r, punkte: r.punkte + punkte, chronik };
     const alt = (state.inventory ?? []).find(it => it.id === r.inventarId);
-    const basis = alleAusruestung(k).find(i => i.id === neu.basisId) ?? null;
+    const basis = findeAusruestung(alleAusruestung(k), neu.basisId);
     dispatch({ type: 'RELIKT_SPEICHERN', payload: { relikt: neu, inventar: reliktAlsInventar(neu, reliktBausteine(k, reliktBaukasten(k)), basis, alt, k) } });
     weiter(neu);
   };
@@ -367,7 +366,7 @@ export const ReliktKarte: React.FC = () => {
       {relikte.length > 0 && (
         <ul className="flex flex-col gap-2 m-0 p-0 list-none">
           {relikte.map(r => {
-            const p = pruefeRelikt(r, bausteine, bk, alleAusruestung(k).find(i => i.id === r.basisId) ?? null, { k, heldengrad });
+            const p = pruefeRelikt(r, bausteine, bk, findeAusruestung(alleAusruestung(k), r.basisId), { k, heldengrad });
             const kraefte = r.beseelung ? aktiveKraefte(r.beseelung) : [];
             const imInventar = (state.inventory ?? []).some(it => it.id === r.inventarId);
             return (

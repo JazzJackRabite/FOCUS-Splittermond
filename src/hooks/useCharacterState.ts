@@ -13,15 +13,15 @@ import type {
   StatusCondition,
   AdvancementLogEntry,
 } from '../types';
-import { RACES } from '../data/rules';
+
 import { mitRegelIds } from '../regelwerk/bruecke';
 import { saveToLocalStorage, loadFromLocalStorage } from './useLocalStorage';
-import { STRENGTHS_DATA } from '../data/strengths';
 import { generateId } from '../utils/id';
 import { getSkillXpCost, getAttrXpCost, calculateItemCost } from '../utils/costCalculations';
 import { referenceCharacterResources } from '../utils/gameResourceManager';
 import { aktiverKatalog } from '../regelwerk/bruecke';
 import { spielwerteDesZaubers } from '../regelwerk/zauberwerte';
+import { gratisStaerkeDerKultur, grwStaerken } from '../regelwerk/grwListen';
 
 function createLogEntry(
   category: AdvancementLogEntry['category'],
@@ -277,17 +277,18 @@ export function baseCharacterReducer(
       if (!newHomeRegion) {
         return { ...state, homeRegion: newHomeRegion };
       }
-      const regionStrengthName = `Kulturkunde (${newHomeRegion})`;
-      // Remove old creation-source Kulturkunde entries from other regions
-      const strengthsWithoutOldKulturkunde = state.strengthsList.filter(
-        (s) => !s.name.startsWith('Kulturkunde') || s.name === regionStrengthName || s.source !== 'creation',
+      const gratis = gratisStaerkeDerKultur();
+      const regionStrengthName = `${gratis} (${newHomeRegion})`;
+      // Einträge dieser Stärke aus früheren Heimatregionen (Quelle Erschaffung) entfernen
+      const staerkenOhneAlteRegion = state.strengthsList.filter(
+        (s) => !s.name.startsWith(gratis) || s.name === regionStrengthName || s.source !== 'creation',
       );
-      const alreadyHasKulturkunde = state.strengthsList.some((s) => s.name === regionStrengthName);
-      if (alreadyHasKulturkunde) {
-        return { ...state, homeRegion: newHomeRegion, strengthsList: strengthsWithoutOldKulturkunde };
+      const hatRegionSchon = state.strengthsList.some((s) => s.name === regionStrengthName);
+      if (hatRegionSchon) {
+        return { ...state, homeRegion: newHomeRegion, strengthsList: staerkenOhneAlteRegion };
       }
-      const hrData = STRENGTHS_DATA.find((sd) => sd.name === 'Kulturkunde');
-      const kulturkundeItem: ItemEntry = {
+      const hrData = grwStaerken().find((sd) => sd.name === gratis);
+      const gratisEintrag: ItemEntry = {
         name: regionStrengthName,
         level: 1,
         isFree: true,
@@ -298,7 +299,7 @@ export function baseCharacterReducer(
         sourceRef: 'GRW',
         page: hrData?.page,
       };
-      return { ...state, homeRegion: newHomeRegion, strengthsList: [...strengthsWithoutOldKulturkunde, kulturkundeItem] };
+      return { ...state, homeRegion: newHomeRegion, strengthsList: [...staerkenOhneAlteRegion, gratisEintrag] };
     }
 
     case 'MOD_ATTR_BASE': {

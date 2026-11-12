@@ -5444,7 +5444,11 @@
      }
     ],
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "mehrfach_waehlbar": {
+     "anzahl": null,
+     "beleg": "Diese Stärke ist beliebig oft wählbar."
+    }
    }
   },
   {
@@ -5474,7 +5478,12 @@
      }
     ],
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "mehrfach_waehlbar": {
+     "anzahl": null,
+     "je": "Typus",
+     "beleg": "Die Stärke ist mehrfach wählbar und gilt dann immer für einen anderen Typus."
+    }
    }
   },
   {
@@ -5901,7 +5910,12 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "mehrfach_waehlbar": {
+     "je_heldengrad": 1,
+     "hoechstbonus": 8,
+     "beleg": "Diese Stärke kann einmal pro Heldengrad gewählt werden, bis zu einem maximalen Bonus in Höhe von 8 Punkten."
+    }
    }
   },
   {
@@ -5951,7 +5965,12 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "mehrfach_waehlbar": {
+     "je_heldengrad": 1,
+     "hoechstbonus": 8,
+     "beleg": "Diese Stärke kann einmal pro Heldengrad gewählt werden, bis zu einem maximalen Bonus in Höhe von 8 Punkten."
+    }
    }
   },
   {
@@ -6157,7 +6176,13 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "mehrfach_waehlbar": {
+     "anzahl": null,
+     "je": "Kultur",
+     "beleg": "einer bestimmten Region oder eines Volkes",
+     "auslegung": "Die Stärke gilt für genau eine Kultur; für eine weitere Kultur wird sie erneut gewählt (der Editor vergibt sie beim Erschaffen als „Kulturkunde (Region)“)."
+    }
    }
   },
   {
@@ -6193,7 +6218,11 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "mehrfach_waehlbar": {
+     "anzahl": 3,
+     "beleg": "Diese Stärke kann bis zu dreimal gewählt werden."
+    }
    }
   },
   {
@@ -6364,7 +6393,11 @@
      }
     ],
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "mehrfach_waehlbar": {
+     "anzahl": 3,
+     "beleg": "Diese Stärke kann bis zu dreimal gewählt werden."
+    }
    }
   },
   {

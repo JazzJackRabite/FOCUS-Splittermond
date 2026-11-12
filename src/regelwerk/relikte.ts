@@ -9,7 +9,7 @@
 import type { Katalog } from './katalog';
 import type { Eintrag } from './typen';
 import type { InventoryItem, Relikt, ReliktBaustein, ReliktBeseelung, ReliktChronikEintrag, Spell } from '../types';
-import { alleAusruestung, type AusruestungsItem } from './ausruestung';
+import { alleAusruestung, findeAusruestung, type AusruestungsItem } from './ausruestung';
 import { aktiverKatalog } from './bruecke';
 
 /** Gegenstandsarten, wie sie daten.baustein.gilt_fuer nennt */
@@ -429,7 +429,7 @@ export function veralteteReliktEintraege(relikte: Relikt[], inventar: InventoryI
     const alt = inventar.find(it => it.id === r.inventarId);
     if (!alt) continue;
     if (r.bausteine.some(w => !bausteine.some(b => b.id === w.id))) continue; // Paket fehlt: nichts anfassen
-    const basis = r.basisId ? aus.find(i => i.id === r.basisId) ?? null : null;
+    const basis = findeAusruestung(aus, r.basisId);
     if (r.basisId && !basis) continue;
     const neu = reliktAlsInventar(r, bausteine, basis, alt, k);
     const a = alt as unknown as Record<string, unknown>, n = neu as unknown as Record<string, unknown>;

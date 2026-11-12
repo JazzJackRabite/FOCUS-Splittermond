@@ -4,7 +4,11 @@ import fs from 'node:fs';
 import { Katalog } from '../katalog';
 import { erstelleKatalog, grimoireLesen } from '../laden';
 import { basisAusDateien, grimoireDatei } from './hilfen';
-import { fokusDurchZustaende, mitZustaenden, zustandswerte } from '../zustandswerte';
+import { fokusDurchZustaende, mitZustaenden, textMitZustaenden, zustandswerte } from '../zustandswerte';
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import { Werte } from '../../components/begleiter/Wertekasten';
+import { setzeAktivenKatalog } from '../bruecke';
 import { getConditionMalus } from '../../utils/conditionModifiers';
 import type { StatusCondition } from '../../types';
 
@@ -58,5 +62,26 @@ describe('Zustände und abgeleitete Werte (GRW S. 168–169)', () => {
     expect(mitZustaenden('VTD', 20, zw)).toBe(18);
     expect(fokusDurchZustaende(13, zustandswerte([z('Verstoßen', 1)], k))).toBe(3);
     expect(fokusDurchZustaende(13, zustandswerte([z('Verstoßen', 4)], k))).toBe(13);
+  });
+});
+
+describe('Begleiter: Zustände im Wertekasten eingerechnet', () => {
+  it('Text mit führender Zahl wird umgerechnet, der Rest bleibt', () => {
+    const zw = zustandswerte([z('Erschöpft', 2)], K);
+    expect(textMitZustaenden('INI', '7–1W6', zw)).toEqual({ text: '9–1W6', basis: '7–1W6', geaendert: true });
+    expect(textMitZustaenden('GSW', '8', zw).text).toBe('6');
+    expect(textMitZustaenden('VTD', '20', zw)).toEqual({ text: '20', basis: '20', geaendert: false });
+    expect(textMitZustaenden('GSW', '–', zw).geaendert).toBe(false);
+  });
+
+  it('Wertekasten zeigt die Werte nach Zuständen, Grundwert in Klammern', () => {
+    setzeAktivenKatalog(K);
+    const w = { attribute: { BEW: 3 }, abgeleitete_werte: { GSW: '8', VTD: '20', GW: '18', KW: '19', SR: '1' }, waffen: [{ name: 'Biss', wert: '12', schaden: '1W6', wgs: '7', ini: '7', merkmale: '' }] };
+    render(React.createElement(Werte, { w: w as never, zustaende: [z('Erschöpft', 2), z('Ringend')] }));
+    expect(screen.getByTestId('zustand-wert-GSW').textContent).toBe('0(8)');
+    expect(screen.getByTestId('zustand-wert-VTD').textContent).toBe('17(20)');
+    expect(screen.getByTestId('zustand-wert-INI').textContent).toBe('9(7)');
+    expect(screen.getByTestId('zustand-wert-VTD').getAttribute('title')).toContain('Ringend: −3');
+    setzeAktivenKatalog(null);
   });
 });

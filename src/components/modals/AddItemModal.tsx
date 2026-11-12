@@ -2,8 +2,6 @@ import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import { useHausregeln } from '../../fundament/hausregeln';
 import { Knopf, Dialog } from '../../fundament';
 import React, { useState, useEffect, useMemo } from 'react';
-import { RESOURCE_DESCRIPTIONS } from '../../data/resources';
-import { WEAKNESS_DESCRIPTIONS, WEAKNESS_PAGES } from '../../data/weaknesses';
 import {
   getStrengthDescription,
   getWeaknessDescription,
@@ -11,6 +9,7 @@ import {
 } from '../../utils/gameResourceManager';
 import type { ItemEntry, AppMode } from '../../types';
 import { getInitialSelection } from '../../utils/modalHelpers';
+import { grwRessourcenTexte, grwSchwaechenSeiten, grwSchwaechenTexte } from '../../regelwerk/grwListen';
 
 interface StrengthData {
   name: string;
@@ -80,9 +79,9 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({
     return (items || []).map((item) => {
       if (typeof item === 'string') {
         const d = type === 'weakness'
-          ? getWeaknessDescription(item, WEAKNESS_DESCRIPTIONS[item] || '')
+          ? getWeaknessDescription(item, grwSchwaechenTexte()[item] || '')
           : '';
-        const page = type === 'weakness' ? (WEAKNESS_PAGES[item] ?? 84) : undefined;
+        const page = type === 'weakness' ? (grwSchwaechenSeiten()[item] ?? 84) : undefined;
         return {
           name: item,
           cost: 1,
@@ -210,10 +209,10 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({
     }
     if (!finalDesc && isResource) {
       const rd = currentItemData as ResourceData | null;
-      finalDesc = getResourceDescription(name, rd?.desc || RESOURCE_DESCRIPTIONS[selectedName] || '');
+      finalDesc = getResourceDescription(name, rd?.desc || grwRessourcenTexte()[selectedName] || '');
     }
     if (!finalDesc && type === 'weakness') {
-      finalDesc = getWeaknessDescription(name, WEAKNESS_DESCRIPTIONS[selectedName] || '');
+      finalDesc = getWeaknessDescription(name, grwSchwaechenTexte()[selectedName] || '');
     }
 
     let source = 'Eigene';
@@ -236,7 +235,7 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({
       }
     } else if (type === 'weakness') {
       source = isCustom ? (customSource || 'Eigen') : ((currentItemData as any)?.source ?? 'GRW');
-      page = isCustom ? undefined : ((currentItemData as any)?.page ?? WEAKNESS_PAGES[name] ?? 84);
+      page = isCustom ? undefined : ((currentItemData as any)?.page ?? grwSchwaechenSeiten()[name] ?? 84);
     }
 
     onAdd(name, level, finalDesc, pointCost, source, page, isFree);
@@ -397,19 +396,19 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({
               className="w-full p-2 border border-rahmen rounded-knopf bg-flaeche text-schrift"
               placeholder={
                 (currentItemData as StrengthData | ResourceData)?.desc ||
-                (type === 'weakness' && WEAKNESS_DESCRIPTIONS[selectedName]) ||
-                (type === 'resource' && RESOURCE_DESCRIPTIONS[selectedName]) ||
+                (type === 'weakness' && grwSchwaechenTexte()[selectedName]) ||
+                (type === 'resource' && grwRessourcenTexte()[selectedName]) ||
                 'Beschreibung'
               }
             />
             {Boolean(
               (currentItemData as StrengthData | ResourceData)?.desc ||
-                (type === 'weakness' && WEAKNESS_DESCRIPTIONS[selectedName])
+                (type === 'weakness' && grwSchwaechenTexte()[selectedName])
             ) && (
               <div className="text-[11px] text-leise mt-1">
                 {(isStrength ? 'Regel: ' : '') +
                   ((currentItemData as StrengthData | ResourceData)?.desc ||
-                    WEAKNESS_DESCRIPTIONS[selectedName] ||
+                    grwSchwaechenTexte()[selectedName] ||
                     '')}
               </div>
             )}

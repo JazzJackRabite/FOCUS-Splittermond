@@ -3,14 +3,9 @@ import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import { useHausregeln } from '../../fundament/hausregeln';
 import { Knopf, Dialog } from '../../fundament';
 import React, { useState, useEffect, useMemo } from 'react';
-import {
-  MASTERIES_DB,
-  GENERAL_COMBAT_MASTERIES,
-  GENERAL_MAGIC_MASTERIES,
-  isMasteryRepeatable,
-} from '../../data/masteries';
+import { isMasteryRepeatable } from '../../data/masteries';
 import type { MasteryEntry as DbMasteryEntry } from '../../data/masteries';
-import { SKILL_CATEGORIES } from '../../data/rules';
+
 import { validateFreeMasteryAssignment } from '../../utils/validation';
 import { getMasteryDescription, getResolvedMasteries } from '../../utils/gameResourceManager';
 import { useRegelwerk } from '../../regelwerk/RegelwerkContext';
@@ -21,6 +16,7 @@ import {
   type PrerequisiteCheckResult,
 } from '../../utils/prerequisiteValidator';
 import type { Mastery } from '../../types';
+import { grwAllgemeineKampfmeisterschaften, grwAllgemeineMagiemeisterschaften, grwFertigkeitsKategorien } from '../../regelwerk/grwListen';
 
 interface MasteryModalProps {
   skillName: string;
@@ -97,13 +93,13 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
   const { katalog } = useRegelwerk();
   const filteredMasteries = useMemo(() => {
     let opts: DbMasteryEntry[] = getResolvedMasteries(skillName);
-    if (SKILL_CATEGORIES.COMBAT.includes(skillName)) {
+    if (grwFertigkeitsKategorien().COMBAT.includes(skillName)) {
       // General combat masteries (+ allgemeine Kampf-/Nahkampfmeisterschaften aus geladenen Regelpaketen)
-      opts = [...opts, ...GENERAL_COMBAT_MASTERIES, ...getResolvedMasteries('Allgemeine Nahkampfmeisterschaften'), ...getResolvedMasteries('Allgemeine Kampfmeisterschaften')];
+      opts = [...opts, ...grwAllgemeineKampfmeisterschaften(), ...getResolvedMasteries('Allgemeine Nahkampfmeisterschaften'), ...getResolvedMasteries('Allgemeine Kampfmeisterschaften')];
     }
-    if (SKILL_CATEGORIES.MAGIC.includes(skillName)) {
+    if (grwFertigkeitsKategorien().MAGIC.includes(skillName)) {
       // General magic masteries (+ aus geladenen Regelpaketen)
-      opts = [...opts, ...GENERAL_MAGIC_MASTERIES, ...getResolvedMasteries('Allgemeine Magiemeisterschaften')];
+      opts = [...opts, ...grwAllgemeineMagiemeisterschaften(), ...getResolvedMasteries('Allgemeine Magiemeisterschaften')];
     }
     // Deduplicate by name
     const uniqueMap = new Map<string, DbMasteryEntry>();

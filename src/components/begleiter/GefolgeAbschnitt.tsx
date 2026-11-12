@@ -113,7 +113,7 @@ const GefolgeEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; maxFer
       )}
 
       {b.rasse && <BegleiterVitals spiel={spiel} daten={daten} />}
-      <Werte w={g.werte} aktionen={spiel.aktionen} />
+      <Werte w={g.werte} aktionen={spiel.aktionen} zustaende={spiel.zustand.zustaende} />
       <div className="flex flex-wrap gap-2 items-end">
         {ws.length > 0 && <span className="flex flex-wrap gap-2">{g.waffen.filter(x => !x.angeboren).map((x, i) => (
           <MarkeMitEntfernen key={`${x.id}-${i}`} label={`Waffe ${x.name} entfernen`} onEntfernen={() => { const j = ws.indexOf(x.id); aendern({ waffen: ws.filter((_, n) => n !== j) }); }}>

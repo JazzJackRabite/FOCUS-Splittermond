@@ -3,7 +3,6 @@ import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import { useHausregeln } from '../../fundament/hausregeln';
 import { Knopf, Dialog } from '../../fundament';
 import React, { useState, useEffect, useMemo } from 'react';
-import { SPELLS_DB } from '../../data/spells';
 import { getSpellDescription } from '../../utils/gameResourceManager';
 import { parseSpellPermissibleModifications } from '../../utils/magicRules';
 import type { Spell } from '../../types';

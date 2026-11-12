@@ -78,3 +78,16 @@ export function zustandsErklaerung(wert: Wertname | 'FO', zw: Zustandswerte): st
   const e = zw.erklaerung[wert];
   return e?.length ? `Zustände: ${e.join(', ')}` : '';
 }
+
+/**
+ * Wert aus einem Wertekasten (Text wie „15“ oder „7–1W6“) mit Zuständen: Die führende Zahl wird umgerechnet,
+ * der Rest bleibt stehen. Ohne Zahl oder ohne Wirkung bleibt der Text unverändert.
+ */
+export function textMitZustaenden(wert: Wertname, text: string | number | undefined | null, zw: Zustandswerte): { text: string; basis: string; geaendert: boolean } {
+  const basis = text === undefined || text === null ? '' : String(text);
+  const m = basis.match(/^\s*(-?\d+)(.*)$/s);
+  const wirkt = zw.plus[wert] !== 0 || zw.faktor[wert] !== undefined || zw.setzen[wert] !== undefined;
+  if (!m || !wirkt) return { text: basis, basis, geaendert: false };
+  const neu = mitZustaenden(wert, Number(m[1]), zw);
+  return { text: `${neu}${m[2]}`, basis, geaendert: neu !== Number(m[1]) };
+}

@@ -13,10 +13,7 @@ import {
 } from 'lucide-react';
 import { useCharacter } from '../../context/CharacterContext';
 import { usePlaySession } from '../../context/PlaySessionContext';
-import {
-  HEALTH_LEVEL_LABELS,
-  WOUND_PENALTIES,
-} from '../../data/rules';
+import { grwGesundheitsstufen } from '../../regelwerk/grwListen';
 import { zustandTooltip } from '../../utils/conditionModifiers';
 import { toast } from 'react-hot-toast';
 import { generateId } from '../../utils/id';
@@ -755,10 +752,9 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
 
               {/* ── Health level rows (5 standard Splittermond levels) ── */}
               <div className="space-y-1.5">
-                {HEALTH_LEVEL_LABELS.slice(0, 5).map((label: string, level: number) => {
+                {grwGesundheitsstufen().slice(0, 5).map(({ name: label, wundabzug: penalty }, level: number) => {
                   const start = level * maxLP;
                   const levelSlots = healthSlots.slice(start, start + maxLP);
-                  const penalty = WOUND_PENALTIES[level];
                   return (
                     <div key={level} className="flex items-center gap-2 sm:gap-3">
                       <div className="w-32 sm:w-36 text-xs font-semibold text-schrift shrink-0 leading-tight flex items-center justify-between">

@@ -11,16 +11,17 @@ import type { Katalog } from './katalog';
 import { pruefeErschaffung, type Bau, type ErschaffungsBefund, type ModulWahl } from './erschaffung';
 import { aktiverKatalog, ATTRIBUT_NAME, fertigkeitId, idNachName, meisterschaftId, RASSE_ID } from './bruecke';
 import type { CharacterState } from '../types';
-import { ALL_SKILLS } from '../data/rules';
+
 
 export type { ModulWahl };
 
 import type { ErschaffungsModulAngewendet as ModulAngewendet, ErschaffungsModulZustand as ErschaffungsModul, ErschaffungsWahl } from '../types';
+import { grwAlleFertigkeiten } from '../regelwerk/grwListen';
 export type { ModulAngewendet, ErschaffungsModul, ErschaffungsWahl };
 
 /** Katalog-Fertigkeits-ID → Fertigkeitsname im Editor (z. B. „Geschichte & Mythen“) */
 export function editorFertigkeit(k: Katalog, id: string): string | undefined {
-  return ALL_SKILLS.find(s => fertigkeitId(k, s) === id);
+  return grwAlleFertigkeiten().find(s => fertigkeitId(k, s) === id);
 }
 
 export interface ModulGruppe { index: number; text: string; punkte: number; optionen: { id?: string; text: string; auswahl?: string }[]; restVon?: number }

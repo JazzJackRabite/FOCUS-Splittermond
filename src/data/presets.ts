@@ -1,9 +1,7 @@
 import type { CharacterState } from '../types';
 import { DEFAULT_STATE } from '../hooks/useCharacterState';
-import { STRENGTHS_DATA } from './strengths';
-import { WEAKNESS_DESCRIPTIONS } from './weaknesses';
-import { RESOURCE_DESCRIPTIONS } from './resources';
 import { referenceCharacterResources } from '../utils/gameResourceManager';
+import { grwRessourcenTexte, grwSchwaechenTexte, grwStaerken } from '../regelwerk/grwListen';
 
 export interface ArchetypePreset {
   id: string;
@@ -17,7 +15,7 @@ export interface ArchetypePreset {
 }
 
 const getStrengthDesc = (name: string): string => {
-  const s = STRENGTHS_DATA.find((item) => item.name === name);
+  const s = grwStaerken().find((item) => item.name === name);
   return s ? s.desc : '';
 };
 
@@ -79,13 +77,13 @@ const RAW_CHARACTER_PRESETS: ArchetypePreset[] = [
         { name: 'Zäh', level: 1, source: 'creation', isFree: false, isRacial: false, pointCost: 1, desc: getStrengthDesc('Zäh') },
       ],
       weaknessesList: [
-        { name: 'Kodex', level: 1, source: 'creation', isFree: false, pointCost: 0, desc: WEAKNESS_DESCRIPTIONS['Kodex'] },
+        { name: 'Kodex', level: 1, source: 'creation', isFree: false, pointCost: 0, desc: grwSchwaechenTexte()['Kodex'] },
       ],
       resourcesList: [
-        { name: 'Kreatur', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: RESOURCE_DESCRIPTIONS['Kreatur'] },
-        { name: 'Kontakte', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: RESOURCE_DESCRIPTIONS['Kontakte'] },
-        { name: 'Relikt', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: RESOURCE_DESCRIPTIONS['Relikt'] },
-        { name: 'Stand', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: RESOURCE_DESCRIPTIONS['Stand'] },
+        { name: 'Kreatur', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: grwRessourcenTexte()['Kreatur'] },
+        { name: 'Kontakte', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: grwRessourcenTexte()['Kontakte'] },
+        { name: 'Relikt', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: grwRessourcenTexte()['Relikt'] },
+        { name: 'Stand', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: grwRessourcenTexte()['Stand'] },
       ],
       masteries: {
         Überleben: [
@@ -172,13 +170,13 @@ const RAW_CHARACTER_PRESETS: ArchetypePreset[] = [
         { name: 'Einen Schritt voraus', level: 1, source: 'creation', isFree: false, isRacial: false, pointCost: 2, desc: getStrengthDesc('Einen Schritt voraus') },
       ],
       weaknessesList: [
-        { name: 'Kodex', level: 1, source: 'creation', isFree: false, pointCost: 0, desc: WEAKNESS_DESCRIPTIONS['Kodex'] },
+        { name: 'Kodex', level: 1, source: 'creation', isFree: false, pointCost: 0, desc: grwSchwaechenTexte()['Kodex'] },
       ],
       resourcesList: [
-        { name: 'Stand', level: 3, source: 'creation', isFree: false, pointCost: 1, desc: RESOURCE_DESCRIPTIONS['Stand'] },
-        { name: 'Ansehen', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: RESOURCE_DESCRIPTIONS['Ansehen'] },
-        { name: 'Relikt', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: RESOURCE_DESCRIPTIONS['Relikt'] },
-        { name: 'Vermögen', level: 1, source: 'creation', isFree: false, pointCost: 1, desc: RESOURCE_DESCRIPTIONS['Vermögen'] },
+        { name: 'Stand', level: 3, source: 'creation', isFree: false, pointCost: 1, desc: grwRessourcenTexte()['Stand'] },
+        { name: 'Ansehen', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: grwRessourcenTexte()['Ansehen'] },
+        { name: 'Relikt', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: grwRessourcenTexte()['Relikt'] },
+        { name: 'Vermögen', level: 1, source: 'creation', isFree: false, pointCost: 1, desc: grwRessourcenTexte()['Vermögen'] },
       ],
       masteries: {
         Klingenwaffen: [
@@ -264,13 +262,13 @@ const RAW_CHARACTER_PRESETS: ArchetypePreset[] = [
         { name: 'Krankheitsresistenz', level: 1, source: 'creation', isFree: false, isRacial: false, pointCost: 1, desc: getStrengthDesc('Krankheitsresistenz') },
       ],
       weaknessesList: [
-        { name: 'Weichherzig', level: 1, source: 'creation', isFree: false, pointCost: 0, desc: WEAKNESS_DESCRIPTIONS['Weichherzig'] },
+        { name: 'Weichherzig', level: 1, source: 'creation', isFree: false, pointCost: 0, desc: grwSchwaechenTexte()['Weichherzig'] },
       ],
       resourcesList: [
-        { name: 'Kontakte', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: RESOURCE_DESCRIPTIONS['Kontakte'] },
-        { name: 'Ansehen', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: RESOURCE_DESCRIPTIONS['Ansehen'] },
-        { name: 'Zuflucht', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: RESOURCE_DESCRIPTIONS['Zuflucht'] },
-        { name: 'Vermögen', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: RESOURCE_DESCRIPTIONS['Vermögen'] },
+        { name: 'Kontakte', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: grwRessourcenTexte()['Kontakte'] },
+        { name: 'Ansehen', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: grwRessourcenTexte()['Ansehen'] },
+        { name: 'Zuflucht', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: grwRessourcenTexte()['Zuflucht'] },
+        { name: 'Vermögen', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: grwRessourcenTexte()['Vermögen'] },
       ],
       masteries: {
         Heilkunde: [
@@ -363,13 +361,13 @@ const RAW_CHARACTER_PRESETS: ArchetypePreset[] = [
         { name: 'Einen Schritt voraus', level: 1, source: 'creation', isFree: false, isRacial: false, pointCost: 2, desc: getStrengthDesc('Einen Schritt voraus') },
       ],
       weaknessesList: [
-        { name: 'Gier', level: 1, source: 'creation', isFree: false, pointCost: 0, desc: WEAKNESS_DESCRIPTIONS['Gier'] },
+        { name: 'Gier', level: 1, source: 'creation', isFree: false, pointCost: 0, desc: grwSchwaechenTexte()['Gier'] },
       ],
       resourcesList: [
-        { name: 'Kontakte', level: 3, source: 'creation', isFree: false, pointCost: 1, desc: RESOURCE_DESCRIPTIONS['Kontakte'] },
-        { name: 'Zuflucht', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: RESOURCE_DESCRIPTIONS['Zuflucht'] },
-        { name: 'Vermögen', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: RESOURCE_DESCRIPTIONS['Vermögen'] },
-        { name: 'Relikt', level: 1, source: 'creation', isFree: false, pointCost: 1, desc: RESOURCE_DESCRIPTIONS['Relikt'] },
+        { name: 'Kontakte', level: 3, source: 'creation', isFree: false, pointCost: 1, desc: grwRessourcenTexte()['Kontakte'] },
+        { name: 'Zuflucht', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: grwRessourcenTexte()['Zuflucht'] },
+        { name: 'Vermögen', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: grwRessourcenTexte()['Vermögen'] },
+        { name: 'Relikt', level: 1, source: 'creation', isFree: false, pointCost: 1, desc: grwRessourcenTexte()['Relikt'] },
       ],
       masteries: {
         Heimlichkeit: [
@@ -460,13 +458,13 @@ const RAW_CHARACTER_PRESETS: ArchetypePreset[] = [
         { name: 'Konzentrationsstärke', level: 1, source: 'creation', isFree: false, isRacial: false, pointCost: 1, desc: getStrengthDesc('Konzentrationsstärke') },
       ],
       weaknessesList: [
-        { name: 'Hochmut', level: 1, source: 'creation', isFree: false, pointCost: 0, desc: WEAKNESS_DESCRIPTIONS['Hochmut'] },
+        { name: 'Hochmut', level: 1, source: 'creation', isFree: false, pointCost: 0, desc: grwSchwaechenTexte()['Hochmut'] },
       ],
       resourcesList: [
-        { name: 'Mentor', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: RESOURCE_DESCRIPTIONS['Mentor'] },
-        { name: 'Relikt', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: RESOURCE_DESCRIPTIONS['Relikt'] },
-        { name: 'Stand', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: RESOURCE_DESCRIPTIONS['Stand'] },
-        { name: 'Vermögen', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: RESOURCE_DESCRIPTIONS['Vermögen'] },
+        { name: 'Mentor', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: grwRessourcenTexte()['Mentor'] },
+        { name: 'Relikt', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: grwRessourcenTexte()['Relikt'] },
+        { name: 'Stand', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: grwRessourcenTexte()['Stand'] },
+        { name: 'Vermögen', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: grwRessourcenTexte()['Vermögen'] },
       ],
       masteries: {
         'Arkane Kunde': [
@@ -561,13 +559,13 @@ const RAW_CHARACTER_PRESETS: ArchetypePreset[] = [
         { name: 'Konzentrationsstärke', level: 1, source: 'creation', isFree: false, isRacial: false, pointCost: 1, desc: getStrengthDesc('Konzentrationsstärke') },
       ],
       weaknessesList: [
-        { name: 'Kodex', level: 1, source: 'creation', isFree: false, pointCost: 0, desc: WEAKNESS_DESCRIPTIONS['Kodex'] },
+        { name: 'Kodex', level: 1, source: 'creation', isFree: false, pointCost: 0, desc: grwSchwaechenTexte()['Kodex'] },
       ],
       resourcesList: [
-        { name: 'Rang', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: RESOURCE_DESCRIPTIONS['Rang'] },
-        { name: 'Ansehen', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: RESOURCE_DESCRIPTIONS['Ansehen'] },
-        { name: 'Relikt', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: RESOURCE_DESCRIPTIONS['Relikt'] },
-        { name: 'Zuflucht', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: RESOURCE_DESCRIPTIONS['Zuflucht'] },
+        { name: 'Rang', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: grwRessourcenTexte()['Rang'] },
+        { name: 'Ansehen', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: grwRessourcenTexte()['Ansehen'] },
+        { name: 'Relikt', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: grwRessourcenTexte()['Relikt'] },
+        { name: 'Zuflucht', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: grwRessourcenTexte()['Zuflucht'] },
       ],
       masteries: {
         Hiebwaffen: [
@@ -658,13 +656,13 @@ const RAW_CHARACTER_PRESETS: ArchetypePreset[] = [
         { name: 'Einen Schritt voraus', level: 1, source: 'creation', isFree: false, isRacial: false, pointCost: 2, desc: getStrengthDesc('Einen Schritt voraus') },
       ],
       weaknessesList: [
-        { name: 'Eitelkeit', level: 1, source: 'creation', isFree: false, pointCost: 0, desc: WEAKNESS_DESCRIPTIONS['Eitelkeit'] },
+        { name: 'Eitelkeit', level: 1, source: 'creation', isFree: false, pointCost: 0, desc: grwSchwaechenTexte()['Eitelkeit'] },
       ],
       resourcesList: [
-        { name: 'Relikt', level: 3, source: 'creation', isFree: false, pointCost: 1, desc: RESOURCE_DESCRIPTIONS['Relikt'] },
-        { name: 'Kontakte', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: RESOURCE_DESCRIPTIONS['Kontakte'] },
-        { name: 'Ansehen', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: RESOURCE_DESCRIPTIONS['Ansehen'] },
-        { name: 'Vermögen', level: 1, source: 'creation', isFree: false, pointCost: 1, desc: RESOURCE_DESCRIPTIONS['Vermögen'] },
+        { name: 'Relikt', level: 3, source: 'creation', isFree: false, pointCost: 1, desc: grwRessourcenTexte()['Relikt'] },
+        { name: 'Kontakte', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: grwRessourcenTexte()['Kontakte'] },
+        { name: 'Ansehen', level: 2, source: 'creation', isFree: false, pointCost: 1, desc: grwRessourcenTexte()['Ansehen'] },
+        { name: 'Vermögen', level: 1, source: 'creation', isFree: false, pointCost: 1, desc: grwRessourcenTexte()['Vermögen'] },
       ],
       masteries: {
         Klingenwaffen: [

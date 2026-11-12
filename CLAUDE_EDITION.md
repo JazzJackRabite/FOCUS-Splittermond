@@ -652,6 +652,35 @@ die Grimoires), Dateiendung `.grim`. Das Grundregelwerk ist kein Grimoire; es bl
   Schema, Regelbrowser und LIESMICH. Die neu gebauten Dateien liegen jetzt auf D:. Im Editor die Bytezahl des
   GRW-Pakets im Manifest korrigiert. Tests: 393 grün mit allen 12 Grimoires, 368 ohne Bücher; Build läuft.
 
+## Stand 27 (12.11.2026): Zustände bei Begleitern eingerechnet, Kennzahlenprüfung, Volltest, GRW-Listen aus dem Paket
+
+- **Begleiter:** Der Wertekasten von Tieren, Gefolge, Untoten, Golems und Wesen rechnet die Zustände ein (GSW, VTD, SR,
+  KW, GW, Initiative der Waffen; `regelwerk/zustandswerte.ts`, `textMitZustaenden`). Der Grundwert steht in Klammern
+  daneben, die Erklärung beim Überfahren mit der Maus; die Zeile unter den Zuständen heißt jetzt „In die Werte eingerechnet“.
+- **Kennzahlen:** Neuer Test `konsistenz.test.ts` (Prüfsumme, Bytezahl, Eintragszahl im Manifest; mit FOKUS_GRIMOIRES
+  auch `ladeinfo.original` und Statistik der Grimoires). Gegenstück in der Prüfsuite (`pruefungen.py`, Prüfung `konsistenz`).
+  Beide fangen den Fehler vom Abend („Anzahl ≠ manifest“) ab.
+- **Volltest wieder scharf:** `Pruefsuite/editor_referenz.py` erzeugt die Vergleichsdatei `editor_referenz_voll.json`
+  (liegt auf D:, nicht im Repo). Aufruf siehe `vollabgleich.test.ts`; 5 von 5 grün.
+- **GRW-Listen aus dem Paket** (`regelwerk/grwListen.ts`): Zauber, Meisterschaften (Schwellenwerte aus „Meisterschaften
+  erhalten“), Stärken, Schwächen, Ressourcen (mit Stufenübersicht), Sprachen, Mondzeichen, Fertigkeiten mit Attributen,
+  Rassen, Stärkenpunkte der Erschaffung, Attribute, Gesundheitsstufen, kostenlose Stärke der Kultur. Ausrüstung des
+  GRW aus dem Paket (`ausruestung.ts`, `grwAusruestung`; 177 statt 142 Einträge – dazu Kleidung, Gifte, Material,
+  Verbesserungen; Beschreibungen mit Attributen, Mindestattributen, Härte). Alte Ausrüstungs-IDs („waffen|…“) bei Relikten
+  werden weiter gefunden (`findeAusruestung`). `src/data` und die Listen in `rules.ts` sind nur noch Rückfall ohne Paket;
+  `grwListen.test.ts` und `ausruestung.test.ts` halten sie gleich.
+- **Korrekturen am Rückfall nach dem Paket:** Wie oft Stärken wählbar sind (Datenseite: `daten.mehrfach_waehlbar`):
+  Erhöhter Fokuspool beliebig oft, Hoher GW/KW einmal pro Heldengrad (höchstens 4), Erwählter der [Wesen] und Kulturkunde
+  je Typus bzw. Kultur (vorher pauschal 5). Sprachen: S. 315, Familien wie im Buch, „Sprache der Orks“ statt „Ork-Sprache“,
+  „Gesamt-Gnomisch“ entfernt (nicht im GRW). Gesundheitsstufe 1 heißt „Unverletzt“ wie im GRW.
+- **Beispielcharaktere:** Beim Laden einer Vorlage schreibt der Editor die IDs aus dem Paket mit; `vorlagen.test.ts` prüft,
+  dass jeder Name eine ID hat.
+- **Datenseite (auf D: geliefert):** `Werkzeuge/regelpakete/staerken_mehrfach.py` + `.json`, Schema in `write.py`;
+  GRW-Paket und Manifeste neu gebaut; Prüfsuite 0 neue Befunde.
+- Tests: 417 grün mit allen 12 Grimoires und Volltest, 386 ohne Bücher; Build läuft.
+- Offen: Würfelmechanik, Fokuskosten, Kampfmanöver nach Namen, einzelne Stärken nach Namen (characterCalculations,
+  RestSection), Heimatregionen (stehen nicht im GRW-Paket) – siehe FUNDAMENT.md, Altlasten.
+
 ## Google AI Studio
 
 Unverändert eine Vite-/React-App mit `metadata.json` im Wurzelordner; Import über „Import from GitHub“, Hosting über Cloud Run.

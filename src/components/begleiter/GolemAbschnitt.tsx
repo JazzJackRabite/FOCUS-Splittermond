@@ -120,7 +120,7 @@ const GolemEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; besitzer
         </p>
 
         {wk && <BegleiterVitals spiel={spiel} daten={daten} />}
-        {wk && <Werte w={wk} aktionen={spiel.aktionen} />}
+        {wk && <Werte w={wk} aktionen={spiel.aktionen} zustaende={spiel.zustand.zustaende} />}
 
         <BausteinGruppe k={k} art="Zusätzliche Fähigkeit" b={b} aendern={aendern} />
         <BausteinGruppe k={k} art="Rolle" b={b} aendern={aendern} info="Mehrfach wählbar und kombinierbar; Kämpfer setzt Aggressiv voraus." />

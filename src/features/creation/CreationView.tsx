@@ -2,10 +2,7 @@ import { regelverstoss, useHausregeln } from '../../fundament/hausregeln';
 import React, { useState, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
 import { ChevronsDownUp } from 'lucide-react';
-
-import { ATTRIBUTES, RACES, SKILL_CATEGORIES, SKILL_DATA, REGIONS, MOON_SIGNS } from '../../data/rules';
-import { STRENGTHS_DATA } from '../../data/strengths';
-import { LANGUAGES_DATA } from '../../data/languages';
+import { REGIONS } from '../../data/rules';
 import { getStrengthDescription, matchSchool, getResolvedStrengths, getResolvedResources, getResolvedWeaknesses } from '../../utils/gameResourceManager';
 import { getSkillXpCost, getAttrXpCost } from '../../utils/costCalculations';
 import { useCharacter } from '../../context/CharacterContext';
@@ -13,7 +10,6 @@ import { useAttributeHandlers } from '../../hooks/useAttributeHandlers';
 import { useItemHandlers } from '../../hooks/useItemHandlers';
 import { useMasteryHandlers } from '../../hooks/useMasteryHandlers';
 import { useSpellHandlers } from '../../hooks/useSpellHandlers';
-
 import { StatusWidget } from '../../components/character/StatusWidget';
 import { AttributeRow } from '../../components/attributes/AttributeRow';
 import { SkillRow } from '../../components/skills/SkillRow';
@@ -30,14 +26,15 @@ import { AdvancementLog } from '../../components/advancement/AdvancementLog';
 import { ErschaffungRegelwerk } from '../../components/creation/ErschaffungRegelwerk';
 import type { ConfirmDialogState } from '../../hooks/useModals';
 import type { RaceData } from '../../types';
+import { grwAttribute, grwFertigkeitsKategorien, grwFertigkeitsattribute, grwMondzeichen, grwRassen, grwSprachen, grwStaerken } from '../../regelwerk/grwListen';
 
 // ---------------------------------------------------------------------------
 
 function buildRacialStrengths(newRace: string) {
-  const raceEntry = RACES[newRace as keyof typeof RACES] as RaceData | undefined;
+  const raceEntry = grwRassen()[newRace as keyof ReturnType<typeof grwRassen>] as RaceData | undefined;
   const racialStrengthNames = raceEntry?.strengths ?? [];
   return racialStrengthNames.map((rName) => {
-    const data = STRENGTHS_DATA.find((sd) => sd.name === rName);
+    const data = grwStaerken().find((sd) => sd.name === rName);
     return {
       name: rName,
       level: 1,
@@ -170,9 +167,9 @@ export function CreationView() {
 
   const filteredSkills = React.useMemo(() => {
     if (skillFilter === null) {
-      return [...SKILL_CATEGORIES.GENERAL, ...SKILL_CATEGORIES.COMBAT, ...SKILL_CATEGORIES.MAGIC];
+      return [...grwFertigkeitsKategorien().GENERAL, ...grwFertigkeitsKategorien().COMBAT, ...grwFertigkeitsKategorien().MAGIC];
     }
-    return SKILL_CATEGORIES[skillFilter as keyof typeof SKILL_CATEGORIES] ?? SKILL_CATEGORIES.GENERAL;
+    return grwFertigkeitsKategorien()[skillFilter as keyof ReturnType<typeof grwFertigkeitsKategorien>] ?? grwFertigkeitsKategorien().GENERAL;
   }, [skillFilter]);
 
   // ---- budgets ----
@@ -180,7 +177,7 @@ export function CreationView() {
   const resourceBudget = mode === 'creation' ? creationUsage.resourceLimit - creationUsage.resource : xpAvailable;
   const spellBudget = xpAvailable;
 
-  const raceEntry = RACES[race as keyof typeof RACES] as RaceData | undefined;
+  const raceEntry = grwRassen()[race as keyof ReturnType<typeof grwRassen>] as RaceData | undefined;
   const raceData = raceEntry ?? { gk: 5, mods: {}, freeMods: 0, strengths: [], traits: [] };
 
   const canUndoAdvancement = (state.advancementHistory?.length ?? 0) > 0;
@@ -254,7 +251,7 @@ export function CreationView() {
       )}
       {showLanguageModal && (
         <AddItemModal
-          title="Sprache" items={LANGUAGES_DATA} onClose={() => setShowLanguageModal(false)}
+          title="Sprache" items={grwSprachen()} onClose={() => setShowLanguageModal(false)}
           onAdd={(n, l, d, c, s, p, f) => addListEntry('language', n, l, d, c, s, p, f)}
           mode={mode} type="language" budget={xpAvailable} existingItems={languagesList}
         />
@@ -275,7 +272,7 @@ export function CreationView() {
           onAdd={addMastery}
           existingMasteries={masteries[activeSkillForMastery.name] ?? []}
           allCharacterMasteries={Object.values(masteries).flat()}
-          skills={Object.fromEntries(Object.keys(SKILL_DATA).map((s) => [s, getSkillValue(s)]))}
+          skills={Object.fromEntries(Object.keys(grwFertigkeitsattribute()).map((s) => [s, getSkillValue(s)]))}
           resources={resourcesList}
           culture={homeRegion}
           race={race}
@@ -355,7 +352,7 @@ export function CreationView() {
                     disabled={mode !== 'creation'}
                   >
                     <option value="">-- Wählen --</option>
-                    {MOON_SIGNS.map((sign) => <option key={sign} value={sign}>{sign}</option>)}
+                    {grwMondzeichen().map((sign) => <option key={sign} value={sign}>{sign}</option>)}
                   </select>
                 </div>
               </div>
@@ -363,7 +360,7 @@ export function CreationView() {
               <div>
                 <label className="block text-xs uppercase text-leise font-bold mb-2">Rasse</label>
                 <div className={`flex flex-wrap gap-2 ${mode !== 'creation' ? 'opacity-50 pointer-events-none' : ''}`}>
-                  {Object.keys(RACES).map((r) => (
+                  {Object.keys(grwRassen()).map((r) => (
                     <button
                       key={r} onClick={() => handleRaceChange(r)}
                       disabled={mode !== 'creation'}
@@ -385,7 +382,7 @@ export function CreationView() {
               <div className={`mb-2 ${mode !== 'creation' ? 'opacity-50 pointer-events-none' : ''}`}>
                 <strong className="block mb-1 text-schrift">Wählbare Boni: {raceData.freeMods}</strong>
                 <div className="flex flex-wrap gap-1">
-                  {Object.keys(ATTRIBUTES).map((attr) => {
+                  {Object.keys(grwAttribute()).map((attr) => {
                     const isSelected = raceBonusAttrs.includes(attr);
                     if (race === 'Varg' && attr === 'STA') return null;
                     return (
@@ -417,7 +414,7 @@ export function CreationView() {
               <PointDisplay current={creationUsage.attr} max={18} label="Punkte" mode={mode} />
             </div>
             <div className="space-y-1">
-              {Object.keys(ATTRIBUTES).map((key) => {
+              {Object.keys(grwAttribute()).map((key) => {
                 const base = attrBase[key as keyof typeof attrBase] ?? 0;
                 const total = getAttrValue(key);
                 const raceMod = (raceData.mods[key] as number | undefined) ?? 0;
@@ -515,7 +512,7 @@ export function CreationView() {
                 const currentSpells = spellsList.filter((s) => s.school === skill || matchSchool(s.school, skill));
                 const freeSlots = getFreeSlotsForSkill(skill);
                 const freeSpellSlotsCount = (detailedFreeSpellSlots[skill] ?? []).length;
-                const attrs = SKILL_DATA[skill];
+                const attrs = grwFertigkeitsattribute()[skill];
                 return (
                   <SkillRow
                     key={skill} name={skill} val={val} totalValue={totalValue}

@@ -126,11 +126,12 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ onClose, onSelectPro
   const handleCreateFromPreset = (preset: ArchetypePreset) => {
     const newId = `char_${generateId()}`;
     const referenced = referenceCharacterResources(preset.fullState);
-    const newState = {
+    // Vorlagen nennen Stärken, Meisterschaften und Zauber beim Namen; beim Laden bekommen sie die IDs aus dem Paket
+    const newState = mitRegelIds({
       ...referenced,
       creationFinalized: true,
       mode: 'play' as const,
-    };
+    });
     saveToLocalStorage(newState as unknown as Record<string, unknown>, newId);
     setActiveProfileId(newId);
     toast.success(`Vorlage "${preset.name}" geladen! Charaktererschaffung ist abgeschlossen.`);

@@ -5,19 +5,12 @@ import type {
   Mastery,
   Spell,
 } from '../types';
-import {
-  ATTRIBUTES,
-  RACES,
-  SKILL_CATEGORIES,
-  ALL_SKILLS,
-  SKILL_DATA,
-  HELDENGRADE,
-  getStrengthBudget,
-} from '../data/rules';
+import { HELDENGRADE } from '../data/rules';  // Rückfall ohne Paket
 import { getSkillXpCost, getAttrXpCost, calculateItemCost } from './costCalculations';
 import { heldengrade } from '../regelwerk/steigerungsregeln';
 import { abgeleiteteFuerCharakter, wirkungenFuerCharakter, type CharakterWirkungen, type KatalogWerte } from '../regelwerk/bruecke';
 import { reliktWiderstandFuerCharakter } from '../regelwerk/relikte';
+import { grwAlleFertigkeiten, grwAttribute, grwFertigkeitsKategorien, grwFertigkeitsattribute, grwGesundheitsstufen, grwRassen, staerkenBudget } from '../regelwerk/grwListen';
 
 export interface CharacterCalculationResult {
   getAttrValue: (key: string) => number;
@@ -85,7 +78,7 @@ export function calculateCharacter(state: CharacterState): CharacterCalculationR
   // 1. Attribute calculation
   const getAttrValue = (key: string): number => {
     const base = Number(attrBase[key as keyof typeof attrBase]) || 0;
-    const raceData = RACES[race as keyof typeof RACES] as {
+    const raceData = grwRassen()[race as keyof ReturnType<typeof grwRassen>] as {
       mods: Record<string, number>;
     } | undefined;
     const mod = Number(raceData?.mods?.[key]) || 0;
@@ -96,7 +89,7 @@ export function calculateCharacter(state: CharacterState): CharacterCalculationR
   };
 
   const currentAttributes: Record<string, number> = {};
-  Object.keys(ATTRIBUTES).forEach((k) => {
+  Object.keys(grwAttribute()).forEach((k) => {
     currentAttributes[k] = getAttrValue(k);
   });
 
@@ -155,7 +148,7 @@ export function calculateCharacter(state: CharacterState): CharacterCalculationR
   for (const g of grade) if (xpSpent >= g.minXP) heldengrad = g;
 
   // 4. Derived stats
-  const raceData = RACES[race as keyof typeof RACES] as { gk: number } | undefined;
+  const raceData = grwRassen()[race as keyof ReturnType<typeof grwRassen>] as { gk: number } | undefined;
   const gk = Number(raceData?.gk) || 5;
   const sizeMod = gk === 3 ? 4 : gk === 4 ? 2 : gk === 6 ? -2 : 0;
   const bew = Number(currentAttributes.BEW) || 0;
@@ -269,8 +262,9 @@ export function calculateCharacter(state: CharacterState): CharacterCalculationR
   const maxFO = isNaN(rawMaxFO) ? 0 : rawMaxFO;
 
   // 6. Wound penalty
-  const WOUND_PENALTIES = [0, -1, -2, -4, -8];
-  const HEALTH_LEVEL_NAMES = ['Unverletzt', 'Angeschlagen', 'Verletzt', 'Schwer verletzt', 'Todgeweiht'];
+  const stufenGrw = grwGesundheitsstufen();
+  const WOUND_PENALTIES = stufenGrw.map((x) => x.wundabzug);
+  const HEALTH_LEVEL_NAMES = stufenGrw.map((x) => x.name);
   const slots = state.playState?.healthSlots ?? [];
   let currentWoundPenalty = 0;
   let currentHealthLevelName = 'Unverletzt';
@@ -309,8 +303,8 @@ export function calculateCharacter(state: CharacterState): CharacterCalculationR
   // 8. Creation Usage
   const attrPoints = Object.values(attrBase).reduce((a, b) => a + (Number(b) || 0), 0);
   const skillPoints = Object.values(skillsBase).reduce((a, b) => a + (Number(b) || 0), 0);
-  const nonMagicPoints = ALL_SKILLS.reduce((sum, skill) => {
-    if (SKILL_CATEGORIES.MAGIC.includes(skill)) return sum;
+  const nonMagicPoints = grwAlleFertigkeiten().reduce((sum, skill) => {
+    if (grwFertigkeitsKategorien().MAGIC.includes(skill)) return sum;
     return sum + (Number(skillsBase[skill]) || 0);
   }, 0);
   const strengthPoints = strengthsList
@@ -338,7 +332,7 @@ export function calculateCharacter(state: CharacterState): CharacterCalculationR
     });
   });
 
-  const strengthLimit = getStrengthBudget(race);
+  const strengthLimit = staerkenBudget(race);
 
   const creationUsage: CreationUsage = {
     attr: attrPoints,
@@ -384,13 +378,13 @@ export function calculateCharacter(state: CharacterState): CharacterCalculationR
   };
 
   let totalFreeSlotsAvailable = 0;
-  ALL_SKILLS.forEach((skill) => {
+  grwAlleFertigkeiten().forEach((skill) => {
     totalFreeSlotsAvailable += getFreeSlotsForSkill(skill);
   });
 
   // 10. Free spell slots
   const detailedFreeSpellSlots: Record<string, number[]> = {};
-  SKILL_CATEGORIES.MAGIC.forEach((skill) => {
+  grwFertigkeitsKategorien().MAGIC.forEach((skill) => {
     const val = (skillsBase[skill] ?? 0) + (skillsXp[skill] ?? 0);
     const earned: number[] = [];
     if (val >= 1) earned.push(0);
@@ -417,7 +411,7 @@ export function calculateCharacter(state: CharacterState): CharacterCalculationR
   );
 
   // 11. Grouped masteries & spells
-  const allMasterySkills = Array.from(new Set([...ALL_SKILLS, ...Object.keys(masteries)])).sort();
+  const allMasterySkills = Array.from(new Set([...grwAlleFertigkeiten(), ...Object.keys(masteries)])).sort();
   const groupedMasteries = allMasterySkills.map((skill) => {
     const mList = masteries[skill] ?? [];
     if (mList.length === 0) return null;
@@ -444,7 +438,7 @@ export function calculateCharacter(state: CharacterState): CharacterCalculationR
 
   const getSkillTotal = (skill: string): number | null => {
     const val = getSkillValue(skill);
-    const attrs = SKILL_DATA[skill];
+    const attrs = grwFertigkeitsattribute()[skill];
     if (!attrs) return null;
     return val + currentAttributes[attrs[0]] + currentAttributes[attrs[1]] + getSkillBonus(skill);
   };

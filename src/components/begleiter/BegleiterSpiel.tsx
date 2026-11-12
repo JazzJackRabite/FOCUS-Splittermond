@@ -198,12 +198,12 @@ const BegleiterZustaende: React.FC<{ spiel: ReturnType<typeof useBegleiterSpiel>
         })}
       </div>
       {(() => {
-        // Wirkung der Zustände auf die abgeleiteten Werte des Begleiters (Zahlen aus den Paketeinträgen)
+        // Wirkung der Zustände (Zahlen aus den Paketeinträgen); im Wertekasten sind sie eingerechnet, hier steht die Erklärung
         const zw = zustandswerte(liste);
         const teile = (['VTD', 'GW', 'KW', 'GSW', 'INI', 'SR'] as const).map((w) => zustandsErklaerung(w, zw) && `${w}: ${zw.erklaerung[w]!.join(', ')}`).filter(Boolean);
         if (zw.erklaerung.FO) teile.push(`Fokus: ${zw.erklaerung.FO.join(', ')}`);
         teile.push(...zw.hinweise);
-        return teile.length ? <p className="text-xs text-leise" data-testid="begleiter-zustandswerte">Wirkung auf die Werte – {teile.join(' · ')}</p> : null;
+        return teile.length ? <p className="text-xs text-leise" data-testid="begleiter-zustandswerte">In die Werte eingerechnet – {teile.join(' · ')}</p> : null;
       })()}
       <div className="flex flex-wrap gap-2 items-end">
         <Auswahl beschriftung="Zustand hinzufügen" beschriftungVerborgen value={wahl} onChange={e => setWahl(e.target.value)}>

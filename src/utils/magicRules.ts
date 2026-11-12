@@ -1,10 +1,11 @@
-import { SPELLS_DB, type Spell as DbSpell } from '../data/spells';
+import { type Spell as DbSpell } from '../data/spells';
 import { getSpellDescription } from './gameResourceManager';
 import type { Spell } from '../types';
-import { SKILL_DATA } from '../data/rules';
+
 import type { Katalog } from '../regelwerk/katalog';
 import { aktiverKatalog, idNachName } from '../regelwerk/bruecke';
 import { istVerstaerkt, istWaffenlos, kampfwerte, lpWirkung, probenboni, spielwerteDesZaubers, waffenschaden, zielTrifft, geltenderWert } from '../regelwerk/zauberwerte';
+import { grwFertigkeitsattribute, grwZauber } from '../regelwerk/grwListen';
 
 export interface ParsedFocusCost {
   isChanneled: boolean;
@@ -76,18 +77,18 @@ export function parseFocusCost(costInput?: string | number | null): ParsedFocusC
 }
 
 /**
- * Looks up full spell data in the SPELLS_DB by spell name and optional school.
+ * Looks up full spell data in the grwZauber() by spell name and optional school.
  */
 export function lookupSpellInDb(spellName: string, school?: string): DbSpell | undefined {
   const trimmed = spellName.trim().toLowerCase();
   let found: DbSpell | undefined;
   if (school) {
-    found = SPELLS_DB.find(
+    found = grwZauber().find(
       (s) => s.name.toLowerCase() === trimmed && s.school.toLowerCase() === school.toLowerCase()
     );
   }
   if (!found) {
-    found = SPELLS_DB.find((s) => s.name.toLowerCase() === trimmed);
+    found = grwZauber().find((s) => s.name.toLowerCase() === trimmed);
   }
   if (found) {
     const desc = getSpellDescription(found.name, found.school, found.description);
@@ -776,7 +777,7 @@ export function getActiveSpellRollBonuses(
 ): ActiveSpellRollBonus[] {
   const cleanSkill = (skillName || '').trim();
   const angriff = isCombatAttack || KAMPFFERTIGKEITEN.includes(cleanSkill.toLowerCase());
-  return probenboni(katalog, channeledSpells, { fertigkeit: cleanSkill, attribute: SKILL_DATA[cleanSkill] || [], angriff, waffenId: weaponId })
+  return probenboni(katalog, channeledSpells, { fertigkeit: cleanSkill, attribute: grwFertigkeitsattribute()[cleanSkill] || [], angriff, waffenId: weaponId })
     .map((b) => ({ id: b.id, source: b.quelle, bonus: b.bonus, description: b.text, active: b.vorausgewaehlt }));
 }
 

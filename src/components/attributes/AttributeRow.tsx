@@ -1,7 +1,8 @@
 import React from 'react';
 import { Knopf } from '../../fundament';
-import { ATTRIBUTES } from '../../data/rules';
+
 import type { AttributeRowProps } from '../../types';
+import { grwAttribute } from '../../regelwerk/grwListen';
 
 export const AttributeRow: React.FC<AttributeRowProps> = ({
   attrKey,
@@ -17,7 +18,7 @@ export const AttributeRow: React.FC<AttributeRowProps> = ({
   <div className="flex items-center justify-between py-2 border-b border-rahmen last:border-0 print:border-leise gap-2">
     <div className="flex flex-col min-w-0 flex-1 pr-1">
       <span className="font-bold text-sm sm:text-base text-schrift truncate">
-        {ATTRIBUTES[attrKey as keyof typeof ATTRIBUTES]}
+        {grwAttribute()[attrKey as keyof ReturnType<typeof grwAttribute>]}
       </span>
       <div className="flex items-center gap-1.5 text-xs text-leise">
         <span className="uppercase font-semibold tracking-wider text-gold">{attrKey}</span>
@@ -33,7 +34,7 @@ export const AttributeRow: React.FC<AttributeRowProps> = ({
         onClick={onDecrease}
         disabled={!canDecrease}
         className="sm:w-7 sm:h-7 active:scale-95 disabled:pointer-events-none shrink-0 text-sm touch-manipulation"
-        aria-label={`${ATTRIBUTES[attrKey as keyof typeof ATTRIBUTES]} verringern`}
+        aria-label={`${grwAttribute()[attrKey as keyof ReturnType<typeof grwAttribute>]} verringern`}
         title="Verringern"
       >
         -
@@ -50,7 +51,7 @@ export const AttributeRow: React.FC<AttributeRowProps> = ({
         onClick={onIncrease}
         disabled={!canIncrease}
         className="sm:w-7 sm:h-7 active:scale-95 disabled:pointer-events-none shrink-0 text-sm touch-manipulation"
-        aria-label={`${ATTRIBUTES[attrKey as keyof typeof ATTRIBUTES]} erhöhen`}
+        aria-label={`${grwAttribute()[attrKey as keyof ReturnType<typeof grwAttribute>]} erhöhen`}
         title="Erhöhen"
       >
         +

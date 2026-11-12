@@ -1,9 +1,10 @@
 import type { StatusCondition } from '../types';
 import { aktiverKatalog } from '../regelwerk/bruecke';
 import { gesundheitsstufen } from '../regelwerk/vitals';
-import { SKILL_CATEGORIES, SKILL_DATA } from '../data/rules';
+
 import type { Probenbereich } from '../data/zustaende';
 import { zustand, zustandQuelle } from '../regelwerk/zustaende';
+import { grwFertigkeitsKategorien, grwFertigkeitsattribute } from '../regelwerk/grwListen';
 
 export interface ActiveRollModifier {
   id: string;
@@ -35,8 +36,8 @@ export function isSkillAffectedByBehinderung(skillName: string): boolean {
 
 /** Fertigkeitsgruppe einer Fertigkeit nach ihrem Namen */
 export function probenbereich(fertigkeit: string): Probenbereich {
-  if (SKILL_CATEGORIES.COMBAT.includes(fertigkeit)) return 'kampf';
-  if (SKILL_CATEGORIES.MAGIC.includes(fertigkeit)) return 'magie';
+  if (grwFertigkeitsKategorien().COMBAT.includes(fertigkeit)) return 'kampf';
+  if (grwFertigkeitsKategorien().MAGIC.includes(fertigkeit)) return 'magie';
   return 'allgemein';
 }
 
@@ -101,7 +102,7 @@ export function getConditionMalus(condition: StatusCondition, kontext: Zustandsk
   if (p.bereiche && !p.bereiche.includes(bereich)) return null;
   if (p.attribute) {
     // hängt an Attributen: gilt nur, wenn die Fertigkeit bekannt ist und eines der Attribute nutzt
-    const attribute = kontext.fertigkeit ? SKILL_DATA[kontext.fertigkeit] : null;
+    const attribute = kontext.fertigkeit ? grwFertigkeitsattribute()[kontext.fertigkeit] : null;
     if (!attribute || !attribute.some((x) => p.attribute!.includes(x))) return null;
   }
   const stufe = Math.min(level, p.hoechststufe ?? level);

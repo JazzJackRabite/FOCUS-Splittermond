@@ -11,7 +11,6 @@ import type { BedingungsCharakter } from '../../regelwerk/bedingungen';
 import type { Katalog } from '../../regelwerk/katalog';
 import type { Ergebnis } from '../../regelwerk/typen';
 import type { Begleiter } from '../../types';
-import { HELDENGRADE } from '../../data/rules';
 import { Werte, Eintrag, Hinweise, Notiz } from './Wertekasten';
 import { WesenBaukasten } from './WesenBaukasten';
 import { baukastenArt, basen, wesenBaukastenWerte } from '../../regelwerk/wesenBaukasten';
@@ -119,7 +118,7 @@ const TierEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; f: Fuehre
       </div>
 
       {w && <BegleiterVitals spiel={spiel} daten={daten} />}
-      {e ? (w ? <Werte w={w} aktionen={spiel.aktionen} /> : <p className="text-leise">Keine Werte im Katalog.</p>) : null}
+      {e ? (w ? <Werte w={w} aktionen={spiel.aktionen} zustaende={spiel.zustand.zustaende} /> : <p className="text-leise">Keine Werte im Katalog.</p>) : null}
       {bk && <WesenBaukasten k={k} b={b} w={bk} aendern={aendern} />}
 
       <div className="space-y-2">

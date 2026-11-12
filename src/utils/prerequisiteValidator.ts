@@ -1,6 +1,7 @@
 import type { MasteryEntry, PrerequisiteCondition } from '../data/masteries';
 import type { Mastery, AppMode } from '../types';
 import { aktiverKatalog, bedingungsCharakter, voraussetzungAusKatalog } from '../regelwerk/bruecke';
+import { schwellenwert } from '../regelwerk/grwListen';
 
 export interface PrerequisiteValidationContext {
   allCharacterMasteries: Array<Mastery | string>;
@@ -50,21 +51,10 @@ export function getMasteryTier(mastery: MasteryEntry | { name: string; tier?: nu
 
 /**
  * Returns the required skill value for a given mastery threshold (Schwellenwert)
- * S1: 6, S2: 9, S3: 12, S4: 15
+ * – aus dem GRW-Paket (Kapitel „Meisterschaften erhalten“: 6, 9, 12, 15), siehe regelwerk/grwListen.ts
  */
 export function getRequiredSkillValue(tier: number): number {
-  switch (tier) {
-    case 1:
-      return 6;
-    case 2:
-      return 9;
-    case 3:
-      return 12;
-    case 4:
-      return 15;
-    default:
-      return 6;
-  }
+  return schwellenwert(tier);
 }
 
 /**

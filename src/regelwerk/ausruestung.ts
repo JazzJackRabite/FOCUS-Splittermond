@@ -4,7 +4,9 @@
  *   Projektile, Ausrüstungssätze, Alchemika, Kräuter, Gifte, Material, Verbesserungen, magische Gegenstände).
  * - grwMitGrimoireAenderungen(k, liste): GRW-Liste mit den Änderungen der Grimoires (aktion „ersetzt“ überschreibt Werte,
  *   „ergaenzt“ mit Beschreibung hängt den Text an).
- * - alleAusruestung(): eingebaute GRW-Liste plus Grimoires des aktiven Katalogs; ohne Katalog nur die GRW-Liste.
+ * - grwAusruestung(k): Ausrüstung des Grundregelwerks aus dem GRW-Paket (ohne Paket: eingebauter Rückfall src/data/equipment.ts).
+ * - alleAusruestung(): GRW-Ausrüstung plus Grimoires des aktiven Katalogs; ohne Katalog nur der Rückfall.
+ * - findeAusruestung(liste, id): Eintrag nach ID; versteht auch die IDs der früheren eingebauten Liste („waffen|Nahkampf|…|Name“).
  */
 import { ALL_EQUIPMENT, type ArmorItem, type GearItem, type ShieldItem, type WeaponItem } from '../data/equipment';
 import type { Katalog } from './katalog';
@@ -138,8 +140,35 @@ function grwEintrag(k: Katalog, item: AusruestungsItem, nachName: Map<string, Ei
   return kandidaten[0];
 }
 
-/** Eingebaute GRW-Liste mit den Änderungen der geladenen Grimoires */
-export function grwMitGrimoireAenderungen(k: Katalog, liste: AusruestungsItem[] = ALL_EQUIPMENT as AusruestungsItem[]): AusruestungsItem[] {
+const REIHENFOLGE = Object.keys(AUSRUESTUNGS_TYPEN);
+const GRW_CACHE = new WeakMap<Katalog, AusruestungsItem[]>();
+
+/** Ausrüstung des Grundregelwerks aus dem GRW-Paket, nach Art und Name; ohne GRW-Ausrüstung im Paket der eingebaute Rückfall */
+export function grwAusruestung(k: Katalog | null = aktiverKatalog()): AusruestungsItem[] {
+  if (!k) return ALL_EQUIPMENT as AusruestungsItem[];
+  if (!GRW_CACHE.has(k)) {
+    const basis = k.manifest.basis_paket;
+    const E = Object.values(k.eintraege).filter(e => e.quelle.paket === basis && e.aktion === 'neu' && e.typ in NACH_TYP)
+      .sort((a, b) => REIHENFOLGE.indexOf(a.typ) - REIHENFOLGE.indexOf(b.typ) || a.name.localeCompare(b.name, 'de'));
+    const liste = E.map(e => alsAusruestung(e, kuerzel(k, basis))).filter((x): x is AusruestungsItem => !!x);
+    GRW_CACHE.set(k, liste.length ? liste : ALL_EQUIPMENT as AusruestungsItem[]);
+  }
+  return GRW_CACHE.get(k)!;
+}
+
+/** Eintrag nach ID; IDs der früheren eingebauten Liste („waffen|Nahkampf|Klingenwaffen|Langschwert“) werden über Art, Name und Modus gefunden */
+export function findeAusruestung(liste: AusruestungsItem[], id: string | undefined | null): AusruestungsItem | null {
+  if (!id) return null;
+  const direkt = liste.find(i => i.id === id);
+  if (direkt || !id.includes('|')) return direkt ?? null;
+  const teile = id.split('|'); const name = teile[teile.length - 1];
+  const art = ({ waffen: 'weapon', ruestungen: 'armor', schilde: 'shield', ausruestung: 'gear', alchemika: 'alchemika' } as Record<string, string>)[teile[0]];
+  const passend = liste.filter(i => i.name === name && (!art || i.type === art));
+  return (art === 'weapon' ? passend.find(i => (i as WeaponItem).category === teile[1]) : undefined) ?? passend[0] ?? null;
+}
+
+/** GRW-Ausrüstung mit den Änderungen der geladenen Grimoires */
+export function grwMitGrimoireAenderungen(k: Katalog, liste: AusruestungsItem[] = grwAusruestung(k)): AusruestungsItem[] {
   const basis = k.manifest.basis_paket;
   const nachName = new Map<string, Eintrag[]>();
   for (const e of Object.values(k.eintraege)) {
@@ -185,7 +214,7 @@ export function grwMitGrimoireAenderungen(k: Katalog, liste: AusruestungsItem[] 
 
 /** Alle Ausrüstung für Auswahllisten: GRW (mit Änderungen der Grimoires) plus Grimoires des aktiven Katalogs */
 export function alleAusruestung(k: Katalog | null = aktiverKatalog()): AusruestungsItem[] {
-  if (!k) return ALL_EQUIPMENT as AusruestungsItem[];
+  if (!k) return grwAusruestung(null);
   let c = CACHE.get(k);
   if (!c) { c = { grw: grwMitGrimoireAenderungen(k), buch: grimoireAusruestung(k) }; CACHE.set(k, c); }
   return [...c.grw, ...c.buch];

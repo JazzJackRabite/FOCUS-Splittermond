@@ -1,21 +1,15 @@
-import { SPELLS_DB, type Spell } from '../data/spells';
-import {
-  MASTERIES_DB,
-  GENERAL_COMBAT_MASTERIES,
-  GENERAL_MAGIC_MASTERIES,
-  type MasteryEntry,
-} from '../data/masteries';
-import { STRENGTHS_DATA } from '../data/strengths';
-import { WEAKNESSES_DATA, WEAKNESS_DESCRIPTIONS, WEAKNESS_PAGES } from '../data/weaknesses';
-import { PREDEFINED_RESOURCES, RESOURCE_DESCRIPTIONS } from '../data/resources';
-import { LANGUAGES_DATA } from '../data/languages';
+import { type Spell } from '../data/spells';
+import { type MasteryEntry } from '../data/masteries';
+import type { StrengthData } from '../data/strengths';
+import type { ResourceData } from '../data/resources';
 import type { CharacterState, Mastery, AdvancementLogEntry } from '../types';
 import { generateId } from './id';
 import type { RulebookModulePackage, RulebookMastery } from '../types/rulebookSchema';
 import { grimoireModule } from '../regelwerk/bruecke';
+import { grwAllgemeineKampfmeisterschaften, grwAllgemeineMagiemeisterschaften, grwMeisterschaften, grwRessourcen, grwRessourcenTexte, grwSchwaechenNamen, grwSchwaechenSeiten, grwSchwaechenTexte, grwSprachen, grwStaerken, grwZauber } from '../regelwerk/grwListen';
 
-export type StrengthEntry = (typeof STRENGTHS_DATA)[number];
-export type ResourceEntry = (typeof PREDEFINED_RESOURCES)[number];
+export type StrengthEntry = StrengthData;
+export type ResourceEntry = ResourceData;
 
 // ---------------------------------------------------------------------------
 // Aktive Module: das eingebaute Grundregelwerk (src/data) plus die hochgeladenen Regelpakete
@@ -48,12 +42,12 @@ export function getSpellDescription(spellName: string, schoolName?: string, defa
 
   // 2. Search in core GRW
   if (schoolName) {
-    const found = SPELLS_DB.find(
+    const found = grwZauber().find(
       (s) => s.name.toLowerCase() === trimmed && s.school.toLowerCase() === schoolName.trim().toLowerCase(),
     );
     if (found?.description) return found.description;
   }
-  const fallback = SPELLS_DB.find((s) => s.name.toLowerCase() === trimmed);
+  const fallback = grwZauber().find((s) => s.name.toLowerCase() === trimmed);
   return fallback?.description || defaultDesc;
 }
 
@@ -64,7 +58,7 @@ export function getResolvedSpells(schoolFilter?: string): Spell[] {
   const activePackages = getActivePackages();
 
   // Combine Core + Active Modules
-  const baseSpells: Spell[] = [...SPELLS_DB];
+  const baseSpells: Spell[] = [...grwZauber()];
 
   for (const pkg of activePackages) {
     if (pkg.resources.spells && pkg.resources.spells.length > 0) {
@@ -172,7 +166,7 @@ export function getSpellDetails(
 
   // 2. Search in core GRW
   if (schoolName) {
-    const found = SPELLS_DB.find(
+    const found = grwZauber().find(
       (s) => s.name.trim().toLowerCase() === normSpell && matchSchool(s.school, schoolName),
     );
     if (found) {
@@ -194,8 +188,8 @@ export function getSpellDetails(
     }
   }
 
-  // 3. Fallback search across all spells in SPELLS_DB by name alone
-  const fallback = SPELLS_DB.find((s) => s.name.trim().toLowerCase() === normSpell);
+  // 3. Fallback search across all spells in grwZauber() by name alone
+  const fallback = grwZauber().find((s) => s.name.trim().toLowerCase() === normSpell);
   if (fallback) {
     return {
       found: true,
@@ -254,13 +248,13 @@ export function getMasteryDescription(
   }
 
   // 2. Search in core GRW
-  const found = (MASTERIES_DB[skillName] ?? []).find((x) => x.name === masteryName);
+  const found = (grwMeisterschaften()[skillName] ?? []).find((x) => x.name === masteryName);
   if (found?.desc) return found.desc;
 
-  const general = GENERAL_COMBAT_MASTERIES.find((x) => x.name === masteryName);
+  const general = grwAllgemeineKampfmeisterschaften().find((x) => x.name === masteryName);
   if (general?.desc) return general.desc;
 
-  const magic = GENERAL_MAGIC_MASTERIES.find((x) => x.name === masteryName);
+  const magic = grwAllgemeineMagiemeisterschaften().find((x) => x.name === masteryName);
   if (magic?.desc) return magic.desc;
 
   return defaultDesc;
@@ -313,7 +307,7 @@ export function getMasteryDetails(
   }
 
   // 2. Search in core GRW for specified skill
-  const skillList = MASTERIES_DB[skillName] ?? [];
+  const skillList = grwMeisterschaften()[skillName] ?? [];
   const foundInSkill = skillList.find(
     (x) => x.name === masteryName || x.baseName === masteryName || x.name.replace(/\s*\([ST]?\d+\)$/i, '').trim().toLowerCase() === norm
   );
@@ -331,7 +325,7 @@ export function getMasteryDetails(
   }
 
   // 3. Search in general combat masteries
-  const generalCombat = GENERAL_COMBAT_MASTERIES.find(
+  const generalCombat = grwAllgemeineKampfmeisterschaften().find(
     (x) => x.name === masteryName || x.baseName === masteryName || x.name.replace(/\s*\([ST]?\d+\)$/i, '').trim().toLowerCase() === norm
   );
   if (generalCombat) {
@@ -348,7 +342,7 @@ export function getMasteryDetails(
   }
 
   // 4. Search in general magic masteries
-  const generalMagic = GENERAL_MAGIC_MASTERIES.find(
+  const generalMagic = grwAllgemeineMagiemeisterschaften().find(
     (x) => x.name === masteryName || x.baseName === masteryName || x.name.replace(/\s*\([ST]?\d+\)$/i, '').trim().toLowerCase() === norm
   );
   if (generalMagic) {
@@ -363,8 +357,8 @@ export function getMasteryDetails(
     };
   }
 
-  // 5. Fallback across all skills in MASTERIES_DB
-  for (const [sKey, list] of Object.entries(MASTERIES_DB)) {
+  // 5. Fallback across all skills in grwMeisterschaften()
+  for (const [sKey, list] of Object.entries(grwMeisterschaften())) {
     const f = list.find(
       (x) => x.name === masteryName || x.baseName === masteryName || x.name.replace(/\s*\([ST]?\d+\)$/i, '').trim().toLowerCase() === norm
     );
@@ -403,19 +397,19 @@ export function getResolvedMasteries(skillName?: string): MasteryEntry[] {
 
   // Add core GRW masteries
   if (skillName) {
-    for (const item of MASTERIES_DB[skillName] ?? []) {
+    for (const item of grwMeisterschaften()[skillName] ?? []) {
       map.set(item.name, item);
     }
   } else {
-    for (const arr of Object.values(MASTERIES_DB)) {
+    for (const arr of Object.values(grwMeisterschaften())) {
       for (const item of arr) {
         map.set(item.name, item);
       }
     }
-    for (const item of GENERAL_COMBAT_MASTERIES) {
+    for (const item of grwAllgemeineKampfmeisterschaften()) {
       map.set(item.name, item);
     }
-    for (const item of GENERAL_MAGIC_MASTERIES) {
+    for (const item of grwAllgemeineMagiemeisterschaften()) {
       map.set(item.name, item);
     }
   }
@@ -450,7 +444,7 @@ export function getStrengthDescription(name: string, defaultDesc = ''): string {
     if (found?.desc) return found.desc;
   }
 
-  const found = STRENGTHS_DATA.find((s) => s.name === name);
+  const found = grwStaerken().find((s) => s.name === name);
   return found?.desc || defaultDesc;
 }
 
@@ -475,7 +469,7 @@ export function getStrengthDetails(
     }
   }
 
-  const found = STRENGTHS_DATA.find((s) => s.name === name);
+  const found = grwStaerken().find((s) => s.name === name);
   if (found) {
     return {
       found: true,
@@ -500,7 +494,7 @@ export function getStrengthDetails(
  */
 export function getResolvedStrengths(): StrengthEntry[] {
   const activePackages = getActivePackages();
-  const list: StrengthEntry[] = [...STRENGTHS_DATA];
+  const list: StrengthEntry[] = [...grwStaerken()];
 
   for (const pkg of activePackages) {
     if (pkg.resources.strengths) {
@@ -530,7 +524,7 @@ export function getWeaknessDescription(name: string, defaultDesc = ''): string {
     if (found?.desc) return found.desc;
   }
 
-  return WEAKNESS_DESCRIPTIONS[name] || defaultDesc;
+  return grwSchwaechenTexte()[name] || defaultDesc;
 }
 
 /**
@@ -548,17 +542,17 @@ export function getWeaknessDetails(
         found: true,
         desc: found.desc || fallbackDesc || 'Details im Regelwerk.',
         source: found.source || pkg.shortName || 'Modul',
-        page: found.page ?? WEAKNESS_PAGES[name] ?? 84,
+        page: found.page ?? grwSchwaechenSeiten()[name] ?? 84,
       };
     }
   }
 
-  if (WEAKNESS_DESCRIPTIONS[name]) {
+  if (grwSchwaechenTexte()[name]) {
     return {
       found: true,
-      desc: WEAKNESS_DESCRIPTIONS[name] || fallbackDesc || 'Details im Regelwerk.',
+      desc: grwSchwaechenTexte()[name] || fallbackDesc || 'Details im Regelwerk.',
       source: 'GRW',
-      page: WEAKNESS_PAGES[name] ?? 84,
+      page: grwSchwaechenSeiten()[name] ?? 84,
     };
   }
 
@@ -577,7 +571,7 @@ export function getLanguageDetails(
   name: string,
   fallbackDesc = '',
 ): { found: boolean; desc: string; source: string; page?: number } {
-  const found = LANGUAGES_DATA.find((l) => l.name.toLowerCase() === name.toLowerCase());
+  const found = grwSprachen().find((l) => l.name.toLowerCase() === name.toLowerCase());
   if (found) {
     const familyInfo = found.family ? `Sprachfamilie: ${found.family}.` : '';
     const desc = fallbackDesc || (familyInfo ? `${familyInfo} Details im Regelwerk.` : 'Sprache in Lorakis.');
@@ -605,8 +599,8 @@ export function getResolvedWeaknesses(): {
   descriptions: Record<string, string>;
 } {
   const activePackages = getActivePackages();
-  const list = [...WEAKNESSES_DATA];
-  const descMap: Record<string, string> = { ...WEAKNESS_DESCRIPTIONS };
+  const list = [...grwSchwaechenNamen()];
+  const descMap: Record<string, string> = { ...grwSchwaechenTexte() };
 
   for (const pkg of activePackages) {
     if (pkg.resources.weaknesses) {
@@ -633,7 +627,7 @@ export function getResourceDescription(name: string, defaultDesc = ''): string {
     if (found?.desc) return found.desc;
   }
 
-  return RESOURCE_DESCRIPTIONS[name] || defaultDesc;
+  return grwRessourcenTexte()[name] || defaultDesc;
 }
 
 /**
@@ -656,11 +650,11 @@ export function getResourceDetails(
     }
   }
 
-  const found = PREDEFINED_RESOURCES.find((r) => r.name === name);
-  if (found || RESOURCE_DESCRIPTIONS[name]) {
+  const found = grwRessourcen().find((r) => r.name === name);
+  if (found || grwRessourcenTexte()[name]) {
     return {
       found: true,
-      desc: found?.desc || RESOURCE_DESCRIPTIONS[name] || fallbackDesc || 'Details im Regelwerk.',
+      desc: found?.desc || grwRessourcenTexte()[name] || fallbackDesc || 'Details im Regelwerk.',
       source: found?.source || 'GRW',
       page: found?.page ?? 75,
     };
@@ -682,8 +676,8 @@ export function getResolvedResources(): {
   descriptions: Record<string, string>;
 } {
   const activePackages = getActivePackages();
-  const list: ResourceEntry[] = [...PREDEFINED_RESOURCES];
-  const descMap: Record<string, string> = { ...RESOURCE_DESCRIPTIONS };
+  const list: ResourceEntry[] = [...grwRessourcen()];
+  const descMap: Record<string, string> = { ...grwRessourcenTexte() };
 
   for (const pkg of activePackages) {
     if (pkg.resources.gameResources) {

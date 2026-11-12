@@ -14,7 +14,7 @@ import { aktiverKatalog } from '../regelwerk/bruecke';
 import { lpWirkung, wirksameZustaende } from '../regelwerk/zauberwerte';
 import { grossmeisterAb } from '../regelwerk/bruecke';
 import { generateId } from '../utils/id';
-import { SKILL_CATEGORIES, SKILL_DATA } from '../data/rules';
+
 import { isSkillAffectedByBehinderung } from '../utils/conditionModifiers';
 import {
   executeSpellDamageRoll,
@@ -46,6 +46,7 @@ import {
   type RestDetailItem,
   type RestResultModalData,
 } from '../components/play/RestResultModal';
+import { grwFertigkeitsattribute } from '../regelwerk/grwListen';
 
 export interface RollModalConfig {
   skillName: string;
@@ -327,7 +328,7 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
 
   const openRollForCombat = (skill: string) => {
     const val = getSkillValue(skill);
-    const attrs = SKILL_DATA[skill];
+    const attrs = grwFertigkeitsattribute()[skill];
     const total = attrs
       ? val + (currentAttributes[attrs[0]] ?? 0) + (currentAttributes[attrs[1]] ?? 0)
       : val;

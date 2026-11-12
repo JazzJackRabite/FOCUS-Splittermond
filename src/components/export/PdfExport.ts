@@ -1,5 +1,5 @@
 import type { jsPDF } from 'jspdf';
-import { ATTRIBUTES, RACES, SKILL_CATEGORIES, SKILL_DATA, ALL_SKILLS } from '../../data/rules';
+
 import { calculateCharacter } from '../../utils/characterCalculations';
 import type {
   CharacterState,
@@ -8,6 +8,7 @@ import type {
   Mastery,
   Spell,
 } from '../../types';
+import { grwAttribute, grwFertigkeitsKategorien, grwFertigkeitsattribute, grwRassen } from '../../regelwerk/grwListen';
 
 interface GroupedItem<T> {
   skill: string;
@@ -137,15 +138,15 @@ export async function generatePDF(opts: GeneratePdfOptions): Promise<void> {
   doc.setTextColor(colBlue[0], colBlue[1], colBlue[2]);
   doc.text('ATTRIBUTE', 14, y);
 
-  const raceData = RACES[race as keyof typeof RACES] as {
+  const raceData = grwRassen()[race as keyof ReturnType<typeof grwRassen>] as {
     mods: Record<string, number>;
   };
-  const attrBody = Object.keys(ATTRIBUTES).map((k) => {
+  const attrBody = Object.keys(grwAttribute()).map((k) => {
     const base = attrBase[k as keyof typeof attrBase] ?? 0;
     const raceMod = (raceData?.mods?.[k] ?? 0) as number;
     const bonus = raceBonusAttrs.includes(k) ? 1 : 0;
     const startVal = base + raceMod + bonus;
-    return [ATTRIBUTES[k as keyof typeof ATTRIBUTES], k, startVal, getAttrValue(k)];
+    return [grwAttribute()[k as keyof ReturnType<typeof grwAttribute>], k, startVal, getAttrValue(k)];
   });
 
   autoTable(doc, {
@@ -195,10 +196,10 @@ export async function generatePDF(opts: GeneratePdfOptions): Promise<void> {
   ];
 
   for (const cat of skillCats) {
-    const catSkills = SKILL_CATEGORIES[cat.key as keyof typeof SKILL_CATEGORIES] as string[];
+    const catSkills = grwFertigkeitsKategorien()[cat.key as keyof ReturnType<typeof grwFertigkeitsKategorien>] as string[];
     const skillsInCat = catSkills.map((s) => {
       const val = (Number(skillsBase[s]) || 0) + (Number(skillsXp[s]) || 0);
-      const attrKeys = SKILL_DATA[s];
+      const attrKeys = grwFertigkeitsattribute()[s];
       const total = attrKeys
         ? val + Number(currentAttributes[attrKeys[0]]) + Number(currentAttributes[attrKeys[1]])
         : val;

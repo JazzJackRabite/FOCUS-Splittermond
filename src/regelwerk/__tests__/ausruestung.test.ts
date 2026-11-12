@@ -7,7 +7,7 @@ import path from 'path';
 import { describe, expect, it } from 'vitest';
 import { Katalog } from '../katalog';
 import { grimoireLesen, erstelleKatalog } from '../laden';
-import { AUSRUESTUNGS_TYPEN, alleAusruestung, grimoireAusruestung } from '../ausruestung';
+import { AUSRUESTUNGS_TYPEN, alleAusruestung, findeAusruestung, grwAusruestung, grimoireAusruestung } from '../ausruestung';
 import { ALL_EQUIPMENT } from '../../data/equipment';
 import { basisAusDateien, GRIMOIRE_ORDNER, istGrimoireDatei } from './hilfen';
 import type { LadePaket, RegelPaket } from '../typen';
@@ -46,10 +46,22 @@ function testbuch(): LadePaket {
 }
 
 describe('Ausrüstung aus Grimoires', () => {
-  it('ohne Bücher: genau die eingebaute GRW-Liste', () => {
+  it('ohne Bücher: GRW-Ausrüstung aus dem Paket; der eingebaute Rückfall stimmt in allen Werten damit überein', () => {
     expect(alleAusruestung(null)).toBe(ALL_EQUIPMENT);
-    expect(alleAusruestung(K0)).toEqual(ALL_EQUIPMENT);
+    const grw = grwAusruestung(K0);
+    expect(alleAusruestung(K0)).toEqual(grw);
     expect(grimoireAusruestung(K0)).toEqual([]);
+    expect(grw.every(i => i.id?.startsWith('grw:'))).toBe(true);
+    // jeder Eintrag des Rückfalls steht im Paket, mit denselben Spielwerten (das Paket hat zusätzlich Kleidung, Gifte, Material, Verbesserungen)
+    const werte = (i: Record<string, unknown>) => Object.fromEntries(Object.entries(i).filter(([f]) => !['id', 'desc'].includes(f)).sort(([a], [b]) => a.localeCompare(b)).map(([f, v]) => [f, typeof v === 'string' ? v.toUpperCase() : v === 0 ? '0' : v]));
+    const abw: string[] = [];
+    for (const r of ALL_EQUIPMENT as unknown as Record<string, unknown>[]) {
+      const p = findeAusruestung(grw, r.id as string) as unknown as Record<string, unknown> | null;
+      if (!p) { abw.push(`fehlt: ${r.id}`); continue; }
+      if (JSON.stringify(werte(p)) !== JSON.stringify(werte(r))) abw.push(String(r.id));
+    }
+    expect(abw).toEqual([]);
+    expect(grw.length).toBeGreaterThan(ALL_EQUIPMENT.length);
   });
 
   const { katalog: K } = erstelleKatalog(basis, [testbuch()]);
@@ -57,7 +69,7 @@ describe('Ausrüstung aus Grimoires', () => {
   const finde = (name: string) => liste.filter(i => i.name === name);
 
   it('Waffen, Rüstungen, Gegenstände und Kräuter des Buchs mit Werten, Quelle und Seite', () => {
-    expect(liste.length).toBe(ALL_EQUIPMENT.length + 4);
+    expect(liste.length).toBe(grwAusruestung(K0).length + 4);
     expect(finde('Testklinge')).toEqual([expect.objectContaining({ type: 'weapon', category: 'Nahkampf', skill: 'Klingenwaffen', damage: '1W6+3', wgs: 7,
       price: '12 L', load: 2, attributes: 'Scharf 2', source: 'TB', page: 10 })]);
     expect(finde('Testklinge')[0].desc).toContain('Mindestattribute: STÄ 2');
@@ -90,7 +102,7 @@ describe.skipIf(!ORDNER || !fs.existsSync(ORDNER))('Ausrüstung aller Bücher (l
     const { katalog: K } = erstelleKatalog(basis, grimoires);
     const soll = Object.values(K.eintraege).filter(e => e.quelle.paket !== 'grw' && e.aktion === 'neu' && e.typ in AUSRUESTUNGS_TYPEN).map(e => e.id).sort();
     const liste = alleAusruestung(K);
-    const ids = liste.map(i => i.id).filter((i): i is string => !!i && !i.includes('|')).sort();
+    const ids = liste.map(i => i.id).filter((i): i is string => !!i && !i.startsWith('grw:')).sort();
     expect(ids).toEqual(soll);
     expect(soll.length).toBeGreaterThan(700);
     for (const i of liste) { expect(i.name).toBeTruthy(); expect(typeof i.desc).toBe('string'); }

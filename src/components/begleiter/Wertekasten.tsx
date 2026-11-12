@@ -4,6 +4,8 @@ import type { Wertekasten } from '../../regelwerk/begleiter';
 import type { Aktionen } from './BegleiterSpiel';
 import DiceIcon from '../ui/DiceIcon';
 import { Knopf, Marke } from '../../fundament';
+import type { StatusCondition } from '../../types';
+import { textMitZustaenden, zustandsErklaerung, zustandswerte, type Wertname } from '../../regelwerk/zustandswerte';
 
 const ATTR = ['AUS', 'BEW', 'INT', 'KON', 'MYS', 'STÄ', 'VER', 'WIL'];
 const ABGL = ['GK', 'GSW', 'LP', 'FO', 'VTD', 'SR', 'KW', 'GW'];
@@ -35,14 +37,34 @@ export const WuerfelKnopf: React.FC<{ onClick: () => void; label: string; symbol
   </Knopf>
 );
 
-/** Wertekasten eines Begleiters; mit `aktionen` sind Fertigkeiten, Angriffe und Schaden Würfelknöpfe */
-export const Werte: React.FC<{ w: Wertekasten; aktionen?: Aktionen }> = ({ w, aktionen }) => (
+const ZUSTANDSWERTE: string[] = ['GSW', 'VTD', 'SR', 'KW', 'GW', 'INI'];
+
+/** Angezeigter Wert mit eingerechneten Zuständen; Grundwert und Erklärung beim Überfahren mit der Maus */
+const ZWert: React.FC<{ name: string; text: string | number | undefined; zw: ReturnType<typeof zustandswerte> | null; testid?: string }> = ({ name, text, zw, testid }) => {
+  if (!zw || !ZUSTANDSWERTE.includes(name)) return <>{text ?? '–'}</>;
+  const r = textMitZustaenden(name as Wertname, text, zw);
+  if (!r.geaendert) return <>{text ?? '–'}</>;
+  return (
+    <span title={[`Grundwert ${r.basis}`, zustandsErklaerung(name as Wertname, zw)].join('\n')} data-testid={testid}>
+      {r.text}<span className="text-[11px] text-schaden font-bold ml-1 tabular-nums" aria-label={`Grundwert ${r.basis}`}>({r.basis})</span>
+    </span>
+  );
+};
+
+/**
+ * Wertekasten eines Begleiters; mit `aktionen` sind Fertigkeiten, Angriffe und Schaden Würfelknöpfe.
+ * Mit `zustaende` sind deren Wirkungen (Paketeintrag, `daten.zustandswirkung.werte`) in GSW, VTD, SR, KW, GW
+ * und die Initiative der Waffen eingerechnet; der Grundwert steht in Klammern daneben.
+ */
+export const Werte: React.FC<{ w: Wertekasten; aktionen?: Aktionen; zustaende?: StatusCondition[] }> = ({ w, aktionen, zustaende }) => {
+  const zw = zustaende?.length ? zustandswerte(zustaende) : null;
+  return (
   <div className="text-sm space-y-3 text-schrift">
     <div className="grid grid-cols-4 sm:grid-cols-8 gap-2 text-center">
       {ATTR.map(a => <div key={a}><div className="font-bold text-xs text-leise">{a}</div><div className="font-titel text-base">{w.attribute?.[a] ?? '–'}</div></div>)}
     </div>
     <div className="grid grid-cols-4 sm:grid-cols-8 gap-2 text-center">
-      {ABGL.map(a => <div key={a}><div className="font-bold text-xs text-leise">{a}</div><div className="font-titel text-base">{w.abgeleitete_werte?.[a] ?? '–'}</div></div>)}
+      {ABGL.map(a => <div key={a}><div className="font-bold text-xs text-leise">{a}</div><div className="font-titel text-base"><ZWert name={a} text={w.abgeleitete_werte?.[a]} zw={zw} testid={`zustand-wert-${a}`} /></div></div>)}
     </div>
     {(w.waffen ?? []).length > 0 && (
       <div className="overflow-x-auto">
@@ -53,7 +75,7 @@ export const Werte: React.FC<{ w: Wertekasten; aktionen?: Aktionen }> = ({ w, ak
               <td className="pr-2">{x.name}</td>
               <td className="pr-2">{aktionen ? <WuerfelKnopf symbol="schwert" onClick={() => aktionen.angriff(x)} label={`Angriff ${x.name} würfeln`}>{x.wert}</WuerfelKnopf> : x.wert}</td>
               <td className="pr-2">{aktionen ? <WuerfelKnopf onClick={() => aktionen.schaden(x)} label={`Schaden ${x.name} würfeln`}>{x.schaden}</WuerfelKnopf> : x.schaden}</td>
-              <td className="pr-2">{x.wgs}</td><td className="pr-2">{x.ini}</td><td>{x.merkmale}</td>
+              <td className="pr-2">{x.wgs}</td><td className="pr-2"><ZWert name="INI" text={x.ini} zw={zw} testid="zustand-wert-INI" /></td><td>{x.merkmale}</td>
             </tr>
           ))}</tbody>
         </table>
@@ -73,7 +95,8 @@ export const Werte: React.FC<{ w: Wertekasten; aktionen?: Aktionen }> = ({ w, ak
     {w.felder?.merkmale && <div><span className="text-leise">Merkmale:</span> {w.felder.merkmale}</div>}
     {w.berechnet && <div className="text-leise italic">Werte berechnet aus „Werte wie … mit folgenden Änderungen“.</div>}
   </div>
-);
+  );
+};
 
 /** Kopfzeile eines aufklappbaren Begleiters (Name links, Marken und Aktionen rechts) */
 export const kopfzeile = 'flex items-center justify-between gap-2 flex-wrap';

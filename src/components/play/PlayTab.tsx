@@ -7,10 +7,7 @@ import { PlaySharedVitals } from './PlaySharedVitals';
 import { RestSection } from './RestSection';
 import { WirkungenKarte } from './WirkungenKarte';
 import { SourceBadge } from '../ui/SourceBadge';
-import {
-  ATTRIBUTES,
-  SKILL_CATEGORIES,
-} from '../../data/rules';
+
 import { isSkillAffectedByBehinderung } from '../../utils/conditionModifiers';
 import {
   getMasteryDetails,
@@ -18,6 +15,7 @@ import {
   getWeaknessDetails,
   getLanguageDetails,
 } from '../../utils/gameResourceManager';
+import { grwAttribute, grwFertigkeitsKategorien } from '../../regelwerk/grwListen';
 
 export const PlayTab: React.FC = () => {
   const { state, calc } = useCharacter();
@@ -55,7 +53,7 @@ export const PlayTab: React.FC = () => {
               <span className="text-xs text-leise font-medium">Klick zum Würfeln (2W10 + Wert)</span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
-              {SKILL_CATEGORIES.GENERAL.map((skill) => {
+              {grwFertigkeitsKategorien().GENERAL.map((skill) => {
                 const total = getSkillTotal(skill);
                 const skillMasteries = masteries[skill] ?? [];
                 const isAffected = isSkillAffectedByBehinderung(skill);
@@ -292,7 +290,7 @@ export const PlayTab: React.FC = () => {
               <span className="text-xs text-leise font-medium">Attributsprobe</span>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              {Object.entries(ATTRIBUTES).map(([key, label]) => (
+              {Object.entries(grwAttribute()).map(([key, label]) => (
                 <Knopf
                   key={key}
                   onClick={() => session.openRollForAttr(key)}

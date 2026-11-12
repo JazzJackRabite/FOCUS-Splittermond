@@ -44,6 +44,8 @@ Felder stehen unter `daten` des jeweiligen Eintrags. **Was hier nicht steht, dar
 |---|---|---|
 | Kosten in Erfahrungspunkten, Heldengrade (Schwellen, Grenzen, Widerstandsbonus), Fertigkeitspunkte je Zaubergrad | Kernregeln: `strukturiert` mit `steigerungskosten`, `heldengrade` | `regelwerk/steigerungsregeln.ts` |
 | Zustände: welche es gibt, Stufe, Abzüge auf Proben und Werte, Beschreibung, Quelle (Anzeige beim Überfahren mit der Maus) | Einträge vom Typ `zustand`: `hat_stufe`/`parameter`, `zustandswirkung`, `beschreibung`, `quelle` – Grundregelwerk aus dem GRW-Paket, alle anderen aus den Grimoires | `regelwerk/zustaende.ts`, `regelwerk/zustandswerte.ts`, `utils/conditionModifiers.ts` |
+| Listen des Grundregelwerks: Zauber, Meisterschaften (mit Schwellenwerten), Stärken (wie oft wählbar), Schwächen, Ressourcen (mit Stufenübersicht), Sprachen, Mondzeichen, Fertigkeiten mit Attributen, Rassen, Stärkenpunkte der Erschaffung, Attribute, Gesundheitsstufen | Einträge des GRW-Pakets: `schulen`, `kosten`, `zauberdauer`, `reichweite`, `wirkungsdauer`, `typus`, `wirkung`, `erfolgsgrade`, `schwierigkeit_strukturiert`, `schwelle`, `manoever`, `beschreibung`, `stufe`, `nur_bei_generierung`, `mehrfach_waehlbar`, `tabelle`, `familie`, `untergruppe`, `kategorie`, `attribute`, `attributsmodifikatoren`, `groessenklasse`, `staerken_refs`, `zusaetzliche_staerkepunkte`; Kernregeln: `strukturiert` mit `schwellen`, `staerke_punkte` | `regelwerk/grwListen.ts` |
+| Ausrüstung des Grundregelwerks | Ausrüstungseinträge des GRW-Pakets (`schaden`, `wgs`, `modus`, `merkmale_text`, `vtd_bonus`, `sr`, `behinderung`, `preis`, `last`, `haerte`) | `regelwerk/ausruestung.ts` |
 | Pakete laden und im Browser speichern | Paketkopf, Einträge | `regelwerk/laden.ts`, `regelwerk/paketSpeicher.ts` |
 | Einträge finden, Namen und IDs, Umbenennungen | Einträge mit `id`, `typ`, `name`; ID-Register | `regelwerk/katalog.ts`, `regelwerk/bruecke.ts`, `regelwerk/ids.ts` |
 | Abgeleitete Werte, Heldengrade, Höchstbonus | Kernregeln: `strukturiert`; an Stärken: `abgeleitete_werte_modifikatoren`; `groessenklasse`; an Ausrüstung: `behinderung`, `vtd_bonus`, `mindest_staerke` | `regelwerk/abgeleitet.ts` |
@@ -70,9 +72,9 @@ Datenseite wandern. Neue kommen nicht hinzu.
 
 | Was | Wo | Ziel |
 |---|---|---|
-| Eingebaute Listen des Grundregelwerks: Zauber, Meisterschaften, Stärken, Schwächen, Ressourcen, Ausrüstung, Sprachen | `src/data/*.ts` | Der Editor liest diese Listen aus dem GRW-Paket; `src/data` entfällt |
-| Attribute, Fertigkeiten mit ihren Attributen, Rassen, Mondzeichen, Heldengrade (Grenzen, Boni), Zustandslisten, Wundabzüge | `src/data/rules.ts` | Kernregeln und Einträge des GRW-Pakets |
-| Beispielcharaktere (Archetypen) mit Namen von Stärken, Meisterschaften und Zaubern | `src/data/presets.ts` | Auf IDs umstellen |
+| Rückfall ohne geladenes Paket: Listen des Grundregelwerks (Zauber, Meisterschaften, Stärken, Schwächen, Ressourcen, Ausrüstung, Sprachen) | `src/data/*.ts` | Werden nur noch gelesen, solange kein Paket geladen ist (Start der App, einzelne Tests); Tests halten sie gleich mit dem Paket (`grwListen.test.ts`, `ausruestung.test.ts`). Entfällt, sobald der Editor ohne Rückfall startet |
+| Rückfall ohne geladenes Paket: Attribute, Fertigkeiten mit Attributen, Rassen, Mondzeichen, Heldengrade, Gesundheitsstufen | `src/data/rules.ts` | Wie oben; nur noch über `regelwerk/grwListen.ts` und `steigerungsregeln.ts` gelesen |
+| Heimatregionen für „Kulturkunde (Region)“ | `src/data/rules.ts` (`REGIONS`) | Steht nicht im GRW-Paket; Datenseite: Regionenliste aus dem Kapitel „Lorakis“ |
 | Würfelmechanik (Standard-, Sicherheits-, Risikowurf, Patzer, Triumph, Erfolgsgrade), GRW S. 16–19 | `utils/wuerfeln.ts` | Kernregeln `strukturiert` |
 | Fokuskosten, Erfolgsgrade beim Zaubern, GRW S. 221–222 | `utils/magicRules.ts` | Kernregeln `strukturiert` |
 | Kampfmanöver nach Namen | `utils/combatRules.ts` | Daten der Meisterschaften |
@@ -81,7 +83,9 @@ Datenseite wandern. Neue kommen nicht hinzu.
 | Schadens- und Heildialog: Zustandsliste, Verschnaufpause | `components/play/TakeDamageModal.tsx`, `HealModal.tsx` | Zustände und Kernregeln des Pakets |
 
 Die genaue Liste der geduldeten Regelnamen steht in `src/fundament/altlasten.json` (`regelnamen`).
-Ohne geladenes Regelpaket rechnet der Editor mit diesen eingebauten Werten weiter (Rückfall). Für die Zustände des Grundregelwerks liegt der Rückfall in
+Ohne geladenes Regelpaket rechnet der Editor mit diesen eingebauten Werten weiter (Rückfall). Die Beispielcharaktere
+(`src/data/presets.ts`) nennen Einträge beim Namen; beim Laden einer Vorlage schreibt der Editor die IDs aus dem Paket mit,
+und ein Test prüft, dass jeder Name eine ID im GRW-Paket hat (`vorlagen.test.ts`). Für die Zustände des Grundregelwerks liegt der Rückfall in
 `src/data/zustaende.ts`; Zustände aus anderen Bänden stehen nicht im Code. Das gilt auch für die Kosten in
 Erfahrungspunkten und die Heldengrade: Maßgeblich ist das Paket; `utils/costCalculations.ts` und die Liste in
 `src/data/rules.ts` enthalten dieselben Zahlen nur noch als Rückfall, und ein Test hält beide gleich.

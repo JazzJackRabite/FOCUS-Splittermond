@@ -96,7 +96,7 @@ export const STRENGTHS_DATA: StrengthData[] = [
     {
         "name": "Erhöhter Fokuspool",
         "cost": 2,
-        "max": 5,
+        "max": 20,
         "desc": "Der Abenteurer vermag es, ein größeres Maß an magischer Kraft durch seinen Körper zu leiten. Er erhält 5 zusätzliche Fokuspunkte. Diese Stärke ist beliebig oft wählbar.",
         "multi": true,
         "source": "GRW",
@@ -106,7 +106,7 @@ export const STRENGTHS_DATA: StrengthData[] = [
     {
         "name": "Erwählter der [Wesen]",
         "cost": 1,
-        "max": 5,
+        "max": 1,
         "desc": "Wesen eines bestimmten Typus sind dem Abenteurer äußerst wohlgesonnen. Ihre Einstellung (S. 145) gilt ihm gegenüber stets als um 2 Stufen verbessert. Die Stärke ist mehrfach wählbar und gilt dann immer für einen anderen Typus. Als wählbare Typen kommen alle in der folgenden Liste genannten infrage: Felswesen, Feuerwesen, Geisterwesen, Lichtwesen, Naturwesen, Schattenwesen, Untoter, Wasserwesen, Windwesen",
         "multi": true,
         "source": "GRW",
@@ -196,7 +196,7 @@ export const STRENGTHS_DATA: StrengthData[] = [
     {
         "name": "Hoher Geistiger Widerstand",
         "cost": 2,
-        "max": 5,
+        "max": 4,
         "desc": "Der Abenteurer verfügt über einen unbeugsamen Geist und ist nur schwerlich zu beeinflussen. Sein Geistiger Widerstand ist um 2 Punkte erhöht. Diese Stärke kann einmal pro Heldengrad gewählt werden, bis zu einem maximalen Bonus in Höhe von 8 Punkten.",
         "multi": true,
         "source": "GRW",
@@ -206,7 +206,7 @@ export const STRENGTHS_DATA: StrengthData[] = [
     {
         "name": "Hoher Körperlicher Widerstand",
         "cost": 2,
-        "max": 5,
+        "max": 4,
         "desc": "Der Körper des Abenteurers widersteht selbst stärksten Belastungen. Sein Körperlicher Widerstand ist um 2 Punkte erhöht. Diese Stärke kann einmal pro Heldengrad gewählt werden, bis zu einem maximalen Bonus in Höhe von 8 Punkten.",
         "multi": true,
         "source": "GRW",
@@ -236,7 +236,7 @@ export const STRENGTHS_DATA: StrengthData[] = [
     {
         "name": "Kulturkunde",
         "cost": 1,
-        "max": 5,
+        "max": 1,
         "desc": "Der Abenteurer kennt sich intuitiv mit den Sitten und Bräuchen einer bestimmten Region oder eines Volkes (etwa im Umfang eines Kultur-Moduls) aus. Im sozialen Umgang mit Personen, die dieselbe Kulturkunde besitzen, erhält der Abenteurer einen leicht positiven Umstand (Bonus in Höhe von 2 Punkten). Voraussetzung: Beherrschung der Muttersprache der Kultur.",
         "multi": true,
         "source": "GRW",

@@ -1,7 +1,8 @@
 /**
  * Vollabgleich mit allen Büchern – läuft nur lokal, weil die Grimoires nicht im Repo liegen.
- * Aufruf: FOKUS_GRIMOIRES=<Regelpakete/editor/buecher> FOKUS_REFERENZ_VOLL=<referenz_voll.json> npx vitest run src/regelwerk
- * Die Referenz erzeugt der Python-Lader der Prüfsuite (Katalog mit allen Paketen).
+ * Aufruf: FOKUS_GRIMOIRES=<SCR4P3>/Regelpakete/editor/grimoires FOKUS_REFERENZ_VOLL=<SCR4P3>/Pruefsuite/editor_referenz_voll.json npx vitest run src/regelwerk
+ * Die Vergleichsdatei erzeugt `python editor_referenz.py` im Ordner Pruefsuite (Python-Lader, Katalog mit allen
+ * Paketen); nach jedem Bauen der Pakete neu erzeugen. Sie enthält Buchinhalte und kommt nicht ins Repo.
  */
 import fs from 'fs';
 import path from 'path';

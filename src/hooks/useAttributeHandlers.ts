@@ -1,9 +1,10 @@
 import { getAttrXpCost } from '../utils/costCalculations';
 import { regelverstoss } from '../fundament/hausregeln';
 import { useCallback } from 'react';
-import { RACES } from '../data/rules';
+
 import type React from 'react';
 import type { CharacterAction, AttrMap, AppMode, CreationUsage } from '../types';
+import { grwRassen } from '../regelwerk/grwListen';
 
 interface AttributeHandlersParams {
   state: {
@@ -47,7 +48,7 @@ export function useAttributeHandlers({ state, calc, dispatch }: AttributeHandler
 
   const toggleRaceBonus = useCallback((attr: string) => {
     if (mode === 'xp') return;
-    const max = (RACES[race as keyof typeof RACES] as { freeMods: number }).freeMods;
+    const max = (grwRassen()[race as keyof ReturnType<typeof grwRassen>] as { freeMods: number }).freeMods;
     if (race === 'Varg' && attr === 'STA') return;
     if (raceBonusAttrs.includes(attr)) {
       dispatch({ type: 'TOGGLE_RACE_BONUS', payload: attr });

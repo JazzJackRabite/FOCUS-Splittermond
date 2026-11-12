@@ -44,7 +44,7 @@ const WesenEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number }> = ({ k
       </>}>
       {e && <>
         <BegleiterVitals spiel={spiel} daten={daten} />
-        {w ? <Werte w={w} aktionen={spiel.aktionen} /> : <p className="text-leise">Keine Werte in den Paketen.</p>}
+        {w ? <Werte w={w} aktionen={spiel.aktionen} zustaende={spiel.zustand.zustaende} /> : <p className="text-leise">Keine Werte in den Paketen.</p>}
         {bk ? <WesenBaukasten k={k} b={b} w={bk} aendern={aendern} /> : (
           <div className="space-y-1"><Abschnittstitel als="h3" className="text-[15px]">Dienste</Abschnittstitel><Dienste k={k} wesen={b.id} /></div>
         )}

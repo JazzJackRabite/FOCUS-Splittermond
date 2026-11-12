@@ -1,4 +1,5 @@
-import { GENERAL_COMBAT_MASTERIES, MASTERIES_DB, type MasteryEntry } from '../data/masteries';
+import { type MasteryEntry } from '../data/masteries';
+import { grwAllgemeineKampfmeisterschaften, grwMeisterschaften } from '../regelwerk/grwListen';
 
 export interface AttackEGCalculation {
   totalRoll: number;
@@ -430,15 +431,15 @@ export function isCombatManeuverAllowedForWeapon(
     return false;
   }
 
-  // Check in MASTERIES_DB
-  const dbEntries = MASTERIES_DB[weaponSkill] || [];
+  // Check in grwMeisterschaften()
+  const dbEntries = grwMeisterschaften()[weaponSkill] || [];
   const foundInSkill = dbEntries.find(
     (e) => (e.baseName || e.name).replace(/\s*\([ST]\d+\)/i, '').trim().toLowerCase() === cleanLower
   );
   if (foundInSkill) return true;
 
   if (isMelee) {
-    const foundInGeneral = GENERAL_COMBAT_MASTERIES.find(
+    const foundInGeneral = grwAllgemeineKampfmeisterschaften().find(
       (e) => (e.baseName || e.name).replace(/\s*\([ST]\d+\)/i, '').trim().toLowerCase() === cleanLower
     );
     if (foundInGeneral) return true;
@@ -500,9 +501,9 @@ export function getAvailableCombatManeuvers(
   }
 
   // 3. Search relevant DB masteries (General combat masteries if melee + weapon specific masteries)
-  const skillMasteries = MASTERIES_DB[weaponSkill] || [];
+  const skillMasteries = grwMeisterschaften()[weaponSkill] || [];
   const relevantDbMasteries: MasteryEntry[] = [
-    ...(isMelee ? GENERAL_COMBAT_MASTERIES : []),
+    ...(isMelee ? grwAllgemeineKampfmeisterschaften() : []),
     ...skillMasteries,
   ].filter((m) => {
     return m.manoever || (m.desc && m.desc.includes('[Manöver]'));

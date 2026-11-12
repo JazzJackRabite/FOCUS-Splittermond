@@ -1,11 +1,11 @@
 import React from 'react';
 import { Knopf } from '../../fundament';
 import { SourceBadge } from '../ui/SourceBadge';
-import { ATTRIBUTES, SKILL_CATEGORIES } from '../../data/rules';
-import { MASTERIES_DB, GENERAL_COMBAT_MASTERIES } from '../../data/masteries';
+
 import { getMasteryDescription } from '../../utils/gameResourceManager';
 import { grossmeisterAb } from '../../regelwerk/bruecke';
 import type { Mastery, Spell, AppMode } from '../../types';
+import { grwAllgemeineKampfmeisterschaften, grwAttribute, grwFertigkeitsKategorien, grwMeisterschaften } from '../../regelwerk/grwListen';
 
 interface SkillRowProps {
   name: string;
@@ -60,14 +60,14 @@ export const SkillRow: React.FC<SkillRowProps> = ({
   creationBudget = 0,
   mode = 'creation',
 }) => {
-  const isMagic = SKILL_CATEGORIES.MAGIC.includes(name);
+  const isMagic = grwFertigkeitsKategorien().MAGIC.includes(name);
 
   let tooltipText = '';
   if (attrs && currentAttributes) {
     const [a1, a2] = attrs;
     const v1 = currentAttributes[a1];
     const v2 = currentAttributes[a2];
-    tooltipText = `${ATTRIBUTES[a1 as keyof typeof ATTRIBUTES]} (${v1}) + ${ATTRIBUTES[a2 as keyof typeof ATTRIBUTES]} (${v2}) + Punkte (${val}) = ${totalValue}`;
+    tooltipText = `${grwAttribute()[a1 as keyof ReturnType<typeof grwAttribute>]} (${v1}) + ${grwAttribute()[a2 as keyof ReturnType<typeof grwAttribute>]} (${v2}) + Punkte (${val}) = ${totalValue}`;
   }
 
   const sortedMasteries = [...masteries].sort((a, b) => {
@@ -83,11 +83,11 @@ export const SkillRow: React.FC<SkillRowProps> = ({
   const getMasteryDesc = (mName: string): string | undefined => {
     const customDesc = getMasteryDescription(name, mName);
     if (customDesc) return customDesc;
-    let found = (MASTERIES_DB[name] ?? []).find((x) => x.name === mName);
-    if (!found && SKILL_CATEGORIES.COMBAT.includes(name))
-      found = GENERAL_COMBAT_MASTERIES.find((x) => x.name === mName);
-    if (!found && SKILL_CATEGORIES.MAGIC.includes(name))
-      found = (MASTERIES_DB['Magieschulen'] ?? []).find((x) => x.name === mName);
+    let found = (grwMeisterschaften()[name] ?? []).find((x) => x.name === mName);
+    if (!found && grwFertigkeitsKategorien().COMBAT.includes(name))
+      found = grwAllgemeineKampfmeisterschaften().find((x) => x.name === mName);
+    if (!found && grwFertigkeitsKategorien().MAGIC.includes(name))
+      found = (grwMeisterschaften()['Magieschulen'] ?? []).find((x) => x.name === mName);
     return found?.desc;
   };
 

@@ -79,7 +79,7 @@ const UntotEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; n: Nekro
       {u.abnormitaet && <p><span className="text-leise">{u.abnormitaet.name}:</span> {u.abnormitaetText}</p>}
 
       {wk && <BegleiterVitals spiel={spiel} daten={daten} />}
-      {wk ? <Werte w={wk} aktionen={spiel.aktionen} /> : null}
+      {wk ? <Werte w={wk} aktionen={spiel.aktionen} zustaende={spiel.zustand.zustaende} /> : null}
 
       <div className="space-y-2">
         <Abschnittstitel als="h3" className="text-[15px]">Steigerung (von 0 an)</Abschnittstitel>
