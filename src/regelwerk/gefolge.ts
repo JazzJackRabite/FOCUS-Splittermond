@@ -1,17 +1,12 @@
 /**
- * Gefolge (Ressource Gefolge, GRW S. 77–78).
- * - Der erste Punkt bringt einen Gefolgsmann: Attribute 2 + Rassenmodifikator, dazu die üblichen Werte seiner Kultur
- *   (Fertigkeitspunkte, Stärke und Meisterschaft des Kulturmoduls).
- * - Jeder weitere Punkt: ein weiterer Gefolgsmann ODER eine zusätzliche Meisterschaft/ein zusätzlicher Zauber ODER eine
- *   Fertigkeit auf die erste Meisterschaftsschwelle (6 Punkte) anheben – mit den Meisterschaften und Zaubern dieser Schwelle.
- * - Keine Fertigkeit höher, als es der Heldengrad des Abenteurers zulässt.
- * Zauber nach der Erschaffungsregel (GRW S. 30, Beispiel Klingentänzerin): je Magieschule ab 1 Punkt ein Zauber des Grades 0,
- * ab 3 Punkten einer des Grades 1, ab 6 Punkten einer des Grades 2. Zaubergrad n braucht 3·n Punkte (Grad 0: 1 Punkt).
+ * Gefolge (Ressource Gefolge, GRW S. 77–78). Alle Regelwerte aus dem GRW-Paket:
+ * - `strukturiert.gefolge` an der Ressource (Grundwert der Attribute, Verwendung der Punkte, Grenze nach Heldengrad),
+ * - Meisterschaftsschwellen, Zaubergrad je Punkte und freie Zauber aus den Kernregeln (`regelwerk/abgeleitet.ts`).
  */
 import type { Verstoss } from '../fundament/hausregeln';
 import type { Katalog } from './katalog';
 import type { Begleiter } from '../types';
-import { abgeleiteteWerte } from './abgeleitet';
+import { abgeleiteteWerte, freieZauberNachPunkten, zaubergradNachPunkten } from './abgeleitet';
 import { gruppePasst, type ModulWahl } from './erschaffung';
 import type { Wertekasten } from './begleiter';
 
@@ -23,21 +18,21 @@ export const ATTRIBUTE: [string, string][] = [
 /** Fertigkeitspunkte der ersten Meisterschaftsschwelle (grw:regel:fertigkeiten-regeln:meisterschaften-erhalten) */
 export function ersteSchwelle(k: Katalog): number {
   const s = k.get('grw:regel:fertigkeiten-regeln:meisterschaften-erhalten')?.daten.strukturiert?.schwellen;
-  return Number(s?.find((x: { schwelle: number }) => x.schwelle === 1)?.fertigkeitspunkte) || 6;
+  return Number(s?.find((x: { schwelle: number }) => x.schwelle === 1)?.fertigkeitspunkte) || 0;
 }
 /** Erreichte Meisterschaftsschwelle bei so vielen Punkten (0 = keine) */
 export function schwelleBei(k: Katalog, punkte: number): number {
   const s: { schwelle: number; fertigkeitspunkte: number }[] = k.get('grw:regel:fertigkeiten-regeln:meisterschaften-erhalten')?.daten.strukturiert?.schwellen
-    ?? [{ schwelle: 1, fertigkeitspunkte: 6 }, { schwelle: 2, fertigkeitspunkte: 9 }, { schwelle: 3, fertigkeitspunkte: 12 }, { schwelle: 4, fertigkeitspunkte: 15 }];
+    ?? [];
   return Math.max(0, ...s.filter(x => punkte >= x.fertigkeitspunkte).map(x => x.schwelle));
 }
-/** Höchster Zaubergrad bei so vielen Punkten in der Magieschule (−1 = keiner) */
-export function hoechsterZaubergrad(punkte: number): number {
-  return punkte < 1 ? -1 : Math.min(5, Math.floor(punkte / 3));
-}
-/** Freie Zauber einer Magieschule nach der Erschaffungsregel (1 / 3 / 6 Punkte) */
-export function freieZauberBei(punkte: number): number {
-  return (punkte >= 1 ? 1 : 0) + (punkte >= 3 ? 1 : 0) + (punkte >= 6 ? 1 : 0);
+/** Höchster Zaubergrad bei so vielen Punkten in der Magieschule (−1 = keiner; Kernregeln) */
+export const hoechsterZaubergrad = (k: Katalog, punkte: number) => zaubergradNachPunkten(k, punkte);
+/** Freie Zauber einer Magieschule nach dem Feinschliff der Erschaffung */
+export const freieZauberBei = (k: Katalog, punkte: number) => freieZauberNachPunkten(k, punkte).length;
+/** Regelwerte der Ressource Gefolge aus dem Paket (null, wenn sie fehlen) */
+export function gefolgeRegeln(k: Katalog): { attribut_grundwert: number } | null {
+  return k.get(GEFOLGE_ID)?.daten.strukturiert?.gefolge ?? null;
 }
 
 export const rassen = (k: Katalog) => Object.values(k.eintraege).filter(e => e.typ === 'rasse' && e.daten.attributsmodifikatoren)
@@ -141,9 +136,12 @@ export function gefolgeWerte(k: Katalog, b: Begleiter, maxFertigkeit: number): G
   const verstoss = (text: string, schluessel: string, mass = 1) => { hinweise.push(text); verstoesse.push({ text, schluessel, mass }); };
   const rasse = b.rasse && k.get(b.rasse) ? b.rasse : undefined;
   if (!rasse) hinweise.push('Rasse wählen');
-  const A: Record<string, number> = Object.fromEntries(ATTRIBUTE.map(([, n]) => [n, 2]));
+  const R = gefolgeRegeln(k);
+  if (!R) hinweise.push('Regelwerte der Ressource Gefolge fehlen im GRW-Paket');
+  const grund = R?.attribut_grundwert ?? 0;
+  const A: Record<string, number> = Object.fromEntries(ATTRIBUTE.map(([, n]) => [n, grund]));
   const mod = rasse ? k.get(rasse)!.daten.attributsmodifikatoren : null;
-  for (const [n, v] of Object.entries(mod?.fest ?? {})) A[n] = (A[n] ?? 2) + Number(v);
+  for (const [n, v] of Object.entries(mod?.fest ?? {})) A[n] = (A[n] ?? grund) + Number(v);
   const plaetze = freieAttribute(k, rasse);
   const frei = b.attributFrei ?? [];
   plaetze.forEach((p, i) => {
@@ -188,14 +186,14 @@ export function gefolgeWerte(k: Katalog, b: Begleiter, maxFertigkeit: number): G
   const zauber: GefolgeZauber[] = (b.zauber ?? []).map(id => {
     const e = k.get(id);
     const schulen: { id: string; schule: string; grad: number }[] = e?.daten.schulen ?? [];
-    const passend = schulen.filter(s => s.grad <= hoechsterZaubergrad(pkt(s.id))).sort((x, y) => x.grad - y.grad)[0];
+    const passend = schulen.filter(s => s.grad <= hoechsterZaubergrad(k, pkt(s.id))).sort((x, y) => x.grad - y.grad)[0];
     const s = passend ?? schulen.find(x => pkt(x.id) > 0) ?? schulen[0];
     return { id, name: e?.name ?? id, schule: s?.schule, schuleId: s?.id, grad: s?.grad, ok: !!passend };
   });
   for (const z of zauber) if (!z.ok) verstoss(`Zauber ${z.name}: Magieschule fehlt oder zu wenige Punkte für Grad ${z.grad ?? '?'}`, `z:${z.id}`);
 
   const magie = fertigkeiten.filter(f => k.get(f.id)?.daten.kategorie === 'Magieschule');
-  const freieZauber = magie.reduce((s, f) => s + freieZauberBei(f.punkte), 0);
+  const freieZauber = magie.reduce((s, f) => s + freieZauberBei(k, f.punkte), 0);
   const freieMeisterschaften = angehoben.size;
   const gesamtPunkte = 1 + angehoben.size + Math.max(0, meisterschaften.length - freieMeisterschaften) + Math.max(0, zauber.length - freieZauber);
 
@@ -237,7 +235,7 @@ export function meisterschaftsAngebot(k: Katalog, fertigkeiten: GefolgeFertigkei
 export function zauberAngebot(k: Katalog, fertigkeiten: GefolgeFertigkeit[]) {
   const p = new Map(fertigkeiten.map(f => [f.id, f.punkte]));
   return Object.values(k.eintraege).filter(e => e.typ === 'zauber').flatMap(e => {
-    const s = (e.daten.schulen ?? []).filter((x: { id: string; grad: number }) => p.has(x.id) && x.grad <= hoechsterZaubergrad(p.get(x.id)!))
+    const s = (e.daten.schulen ?? []).filter((x: { id: string; grad: number }) => p.has(x.id) && x.grad <= hoechsterZaubergrad(k, p.get(x.id)!))
       .sort((x: { grad: number }, y: { grad: number }) => x.grad - y.grad)[0];
     return s ? [{ id: e.id, name: e.name, schule: s.schule as string, grad: s.grad as number }] : [];
   }).sort((a, b) => a.schule.localeCompare(b.schule, 'de') || a.grad - b.grad || a.name.localeCompare(b.name, 'de'));

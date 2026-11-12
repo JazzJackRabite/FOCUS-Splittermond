@@ -3,7 +3,7 @@ import React, { useMemo, useState } from 'react';
 import { Bot, Plus, X } from 'lucide-react';
 import { useCharacter } from '../../context/CharacterContext';
 import {
-  IMMER_INSTRUKTIONEN, bausteinInfo, bausteine, golemWerte, hoechstens, korpusGK, korpusStufe,
+  immerInstruktionen, bausteinInfo, bausteine, golemWerte, hoechstens, korpusGK, korpusStufe,
   korpusse, materialInfo, materialien, sonderausstattungen, voraussetzung,
 } from '../../regelwerk/golem';
 import { alsWertekasten } from '../../regelwerk/modifikationen';
@@ -34,7 +34,7 @@ const BausteinGruppe: React.FC<{ k: Katalog; art: string; b: Begleiter; aendern:
     <div className="space-y-2">
       <Titel3>{ART_TEXT[art] ?? art}</Titel3>
       {info && <p className="text-leise">{info}</p>}
-      {art === 'Instruktion' && <p className="text-leise">Immer: {IMMER_INSTRUKTIONEN.join(', ')}.</p>}
+      {art === 'Instruktion' && <p className="text-leise">Immer: {immerInstruktionen(k).join(', ')}.</p>}
       {meine.length > 0 && (
         <ul className="space-y-1">
           {meine.map(({ id, i }) => {
@@ -55,8 +55,8 @@ const BausteinGruppe: React.FC<{ k: Katalog; art: string; b: Begleiter; aendern:
       <div className="flex flex-wrap gap-2 items-end">
         <Auswahl beschriftung={`${art} wählen`} beschriftungVerborgen value={wahl} onChange={ev => setWahl(ev.target.value)}>
           <option value="">{art} wählen …</option>
-          {liste.filter(e => !(art === 'Instruktion' && IMMER_INSTRUKTIONEN.includes(e.name))).map(e => {
-            const n = alle.filter(x => x === e.id).length; const voll = n >= hoechstens(e);
+          {liste.filter(e => !(art === 'Instruktion' && immerInstruktionen(k).includes(e.name))).map(e => {
+            const n = alle.filter(x => x === e.id).length; const voll = n >= hoechstens(k, e);
             const v = voraussetzung(e); const fehlt = v && !namen.has(v); const z = bausteinInfo(e).zuschlag;
             return <option key={e.id} value={e.id} disabled={voll}>{e.name}{z ? ` (Golem ${z})` : ''}{voll ? ' – bereits gewählt' : fehlt ? ` – setzt ${v} voraus` : ''}</option>;
           })}
@@ -84,7 +84,7 @@ const GolemEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; besitzer
   const wk = g.werte ? alsWertekasten(g.werte) : null;
   const daten = spielDaten(b, wk);
   const spiel = useBegleiterSpiel(b, index, daten);
-  if (b.golemRessource && !besitzer.golemPunkte.some(p => p >= g.stufe)) hinweise.push(`Ressource Golem ${g.stufe} nötig (1 Punkt je Stufe)`);
+  if (b.golemRessource && !besitzer.golemPunkte.some(p => p >= g.stufe)) hinweise.push(`Ressource Golem ${g.stufe} nötig`);
 
   return (
     <Eintrag titel={titel} offen={offen} umschalten={() => setOffen(o => !o)} vor={spiel.modale}
@@ -104,7 +104,7 @@ const GolemEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; besitzer
             <option value="">Material wählen …</option>
             {materialien(k).map(m => <option key={m.id} value={m.id}>{m.name} ({materialInfo(m)})</option>)}
           </Auswahl>
-          <label className="flex items-center gap-2 min-h-11" title="Großer Ritus: dauerhaft animiert, eine Applikation je Stufe (Die Magie S. 203)">
+          <label className="flex items-center gap-2 min-h-11" title="Ressource Golem: dauerhaft animiert">
             <input type="checkbox" className="w-5 h-5 accent-gold" checked={!!b.golemRessource} onChange={ev => aendern({ golemRessource: ev.target.checked || undefined })} />
             über Ressource Golem (Großer Ritus)
           </label>
@@ -125,7 +125,7 @@ const GolemEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; besitzer
         <BausteinGruppe k={k} art="Zusätzliche Fähigkeit" b={b} aendern={aendern} />
         <BausteinGruppe k={k} art="Rolle" b={b} aendern={aendern} info="Mehrfach wählbar und kombinierbar; Kämpfer setzt Aggressiv voraus." />
         <BausteinGruppe k={k} art="Applikation" b={b} aendern={aendern}
-          info={<>Gewählt {g.gewaehlt.Applikation.length}, frei {g.applikationenFrei}{b.golemRessource ? ' (eine je Stufe)' : ' (zwei automatisch)'}; jede weitere: +1 Schwierigkeit, +3 Fortschrittspunkte und ein weiterer Schwachpunkt.</>} />
+          info={<>Gewählt {g.gewaehlt.Applikation.length}, frei {g.applikationenFrei}{g.applikationenExtra ? `; zusätzlich ${g.applikationenExtra}, dafür ${g.schwachpunkteNoetig} Schwachpunkt(e) und eine schwerere Konstruktion` : ''}.</>} />
         <BausteinGruppe k={k} art="Schwachpunkt" b={b} aendern={aendern} info={<>Nötig: {g.schwachpunkteNoetig} zusätzlich zum Material.</>} />
         <BausteinGruppe k={k} art="Instruktion" b={b} aendern={aendern} info={<>Implementierbar: {g.instruktionenErlaubt} (eine, weitere über „Zusätzliche Instruktion“).</>} />
         <BausteinGruppe k={k} art="Verfügung" b={b} aendern={aendern}
@@ -191,7 +191,7 @@ export const GolemAbschnitt: React.FC<{ k: Katalog }> = ({ k }) => {
         <>
           <p className="text-sm text-leise">
             Baukasten nach Die Magie S. 205–207: Korpus, Material, Zusätzliche Fähigkeiten, Rollen, Feinschliff. Gekauft oder selbst gebaut
-            (Kleiner Ritus mit Animierungszauber) oder dauerhaft über die Ressource Golem (1 Punkt je Stufe).
+            (Kleiner Ritus mit Animierungszauber) oder dauerhaft über die Ressource Golem.
             {besitzer.golemPunkte.length > 0 && <> Ressource Golem: {besitzer.golemPunkte.join(', ')}.</>}
           </p>
           {eigene.length > 0 && <ul className="space-y-3">{eigene.map(({ b, i }) => <GolemEintrag key={`${b.id}-${i}`} k={k} b={b} index={i} besitzer={besitzer} />)}</ul>}

@@ -28,13 +28,16 @@ const Zaehler: React.FC = () => {
   return <span data-testid="anzahl">{rw.katalog ? Object.keys(rw.katalog.eintraege).length : 0}</span>;
 };
 
+// Einträge des eingebauten GRW-Pakets (ändert sich mit jedem Paketbau)
+const GRW_ANZAHL = (JSON.parse(fs.readFileSync(path.join(PUBLIC, 'grw.srp.json'), 'utf-8')) as { eintraege: unknown[] }).eintraege.length;
+
 describe('Paketverwaltung', () => {
   it('lädt das Grundregelwerk, nimmt ein Buch auf und entfernt es wieder', async () => {
     vi.stubGlobal('fetch', abruf);
     render(<RegelwerkProvider basisUrl="/regelpakete/"><RegelpaketeTab /><Zaehler /></RegelwerkProvider>);
     await waitFor(() => expect(screen.getByText('Splittermond: Die Regeln (3. erratierte Neuauflage)')).toBeTruthy());
     const vorher = Number(screen.getByTestId('anzahl').textContent);
-    expect(vorher).toBe(1539);
+    expect(vorher).toBe(GRW_ANZAHL);
     const datei = new File([JSON.stringify(TESTBUCH)], 'testbuch.grim', { type: 'application/json' });
     await act(async () => { fireEvent.change(screen.getByTestId('regelpakete-upload'), { target: { files: [datei] } }); });
     await waitFor(() => expect(screen.getByText('Testbuch der Prüfung')).toBeTruthy());

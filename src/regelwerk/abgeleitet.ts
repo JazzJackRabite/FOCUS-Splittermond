@@ -81,3 +81,47 @@ export function abgeleiteteWerte(kat: Katalog, attribute: Attribute, rasse: stri
   w.LP_gesamt = w.LP * 5;
   return { werte: w, bedingt, hinweise, hoechstbonus: hb };
 }
+
+// ---------------------------------------------------------------- Steigerung (Kernregeln GRW S. 25, 87–88)
+export const STEIGERUNG_ID = 'grw:regel:steigerung-regeln:erfahrungspunkte-einsetzen';
+export const HELDENGRADE_ID = 'grw:regel:steigerung-regeln:auswirkungen';
+export const ERSCHAFFUNG_ID = 'grw:regel:erschaffung-regeln:uebersicht-ueber-die-charaktererschaffung';
+
+interface Steigerungskosten {
+  attribut: { steigerung: number; kosten_ep: number }[];
+  fertigkeitspunkt: { bis_wert: number; kosten_ep_pro_punkt: number }[];
+  zauber_nach_grad: { grad: number; mindest_fertigkeitspunkte_magieschule: number }[];
+  meisterschaft_nach_schwelle: { schwelle: number; mindest_fertigkeitspunkte: number }[];
+}
+function steigerung(k: Katalog): Steigerungskosten | null { return k.get(STEIGERUNG_ID)?.daten.strukturiert?.steigerungskosten ?? null; }
+
+/** EP für n Fertigkeitspunkte „von 0 an“ nach der Tabelle der Steigerungskosten; null ohne Kernregeln */
+export function fertigkeitspunkteKosten(k: Katalog, n: number): number | null {
+  const t = steigerung(k)?.fertigkeitspunkt; if (!t?.length) return null;
+  let s = 0;
+  for (let p = 1; p <= n; p++) s += (t.find((z) => p <= z.bis_wert) ?? t[t.length - 1]).kosten_ep_pro_punkt;
+  return s;
+}
+/** EP für n Attributsteigerungen (erste, zweite, …); null ohne Kernregeln oder über der Tabelle */
+export function attributSteigerungKosten(k: Katalog, n: number): number | null {
+  const t = steigerung(k)?.attribut; if (!t?.length || n > t.length) return null;
+  return t.slice(0, n).reduce((s, z) => s + z.kosten_ep, 0);
+}
+/** höchste Meisterschaftsschwelle, die n Fertigkeitspunkte erlauben (0 = keine) */
+export function schwelleNachPunkten(k: Katalog, n: number): number {
+  return Math.max(0, ...(steigerung(k)?.meisterschaft_nach_schwelle ?? []).filter((z) => n >= z.mindest_fertigkeitspunkte).map((z) => z.schwelle));
+}
+/** höchster Zaubergrad, den n Punkte in einer Magieschule erlauben (−1 = keiner) */
+export function zaubergradNachPunkten(k: Katalog, n: number): number {
+  return Math.max(-1, ...(steigerung(k)?.zauber_nach_grad ?? []).filter((z) => n >= z.mindest_fertigkeitspunkte_magieschule).map((z) => z.grad));
+}
+/** freie Zauber einer Magieschule bei n Punkten (Feinschliff der Erschaffung): je erreichter Stufe ein Zauber dieses Grades */
+export function freieZauberNachPunkten(k: Katalog, n: number): number[] {
+  const t: { grad: number; ab_fertigkeitspunkten: number }[] = k.get(ERSCHAFFUNG_ID)?.daten.strukturiert?.feinschliff?.freie_zauber_je_magieschule ?? [];
+  return t.filter((z) => n >= z.ab_fertigkeitspunkten).map((z) => z.grad);
+}
+/** höchste Fertigkeitspunkte eines Heldengrades */
+export function hoechstePunkteHeldengrad(k: Katalog, hg: number): number | null {
+  const t: { grad: number; max_fertigkeitspunkte: number }[] = k.get(HELDENGRADE_ID)?.daten.strukturiert?.heldengrade ?? [];
+  return t.find((z) => z.grad === hg)?.max_fertigkeitspunkte ?? null;
+}

@@ -13,13 +13,13 @@
    "pdf_datei": "Splittermond_GRW_dritte-erratierte-Neuauflage-1.pdf",
    "pdf_sha256": "f824ffc4850360d07e1633bdc27cc922dd2ae498320187e7e9e3def3a5dd6cc3",
    "datenbank_datei": "GRW_2026-10-27_mit-Fertigkeiten-und-Mondzeichen.sqlite",
-   "datenbank_sha256": "d533986cd493844e34f0c58eebc92e5c2d1c35b3034856cbd8e1952a2b6a7fee"
+   "datenbank_sha256": "e3b6a41c58126c2bc5d8a8a3d9b75cd91b1ebd2661eecf165411d7b8ec176250"
   },
   "seitenangaben": "buch_seiten = gedruckte Seitenzahl im Buch; pdf_seiten = Seite in der PDF-Datei"
  },
  "abhaengigkeiten": [],
  "statistik": {
-  "eintraege": 1539,
+  "eintraege": 1542,
   "nach_typ": {
    "abstammung": 17,
    "alchemikum": 14,
@@ -30,7 +30,7 @@
    "gift": 7,
    "kleidung": 3,
    "kraeuterwirkung": 10,
-   "kreatur": 17,
+   "kreatur": 20,
    "kultur": 12,
    "material": 14,
    "meisterschaft": 437,
@@ -57,7 +57,7 @@
    "zustand": 17
   },
   "nach_aktion": {
-   "neu": 1539
+   "neu": 1542
   }
  },
  "eintraege": [
@@ -7457,6 +7457,22 @@
      ],
      "pdf_seite": 79,
      "buch_seite": 78
+    },
+    "strukturiert": {
+     "gefolge": {
+      "attribut_grundwert": 2,
+      "erster_punkt": "person",
+      "weiterer_punkt": [
+       "person",
+       "meisterschaft_oder_zauber",
+       "erste_schwelle"
+      ],
+      "fertigkeit_hoechstens": "heldengrad_des_besitzers",
+      "freie_zauber": "grw:regel:erschaffung-regeln:uebersicht-ueber-die-charaktererschaffung"
+     },
+     "belege_ids": [
+      "grw:ressource:gefolge"
+     ]
     },
     "regelgruppe": "grw:ressource:gefolge"
    }
@@ -51221,7 +51237,18 @@
      ]
     },
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "wertesaetze": {
+     "saetze": [
+      {
+       "id": "grw:kreatur:wandelnder-leichnam"
+      },
+      {
+       "id": "grw:kreatur:skelett"
+      }
+     ],
+     "ep_je_verstaerkung": 15
+    }
    }
   },
   {
@@ -66397,6 +66424,145 @@
    ]
   },
   {
+   "id": "grw:kreatur:ghul",
+   "typ": "kreatur",
+   "aktion": "neu",
+   "name": "Ghul",
+   "quelle": {
+    "paket": "grw",
+    "buch_seiten": [
+     272
+    ],
+    "pdf_seiten": [
+     273
+    ],
+    "alt_id": "sm:fdb5d0f0-cc3e-5ae5-b76e-cbda424d28b6",
+    "kategorie_in_datenbank": "kreaturen"
+   },
+   "daten": {
+    "beschreibung": null,
+    "attribute": {
+     "AUS": "0",
+     "BEW": "3",
+     "INT": "1",
+     "KON": "3",
+     "MYS": "0",
+     "STÄ": "4",
+     "VER": "2",
+     "WIL": "3"
+    },
+    "abgeleitete_werte": {
+     "GK": "5",
+     "GSW": "8",
+     "LP": "8",
+     "FO": "6",
+     "VTD": "22",
+     "SR": "0",
+     "KW": "24",
+     "GW": "18"
+    },
+    "waffen": [
+     {
+      "name": "Körper",
+      "wert": "15",
+      "schaden": "1W6+2",
+      "wgs": "6",
+      "ini": "9-1W6",
+      "merkmale": "Durchdringung 1",
+      "merkmale_refs": [
+       {
+        "id": "grw:merkmal:durchdringung",
+        "stufe": 1,
+        "text": "Durchdringung 1"
+       }
+      ]
+     }
+    ],
+    "felder": {
+     "typus": "Monster, Untoter",
+     "monstergrad": "2 / 1",
+     "fertigkeiten": "Akrobatik 7, Athletik 9, Entschlossenheit 4, Heimlichkeit 9, Wahrnehmung 4, Zähigkeit 10",
+     "meisterschaften": "Heimlichkeit (II: Hinterhalt)",
+     "merkmale": "Dämmersicht, Furchterregend (15), Gift (Blut 3 / Benommen / 60 Ticks), Schmerzresistenz, Untot, Verwundbarkeit gegen Lichtschaden"
+    },
+    "hinweise": [
+     "Ergänzt am 11.11.2026 (Werte erhebbarer Untoter aus dem Gegnerkapitel; Anlass: Wertesätze der Erhebungszauber im Editor)."
+    ],
+    "fertigkeiten_refs": [
+     {
+      "id": "grw:fertigkeit:akrobatik",
+      "text": "Akrobatik 7",
+      "wert": 7
+     },
+     {
+      "id": "grw:fertigkeit:athletik",
+      "text": "Athletik 9",
+      "wert": 9
+     },
+     {
+      "id": "grw:fertigkeit:entschlossenheit",
+      "text": "Entschlossenheit 4",
+      "wert": 4
+     },
+     {
+      "id": "grw:fertigkeit:heimlichkeit",
+      "text": "Heimlichkeit 9",
+      "wert": 9
+     },
+     {
+      "id": "grw:fertigkeit:wahrnehmung",
+      "text": "Wahrnehmung 4",
+      "wert": 4
+     },
+     {
+      "id": "grw:fertigkeit:zaehigkeit",
+      "text": "Zähigkeit 10",
+      "wert": 10
+     }
+    ],
+    "merkmale_refs": [
+     {
+      "id": "grw:monstermerkmal:daemmersicht",
+      "text": "Dämmersicht"
+     },
+     {
+      "id": "grw:monstermerkmal:furchterregend",
+      "text": "Furchterregend (15)",
+      "wert": 15
+     },
+     {
+      "id": "grw:monstermerkmal:gift",
+      "text": "Gift (Blut 3 / Benommen / 60 Ticks)",
+      "zusatz": "Blut 3 / Benommen / 60 Ticks"
+     },
+     {
+      "id": "grw:monstermerkmal:schmerzresistenz",
+      "text": "Schmerzresistenz"
+     },
+     {
+      "id": "grw:monstermerkmal:untot",
+      "text": "Untot"
+     },
+     {
+      "id": "grw:monstermerkmal:verwundbarkeit-gegen",
+      "text": "Verwundbarkeit gegen Lichtschaden",
+      "parameter": "Lichtschaden"
+     }
+    ],
+    "meisterschaften_refs": [
+     {
+      "id": "grw:meisterschaft:heimlichkeit:hinterhalt",
+      "text": "Hinterhalt",
+      "fertigkeit": "grw:fertigkeit:heimlichkeit",
+      "schwelle": 2
+     }
+    ]
+   },
+   "hinweise": [
+    "Ergänzt am 11.11.2026 (Werte erhebbarer Untoter aus dem Gegnerkapitel; Anlass: Wertesätze der Erhebungszauber im Editor)."
+   ]
+  },
+  {
    "id": "grw:kreatur:hai",
    "typ": "kreatur",
    "aktion": "neu",
@@ -67495,6 +67661,150 @@
    ]
   },
   {
+   "id": "grw:kreatur:skelett",
+   "typ": "kreatur",
+   "aktion": "neu",
+   "name": "Skelett",
+   "quelle": {
+    "paket": "grw",
+    "buch_seiten": [
+     279
+    ],
+    "pdf_seiten": [
+     280
+    ],
+    "alt_id": "sm:b05f0440-268c-5d84-9033-fd2769e6cb6f",
+    "kategorie_in_datenbank": "kreaturen"
+   },
+   "daten": {
+    "beschreibung": null,
+    "attribute": {
+     "AUS": "0",
+     "BEW": "2",
+     "INT": "0",
+     "KON": "2",
+     "MYS": "0",
+     "STÄ": "3",
+     "VER": "0",
+     "WIL": "1"
+    },
+    "abgeleitete_werte": {
+     "GK": "5",
+     "GSW": "6",
+     "LP": "7",
+     "FO": "2",
+     "VTD": "17",
+     "SR": "0",
+     "KW": "18",
+     "GW": "22"
+    },
+    "waffen": [
+     {
+      "name": "Säbel",
+      "wert": "10",
+      "schaden": "1W6+4",
+      "wgs": "8",
+      "ini": "10-1W6",
+      "merkmale": "Scharf 2",
+      "merkmale_refs": [
+       {
+        "id": "grw:merkmal:scharf",
+        "stufe": 2,
+        "text": "Scharf 2"
+       }
+      ]
+     }
+    ],
+    "felder": {
+     "typus": "Untoter",
+     "monstergrad": "1 / 0-",
+     "fertigkeiten": "Akrobatik 5, Athletik 5, Entschlossenheit 1, Heimlichkeit 2, Wahrnehmung 3, Zähigkeit 6",
+     "meisterschaften": "–",
+     "merkmale": "Betäubungsimmunität, Dunkelsicht, Erschöpfungsresistenz 4, Furchterregend (10), Giftimmunität, Schmerzimmunität, Schwächlich, Untot, Verwundbarkeit gegen Lichtschaden",
+     "beute": "Säbel (7 Lunare)"
+    },
+    "hinweise": [
+     "Ergänzt am 11.11.2026 (Werte erhebbarer Untoter aus dem Gegnerkapitel; Anlass: Wertesätze der Erhebungszauber im Editor)."
+    ],
+    "fertigkeiten_refs": [
+     {
+      "id": "grw:fertigkeit:akrobatik",
+      "text": "Akrobatik 5",
+      "wert": 5
+     },
+     {
+      "id": "grw:fertigkeit:athletik",
+      "text": "Athletik 5",
+      "wert": 5
+     },
+     {
+      "id": "grw:fertigkeit:entschlossenheit",
+      "text": "Entschlossenheit 1",
+      "wert": 1
+     },
+     {
+      "id": "grw:fertigkeit:heimlichkeit",
+      "text": "Heimlichkeit 2",
+      "wert": 2
+     },
+     {
+      "id": "grw:fertigkeit:wahrnehmung",
+      "text": "Wahrnehmung 3",
+      "wert": 3
+     },
+     {
+      "id": "grw:fertigkeit:zaehigkeit",
+      "text": "Zähigkeit 6",
+      "wert": 6
+     }
+    ],
+    "merkmale_refs": [
+     {
+      "id": "grw:monstermerkmal:betaeubungsimmunitaet",
+      "text": "Betäubungsimmunität"
+     },
+     {
+      "id": "grw:monstermerkmal:dunkelsicht",
+      "text": "Dunkelsicht"
+     },
+     {
+      "id": "grw:monstermerkmal:erschoepfungsresistenz",
+      "text": "Erschöpfungsresistenz 4",
+      "stufe": 4
+     },
+     {
+      "id": "grw:monstermerkmal:furchterregend",
+      "text": "Furchterregend (10)",
+      "wert": 10
+     },
+     {
+      "id": "grw:monstermerkmal:giftimmunitaet",
+      "text": "Giftimmunität"
+     },
+     {
+      "id": "grw:monstermerkmal:schmerzimmunitaet",
+      "text": "Schmerzimmunität"
+     },
+     {
+      "id": "grw:monstermerkmal:schwaechlich",
+      "text": "Schwächlich"
+     },
+     {
+      "id": "grw:monstermerkmal:untot",
+      "text": "Untot"
+     },
+     {
+      "id": "grw:monstermerkmal:verwundbarkeit-gegen",
+      "text": "Verwundbarkeit gegen Lichtschaden",
+      "parameter": "Lichtschaden"
+     }
+    ]
+   },
+   "hinweise": [
+    "Ergänzt am 11.11.2026 (Werte erhebbarer Untoter aus dem Gegnerkapitel; Anlass: Wertesätze der Erhebungszauber im Editor)."
+   ]
+  },
+  {
    "id": "grw:kreatur:skorpion",
    "typ": "kreatur",
    "aktion": "neu",
@@ -67737,6 +68047,163 @@
    "hinweise": [
     "Ergänzt am 05.11.2026 (Tierwerte aus dem Gegnerkapitel; Anlass: Verweise der Reit- und Jagdtiere anderer Bände auf diese Werte).",
     "Fußnote im Wertekasten: *(farukanische Taube) bzw. 13 (dragoreische Taube)"
+   ]
+  },
+  {
+   "id": "grw:kreatur:wandelnder-leichnam",
+   "typ": "kreatur",
+   "aktion": "neu",
+   "name": "Wandelnder Leichnam",
+   "quelle": {
+    "paket": "grw",
+    "buch_seiten": [
+     282
+    ],
+    "pdf_seiten": [
+     283
+    ],
+    "alt_id": "sm:5ff0e9c7-3601-57c7-86b0-e08e9caa2cb8",
+    "kategorie_in_datenbank": "kreaturen"
+   },
+   "daten": {
+    "beschreibung": null,
+    "attribute": {
+     "AUS": "0",
+     "BEW": "1",
+     "INT": "0",
+     "KON": "3",
+     "MYS": "0",
+     "STÄ": "3",
+     "VER": "0",
+     "WIL": "0"
+    },
+    "abgeleitete_werte": {
+     "GK": "5",
+     "GSW": "4",
+     "LP": "8",
+     "FO": "0",
+     "VTD": "17",
+     "SR": "0",
+     "KW": "19",
+     "GW": "14"
+    },
+    "waffen": [
+     {
+      "name": "Körper",
+      "wert": "8",
+      "schaden": "1W6+1",
+      "wgs": "11",
+      "ini": "10-1W6",
+      "merkmale": "Umklammern",
+      "merkmale_refs": [
+       {
+        "id": "grw:merkmal:umklammern",
+        "stufe": null,
+        "text": "Umklammern"
+       }
+      ]
+     }
+    ],
+    "felder": {
+     "typus": "Untoter",
+     "monstergrad": "1 / 0-",
+     "fertigkeiten": "Akrobatik 4, Athletik 6, Entschlossenheit 0, Heimlichkeit 1, Wahrnehmung 0, Zähigkeit 8",
+     "meisterschaften": "Handgemenge (I: Halten, Umklammern)",
+     "merkmale": "Betäubungsimmunität, Dunkelsicht, Erschöpfungsresistenz 4, Furchterregend (15), Giftimmunität, Schmerzimmunität, Schwächlich, Untot, Verwundbarkeit gegen Lichtschaden"
+    },
+    "hinweise": [
+     "Ergänzt am 11.11.2026 (Werte erhebbarer Untoter aus dem Gegnerkapitel; Anlass: Wertesätze der Erhebungszauber im Editor)."
+    ],
+    "fertigkeiten_refs": [
+     {
+      "id": "grw:fertigkeit:akrobatik",
+      "text": "Akrobatik 4",
+      "wert": 4
+     },
+     {
+      "id": "grw:fertigkeit:athletik",
+      "text": "Athletik 6",
+      "wert": 6
+     },
+     {
+      "id": "grw:fertigkeit:entschlossenheit",
+      "text": "Entschlossenheit 0",
+      "wert": 0
+     },
+     {
+      "id": "grw:fertigkeit:heimlichkeit",
+      "text": "Heimlichkeit 1",
+      "wert": 1
+     },
+     {
+      "id": "grw:fertigkeit:wahrnehmung",
+      "text": "Wahrnehmung 0",
+      "wert": 0
+     },
+     {
+      "id": "grw:fertigkeit:zaehigkeit",
+      "text": "Zähigkeit 8",
+      "wert": 8
+     }
+    ],
+    "merkmale_refs": [
+     {
+      "id": "grw:monstermerkmal:betaeubungsimmunitaet",
+      "text": "Betäubungsimmunität"
+     },
+     {
+      "id": "grw:monstermerkmal:dunkelsicht",
+      "text": "Dunkelsicht"
+     },
+     {
+      "id": "grw:monstermerkmal:erschoepfungsresistenz",
+      "text": "Erschöpfungsresistenz 4",
+      "stufe": 4
+     },
+     {
+      "id": "grw:monstermerkmal:furchterregend",
+      "text": "Furchterregend (15)",
+      "wert": 15
+     },
+     {
+      "id": "grw:monstermerkmal:giftimmunitaet",
+      "text": "Giftimmunität"
+     },
+     {
+      "id": "grw:monstermerkmal:schmerzimmunitaet",
+      "text": "Schmerzimmunität"
+     },
+     {
+      "id": "grw:monstermerkmal:schwaechlich",
+      "text": "Schwächlich"
+     },
+     {
+      "id": "grw:monstermerkmal:untot",
+      "text": "Untot"
+     },
+     {
+      "id": "grw:monstermerkmal:verwundbarkeit-gegen",
+      "text": "Verwundbarkeit gegen Lichtschaden",
+      "parameter": "Lichtschaden"
+     }
+    ],
+    "meisterschaften_refs": [
+     {
+      "id": "grw:meisterschaft:handgemenge:halten",
+      "text": "Halten",
+      "fertigkeit": "grw:fertigkeit:handgemenge",
+      "schwelle": 1
+     },
+     {
+      "id": "grw:meisterschaft:allgemeine-nahkampfmeisterschaften:umklammern",
+      "text": "Umklammern",
+      "fertigkeit": "grw:fertigkeit:handgemenge",
+      "schwelle": 1
+     }
+    ]
+   },
+   "hinweise": [
+    "Ergänzt am 11.11.2026 (Werte erhebbarer Untoter aus dem Gegnerkapitel; Anlass: Wertesätze der Erhebungszauber im Editor)."
    ]
   },
   {

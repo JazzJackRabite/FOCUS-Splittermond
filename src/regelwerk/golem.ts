@@ -1,13 +1,8 @@
 /**
- * Golems (Die Magie S. 197–207): Baukasten mit Korpus, Material, Zusätzlichen Fähigkeiten, Rollen, Applikationen,
- * Schwachpunkten, Instruktionen, Verfügungen und Sonderausstattung.
- * - Stufe des Merkmals Golem = Korpus + Zuschläge der Zusätzlichen Fähigkeiten und Rollen.
- * - Jeder Golem hat automatisch zwei Applikationen; jede weitere erschwert die Konstruktion (+1 Schwierigkeit, +3 Fortschritts-
- *   punkte) und verlangt einen weiteren Schwachpunkt. Mit der Ressource Golem: eine Applikation je Stufe.
- * - Instruktionen Folge und Warte hat jeder Golem, dazu eine weitere; mehr über die Applikation „Zusätzliche Instruktion“.
- * - Sonderausstattung: eine je zwei Stufen (Schritt 5: Feinschliff).
- * - Preis (Kasten „Einen Golem kaufen“): 50 L je Stufe, 10 L je zusätzlicher Applikation nach der ersten, 5 L je Sonderausstattung.
- * - Konstruktion: erweiterte Probe gegen 20 + 2 × Stufe, Fortschrittspunkte 2 × Stufe (S. 200).
+ * Golems: Baukasten mit Korpus, Material, Zusätzlichen Fähigkeiten, Rollen, Applikationen, Schwachpunkten, Instruktionen,
+ * Verfügungen und Sonderausstattung. Regelwerte aus dem Paket: `strukturiert.golem` am Regeltext zu den weiteren
+ * Regelelementen (freie Applikationen, Instruktionen, Konstruktion, Preis, Ressource Golem), `baustein_werte` an
+ * Schwachpunkten, deren Zahlen nur im Fließtext stehen; die Stufe kommt aus Korpus und Zuschlägen der Bausteine.
  */
 import type { Verstoss } from '../fundament/hausregeln';
 import type { Katalog } from './katalog';
@@ -19,7 +14,27 @@ import {
 } from './modifikationen';
 
 export const BAUSTEIN_ARTEN = ['Zusätzliche Fähigkeit', 'Rolle', 'Applikation', 'Schwachpunkt', 'Instruktion', 'Verfügung'] as const;
-export const IMMER_INSTRUKTIONEN = ['Folge', 'Warte'];
+
+interface GolemRegeln {
+  applikationen_frei: number;
+  instruktionen_immer: string[];
+  instruktionen_weitere: number;
+  instruktion_applikation?: string;
+  konstruktion: { schwierigkeit_grund: number; schwierigkeit_je_stufe: number; fortschritt_je_stufe: number; je_applikation_schwierigkeit: number; je_applikation_fortschritt: number; schwachpunkte_je_applikation: number };
+  preis_lunare: { je_stufe: number; je_applikation_nach_erster: number; je_sonderausstattung: number };
+  sonderausstattung_je_stufen: number;
+  ressource: { applikationen_je_stufe: number; verfuegungen_je_stufe: number; verfuegungen_mindestens: number };
+  mehrfach_beliebig?: string[];
+}
+const GR_CACHE = new WeakMap<Katalog, { r: GolemRegeln | null }>();
+/** Regelwerte der Golems aus dem Paket (null, wenn der Band nicht geladen ist) */
+export function golemRegeln(k: Katalog): GolemRegeln | null {
+  let c = GR_CACHE.get(k);
+  if (!c) { c = { r: Object.values(k.eintraege).find(e => e.daten.strukturiert?.golem)?.daten.strukturiert.golem ?? null }; GR_CACHE.set(k, c); }
+  return c.r;
+}
+/** Instruktionen, die jeder Golem beherrscht (Namen aus dem Paket) */
+export const immerInstruktionen = (k: Katalog) => (golemRegeln(k)?.instruktionen_immer ?? []).map(id => k.get(id)?.name ?? id);
 
 export const korpusse = (k: Katalog) => Object.values(k.eintraege).filter(e => e.typ === 'golem_baustein' && e.daten.baustein === 'Korpus')
   .sort((a, b) => korpusStufe(a) - korpusStufe(b));
@@ -36,9 +51,10 @@ export function korpusStufe(e: Eintrag): number {
   return m ? Number(m[1]) : 1;
 }
 
-/** Wie oft darf ein Baustein gewählt werden? Rollen beliebig oft (S. 205), sonst nach Beschreibung */
-export function hoechstens(e: Eintrag): number {
-  return e.daten.baustein === 'Rolle' ? Infinity : mehrfachAusText(e.daten.beschreibung);
+/** Wie oft darf ein Baustein gewählt werden? Laut Paket (beliebig oft je Bausteinart, Höchstzahl), sonst nach Beschreibung */
+export function hoechstens(k: Katalog, e: Eintrag): number {
+  if ((golemRegeln(k)?.mehrfach_beliebig ?? []).includes(e.daten.baustein)) return Infinity;
+  return Number(e.daten.baustein_werte?.hoechstens) || mehrfachAusText(e.daten.beschreibung);
 }
 
 /** Voraussetzung „Voraussetzung: Zusätzliche Fähigkeit Aggressiv“ → Name */
@@ -46,12 +62,10 @@ export function voraussetzung(e: Eintrag): string | null {
   return String(e.daten.beschreibung ?? '').match(/Voraussetzung: (?:Zusätzliche Fähigkeit )?([^;,.]+)/)?.[1]?.trim() ?? null;
 }
 
-/** Zahlen der Schwachpunkte, die die Beschreibung nur als Prosa nennt */
+/** Zahlen der Schwachpunkte, die die Beschreibung nur als Prosa nennt (`baustein_werte` im Paket) */
 function schwachpunktModifikation(e: Eintrag): Modifikationen {
   const m = leer();
-  if (/:anfaellig$/.test(e.id)) { m.abgeleitet.VTD = -1; m.abgeleitet.GW = -1; m.abgeleitet.KW = -1; }
-  else if (/:feingliedrig$/.test(e.id)) { m.abgeleitet.SR = -1; m.abgeleitet.LP = -1; }
-  else if (/:langsam$/.test(e.id)) { m.abgeleitet.GSW = -3; }
+  for (const [w, v] of Object.entries(e.daten.baustein_werte?.modifikationen ?? {})) m.abgeleitet[w] = Number(v);
   return m;
 }
 
@@ -66,11 +80,14 @@ export function sonderausstattungen(k: Katalog): { optionen: string[]; material:
 export function golemSchwelle(k: Katalog, stufe: number): number {
   const r = Object.values(k.eintraege).find(e => e.typ === 'regel' && /baukasten-schritt-5-feinschliff$/.test(e.id));
   const t = (r?.daten.tabellen ?? []).find((x: { kopf: string[] }) => x.kopf?.[0] === 'Stufe');
-  for (const [bereich, schwelle] of (t?.zeilen ?? []) as string[][]) {
+  const zeilen = (t?.zeilen ?? []) as string[][];
+  for (const [bereich, schwelle] of zeilen) {
     const [von, bis] = bereich.split('-').map(Number);
     if (stufe >= von && stufe <= (bis || von)) return Number(schwelle);
   }
-  return stufe >= 9 ? 4 : 1;
+  // über der letzten Zeile der Tabelle gilt deren Schwelle
+  const letzte = zeilen[zeilen.length - 1];
+  return letzte && stufe > Number(letzte[0].split('-').pop()) ? Number(letzte[1]) : 0;
 }
 
 /** Animierungszauber, der einen Golem dieser Stufe animieren kann („Merkmal Golem 3 oder niedriger“) */
@@ -197,6 +214,8 @@ export function golemWerte(k: Katalog, b: Begleiter): GolemWerte {
   const gewaehlt: Record<string, Eintrag[]> = Object.fromEntries(BAUSTEIN_ARTEN.map(a => [a, []]));
   for (const i of b.bausteine ?? []) { const e = k.get(i); if (e?.typ === 'golem_baustein' && gewaehlt[e.daten.baustein]) gewaehlt[e.daten.baustein].push(e); }
   const anzahl = (e: Eintrag) => (b.bausteine ?? []).filter(x => x === e.id).length;
+  const GR = golemRegeln(k);
+  if (!GR) hinweise.push('Regelwerte der Golems fehlen (Band nicht geladen)');
 
   const stufePosten = [{ text: `Korpus ${korpus?.name ?? '?'}`, wert: korpus ? korpusStufe(korpus) : 0 }];
   for (const e of [...gewaehlt['Zusätzliche Fähigkeit'], ...gewaehlt.Rolle]) {
@@ -207,7 +226,7 @@ export function golemWerte(k: Katalog, b: Begleiter): GolemWerte {
 
   // Mehrfachwahl und Voraussetzungen
   for (const e of new Set(Object.values(gewaehlt).flat())) {
-    if (anzahl(e) > hoechstens(e)) verstoss(`${e.name} ist höchstens ${hoechstens(e)}-mal wählbar`, `anzahl:${e.id}`, anzahl(e) - hoechstens(e));
+    if (anzahl(e) > hoechstens(k, e)) verstoss(`${e.name} ist höchstens ${hoechstens(k, e)}-mal wählbar`, `anzahl:${e.id}`, anzahl(e) - hoechstens(k, e));
     const v = voraussetzung(e);
     if (v && !Object.values(gewaehlt).flat().some(x => x.name === v)) verstoss(`${e.name} setzt ${v} voraus`, `voraus:${e.id}`);
   }
@@ -215,17 +234,18 @@ export function golemWerte(k: Katalog, b: Begleiter): GolemWerte {
   if (!material) hinweise.push('Material wählen (Schritt 2)');
   const materialSchwachpunkt: string | null = material?.daten.felder?.schwachpunkt ?? null;
 
-  const applikationenFrei = b.golemRessource ? Math.max(2, stufe) : 2;
+  const frei0 = GR?.applikationen_frei ?? 0;
+  const applikationenFrei = b.golemRessource ? Math.max(frei0, (GR?.ressource.applikationen_je_stufe ?? 0) * stufe) : frei0;
   const applikationenExtra = Math.max(0, gewaehlt.Applikation.length - applikationenFrei);
-  const schwachpunkteNoetig = applikationenExtra;
+  const schwachpunkteNoetig = applikationenExtra * (GR?.konstruktion.schwachpunkte_je_applikation ?? 0);
   if (gewaehlt.Schwachpunkt.length < schwachpunkteNoetig)
     verstoss(`Für ${applikationenExtra} zusätzliche Applikation${applikationenExtra > 1 ? 'en' : ''} fehlen ${schwachpunkteNoetig - gewaehlt.Schwachpunkt.length} Schwachpunkt(e)`, 'schwachpunkte', schwachpunkteNoetig - gewaehlt.Schwachpunkt.length);
-  const instruktionenErlaubt = 1 + gewaehlt.Applikation.filter(e => /zusaetzliche-instruktion$/.test(e.id)).length;
-  const instr = gewaehlt.Instruktion.filter(e => !IMMER_INSTRUKTIONEN.includes(e.name));
+  const instruktionenErlaubt = (GR?.instruktionen_weitere ?? 0) + gewaehlt.Applikation.filter(e => e.id === GR?.instruktion_applikation).length;
+  const instr = gewaehlt.Instruktion.filter(e => !(GR?.instruktionen_immer ?? []).includes(e.id));
   if (instr.length > instruktionenErlaubt) verstoss(`Mehr Instruktionen (${instr.length}) als implementierbar (${instruktionenErlaubt}); weitere über die Applikation Zusätzliche Instruktion`, 'instruktionen', instr.length - instruktionenErlaubt);
-  const verfuegungenAktiv = b.golemRessource ? Math.max(1, stufe) : null;
+  const verfuegungenAktiv = b.golemRessource ? Math.max(GR?.ressource.verfuegungen_mindestens ?? 0, (GR?.ressource.verfuegungen_je_stufe ?? 0) * stufe) : null;
   if (verfuegungenAktiv !== null && gewaehlt['Verfügung'].length > verfuegungenAktiv) verstoss(`Höchstens ${verfuegungenAktiv} aktive Verfügungen (Ressource Golem)`, 'verfuegungen', gewaehlt['Verfügung'].length - verfuegungenAktiv);
-  const sonderausstattungPlaetze = Math.floor(stufe / 2);
+  const sonderausstattungPlaetze = GR?.sonderausstattung_je_stufen ? Math.floor(stufe / GR.sonderausstattung_je_stufen) : 0;
   const sa = (b.sonderausstattung ?? []).slice(0, sonderausstattungPlaetze).filter(Boolean);
   if ((b.sonderausstattung ?? []).filter(Boolean).length > sonderausstattungPlaetze) verstoss(`Höchstens ${sonderausstattungPlaetze} Sonderausstattung(en)`, 'sonderausstattung', (b.sonderausstattung ?? []).filter(Boolean).length - sonderausstattungPlaetze);
 
@@ -255,17 +275,25 @@ export function golemWerte(k: Katalog, b: Begleiter): GolemWerte {
     sa.forEach((s2, i) => mods.push(mitWahl(leseModifikationen(k, s2), 'Sonderausstattung', `sa:${i}`)));
     const m = summe(...mods);
     werte = anwenden(k, grund, m);
+    // Mindestwerte der Schwachpunkte (z. B. Geschwindigkeit nicht unter einen Wert)
+    for (const e of [...gewaehlt.Schwachpunkt, ...(matSp ? [matSp] : [])])
+      for (const [w, min] of Object.entries(e.daten.baustein_werte?.mindestwert ?? {}))
+        if (werte.abgeleitet[w] !== undefined) werte.abgeleitet[w] = Math.max(Number(min), werte.abgeleitet[w]);
     werte.merkmale = werte.merkmale.map(x => (/^Golem \d+$/.test(x) ? `Golem ${stufe}` : x));
 
     wahlenAnwenden(k, werte, wahlen, feste, b.feinschliff ?? {}, verstoss, 'der Golem');
   }
   for (const s2 of sa) if (/^Applikation /.test(s2)) feinschliff.push(`Sonderausstattung: ${s2}`);
 
-  const preis = 50 * stufe + 10 * Math.max(0, applikationenExtra - 1) + 5 * sa.length;
+  const P = GR?.preis_lunare, KO = GR?.konstruktion;
+  const preis = P ? P.je_stufe * stufe + P.je_applikation_nach_erster * Math.max(0, applikationenExtra - 1) + P.je_sonderausstattung * sa.length : 0;
   return {
     korpus, stufe, stufePosten, werte, gewaehlt, applikationenFrei, applikationenExtra, schwachpunkteNoetig, materialSchwachpunkt,
     instruktionenErlaubt, verfuegungenAktiv, sonderausstattungPlaetze, meisterschaftSchwelle: schwelle5,
-    preis, konstruktion: { schwierigkeit: 20 + 2 * stufe + applikationenExtra, fortschritt: 2 * stufe + 3 * applikationenExtra },
+    preis, konstruktion: KO
+      ? { schwierigkeit: KO.schwierigkeit_grund + KO.schwierigkeit_je_stufe * stufe + KO.je_applikation_schwierigkeit * applikationenExtra,
+          fortschritt: KO.fortschritt_je_stufe * stufe + KO.je_applikation_fortschritt * applikationenExtra }
+      : { schwierigkeit: 0, fortschritt: 0 },
     animierung: animierung(k, stufe), feinschliff, wahlen, hinweise, verstoesse,
   };
 }

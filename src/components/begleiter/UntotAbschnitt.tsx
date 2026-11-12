@@ -3,7 +3,7 @@ import React, { useMemo, useState } from 'react';
 import { Skull, Plus, Minus } from 'lucide-react';
 import { useCharacter } from '../../context/CharacterContext';
 import {
-  ANGRIFF, abnormitaeten, steigerbareFertigkeiten, attributKosten, erhebungen, fertigkeitKosten, meisterschaftenBis, untotWerte,
+  ANGRIFF, abnormitaeten, nekromantenMeisterschaften, untoteRegelQuelle, steigerbareFertigkeiten, attributKosten, erhebungen, fertigkeitKosten, meisterschaftenBis, untotWerte,
 } from '../../regelwerk/untote';
 import { ATTRIBUT_KURZ, alsWertekasten } from '../../regelwerk/modifikationen';
 import type { Katalog } from '../../regelwerk/katalog';
@@ -12,7 +12,7 @@ import { Werte, Eintrag, Hinweise, Notiz, MarkeMitEntfernen } from './Wertekaste
 import { BegleiterVitals, VitalKurz, spielDaten, useBegleiterSpiel } from './BegleiterSpiel';
 import { Abschnittstitel, Auswahl, Eingabe, Karte, Knopf, Marke } from '../../fundament';
 
-interface Nekromant { nekromant: boolean; meisterDerAbnormitaeten: boolean; zauber: string[] }
+interface Nekromant { nekromant: boolean; meisterDerAbnormitaeten: boolean; mehrfachMit: string; zauber: string[] }
 
 const Stufer: React.FC<{ label: string; wert: number; setzen: (n: number) => void; kosten: string }> = ({ label, wert, setzen, kosten }) => (
   <div className="flex items-center gap-2">
@@ -73,8 +73,8 @@ const UntotEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; n: Nekro
         </Auswahl>
       </div>
       <p>
-        {u.erhebung ? <>{u.erhebung.zauber.name} (Grad {u.erhebung.grad}): je Verstärkung {u.erhebung.epJeVerstaerkung} EP{n.nekromant ? ', beliebig oft (Nekromant)' : ', einmal (mehrfach mit Nekromant)'}. </> : null}
-        Neue Punkte je Fertigkeit höchstens {u.grenze}. Verstand 0 (frisch erhoben); nur einfache Befehle, ab Verstand 1 auch komplexere (Die Magie S. 182).
+        {u.erhebung ? <>{u.erhebung.zauber.name} (Grad {u.erhebung.grad}): je Verstärkung {u.erhebung.epJeVerstaerkung} EP{n.nekromant ? `, beliebig oft (${n.mehrfachMit})` : `, einmal (mehrfach mit ${n.mehrfachMit})`}. </> : null}
+        Neue Punkte je Fertigkeit höchstens {u.grenze}{untoteRegelQuelle(k) ? ` (${untoteRegelQuelle(k)})` : ''}.
       </p>
       {u.abnormitaet && <p><span className="text-leise">{u.abnormitaet.name}:</span> {u.abnormitaetText}</p>}
 
@@ -85,13 +85,13 @@ const UntotEintrag: React.FC<{ k: Katalog; b: Begleiter; index: number; n: Nekro
         <Abschnittstitel als="h3" className="text-[15px]">Steigerung (von 0 an)</Abschnittstitel>
         <div className="grid sm:grid-cols-2 gap-x-6 gap-y-2">
           {ATTRIBUT_KURZ.map(a => (
-            <Stufer key={a} label={a} wert={st.attribute?.[a] ?? 0} setzen={v => setzeA(a, v)} kosten={`${attributKosten(st.attribute?.[a] ?? 0)} EP`} />
+            <Stufer key={a} label={a} wert={st.attribute?.[a] ?? 0} setzen={v => setzeA(a, v)} kosten={`${attributKosten(k, st.attribute?.[a] ?? 0)} EP`} />
           ))}
         </div>
         <div className="grid sm:grid-cols-2 gap-x-6 gap-y-2">
           {fertigkeitsListe.map(f => (
             <Stufer key={f} label={f === ANGRIFF ? 'Angriff (Waffen)' : k.get(f)?.name ?? f} wert={st.fertigkeiten?.[f] ?? 0} setzen={v => setzeF(f, v)}
-              kosten={`${fertigkeitKosten(st.fertigkeiten?.[f] ?? 0)} EP`} />
+              kosten={`${fertigkeitKosten(k, st.fertigkeiten?.[f] ?? 0)} EP`} />
           ))}
         </div>
         <div className="flex flex-wrap gap-2 items-end">
@@ -146,10 +146,8 @@ export const UntotAbschnitt: React.FC<{ k: Katalog }> = ({ k }) => {
   const [zauber, setZauber] = useState('');
   const [satz, setSatz] = useState('');
   const liste = useMemo(() => erhebungen(k), [k]);
-  const ms = Object.values(state.masteries ?? {}).flat();
-  const n: Nekromant = {
-    nekromant: ms.some(m => /^Nekromant\b/.test(m.name)),
-    meisterDerAbnormitaeten: ms.some(m => /^Meister der Abnormitäten\b/.test(m.name)),
+    const n: Nekromant = {
+    ...nekromantenMeisterschaften(k, state.masteries),
     zauber: (state.spellsList ?? []).map(s => s.name),
   };
   const eigene = (state.begleiter ?? []).map((b, i) => ({ b, i })).filter(x => x.b.art === 'untoter');

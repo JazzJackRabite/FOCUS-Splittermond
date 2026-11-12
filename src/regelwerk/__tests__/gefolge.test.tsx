@@ -74,8 +74,8 @@ describe('Gefolge: Regeln', () => {
   });
 
   it('Zauber: Grad nach Punkten, freie Zauber je Magieschule', () => {
-    expect([0, 1, 2, 3, 5, 6, 9, 15].map(hoechsterZaubergrad)).toEqual([-1, 0, 0, 1, 1, 2, 3, 5]);
-    expect([0, 1, 3, 6, 9].map(freieZauberBei)).toEqual([0, 1, 2, 3, 3]);
+    expect([0, 1, 2, 3, 5, 6, 9, 15].map(n => hoechsterZaubergrad(K, n))).toEqual([-1, 0, 0, 1, 1, 2, 3, 5]);
+    expect([0, 1, 3, 6, 9].map(n => freieZauberBei(K, n))).toEqual([0, 1, 2, 3, 3]);
     const magier = { ...zwingarder, kulturWahl: { fertigkeiten: { ...zwingarder.kulturWahl!.fertigkeiten, 5: 'grw:fertigkeit:staerkungsmagie' } } };
     const g = gefolgeWerte(K, magier, 6);
     expect(g.freieZauber).toBe(1);

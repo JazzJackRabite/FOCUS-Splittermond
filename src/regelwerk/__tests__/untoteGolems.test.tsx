@@ -54,20 +54,23 @@ describe('Modifikationen-Texte', () => {
 });
 
 describe('Untote: Regeln', () => {
-  it('Kosten und Grenzen nach Die Magie S. 183', () => {
-    expect([1, 6, 7, 9, 10].map(fertigkeitKosten)).toEqual([3, 18, 23, 33, 40]);
-    expect([1, 2, 3].map(attributKosten)).toEqual([10, 25, 45]);
-    expect([5, 6, 8, 9, 15].map(freieSchwelle)).toEqual([0, 1, 1, 2, 4]);
-    expect([1, 2, 3, 4, 5].map(grenzHeldengrad)).toEqual([1, 1, 2, 3, 4]);
+  it('Kosten nach den Kernregeln (Steigerung „von 0 an“)', () => {
+    expect([1, 6, 7, 9, 10].map(n => fertigkeitKosten(K, n))).toEqual([3, 18, 23, 33, 40]);
+    expect([1, 2, 3].map(n => attributKosten(K, n))).toEqual([10, 25, 45]);
+    expect([5, 6, 8, 9, 15].map(n => freieSchwelle(K, n))).toEqual([0, 1, 1, 2, 4]);
+    expect([1, 2, 3, 4, 5].map(n => grenzHeldengrad(K, n))).toEqual([null, null, null, null, null]); // Regeltext fehlt ohne den Band
   });
-  it('nur GRW: Untote erheben mit Wandelnder Leichnam/Skelett (Werte nicht im Paket)', () => {
+  it('nur GRW: Untote erheben mit Wandelnder Leichnam/Skelett (Werte im GRW-Paket, Steigerungsregeln fehlen)', () => {
     const e = erhebungen(K);
     expect(e.map(x => x.zauber.name)).toEqual(['Untote erheben']);
     expect(e[0]).toMatchObject({ grad: 3, epJeVerstaerkung: 15 });
-    const u = untotWerte(K, { id: 'untoter:Skelett', art: 'untoter', name: 'Skelett', erhebung: 'grw:zauber:untote-erheben', verstaerkungen: 1,
+    const u = untotWerte(K, { id: 'grw:kreatur:skelett', art: 'untoter', name: 'Skelett', erhebung: 'grw:zauber:untote-erheben', verstaerkungen: 1,
       steigerung: { fertigkeiten: { [ANGRIFF]: 3 } } }, { nekromant: false, meisterDerAbnormitaeten: false });
-    expect(u).toMatchObject({ epGesamt: 15, epVerbraucht: 9, grenze: 9, werte: null });
-    expect(u.hinweise.some(h => /GRW S. 279/.test(h))).toBe(true);
+    expect(u).toMatchObject({ epGesamt: 15, epVerbraucht: 9, grenze: 0 });
+    expect(u.wertesatz?.id).toBe('grw:kreatur:skelett');
+    expect(u.werte?.abgeleitet.LP).toBe(7);
+    expect(u.werte?.attribute.VER).toBe(0);
+    expect(u.hinweise.some(h => /Steigerung von Untoten fehlen/.test(h))).toBe(true);
   });
 });
 
@@ -76,6 +79,9 @@ const MAGIE = grimoireDatei('magie');
 describe.skipIf(!MAGIE || !fs.existsSync(MAGIE))('Untote und Golems mit „Die Magie“ (lokal)', () => {
   let KM = K;
   beforeAll(() => { KM = erstelleKatalog(b, [grimoireLesen(fs.readFileSync(MAGIE, 'utf-8'), b.manifest)]).katalog; });
+  it('Grenze der neuen Punkte nach Zaubergrad (aus dem Paket)', () => {
+    expect([1, 2, 3, 4, 5].map(n => grenzHeldengrad(KM, n))).toEqual([1, 1, 2, 3, 4]);
+  });
 
   it('Erhebungszauber, Gruftkatze: Verstand 0, Steigerung wirkt auf abgeleitete Werte, Abnormität', () => {
     expect(erhebungen(KM).map(x => x.zauber.name)).toEqual(['Totentier', 'Untote erheben', 'Grabesbestie', 'Der letzte Ruf']);
