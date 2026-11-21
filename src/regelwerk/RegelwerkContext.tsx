@@ -5,8 +5,8 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { Katalog } from './katalog';
 import type { LadePaket } from './typen';
-import { grimoireLesen, erstelleKatalog, ladeBasis, type Basis } from './laden';
-import { alleGespeichertenPakete, paketEntfernen, paketSpeichern } from './paketSpeicher';
+import { basisAusTexten, grimoireLesen, erstelleKatalog, ladeBasis, type Basis } from './laden';
+import { alleGespeichertenPakete, basisSpeichern, gespeicherteBasis, paketEntfernen, paketSpeichern } from './paketSpeicher';
 import { setzeAktivenKatalog } from './bruecke';
 
 export type RegelwerkStatus = 'laedt' | 'bereit' | 'fehler' | 'nicht_verfuegbar';
@@ -44,9 +44,20 @@ export const RegelwerkProvider: React.FC<{ children: React.ReactNode; basisUrl?:
     let aktiv = true;
     (async () => {
       try {
-        const b = await ladeBasis(basisUrl);
+        // Grundregelwerk aus public/; ohne Netz die zuletzt geladene Fassung aus dem Browser
+        let b: Basis; const m: string[] = [];
+        try {
+          b = await ladeBasis(basisUrl);
+          if (b.roh && !b.warnungen.length) void basisSpeichern(b.roh.manifest, b.roh.paket);
+        } catch (e) {
+          const g = await gespeicherteBasis();
+          if (!g) throw e;
+          b = await basisAusTexten(g.manifest, g.paket);
+          m.push(`Grundregelwerk ohne Netz: gespeicherte Fassung vom ${new Date(g.gespeichertAm).toLocaleDateString('de-DE')} (${(e as Error).message}).`);
+        }
+        m.push(...b.warnungen);
         const gespeichert = await alleGespeichertenPakete();
-        const geladen: LadePaket[] = []; const m = [...b.warnungen];
+        const geladen: LadePaket[] = [];
         for (const g of gespeichert) {
           try { geladen.push(grimoireLesen(g.text, b.manifest)); } catch (e) { m.push(`${g.titel}: ${(e as Error).message}`); }
         }

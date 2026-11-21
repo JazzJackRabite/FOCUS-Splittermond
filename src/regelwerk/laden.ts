@@ -20,14 +20,15 @@ async function sha256Hex(daten: ArrayBuffer): Promise<string | null> {
   }
 }
 
-export interface Basis { manifest: Manifest; basis: LadePaket; warnungen: string[] }
+export interface Basis { manifest: Manifest; basis: LadePaket; warnungen: string[]; /** geladene Texte, zum Speichern für den Start ohne Netz */ roh?: { manifest: string; paket: string } }
 
 /** Lädt Manifest und Grundregelwerk aus dem public-Ordner des Editors. */
 export async function ladeBasis(basisUrl: string = (import.meta.env?.BASE_URL ?? '/') + BASIS_ORDNER, abruf: typeof fetch = fetch): Promise<Basis> {
   const warnungen: string[] = [];
   const mRes = await abruf(basisUrl + 'manifest.json');
   if (!mRes.ok) throw new Error(`Regelpakete: manifest.json nicht ladbar (${mRes.status})`);
-  const manifest = (await mRes.json()) as Manifest;
+  const manifestText = await mRes.text();
+  const manifest = JSON.parse(manifestText) as Manifest;
   const info = manifest.pakete.find(p => p.id === manifest.basis_paket);
   if (!info?.datei) throw new Error('Regelpakete: Basispaket fehlt im Manifest');
   const pRes = await abruf(basisUrl + info.datei);
@@ -35,8 +36,21 @@ export async function ladeBasis(basisUrl: string = (import.meta.env?.BASE_URL ??
   const roh = await pRes.arrayBuffer();
   const sha = await sha256Hex(roh);
   if (sha && info.sha256 && sha !== info.sha256) warnungen.push(`${info.datei}: Prüfsumme stimmt nicht mit dem Manifest überein`);
-  const paket = JSON.parse(new TextDecoder('utf-8').decode(roh)) as RegelPaket;
-  return { manifest, basis: { info, paket, erwarteteEintraege: info.eintraege }, warnungen };
+  const paketText = new TextDecoder('utf-8').decode(roh);
+  const paket = JSON.parse(paketText) as RegelPaket;
+  return { manifest, basis: { info, paket, erwarteteEintraege: info.eintraege }, warnungen, roh: { manifest: manifestText, paket: paketText } };
+}
+
+/** Grundregelwerk aus gespeicherten Texten (Start ohne Netz); Prüfsumme gegen das gespeicherte Manifest */
+export async function basisAusTexten(manifestText: string, paketText: string): Promise<Basis> {
+  const manifest = JSON.parse(manifestText) as Manifest;
+  const info = manifest.pakete.find(p => p.id === manifest.basis_paket);
+  if (!info?.datei) throw new Error('Regelpakete: Basispaket fehlt im gespeicherten Manifest');
+  const roh = new TextEncoder().encode(paketText);
+  const sha = await sha256Hex(roh.buffer as ArrayBuffer);
+  if (sha && info.sha256 && sha !== info.sha256) throw new Error('Gespeichertes Grundregelwerk ist beschädigt (Prüfsumme)');
+  const paket = JSON.parse(paketText) as RegelPaket;
+  return { manifest, basis: { info, paket, erwarteteEintraege: info.eintraege }, warnungen: [] };
 }
 
 /** Liest ein hochgeladenes Grimoire und prüft, ob es zum Editor passt. Wirft einen Fehler mit verständlicher Meldung. */
