@@ -1,4 +1,4 @@
-// Generated directly from src/data/splittermond_grw.sqlite
+// Rückfall ohne geladenes Regelpaket (FUNDAMENT.md, Grundsatz 2); erzeugt aus der GRW-Datenbank, maßgeblich ist das GRW-Paket
 // Total resources: 10
 
 export interface ResourceData {

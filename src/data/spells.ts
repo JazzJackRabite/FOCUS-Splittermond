@@ -1,4 +1,4 @@
-// Generated directly from src/data/splittermond_grw.sqlite
+// Rückfall ohne geladenes Regelpaket (FUNDAMENT.md, Grundsatz 2); erzeugt aus der GRW-Datenbank, maßgeblich ist das GRW-Paket
 // Total unique spells: 278, school instances: 419
 
 export interface Spell {

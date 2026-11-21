@@ -332,8 +332,8 @@ aus echtem Schaden; Würfelformeln zusammenfassen. Die Funktionen aus Stand 9–
 **Technik:** Die Zauberwerte standen in Stand 16 als geprüfte Tabelle im Code; seit Stand 17 kommen sie aus den Regelpaketen. 314 Tests grün, Build läuft.
 
 **Offen:** Die Tabellen gelten nur für GRW-Zauber (Namen fest im Code); Zauber aus Grimoires wirken nicht automatisch.
-Wiederherstellung entfernt eine feste Liste von Zuständen statt „Zustände, die Folge von Angriffen sind“. Unbenutzte
-Dateien aus AI Studio im Repository: `public/assets/aistudio/*.png`, `.aistudio/`, leere `src/data/splittermond_grw.sqlite`.
+Wiederherstellung entfernt eine feste Liste von Zuständen statt „Zustände, die Folge von Angriffen sind“. (Erledigt: Die
+unbenutzten Dateien aus AI Studio sind entfernt, siehe Stand 33.)
 
 ## Tab „Begleiter“, Teil 4: würfeln, Lebenspunkte und Fokus
 
@@ -837,6 +837,10 @@ die Grimoires), Dateiendung `.grim`. Das Grundregelwerk ist kein Grimoire; es bl
   Begleiteransicht sowie allen Dialogen sind umgestellt (mindestens 44 Pixel hoch). Neue Prüfung: selbst gebaute
   `<button>` je Datei stehen als Altlast (`knoepfe`) und dürfen nur weniger werden; übrig sind 6 in `PlaySharedVitals.tsx`
   (LP-, Fokus- und Temp-LP-Kästchen, Zähler).
+- **Reste aus AI Studio:** `.aistudio/`, `public/assets/aistudio/` und die leere `src/data/splittermond_grw.sqlite` waren
+  schon entfernt (Commit 6954724, `.gitignore` hält sie draußen). Dazu jetzt: `metadata.json` ohne die ungenutzte
+  Gemini-Berechtigung (die App ruft keine KI auf), Name und Beschreibung aktuell; README verweist auf `FOKUS-1.2` statt
+  `FOCUS_GoogleAIStudio`; die Kopfzeilen in `src/data/*.ts` nennen sie als Rückfall statt einer gelöschten Datenbank.
 - Tests: 448 grün mit allen Grimoires (5 übersprungen); Prüfsuite regelpakete 0 Befunde; Build läuft; im Browser geprüft
   (Hauptnavigation, Schaden, Heilung, Einstellungen, Profile, Inventar, Angriff, Begleiter-Assistent).
 
