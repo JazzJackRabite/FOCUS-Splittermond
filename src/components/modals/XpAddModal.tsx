@@ -1,6 +1,5 @@
-import { Dialogfenster, Dialoghintergrund } from '../../fundament';
+import { Dialogfenster, Dialoghintergrund, Dialog, Knopf, Wahlknopf } from '../../fundament';
 import React, { useState } from 'react';
-import { Dialog, Knopf } from '../../fundament';
 import { Plus, Minus, Sparkles } from 'lucide-react';
 
 interface XpAddModalProps {
@@ -42,18 +41,9 @@ export const XpAddModal: React.FC<XpAddModalProps> = ({ onClose, onAdd }) => {
               </label>
               <div className="grid grid-cols-6 gap-1.5">
                 {quickAmounts.map((amt) => (
-                  <button
-                    key={amt}
-                    type="button"
-                    onClick={() => setVal(amt)}
-                    className={`min-h-11 py-1.5 text-xs font-bold rounded-knopf border transition-colors cursor-pointer ${
-                      val === amt
-                        ? 'bg-erhoeht text-schrift border-rahmen '
-                        : 'bg-flaeche text-schrift border-rahmen hover:bg-rahmen'
-                    }`}
-                  >
+                  <Wahlknopf gewaehlt={val === amt} mittig key={amt} onClick={() => setVal(amt)} className="text-xs font-bold">
                     +{amt}
-                  </button>
+                  </Wahlknopf>
                 ))}
               </div>
             </div>

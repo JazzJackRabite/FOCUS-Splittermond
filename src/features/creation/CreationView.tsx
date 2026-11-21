@@ -1,3 +1,4 @@
+import { Knopf, Wahlknopf } from '../../fundament';
 import { regelverstoss, useHausregeln } from '../../fundament/hausregeln';
 import React, { useState, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
@@ -360,11 +361,7 @@ export function CreationView() {
                 <label className="block text-xs uppercase text-leise font-bold mb-2">Rasse</label>
                 <div className={`flex flex-wrap gap-2 ${mode !== 'creation' ? 'opacity-50 pointer-events-none' : ''}`}>
                   {Object.keys(grwRassen()).map((r) => (
-                    <button
-                      key={r} onClick={() => handleRaceChange(r)}
-                      disabled={mode !== 'creation'}
-                      className={`min-h-11 px-3 py-1 text-sm rounded-knopf transition-all ${race === r ? 'bg-erhoeht text-schrift ring-2 ring-gold ring-offset-1' : 'bg-flaeche text-schrift border border-rahmen hover:bg-rahmen'}`}
-                    >{r}</button>
+                    <Wahlknopf gewaehlt={race === r} mittig key={r} onClick={() => handleRaceChange(r)} disabled={mode !== 'creation'} className="text-sm">{r}</Wahlknopf>
                   ))}
                 </div>
               </div>
@@ -385,11 +382,7 @@ export function CreationView() {
                     const isSelected = raceBonusAttrs.includes(attr);
                     if (race === 'Varg' && attr === 'STA') return null;
                     return (
-                      <button
-                        key={attr} onClick={() => toggleRaceBonus(attr)}
-                        disabled={mode !== 'creation'}
-                        className={`text-[11px] px-2 py-1 border rounded-knopf uppercase font-bold ${isSelected ? 'bg-erhoeht text-schrift border-gold' : 'bg-flaeche text-leise border-rahmen hover:bg-rahmen hover:text-schrift'}`}
-                      >{attr}</button>
+                      <Wahlknopf gewaehlt={isSelected} mittig key={attr} onClick={() => toggleRaceBonus(attr)} disabled={mode !== 'creation'} className="text-[11px] uppercase font-bold">{attr}</Wahlknopf>
                     );
                   })}
                 </div>
@@ -481,23 +474,15 @@ export function CreationView() {
                   ].map((cat) => {
                     const isSelected = cat.k === 'ALL' ? skillFilter === null : skillFilter === cat.k;
                     return (
-                      <button
-                        key={cat.k}
-                        onClick={() => setSkillFilter(cat.k === 'ALL' ? null : (skillFilter === cat.k ? null : cat.k))}
-                        className={`px-2.5 py-1 text-xs rounded-knopf transition-all font-bold cursor-pointer ${
-                          isSelected
-                            ? 'bg-erhoeht text-schrift border border-gold ring-1 ring-gold'
-                            : 'bg-seite text-leise border border-rahmen hover:text-schrift hover:bg-erhoeht'
-                        }`}
-                      >
+                      <Wahlknopf gewaehlt={isSelected} mittig key={cat.k} onClick={() => setSkillFilter(cat.k === 'ALL' ? null : (skillFilter === cat.k ? null : cat.k))} className="text-xs font-bold">
                         {cat.l}
-                      </button>
+                      </Wahlknopf>
                     );
                   })}
                   {hasExpandedSkills && (
-                    <button onClick={collapseAllSkills} className="text-leise hover:text-schrift px-1 py-1 ml-1 cursor-pointer transition-colors" title="Alle einklappen">
+                    <Knopf nurSymbol onClick={collapseAllSkills} title="Alle einklappen" className="ml-1" aria-label="Alle einklappen">
                       <ChevronsDownUp size={16} />
-                    </button>
+                    </Knopf>
                   )}
                 </div>
               </div>
@@ -546,7 +531,7 @@ export function CreationView() {
             <div className="bg-flaeche p-5 rounded-karte border border-rahmen relative flex flex-col">
               <div className="flex justify-between items-center border-b border-gold pb-2 mb-2">
                 <h3 className="font-bold text-[17px] fantasy-font text-gold-hell truncate min-w-0">Stärken</h3>
-                <button onClick={() => setShowStrengthModal(true)} className="text-xs bg-erhoeht hover:bg-rahmen border border-gold px-2.5 py-1 rounded-knopf no-print font-bold text-schrift shrink-0 ml-2 transition-colors cursor-pointer ">+ Hinzufügen</button>
+                <Knopf art="sekundaer" onClick={() => setShowStrengthModal(true)} className="text-xs font-bold shrink-0 ml-2">+ Hinzufügen</Knopf>
               </div>
               <PointDisplay current={creationUsage.strength} max={creationUsage.strengthLimit} label="Erstellung" mode={mode} />
               <div className="flex-grow">
@@ -556,7 +541,7 @@ export function CreationView() {
             <div className="bg-flaeche p-5 rounded-karte border border-rahmen relative flex flex-col">
               <div className="flex justify-between items-center border-b border-gold pb-2 mb-2">
                 <h3 className="font-bold text-[17px] fantasy-font text-gold-hell truncate min-w-0">Schwächen</h3>
-                <button onClick={() => setShowWeaknessModal(true)} className="text-xs bg-erhoeht hover:bg-rahmen border border-gold px-2.5 py-1 rounded-knopf no-print font-bold text-schrift shrink-0 ml-2 transition-colors cursor-pointer ">+ Hinzufügen</button>
+                <Knopf art="sekundaer" onClick={() => setShowWeaknessModal(true)} className="text-xs font-bold shrink-0 ml-2">+ Hinzufügen</Knopf>
               </div>
               <div className="flex-grow">
                 <ItemList items={weaknessesList} onDelete={(idx) => removeListEntry('weakness', idx)} typeLabel="Schwächen" showCosts={false} mode={mode} />
@@ -569,7 +554,7 @@ export function CreationView() {
             <div className="bg-flaeche p-5 rounded-karte border border-rahmen relative flex flex-col">
               <div className="flex justify-between items-center border-b border-gold pb-2 mb-2">
                 <h3 className="font-bold text-[17px] fantasy-font text-gold-hell truncate min-w-0">Ressourcen</h3>
-                <button onClick={() => setShowResourceModal(true)} className="text-xs bg-erhoeht hover:bg-rahmen border border-gold px-2.5 py-1 rounded-knopf no-print font-bold text-schrift shrink-0 ml-2 transition-colors cursor-pointer ">+ Hinzufügen</button>
+                <Knopf art="sekundaer" onClick={() => setShowResourceModal(true)} className="text-xs font-bold shrink-0 ml-2">+ Hinzufügen</Knopf>
               </div>
               <PointDisplay current={creationUsage.resource} max={creationUsage.resourceLimit} label="Erstellung" mode={mode} />
               <div className="flex-grow">
@@ -579,7 +564,7 @@ export function CreationView() {
             <div className="bg-flaeche p-5 rounded-karte border border-rahmen relative flex flex-col">
               <div className="flex justify-between items-center border-b border-gold pb-2 mb-2">
                 <h3 className="font-bold text-[17px] fantasy-font text-gold-hell truncate min-w-0">Sprachen</h3>
-                <button onClick={() => setShowLanguageModal(true)} className="text-xs bg-erhoeht hover:bg-rahmen border border-gold px-2.5 py-1 rounded-knopf no-print font-bold text-schrift shrink-0 ml-2 transition-colors cursor-pointer ">+ Hinzufügen</button>
+                <Knopf art="sekundaer" onClick={() => setShowLanguageModal(true)} className="text-xs font-bold shrink-0 ml-2">+ Hinzufügen</Knopf>
               </div>
               <div className="flex-grow">
                 <ItemList items={languagesList} onDelete={(idx) => removeListEntry('language', idx)} typeLabel="Sprachen" showCosts mode={mode} />
@@ -625,7 +610,7 @@ export function CreationView() {
                                 <div className="text-leise no-print flex items-center gap-2">
                                   <span>{m.cost} EP</span>
                                   {canDeleteMastery && (
-                                    <button onClick={() => removeMasteryById(m.skill ?? '', m.id)} className="text-schaden hover:text-schaden font-bold px-1" title="Entfernen">×</button>
+                                    <Knopf art="gefahr" nurSymbol onClick={() => removeMasteryById(m.skill ?? '', m.id)} title="Entfernen" aria-label="Entfernen">×</Knopf>
                                   )}
                                 </div>
                               </div>
@@ -662,7 +647,7 @@ export function CreationView() {
                                 <div className="text-leise no-print flex items-center gap-2">
                                   <span title={s.isFree ? 'Gratis-Zauber (0 EP)' : `${spellEpCost} EP`}>{spellEpCost} EP</span>
                                   {canDeleteSpell && (
-                                    <button onClick={() => removeSpellByObj(s)} className="text-schaden hover:text-schaden font-bold px-1" title="Entfernen">×</button>
+                                    <Knopf art="gefahr" nurSymbol onClick={() => removeSpellByObj(s)} title="Entfernen" aria-label="Entfernen">×</Knopf>
                                   )}
                                 </div>
                               </div>

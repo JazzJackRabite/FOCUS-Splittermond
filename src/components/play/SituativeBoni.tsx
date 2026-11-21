@@ -1,3 +1,4 @@
+import { Wahlknopf } from '../../fundament';
 import React, { useContext, useMemo, useState } from 'react';
 import { Sparkles } from 'lucide-react';
 import { CharacterContext } from '../../context/CharacterContext';
@@ -55,15 +56,12 @@ export const SituativeBoni: React.FC<{
             {verrechenbar.map(b => {
               const an = gewaehlt.has(b.id);
               return (
-                <button key={b.id} type="button" onClick={() => onToggle(b.id)} aria-pressed={an} title={b.beleg}
-                  className={`min-h-11 text-left px-2.5 py-1 rounded-knopf text-xs border transition-all cursor-pointer ${an
-                    ? 'bg-unverletzt-grund text-schrift border-unverletzt font-bold'
-                    : dunkel ? 'bg-seite text-schrift border-rahmen hover:bg-flaeche' : 'bg-flaeche text-schrift border-rahmen hover:bg-rahmen'}`}>
+                <Wahlknopf gewaehlt={an} ton="erholung" key={b.id} onClick={() => onToggle(b.id)} title={b.beleg} className="block text-xs px-2.5">
                   <span className="tabular-nums font-bold mr-1">{vorzeichen(b.wert!)}</span>
                   <span className="font-semibold">{b.quelle}</span>
                   {b.bedingung && <span className={an ? 'text-schrift' : 'opacity-75'}> – {b.bedingung}</span>}
                   {!b.bedingung && <span className={an ? 'text-schrift' : 'opacity-75'}> – {b.text}</span>}
-                </button>
+                </Wahlknopf>
               );
             })}
           </div>
@@ -131,14 +129,11 @@ export const ZauberAnpassungen: React.FC<{
             {waehlbar.map(a => {
               const an = gewaehlt.has(a.id);
               return (
-                <button key={a.id} type="button" onClick={() => onToggle(a.id)} aria-pressed={an} title={a.beleg}
-                  className={`min-h-11 text-left px-2.5 py-1 rounded-knopf text-xs border transition-all cursor-pointer ${an
-                    ? 'bg-unverletzt-grund text-schrift border-unverletzt font-bold'
-                    : 'bg-flaeche text-schrift border-rahmen hover:bg-rahmen'}`}>
+                <Wahlknopf gewaehlt={an} ton="erholung" mittig key={a.id} onClick={() => onToggle(a.id)} title={a.beleg} className="text-xs">
                   <span className="tabular-nums font-bold mr-1">{a.texte.join(', ')}</span>
                   <span className="font-semibold">{a.quelle}</span>
                   {a.bedingungen.length > 0 && <span className={an ? 'text-schrift' : 'opacity-75'}> – {a.bedingungen.join('; ')}</span>}
-                </button>
+                </Wahlknopf>
               );
             })}
           </div>

@@ -95,9 +95,9 @@ describe('TakeDamageModal (GRW S. 162-165 & S. 81)', () => {
     // Select Betäubung
     fireEvent.click(screen.getByRole('button', { name: /Betäubung/i }));
 
-    // Toggle condition Blutend
-    const blutendCheckbox = screen.getByLabelText(/Blutend/i);
-    fireEvent.click(blutendCheckbox);
+    // Zustand Blutend aus der Liste der Zustände hinzufügen
+    fireEvent.change(screen.getByDisplayValue('Angsterfüllt'), { target: { value: 'Blutend' } });
+    fireEvent.click(screen.getByRole('button', { name: /\+ Zustand/i }));
 
     // Enter note
     const noteInput = screen.getByPlaceholderText(/z\. B\. Ork-Krieger Kriegsaxt/i);

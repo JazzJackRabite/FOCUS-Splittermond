@@ -1,6 +1,5 @@
-import { Dialogfenster, Dialoghintergrund } from '../../fundament';
+import { Dialogfenster, Dialoghintergrund, Knopf, Dialog, Wahlknopf } from '../../fundament';
 import React, { useState, useMemo } from 'react';
-import { Knopf, Dialog } from '../../fundament';
 import {
   History,
   ChevronDown,
@@ -233,22 +232,13 @@ export const AdvancementLog: React.FC<AdvancementLogProps> = ({
 
         <div className="flex items-center gap-2">
           {onUndo && (
-            <button
-              onClick={onUndo}
-              disabled={!canUndo}
-              className={`min-h-11 flex items-center gap-1 px-2.5 py-1.5 rounded-knopf text-xs font-bold transition border ${
-                canUndo
-                  ? 'bg-erhoeht text-schrift hover:bg-rahmen border-gold cursor-pointer active:scale-95'
-                  : 'bg-rahmen text-schrift border-rahmen cursor-not-allowed opacity-60'
-              }`}
+            <Knopf art="sekundaer" onClick={onUndo} disabled={!canUndo} className="text-xs font-bold"
               title={
                 canUndo
                   ? 'Letztes Ereignis rückgängig machen (Berechnungen zurücksetzen & Protokolleintrag löschen)'
                   : 'Kein Ereignis zum Rückgängigmachen vorhanden'
-              }
-            >
-              <RotateCcw size={14} /> Rückgängig
-            </button>
+              }><RotateCcw size={14} /> Rückgängig
+            </Knopf>
           )}
           <Knopf art="sekundaer"
             onClick={() => setShowXpModal(true)}
@@ -325,17 +315,9 @@ export const AdvancementLog: React.FC<AdvancementLogProps> = ({
                   { id: 'other', label: 'Sonstiges' },
                 ] as const
               ).map((cat) => (
-                <button
-                  key={cat.id}
-                  onClick={() => setFilterCategory(cat.id)}
-                  className={`min-h-11 px-2.5 py-1 text-xs rounded-full font-medium transition-all ${
-                    filterCategory === cat.id
-                      ? 'bg-erhoeht text-schrift '
-                      : 'bg-erhoeht text-schrift hover:bg-rahmen border border-rahmen'
-                  }`}
-                >
+                <Wahlknopf gewaehlt={filterCategory === cat.id} mittig key={cat.id} onClick={() => setFilterCategory(cat.id)} className="text-xs rounded-full font-medium">
                   {cat.label}
-                </button>
+                </Wahlknopf>
               ))}
             </div>
 

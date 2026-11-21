@@ -1,7 +1,7 @@
 /** Gemeinsame Teile der Assistenten-Schritte: Erklärtext, Zwischentitel, Wahlkarte, Übersicht. */
 import React from 'react';
 import { Check } from 'lucide-react';
-import { Abschnittstitel, Marke } from '../../../fundament';
+import { Abschnittstitel, Marke, Wahlknopf } from '../../../fundament';
 import { Werte, Hinweise } from '../Wertekasten';
 import { artInfo, begleiterAnsicht } from '../ansicht';
 import type { Schritt, SchrittProps } from './typen';
@@ -14,16 +14,14 @@ export const Titel3: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 export const Wahlkarte: React.FC<{
   gewaehlt: boolean; onClick: () => void; titel: string; text?: React.ReactNode; symbol?: React.ReactNode; disabled?: boolean; hinweis?: string;
 }> = ({ gewaehlt, onClick, titel, text, symbol, disabled, hinweis }) => (
-  <button type="button" onClick={onClick} disabled={disabled} aria-pressed={gewaehlt}
-    className={`text-left min-h-11 w-full rounded-karte border p-4 transition-colors flex gap-3 items-start font-text ${
-      gewaehlt ? 'border-gold bg-erhoeht' : 'border-rahmen bg-flaeche hover:border-gold hover:bg-erhoeht'} disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-rahmen`}>
+  <Wahlknopf gewaehlt={gewaehlt} mittig onClick={onClick} disabled={disabled} className="w-full">
     {symbol && <span className="text-gold shrink-0 mt-0.5" aria-hidden>{symbol}</span>}
     <span className="min-w-0 flex-1 space-y-1">
       <span className="flex items-center gap-2 font-bold text-schrift text-[15px]">{titel}{gewaehlt && <Check size={16} className="text-gold" aria-hidden />}</span>
       {text && <span className="block text-sm text-leise">{text}</span>}
       {hinweis && <span className="block text-xs text-leise italic">{hinweis}</span>}
     </span>
-  </button>
+  </Wahlknopf>
 );
 
 /** Letzter Schritt jeder Art: Werte, Kurzangaben und offene Hinweise vor dem Erstellen */

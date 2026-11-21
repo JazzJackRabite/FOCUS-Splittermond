@@ -1,6 +1,6 @@
 import { fokusDurchZustaende, mitZustaenden, zustandsErklaerung, zustandswerte } from '../../regelwerk/zustandswerte';
 import { alleZustaende, zustandHatStufe, zustandQuelle } from '../../regelwerk/zustaende';
-import { Rauten, Knopf } from '../../fundament';
+import { Rauten, Knopf, Wahlknopf } from '../../fundament';
 import React, { useState, useMemo } from 'react';
 import {
   AlertTriangle,
@@ -547,19 +547,10 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                     >
                       <span>Zustände</span>
                     </Knopf>
-                    <button
-                      type="button"
-                      onClick={() => setShowMinimalConditionPicker((prev) => !prev)}
-                      className={`w-4.5 h-4.5 rounded-knopf text-[11px] font-bold flex items-center justify-center transition-all cursor-pointer border ${
-                        showMinimalConditionPicker
-                          ? 'border-gold bg-gold text-seite '
-                          : 'border-rahmen bg-erhoeht hover:border-gold text-schrift hover:text-gold'
-                      }`}
-                      title={showMinimalConditionPicker ? 'Schnellmenü schließen' : 'Zustand schnell hinzufügen'}
-                      aria-label="Zustand hinzufügen"
-                    >
+                    <Wahlknopf gewaehlt={showMinimalConditionPicker} mittig className="w-11" onClick={() => setShowMinimalConditionPicker((prev) => !prev)} title={showMinimalConditionPicker ? 'Schnellmenü schließen' : 'Zustand schnell hinzufügen'}
+                      aria-label="Zustand hinzufügen">
                       {showMinimalConditionPicker ? '✕' : '+'}
-                    </button>
+                    </Wahlknopf>
                   </div>
                   <span className="text-[11px] text-leise font-semibold">
                     {conditions.length} aktiv
@@ -585,17 +576,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                       {['Liegend', 'Benommen', 'Erschöpft', 'Blutend', 'Brennend', 'Geblendet', 'Bewusstlos'].map((key) => {
                         const existing = conditions.find((c) => c.key === key);
                         return (
-                          <button
-                            key={key}
-                            type="button"
-                            onClick={() => handleAddQuickCondition(key)}
-                            className={`min-h-11 px-2 py-0.5 rounded-full text-[11px] font-medium border transition-all cursor-pointer flex items-center gap-1 ${
-                              existing
-                                ? 'bg-erschoepft-grund border-gold text-schrift hover:bg-erschoepft-grund'
-                                : 'bg-erhoeht border-rahmen text-schrift hover:border-gold hover:text-schrift'
-                            }`}
-                            title={`${existing ? `${key} aktiv (Klick erhöht Stufe)` : `${key} hinzufügen`}\nQuelle: ${zustandQuelle(key)}`}
-                          >
+                          <Wahlknopf gewaehlt={!!existing} mittig key={key} onClick={() => handleAddQuickCondition(key)} title={`${existing ? `${key} aktiv (Klick erhöht Stufe)` : `${key} hinzufügen`}\nQuelle: ${zustandQuelle(key)}`} className="rounded-full text-[11px] font-medium">
                             <span>{key}</span>
                             {existing && existing.level && (
                               <span className="text-gold tabular-nums font-bold text-[11px]">
@@ -603,7 +584,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                               </span>
                             )}
                             <span className="text-gold text-[11px] font-bold">+</span>
-                          </button>
+                          </Wahlknopf>
                         );
                       })}
                     </div>
@@ -735,17 +716,12 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                           ✕
                         </div>
                       ))}
-                    <button
-                      type="button"
-                      onClick={() => {
+                    <Knopf nurSymbol onClick={() => {
                         dispatch({ type: 'PLAY_ADD_TEMP_HP', payload: { amount: 1 } });
                         toast.success('+1 temporärer LP');
-                      }}
-                      title="+1 temporären LP hinzufügen"
-                      className="w-5.5 h-5.5 sm:w-6 sm:h-6 rounded-knopf border border-dashed border-temporaer hover:border-temporaer text-temporaer flex items-center justify-center text-xs font-bold hover:bg-temporaer-grund transition-all cursor-pointer"
-                    >
+                      }} title="+1 temporären LP hinzufügen" aria-label="+1 temporären LP hinzufügen">
                       +
-                    </button>
+                    </Knopf>
                   </div>
                 </div>
               )}

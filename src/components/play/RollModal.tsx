@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo, useContext } from 'react';
 import { X, Sparkles, RotateCw, Zap, Check } from 'lucide-react';
 import DiceIcon from '../ui/DiceIcon';
-import { Dialog, Knopf } from '../../fundament';
+import { Dialog, Knopf, Wahlknopf } from '../../fundament';
 import type { RollEntry } from './DiceLog';
 import { generateId } from '../../utils/id';
 import type { StatusCondition, ChanneledSpell } from '../../types';
@@ -373,17 +373,7 @@ export const RollModal: React.FC<RollModalProps> = ({
               {spellBonuses.map((b) => {
                 const isActive = activeSpellBonusIds.has(b.id);
                 return (
-                  <button
-                    key={b.id}
-                    type="button"
-                    onClick={() => toggleSpellBonus(b.id)}
-                    title={`${b.description} (Klicken zum ${isActive ? 'Abwählen' : 'Aktivieren'})`}
-                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-knopf text-xs font-bold transition-all border cursor-pointer ${
-                      isActive
-                        ? 'bg-magie-grund text-schrift border-magie hover:bg-magie hover:text-seite active:scale-98'
-                        : 'bg-flaeche text-leise border-rahmen line-through hover:opacity-100'
-                    }`}
-                  >
+                  <Wahlknopf gewaehlt={isActive} mittig key={b.id} onClick={() => toggleSpellBonus(b.id)} title={`${b.description} (Klicken zum ${isActive ? 'Abwählen' : 'Aktivieren'})`} className="text-xs font-bold">
                     {isActive ? (
                       <Check size={12} strokeWidth={3} className="shrink-0 text-magie" />
                     ) : (
@@ -397,7 +387,7 @@ export const RollModal: React.FC<RollModalProps> = ({
                     >
                       +{b.bonus}
                     </span>
-                  </button>
+                  </Wahlknopf>
                 );
               })}
             </div>
@@ -431,20 +421,14 @@ export const RollModal: React.FC<RollModalProps> = ({
                 const isWound = m.source === 'wound' || m.id === 'wound_penalty';
                 const isBehinderung = m.source === 'behinderung' || m.id === 'behinderung';
                 return (
-                  <button
+                  <Wahlknopf
                     key={m.id}
-                    type="button"
+                    gewaehlt={m.active}
+                    ton={isWound || isBehinderung ? 'gefahr' : 'gold'}
+                    mittig
                     onClick={() => toggleModifier(m.id)}
                     title={`${m.description || m.label} (Klicken zum ${m.active ? 'Abwählen' : 'Aktivieren'})`}
-                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-knopf text-xs font-bold transition-all border cursor-pointer ${
-                      m.active
-                        ? isWound
-                          ? 'bg-schaden-grund text-schrift border-schaden hover:bg-schaden-grund hover:text-schrift active:scale-98'
-                          : isBehinderung
-                            ? 'bg-schaden-grund text-schrift border-schaden hover:bg-schaden-grund hover:text-schrift active:scale-98'
-                            : 'bg-erhoeht text-schrift border-rahmen hover:bg-rahmen active:scale-98'
-                        : 'bg-flaeche text-leise border-rahmen line-through hover:opacity-100'
-                    }`}
+                    className={`px-2.5 text-xs font-bold ${m.active ? '' : 'text-leise line-through'}`}
                   >
                     {m.active ? (
                       <Check
@@ -467,7 +451,7 @@ export const RollModal: React.FC<RollModalProps> = ({
                     >
                       {m.malus > 0 ? `+${m.malus}` : m.malus}
                     </span>
-                  </button>
+                  </Wahlknopf>
                 );
               })}
             </div>
@@ -520,18 +504,9 @@ export const RollModal: React.FC<RollModalProps> = ({
               { key: 'safe', label: 'Sicherheit' },
               { key: 'risk', label: 'Risiko' },
             ] as { key: RollType; label: string }[]).map(({ key, label }) => (
-              <button
-                key={key}
-                type="button"
-                onClick={() => setRollType(key)}
-                className={`min-h-11 flex-1 py-2 text-sm font-bold rounded-knopf border transition-all ${
-                  rollType === key
-                    ? 'bg-erhoeht text-schrift border-rahmen '
-                    : 'bg-flaeche text-schrift border-rahmen hover:bg-rahmen'
-                }`}
-              >
+              <Wahlknopf gewaehlt={rollType === key} mittig key={key} onClick={() => setRollType(key)} className="flex-1 text-sm font-bold">
                 {label}
-              </button>
+              </Wahlknopf>
             ))}
           </div>
           <p className="text-xs text-leise mt-1">
@@ -607,8 +582,8 @@ export const RollModal: React.FC<RollModalProps> = ({
 
               <div className="flex flex-col sm:flex-row gap-2">
                 {/* Option 1: +3 Bonus auf diese Probe */}
-                <button
-                  type="button"
+                <Knopf
+                  art={splinterBonusSpent ? 'sekundaer' : 'primaer'}
                   onClick={handleSplinterBonus}
                   disabled={splitterPoints < 1 || splinterBonusSpent}
                   title={
@@ -618,37 +593,22 @@ export const RollModal: React.FC<RollModalProps> = ({
                       ? 'Keine Splitterpunkte mehr verfügbar'
                       : '1 SP einsetzen für +3 auf dieses Würfelergebnis'
                   }
-                  className={`min-h-11 flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-knopf text-xs font-bold transition-all border ${
-                    splinterBonusSpent
-                      ? 'bg-erhoeht text-schrift border-gold opacity-90 cursor-default'
-                      : splitterPoints >= 1
-                      ? 'bg-gold hover:bg-gold-hell hover:text-seite text-seite border-erschoepft active:scale-98'
-                      : 'bg-seite text-schrift border-rahmen cursor-not-allowed dark-theme-slot-inactive'
-                  }`}
+                  className="flex-1 text-xs font-bold"
                 >
                   <Sparkles size={14} />
                   <span>{splinterBonusSpent ? '✓ +3 SP aktiv' : 'Splitterpunkt: +3 (1 SP)'}</span>
-                </button>
+                </Knopf>
 
                 {/* Option 2: Wurf wiederholen */}
-                <button
-                  type="button"
-                  onClick={handleSplinterReroll}
-                  disabled={splitterPoints < 1}
+                <Knopf onClick={handleSplinterReroll} disabled={splitterPoints < 1}
                   title={
                     splitterPoints < 1
                       ? 'Keine Splitterpunkte mehr verfügbar'
                       : '1 SP einsetzen um den Wurf komplett neu zu würfeln'
-                  }
-                  className={`min-h-11 flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-knopf text-xs font-bold transition-all border ${
-                    splitterPoints >= 1
-                      ? 'bg-erhoeht hover:bg-rahmen text-schrift border-rahmen active:scale-98'
-                      : 'bg-seite text-leise border-rahmen cursor-not-allowed dark-theme-slot-inactive'
-                  }`}
-                >
+                  } className="flex-1 text-xs font-bold">
                   <RotateCw size={14} />
                   <span>Neuwurf (1 SP){splinterRerollCount > 0 ? ` (${splinterRerollCount}×)` : ''}</span>
-                </button>
+                </Knopf>
               </div>
             </div>
             )}

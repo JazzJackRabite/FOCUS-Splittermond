@@ -160,26 +160,15 @@ export const ChanneledSpellsTracker: React.FC<ChanneledSpellsTrackerProps> = ({
                   <Clock size={13} className="text-gold shrink-0" />
                   <span className="text-leise text-[11px] font-medium">Runde:</span>
                   <div className="flex items-center gap-1 bg-flaeche border border-rahmen rounded-knopf px-1 py-0.5">
-                    <button
-                      type="button"
-                      disabled={currentRound <= 1}
-                      onClick={() => onUpdateSpell?.(spell.id, { activeRounds: Math.max(1, currentRound - 1) })}
-                      className="w-4 h-4 flex items-center justify-center text-schrift hover:bg-rahmen rounded-knopf disabled:opacity-30"
-                      title="Runde verringern"
-                    >
+                    <Knopf nurSymbol disabled={currentRound <= 1} onClick={() => onUpdateSpell?.(spell.id, { activeRounds: Math.max(1, currentRound - 1) })} title="Runde verringern" aria-label="Runde verringern">
                       <Minus size={10} />
-                    </button>
+                    </Knopf>
                     <span className="font-bold text-xs tabular-nums px-1 min-w-[1.2rem] text-center text-schrift">
                       {currentRound}
                     </span>
-                    <button
-                      type="button"
-                      onClick={() => onUpdateSpell?.(spell.id, { activeRounds: currentRound + 1 })}
-                      className="w-4 h-4 flex items-center justify-center text-schrift hover:bg-rahmen rounded-knopf"
-                      title="+1 Runde weiter"
-                    >
+                    <Knopf nurSymbol onClick={() => onUpdateSpell?.(spell.id, { activeRounds: currentRound + 1 })} title="+1 Runde weiter" aria-label="+1 Runde weiter">
                       <Plus size={10} />
-                    </button>
+                    </Knopf>
                   </div>
                 </div>
 
@@ -187,26 +176,15 @@ export const ChanneledSpellsTracker: React.FC<ChanneledSpellsTrackerProps> = ({
                 <div className="flex items-center gap-1.5">
                   <span className="text-leise text-[11px] font-medium">Ticks:</span>
                   <div className="flex items-center gap-1 bg-flaeche border border-rahmen rounded-knopf px-1 py-0.5">
-                    <button
-                      type="button"
-                      disabled={currentTicks <= 0}
-                      onClick={() => onUpdateSpell?.(spell.id, { activeTicks: Math.max(0, currentTicks - 1) })}
-                      className="w-4 h-4 flex items-center justify-center text-schrift hover:bg-rahmen rounded-knopf disabled:opacity-30"
-                      title="Tick verringern"
-                    >
+                    <Knopf nurSymbol disabled={currentTicks <= 0} onClick={() => onUpdateSpell?.(spell.id, { activeTicks: Math.max(0, currentTicks - 1) })} title="Tick verringern" aria-label="Tick verringern">
                       <Minus size={10} />
-                    </button>
+                    </Knopf>
                     <span className="font-bold text-xs tabular-nums px-1 min-w-[1.2rem] text-center text-schrift">
                       {currentTicks}
                     </span>
-                    <button
-                      type="button"
-                      onClick={() => onUpdateSpell?.(spell.id, { activeTicks: currentTicks + 1 })}
-                      className="w-4 h-4 flex items-center justify-center text-schrift hover:bg-rahmen rounded-knopf"
-                      title="+1 Tick"
-                    >
+                    <Knopf nurSymbol onClick={() => onUpdateSpell?.(spell.id, { activeTicks: currentTicks + 1 })} title="+1 Tick" aria-label="+1 Tick">
                       <Plus size={10} />
-                    </button>
+                    </Knopf>
                   </div>
                   <Knopf
                     onClick={() => onUpdateSpell?.(spell.id, { activeTicks: currentTicks + 3 })}

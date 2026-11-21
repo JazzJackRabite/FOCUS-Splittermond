@@ -1,6 +1,5 @@
-import { Dialogfenster, Dialoghintergrund } from '../../fundament';
+import { Dialogfenster, Dialoghintergrund, Knopf, Dialog } from '../../fundament';
 import React, { useState, useEffect } from 'react';
-import { Knopf, Dialog } from '../../fundament';
 import { Sun, Moon, RotateCcw, Settings, Heart, Sparkles, X, Check, Clock } from 'lucide-react';
 import type { ItemEntry, Mastery } from '../../types';
 import { ruheregeln, ruhephasenRegeneration, ruhewirkungen, type Ruhewirkung } from '../../regelwerk/spielwirkungen';
@@ -346,14 +345,9 @@ export const RestSection: React.FC<RestSectionProps> = ({
                   </span>
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={() => setActiveModal(null)}
-                className="p-1.5 rounded-knopf text-schrift hover:text-schrift hover:bg-rahmen transition-colors cursor-pointer"
-                title="Schließen"
-              >
+              <Knopf nurSymbol onClick={() => setActiveModal(null)} title="Schließen" aria-label="Schließen">
                 <X size={20} />
-              </button>
+              </Knopf>
             </div>
 
             {/* Modal Content */}

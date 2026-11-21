@@ -1,7 +1,6 @@
-import { alleZustaende, zustandHatStufe, zustandQuelle } from '../../regelwerk/zustaende';
-import { Dialogfenster, Dialoghintergrund } from '../../fundament';
+import { splitterSchadensminderung, standardGesundheitsstufen, zustaendeFuerSchaden } from '../../regelwerk/schadenUndHeilung';
+import { Dialogfenster, Dialoghintergrund, Knopf, Wahlknopf, Dialog } from '../../fundament';
 import React, { useState, useMemo } from 'react';
-import { Knopf, Dialog } from '../../fundament';
 import { Flame, Shield, Sparkles, X, Plus, Minus, AlertTriangle, Heart, Check } from 'lucide-react';
 import type { HealthSlot } from '../../types';
 
@@ -26,22 +25,8 @@ export interface TakeDamageModalProps {
   }) => void;
 }
 
-const COMMON_DAMAGE_CONDITIONS: Array<{ key: string; hasLevel: boolean; maxLevel?: number; label: string }> = [
-  { key: 'Blutend', hasLevel: true, maxLevel: 2, label: 'Blutend (Schnitt/Stich)' },
-  { key: 'Brennend', hasLevel: true, maxLevel: 3, label: 'Brennend (Feuerschaden)' },
-  { key: 'Benommen', hasLevel: true, maxLevel: 2, label: 'Benommen (Wucht/Schock)' },
-  { key: 'Liegend', hasLevel: false, label: 'Liegend (zu Boden geworfen)' },
-  { key: 'Erschöpft', hasLevel: true, maxLevel: 3, label: 'Erschöpft (Kälte/Ausdauer)' },
-  { key: 'Vergiftet', hasLevel: false, label: 'Vergiftet (nur Markierung, kein GRW-Zustand)' },
-];
-
-const GRW_STUFEN = [
-  { name: 'Unverletzt', wundabzug: 0 }, { name: 'Angeschlagen', wundabzug: -1 }, { name: 'Verletzt', wundabzug: -2 },
-  { name: 'Schwer verletzt', wundabzug: -4 }, { name: 'Todgeweiht', wundabzug: -8 },
-];
-
 export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
-  stufen = GRW_STUFEN,
+  stufen: stufenProp,
   begleiter,
   onClose,
   maxLP,
@@ -51,6 +36,9 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
   currentHealthSlots,
   onApplyDamage,
 }) => {
+  const stufen = useMemo(() => stufenProp ?? standardGesundheitsstufen(), [stufenProp]);
+  const splitter = useMemo(() => splitterSchadensminderung(), []);
+  const zustaende = useMemo(() => zustaendeFuerSchaden(), []);
   // Raw incoming damage
   const [rawDamage, setRawDamage] = useState<number>(5);
 
@@ -61,20 +49,10 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
   const [applySR, setApplySR] = useState<boolean>(derivedSR > 0);
   const [effectiveSR, setEffectiveSR] = useState<number>(derivedSR);
 
-  // Splitterpunkt: Schaden um 5 Punkte reduzieren (GRW S. 81)
+  // Splitterpunkt: Schadensminderung (Splittergaben, Wert aus dem Paket)
   const [useSplitter, setUseSplitter] = useState<boolean>(false);
 
-  // Zustände durch Schaden (GRW S. 168–169)
-  const [activeConditions, setActiveConditions] = useState<Record<string, { active: boolean; level: number }>>({
-    Blutend: { active: false, level: 1 },
-    Brennend: { active: false, level: 1 },
-    Benommen: { active: false, level: 1 },
-    Liegend: { active: false, level: 1 },
-    Erschöpft: { active: false, level: 1 },
-    Vergiftet: { active: false, level: 1 },
-  });
-
-  const [extraCondition, setExtraCondition] = useState<string>('Geblendet');
+  const [extraCondition, setExtraCondition] = useState<string>(() => zustaende[0]?.name ?? '');
   const [extraLevel, setExtraLevel] = useState<number>(1);
   const [extraConditionsList, setExtraConditionsList] = useState<Array<{ key: string; level?: number }>>([]);
 
@@ -89,12 +67,12 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
 
   const finalDamage = useMemo(() => {
     let dmg = damageAfterSR;
-    if (useSplitter && currentSplitterPoints > 0) {
-      // GRW S. 81: Schaden aus einer Quelle um 5 Punkte reduzieren (1× pro Schadensquelle)
-      dmg = Math.max(0, dmg - 5);
+    if (splitter && useSplitter && currentSplitterPoints > 0) {
+      // Splittergabe Schadensminderung: Schaden aus einer Quelle senken (einmal je Schadensquelle)
+      dmg = Math.max(0, dmg - splitter.punkte);
     }
     return Math.max(0, dmg);
-  }, [damageAfterSR, useSplitter, currentSplitterPoints]);
+  }, [damageAfterSR, useSplitter, currentSplitterPoints, splitter]);
 
   // Temp HP absorption estimation
   const absorbedByTemp = useMemo(() => {
@@ -157,29 +135,12 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
   }, [currentHealthSlots, maxLP, damageHittingHealth, damageKind, stufen]);
 
   // Handlers
-  const handleToggleCommonCondition = (key: string) => {
-    setActiveConditions((prev) => ({
-      ...prev,
-      [key]: {
-        ...prev[key],
-        active: !prev[key]?.active,
-      },
-    }));
-  };
-
-  const handleLevelChange = (key: string, lvl: number) => {
-    setActiveConditions((prev) => ({
-      ...prev,
-      [key]: {
-        ...prev[key],
-        level: Math.max(1, lvl),
-      },
-    }));
-  };
+  const gewaehlterZustand = zustaende.find((x) => x.name === extraCondition);
 
   const handleAddExtraCondition = () => {
     if (!extraCondition) return;
-    const hasLvl = zustandHatStufe(extraCondition);
+    const z = zustaende.find((x) => x.name === extraCondition);
+    const hasLvl = !!z?.mitStufe;
     setExtraConditionsList((prev) => [
       ...prev,
       { key: extraCondition, level: hasLvl ? extraLevel : undefined },
@@ -195,24 +156,12 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
 
     const selectedConds: Array<{ key: string; level?: number }> = [];
 
-    // Collect common active conditions
-    Object.entries(activeConditions).forEach(([key, val]) => {
-      if (val.active) {
-        const condDef = COMMON_DAMAGE_CONDITIONS.find((c) => c.key === key);
-        selectedConds.push({
-          key,
-          level: condDef?.hasLevel ? val.level : undefined,
-        });
-      }
-    });
-
-    // Add extra conditions
     selectedConds.push(...extraConditionsList);
 
     onApplyDamage({
       kind: damageKind,
       amount: finalDamage,
-      spendSplitter: !begleiter && useSplitter && currentSplitterPoints > 0,
+      spendSplitter: !begleiter && !!splitter && useSplitter && currentSplitterPoints > 0,
       selectedConditions: begleiter ? [] : selectedConds,
       note: damageNote.trim() || undefined,
     });
@@ -238,14 +187,7 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
               </p>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-knopf border border-rahmen bg-erhoeht text-schrift hover:border-gold transition-colors"
-            title="Schließen" aria-label="Schließen"
-          >
-            <X size={20} />
-          </button>
+          <Knopf nurSymbol onClick={onClose} title="Schließen" aria-label="Schließen"><X size={20} /></Knopf>
         </div>
 
         {/* Scrollable Body */}
@@ -307,55 +249,31 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
             </label>
             <div className="grid grid-cols-3 gap-2">
               {/* Echter Schaden */}
-              <button
-                type="button"
-                onClick={() => setDamageKind('consumed')}
-                className={`min-h-11 p-2 rounded-knopf border text-left transition-all cursor-pointer ${
-                  damageKind === 'consumed'
-                    ? 'bg-schaden-grund border-schaden text-schrift'
-                    : 'bg-seite border-rahmen text-schrift hover:bg-seite'
-                }`}
-              >
+              <Wahlknopf gewaehlt={damageKind === 'consumed'} ton="gefahr" onClick={() => setDamageKind('consumed')}>
                 <div className="flex items-center justify-between mb-0.5">
                   <span className="font-bold text-xs">Echter Schaden</span>
                   <span className="text-schaden font-bold tabular-nums text-xs">■</span>
                 </div>
                 <div className="text-[11px] text-leise leading-tight">Wunden, Stürze, Waffen</div>
-              </button>
+              </Wahlknopf>
 
               {/* Betäubungsschaden */}
-              <button
-                type="button"
-                onClick={() => setDamageKind('exhausted')}
-                className={`min-h-11 p-2 rounded-knopf border text-left transition-all cursor-pointer ${
-                  damageKind === 'exhausted'
-                    ? 'bg-erschoepft-grund border-erschoepft text-schrift'
-                    : 'bg-seite border-rahmen text-schrift hover:bg-seite'
-                }`}
-              >
+              <Wahlknopf gewaehlt={damageKind === 'exhausted'} onClick={() => setDamageKind('exhausted')}>
                 <div className="flex items-center justify-between mb-0.5">
                   <span className="font-bold text-xs">Betäubung</span>
                   <span className="text-gold font-bold tabular-nums text-xs">/</span>
                 </div>
                 <div className="text-[11px] text-leise leading-tight">Stumpfe Hiebe, Schock</div>
-              </button>
+              </Wahlknopf>
 
               {/* Kanalisierter Schaden */}
-              <button
-                type="button"
-                onClick={() => setDamageKind('channeled')}
-                className={`min-h-11 p-2 rounded-knopf border text-left transition-all cursor-pointer ${
-                  damageKind === 'channeled'
-                    ? 'bg-flaeche border-kanalisiert text-schrift'
-                    : 'bg-seite border-rahmen text-schrift hover:bg-seite'
-                }`}
-              >
+              <Wahlknopf gewaehlt={damageKind === 'channeled'} onClick={() => setDamageKind('channeled')}>
                 <div className="flex items-center justify-between mb-0.5">
                   <span className="font-bold text-xs">Kanalisiert</span>
                   <span className="text-kanalisiert font-bold tabular-nums text-xs">X</span>
                 </div>
                 <div className="text-[11px] text-leise leading-tight">Magische Bindung</div>
-              </button>
+              </Wahlknopf>
             </div>
           </div>
 
@@ -400,8 +318,8 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
           </div>
 
           {!begleiter && (<>
-          {/* 4. Splitterpunkt: Schaden um 5 reduzieren (GRW S. 81) */}
-          <div className="bg-seite border border-rahmen rounded-knopf p-3 sm:p-3.5 space-y-2">
+          {/* 4. Splitterpunkt: Schadensminderung (Wert aus dem Paket) */}
+          {splitter && <div className="bg-seite border border-rahmen rounded-knopf p-3 sm:p-3.5 space-y-2">
             <div className="flex items-center justify-between">
               <label
                 className={`text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 ${
@@ -416,7 +334,7 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
                   className="rounded-knopf text-gold focus:ring-0 cursor-pointer w-4 h-4 disabled:opacity-40"
                 />
                 <Sparkles size={14} className={currentSplitterPoints > 0 ? 'text-gold' : 'text-leise'} />
-                <span>4. Splitterpunkt: Schaden um 5 reduzieren</span>
+                <span>4. Splitterpunkt: Schaden um {splitter.punkte} reduzieren</span>
               </label>
               <span
                 className={`text-[11px] font-bold px-2 py-0.5 rounded-knopf border ${
@@ -431,13 +349,13 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
 
             {useSplitter && currentSplitterPoints > 0 && (
               <div className="text-[11px] text-schrift bg-flaeche px-2.5 py-1.5 rounded-knopf border border-rahmen flex items-center justify-between">
-                <span>GRW S. 81: Schaden aus einer Quelle um 5 Punkte reduzieren (1 SP)</span>
+                <span>{splitter.quelle}: {splitter.text} (1 SP)</span>
                 <span className="text-gold font-bold">
-                  {damageAfterSR} → {finalDamage} Schaden (−{Math.min(5, damageAfterSR)})
+                  {damageAfterSR} → {finalDamage} Schaden (−{Math.min(splitter.punkte, damageAfterSR)})
                 </span>
               </div>
             )}
-          </div>
+          </div>}
 
           {/* 5. Temporäre Lebenspunkte */}
           {activeTempHP > 0 && (
@@ -460,57 +378,6 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
               5. Zustände durch den Treffer (GRW S. 168–169)
             </label>
 
-            {/* Quick condition toggles */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {COMMON_DAMAGE_CONDITIONS.map((cond) => {
-                const isActive = activeConditions[cond.key]?.active;
-                const level = activeConditions[cond.key]?.level ?? 1;
-
-                return (
-                  <div
-                    key={cond.key}
-                    className={`rounded-knopf border p-2 transition-all flex flex-col justify-between ${
-                      isActive
-                        ? 'bg-erschoepft-grund border-gold text-schrift'
-                        : 'bg-seite border-rahmen text-schrift'
-                    }`}
-                  >
-                    <label className="flex items-center gap-1.5 cursor-pointer select-none">
-                      <input
-                        type="checkbox"
-                        checked={isActive}
-                        onChange={() => handleToggleCommonCondition(cond.key)}
-                        className="rounded-knopf text-gold focus:ring-0 cursor-pointer w-3.5 h-3.5"
-                      />
-                      <span className="text-xs font-bold truncate">{cond.key}</span>
-                    </label>
-
-                    {cond.hasLevel && isActive && (
-                      <div className="mt-1.5 pt-1.5 border-t border-erschoepft flex items-center justify-between">
-                        <span className="text-[11px] text-leise">Stufe:</span>
-                        <div className="flex items-center gap-1">
-                          {[1, 2, ...(cond.maxLevel && cond.maxLevel >= 3 ? [3] : [])].map((lvl) => (
-                            <button
-                              key={lvl}
-                              type="button"
-                              onClick={() => handleLevelChange(cond.key, lvl)}
-                              className={`w-5 h-5 rounded-knopf text-[11px] font-bold flex items-center justify-center cursor-pointer transition-colors ${
-                                level === lvl
-                                  ? 'bg-gold text-seite'
-                                  : 'bg-flaeche text-schrift hover:bg-erhoeht hover:text-schrift'
-                              }`}
-                            >
-                              {lvl}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
             {/* Additional condition dropdown */}
             <div className="pt-2 border-t border-rahmen flex items-center gap-2">
               <select
@@ -518,20 +385,24 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
                 onChange={(e) => setExtraCondition(e.target.value)}
                 className="bg-seite border border-rahmen rounded-knopf px-2 py-1 text-xs text-schrift font-medium focus:outline-none focus:border-gold flex-1 min-w-[120px]"
               >
-                {alleZustaende().map((cond) => (
-                  <option key={cond} value={cond} title={`Quelle: ${zustandQuelle(cond)}`}>
-                    {cond}
+                {zustaende.map((z) => (
+                  <option key={z.name} value={z.name} title={`Quelle: ${z.quelle}`}>
+                    {z.name}
                   </option>
                 ))}
               </select>
 
-              {zustandHatStufe(extraCondition) && (
+              {gewaehlterZustand?.mitStufe && (
                 <input
                   type="number"
                   min={1}
-                  max={6}
+                  max={gewaehlterZustand.hoechststufe}
+                  aria-label={`Stufe ${extraCondition}`}
                   value={extraLevel}
-                  onChange={(e) => setExtraLevel(Math.max(1, parseInt(e.target.value, 10) || 1))}
+                  onChange={(e) => {
+                    const n = Math.max(1, parseInt(e.target.value, 10) || 1);
+                    setExtraLevel(gewaehlterZustand.hoechststufe ? Math.min(gewaehlterZustand.hoechststufe, n) : n);
+                  }}
                   className="w-12 bg-seite border border-rahmen rounded-knopf px-1.5 py-1 text-center text-xs tabular-nums font-bold text-schrift focus:outline-none focus:border-gold"
                 />
               )}

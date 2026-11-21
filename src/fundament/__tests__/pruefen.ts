@@ -33,6 +33,18 @@ export function farbwerte(): Record<string, number> {
   return out;
 }
 
+/** Schaltflächen, die eine Ansicht selbst baut (`<button`) statt mit Knopf oder Wahlknopf, je Datei */
+export function eigeneKnoepfe(): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const p of dateien(SRC)) {
+    const r = rel(p);
+    if (!r.endsWith('.tsx') || r.startsWith('src/fundament/')) continue;
+    const n = (fs.readFileSync(p, 'utf8').match(/<button\b/g) ?? []).length;
+    if (n) out[r] = n;
+  }
+  return out;
+}
+
 /** Ordner mit Programmcode, in dem keine Regelnamen stehen sollen (src/data sind die eingebauten Listen – eigene Altlast) */
 const CODE = ['components', 'context', 'features', 'hooks', 'regelwerk', 'utils', 'fundament'];
 const REGELTYPEN = new Set(['zauber', 'meisterschaft', 'staerke']);

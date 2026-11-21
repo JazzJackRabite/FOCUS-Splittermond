@@ -808,6 +808,33 @@ die Grimoires), Dateiendung `.grim`. Das Grundregelwerk ist kein Grimoire; es bl
 - `write.py`: Ohne PDF beim Bau bleibt die volle Prüfsumme aus dem bisherigen Paket erhalten.
 - Tests: 439 grün mit allen Grimoires (5 übersprungen), 408 ohne Bücher; Prüfsuite regelpakete 0 Befunde; Build läuft.
 
+## Stand 33 (21.11.2026): Schaden und Heilung aus dem Paket, Härte, Bakebakeku, Schaltflächen aus den Bausteinen
+
+- **Schadensdialog** (`regelwerk/schadenUndHeilung.ts`): Gesundheitsstufen aus den Kernregeln, Schadensminderung durch
+  einen Splitterpunkt aus den Splittergaben (−5, GRW S. 81). Die feste Schnellauswahl „Blutend 1–2, Brennend 1–3,
+  Benommen 1–2, Vergiftet“ ist entfernt: Die Höchststufen standen in keinem Regeltext, „Vergiftet“ ist kein Zustand.
+  Zustände kommen aus der Liste der Pakete, eine Höchststufe nur, wo das Paket sie nennt (Geblendet 4).
+- **Heildialog:** „Erste Hilfe“ und „Wundversorgung“ (wählten Blutend automatisch ab, ohne Regelgrundlage im Paket)
+  sind durch „Heilkunde“ ersetzt (Auswirkungen aus der Fertigkeit als Hinweis); welche Zustände enden, wählt der
+  Spieltisch. „Erholung“ heißt jetzt Verschnaufpause, Dauer und Wirkung aus der Kernregel Heilung.
+- **Gefolge, Untote, Golems:** Die Altlasten-Zeile war überholt; alle Regelwerte kommen schon aus `strukturiert`.
+  Beide Zeilen sind aus der Altlasten-Tabelle gestrichen, die Regelquellen ergänzt.
+- **Härte** als Feld am Gegenstand (`hardness`): aus den Paketen für Waffen, Rüstungen, Schilde und Gegenstände,
+  im Inventar angezeigt und bearbeitbar, beim Relikt mit „Härte +1“ hochgerechnet (vorher nur Text). Der Rückfall
+  `src/data/equipment.ts` trägt die Härte der 79 GRW-Waffen und -Rüstungen mit.
+- **Bestiarium** (Datenseite `Werkzeuge/regelpakete/kreatur_varianten.py` + `.json`): Bakebakeku (Bestienmeister S. 48)
+  hatte nur Zuschläge zu Wareishi und keine Waffe; jetzt `werte_berechnet` (Zuschläge, Körper 20 / 2W6+5 / WGS 9 aus der
+  Zeilenfolge der PDF-Seite, Merkmale ersetzt, Zauber und Meisterschaften ergänzt). Weitere Lücken gibt es nur bei
+  Tieren aus Preislisten, deren Band keinen Wertekasten hat (GRW: Esel, Wach- oder Jagdhund; Mondstahlklingen u. a.
+  Pony, Äffchen, Sperberdrache); dafür steht nichts in den Büchern.
+- **Schaltflächen aus den Bausteinen:** neu `Wahlknopf` (auswählbare Karte, `aria-pressed`) und `Reiter` (Reiterleiste,
+  `role="tab"`). Rund 120 selbst gebaute `<button>` in Hauptnavigation, Spiel-, Kampf-, Inventar-, Erschaffungs- und
+  Begleiteransicht sowie allen Dialogen sind umgestellt (mindestens 44 Pixel hoch). Neue Prüfung: selbst gebaute
+  `<button>` je Datei stehen als Altlast (`knoepfe`) und dürfen nur weniger werden; übrig sind 6 in `PlaySharedVitals.tsx`
+  (LP-, Fokus- und Temp-LP-Kästchen, Zähler).
+- Tests: 448 grün mit allen Grimoires (5 übersprungen); Prüfsuite regelpakete 0 Befunde; Build läuft; im Browser geprüft
+  (Hauptnavigation, Schaden, Heilung, Einstellungen, Profile, Inventar, Angriff, Begleiter-Assistent).
+
 ## Google AI Studio
 
 Unverändert eine Vite-/React-App mit `metadata.json` im Wurzelordner; Import über „Import from GitHub“, Hosting über Cloud Run.

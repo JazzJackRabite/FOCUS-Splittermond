@@ -1,6 +1,5 @@
-import { Dialogfenster, Dialoghintergrund } from '../../fundament';
+import { Dialogfenster, Dialoghintergrund, Knopf, Dialog, Wahlknopf } from '../../fundament';
 import React, { useState, useMemo, useEffect, useId, useContext } from 'react';
-import { Knopf, Dialog } from '../../fundament';
 import {
   Sword,
   Shield,
@@ -569,27 +568,17 @@ export const AttackModal: React.FC<AttackModalProps> = ({
 
           <div className="flex items-center gap-2 shrink-0">
             {splitterpunkte > 0 && (
-              <button
-                type="button"
-                onClick={() => {
+              <Knopf onClick={() => {
                   onSpendSplitterpunkt();
                   setExtraSPBonus((prev) => prev + 3);
-                }}
-                className="min-h-11 bg-erschoepft-grund hover:bg-erschoepft text-gold-hell border border-erschoepft px-2.5 py-1 rounded-knopf text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
-                title="Splitterpunkt einsetzen: +3 auf den Wurf"
-              >
+                }} title="Splitterpunkt einsetzen: +3 auf den Wurf" className="text-xs font-bold">
                 <Sparkles size={13} className="text-gold" />
                 <span>+3 (SP: {splitterpunkte})</span>
-              </button>
+              </Knopf>
             )}
-            <button
-              type="button"
-              onClick={onClose}
-              className="min-h-11 min-w-11 inline-flex items-center justify-center text-leise hover:text-schrift hover:bg-rahmen rounded-knopf transition-colors cursor-pointer"
-              title="Schließen (Esc)" aria-label="Schließen"
-            >
+            <Knopf nurSymbol onClick={onClose} title="Schließen (Esc)" aria-label="Schließen">
               <X size={20} />
-            </button>
+            </Knopf>
           </div>
         </div>
 
@@ -633,19 +622,9 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                   {/* Quick Presets */}
                   <div className="flex gap-1">
                     {[15, 18, 21, 24].map((val) => (
-                      <button
-                        key={val}
-                        type="button"
-                        onClick={() => setTargetVTD(val)}
-                        className={`min-h-11 px-2 py-1 text-xs rounded-knopf border transition-all cursor-pointer tabular-nums font-semibold ${
-                          targetVTD === val
-                            ? 'bg-gold text-seite border-gold-hell'
-                            : 'bg-seite text-schrift border-rahmen hover:bg-flaeche hover:text-schrift'
-                        }`}
-                        title={`Standard VTD ${val}`}
-                      >
+                      <Wahlknopf gewaehlt={targetVTD === val} mittig key={val} onClick={() => setTargetVTD(val)} title={`Standard VTD ${val}`} className="text-xs tabular-nums font-semibold">
                         {val}
-                      </button>
+                      </Wahlknopf>
                     ))}
                   </div>
                 </div>
@@ -676,18 +655,9 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                   </div>
                   <div className="flex gap-1">
                     {[0, 2, 4, 6].map((rs) => (
-                      <button
-                        key={rs}
-                        type="button"
-                        onClick={() => setTargetArmor(rs)}
-                        className={`min-h-11 px-2 py-1 text-xs rounded-knopf border transition-all cursor-pointer tabular-nums font-semibold ${
-                          targetArmor === rs
-                            ? 'bg-erschoepft text-seite border-erschoepft'
-                            : 'bg-seite text-schrift border-rahmen hover:bg-flaeche'
-                        }`}
-                      >
+                      <Wahlknopf gewaehlt={targetArmor === rs} mittig key={rs} onClick={() => setTargetArmor(rs)} className="text-xs tabular-nums font-semibold">
                         {rs}
-                      </button>
+                      </Wahlknopf>
                     ))}
                   </div>
                 </div>
@@ -714,21 +684,11 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                   {spellAttackBonuses.map((b) => {
                     const isActive = activeSpellBonusIds.has(b.id);
                     return (
-                      <button
-                        key={b.id}
-                        type="button"
-                        onClick={() => toggleSpellBonus(b.id)}
-                        className={`min-h-11 flex items-center gap-1 px-2.5 py-1 rounded-knopf text-xs font-semibold border transition-all cursor-pointer ${
-                          isActive
-                            ? 'bg-magie-grund text-schrift border-magie '
-                            : 'bg-seite text-leise border-rahmen line-through'
-                        }`}
-                        title={`${b.description} (Klicken zum ${isActive ? 'Abwählen' : 'Aktivieren'})`}
-                      >
+                      <Wahlknopf gewaehlt={isActive} mittig key={b.id} onClick={() => toggleSpellBonus(b.id)} title={`${b.description} (Klicken zum ${isActive ? 'Abwählen' : 'Aktivieren'})`} className="text-xs font-semibold">
                         {isActive ? <Check size={12} className="text-magie" /> : <X size={12} className="text-leise" />}
                         <span>{b.source}</span>
                         <span className="tabular-nums font-bold text-magie">+{b.bonus} AT</span>
-                      </button>
+                      </Wahlknopf>
                     );
                   })}
                   {spellWeaponDamage.totalDamage > 0 && (
@@ -830,20 +790,11 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                   </span>
                 )}
                 {conditionMods.map((c) => (
-                  <button
-                    key={c.id}
-                    type="button"
-                    onClick={() =>
+                  <Wahlknopf gewaehlt={activeConditionsState[c.id]} ton="gefahr" mittig key={c.id} onClick={() =>
                       setActiveConditionsState((prev) => ({ ...prev, [c.id]: !prev[c.id] }))
-                    }
-                    className={`min-h-11 px-2 py-0.5 rounded-knopf text-[11px] font-bold border transition-colors cursor-pointer ${
-                      activeConditionsState[c.id]
-                        ? 'bg-schaden-grund text-schrift border-schaden'
-                        : 'bg-seite text-leise border-rahmen line-through'
-                    }`}
-                  >
+                    } className="text-[11px] font-bold">
                     {c.label} ({c.malus})
-                  </button>
+                  </Wahlknopf>
                 ))}
               </div>
             )}
@@ -867,20 +818,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                 const isSelected = isMastery ? gewaehlteManoever.some((g) => g.id === m.id) : gewaehlteManoever.length === 0;
                 const sperre = isMastery && !isSelected && regeln.kombination.mehrere ? manoeverHinzufuegbar(gewaehlteManoever, m, regeln) : null;
                 return (
-                  <button
-                    key={m.id}
-                    type="button"
-                    onClick={() => umschaltenManoever(m)}
-                    disabled={!!sperre}
-                    title={[sperre ?? '', m.page ? `${m.source ?? 'GRW'} S. ${m.page}` : '', ...(m.belege ?? [])].filter(Boolean).join('\n') || undefined}
-                    aria-pressed={isSelected}
-                    data-testid={`manoever-${m.id}`}
-                    className={`min-h-11 text-left p-2.5 rounded-knopf border transition-all cursor-pointer relative flex flex-col justify-between disabled:opacity-50 disabled:cursor-not-allowed ${
-                      isSelected
-                        ? 'bg-flaeche border-gold ring-1 ring-rahmen'
-                        : 'bg-seite border-rahmen hover:bg-seite hover:border-rahmen'
-                    }`}
-                  >
+                  <Wahlknopf gewaehlt={isSelected} key={m.id} onClick={() => umschaltenManoever(m)} disabled={!!sperre} title={[sperre ?? '', m.page ? `${m.source ?? 'GRW'} S. ${m.page}` : '', ...(m.belege ?? [])].filter(Boolean).join('\n') || undefined} data-testid={`manoever-${m.id}`} className="relative">
                     <div className="flex items-center justify-between gap-1 mb-1">
                       <div className="flex items-center gap-1.5 font-bold text-xs text-schrift">
                         <span>{m.name}</span>
@@ -898,7 +836,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                     <p className="text-[11px] text-schrift leading-snug line-clamp-2">
                       {m.shortDesc}
                     </p>
-                  </button>
+                  </Wahlknopf>
                 );
               })}
             </div>
@@ -938,21 +876,12 @@ export const AttackModal: React.FC<AttackModalProps> = ({
               </span>
               <div className="flex items-center gap-1">
                 {(['standard', 'safe', 'risk'] as RollType[]).map((mode) => (
-                  <button
-                    key={mode}
-                    type="button"
-                    onClick={() => {
+                  <Wahlknopf gewaehlt={rollType === mode} mittig key={mode} onClick={() => {
                       setRollType(mode);
                       if (hasRolled) handleExecuteRoll(mode);
-                    }}
-                    className={`min-h-11 px-2 py-0.5 text-xs rounded-knopf border transition-all cursor-pointer font-medium ${
-                      rollType === mode
-                        ? 'bg-erhoeht text-schrift border-gold'
-                        : 'bg-seite text-leise border-rahmen'
-                    }`}
-                  >
+                    }} className="text-xs font-medium">
                     {mode === 'standard' ? 'Standard' : mode === 'safe' ? 'Sicherheit' : 'Risiko'}
-                  </button>
+                  </Wahlknopf>
                 ))}
               </div>
             </div>

@@ -1,3 +1,4 @@
+import { Knopf, Reiter } from './fundament';
 import React, { useState, useEffect } from 'react';
 import { Toaster, toast } from 'react-hot-toast';
 import { Users, Settings, RotateCcw } from 'lucide-react';
@@ -43,15 +44,11 @@ const HeaderUndoButton: React.FC = () => {
   };
 
   return (
-    <button
-      type="button"
+    <Knopf
+      art="sekundaer"
+      nurSymbol
       onClick={handleUndo}
       disabled={!canUndo}
-      className={`p-2 rounded-knopf transition flex items-center justify-center font-bold border ${
-        canUndo
-          ? 'bg-erhoeht border-gold text-schrift hover:bg-rahmen hover:text-gold-hell cursor-pointer active:scale-95'
-          : 'bg-flaeche border-rahmen text-leise cursor-not-allowed'
-      }`}
       title={
         canUndoPlay
           ? 'Letzte Aktion rückgängig machen'
@@ -62,7 +59,7 @@ const HeaderUndoButton: React.FC = () => {
       aria-label="Rückgängig"
     >
       <RotateCcw size={19} />
-    </button>
+    </Knopf>
   );
 };
 
@@ -218,25 +215,15 @@ const App: React.FC = () => {
 
               {/* 2. Action Controls */}
               <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-                <button
-                  onClick={() => setShowProfileModal(true)}
-                  className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-knopf transition bg-erhoeht border border-gold text-schrift hover:bg-rahmen hover:text-gold-hell flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-bold cursor-pointer"
-                  title="Helden-Profile & Vorlagen"
-                >
+                <Knopf art="sekundaer" onClick={() => setShowProfileModal(true)} title="Helden-Profile & Vorlagen" className="text-xs sm:text-sm font-bold">
                   <Users size={17} />
                   <span className="hidden sm:inline">Meine Charaktere</span>
                   <span className="inline sm:hidden">Helden</span>
-                </button>
+                </Knopf>
 
-                <button
-                  type="button"
-                  onClick={() => setShowThemeModal(true)}
-                  className="p-1.5 sm:p-2 rounded-knopf transition bg-erhoeht border border-gold text-schrift hover:bg-rahmen hover:text-gold-hell flex items-center justify-center font-bold cursor-pointer"
-                  title="Menü & Einstellungen"
-                  aria-label="Menü & Einstellungen"
-                >
+                <Knopf art="sekundaer" nurSymbol onClick={() => setShowThemeModal(true)} title="Menü & Einstellungen" aria-label="Menü & Einstellungen">
                   <Settings size={19} />
-                </button>
+                </Knopf>
 
                 <HeaderUndoButton />
               </div>
@@ -265,76 +252,33 @@ const App: React.FC = () => {
           )}
 
           {/* TABS */}
-          <div className="sticky top-0 z-30 flex bg-flaeche border-b border-rahmen no-print w-full overflow-x-auto px-2 sm:px-4">
-            <button
-              onClick={() => {
+          <div role="tablist" aria-label="Bereiche" className="sticky top-0 z-30 flex bg-flaeche border-b border-rahmen no-print w-full overflow-x-auto px-2 sm:px-4">
+            <Reiter gewaehlt={mode === 'creation' || mode === 'xp'} onClick={() => {
                 if (mode === 'creation' || mode === 'xp') return;
                 if (state.creationFinalized) {
                   dispatch({ type: 'SET_MODE', payload: 'xp' });
                 } else {
                   dispatch({ type: 'SET_MODE', payload: 'creation' });
                 }
-              }}
-              className={`flex-1 min-w-[85px] min-h-11 py-2 sm:py-2.5 md:py-3 font-titel px-1.5 sm:px-3 text-center font-bold uppercase tracking-normal sm:tracking-wider md:tracking-widest text-[11px] sm:text-xs md:text-sm transition-all flex items-center justify-center select-none ${
-                mode === 'creation' || mode === 'xp'
-                  ? 'text-gold border-b-2 border-gold'
-                  : 'text-leise border-b-2 border-transparent hover:text-schrift'
-              }`}
-            >
+              }} className="flex-1 min-w-[85px] py-2 sm:py-2.5 md:py-3 font-titel px-1.5 sm:px-3 uppercase tracking-normal sm:tracking-wider md:tracking-widest text-[11px] sm:text-xs md:text-sm">
               <span>Charakter</span>
-            </button>
+            </Reiter>
 
-            <button
-              onClick={() => handleTabClick('play')}
-              disabled={!isAdvancementUnlocked}
-              className={`flex-1 min-w-[85px] min-h-11 py-2 sm:py-2.5 md:py-3 font-titel px-1.5 sm:px-3 text-center font-bold uppercase tracking-normal sm:tracking-wider md:tracking-widest text-[11px] sm:text-xs md:text-sm transition-all flex items-center justify-center select-none ${
-                mode === 'play'
-                  ? 'text-gold border-b-2 border-gold'
-                  : 'text-leise border-b-2 border-transparent hover:text-schrift'
-              } ${!isAdvancementUnlocked ? 'opacity-50 cursor-not-allowed' : ''}`}
-              title={!isAdvancementUnlocked ? 'Erst verfügbar wenn Erschaffung abgeschlossen' : ''}
-            >
+            <Reiter gewaehlt={mode === 'play'} onClick={() => handleTabClick('play')} disabled={!isAdvancementUnlocked} title={!isAdvancementUnlocked ? 'Erst verfügbar wenn Erschaffung abgeschlossen' : ''} className="flex-1 min-w-[85px] py-2 sm:py-2.5 md:py-3 font-titel px-1.5 sm:px-3 uppercase tracking-normal sm:tracking-wider md:tracking-widest text-[11px] sm:text-xs md:text-sm">
               <span>Spielen</span>
-            </button>
+            </Reiter>
 
-            <button
-              onClick={() => handleTabClick('combat')}
-              disabled={!isAdvancementUnlocked}
-              className={`flex-1 min-w-[105px] min-h-11 py-2 sm:py-2.5 md:py-3 font-titel px-1.5 sm:px-3 text-center font-bold uppercase tracking-normal sm:tracking-wider md:tracking-widest text-[11px] sm:text-xs md:text-sm transition-all flex items-center justify-center select-none ${
-                mode === 'combat'
-                  ? 'text-gold border-b-2 border-gold'
-                  : 'text-leise border-b-2 border-transparent hover:text-schrift'
-              } ${!isAdvancementUnlocked ? 'opacity-50 cursor-not-allowed' : ''}`}
-              title={!isAdvancementUnlocked ? 'Erst verfügbar wenn Erschaffung abgeschlossen' : ''}
-            >
+            <Reiter gewaehlt={mode === 'combat'} onClick={() => handleTabClick('combat')} disabled={!isAdvancementUnlocked} title={!isAdvancementUnlocked ? 'Erst verfügbar wenn Erschaffung abgeschlossen' : ''} className="flex-1 min-w-[105px] py-2 sm:py-2.5 md:py-3 font-titel px-1.5 sm:px-3 uppercase tracking-normal sm:tracking-wider md:tracking-widest text-[11px] sm:text-xs md:text-sm">
               <span>Kampf &amp; Magie</span>
-            </button>
+            </Reiter>
 
-            <button
-              onClick={() => handleTabClick('inventory')}
-              disabled={!isAdvancementUnlocked}
-              className={`flex-1 min-w-[85px] min-h-11 py-2 sm:py-2.5 md:py-3 font-titel px-1.5 sm:px-3 text-center font-bold uppercase tracking-normal sm:tracking-wider md:tracking-widest text-[11px] sm:text-xs md:text-sm transition-all flex items-center justify-center select-none ${
-                mode === 'inventory'
-                  ? 'text-gold border-b-2 border-gold'
-                  : 'text-leise border-b-2 border-transparent hover:text-schrift'
-              } ${!isAdvancementUnlocked ? 'opacity-50 cursor-not-allowed' : ''}`}
-              title={!isAdvancementUnlocked ? 'Erst verfügbar wenn Erschaffung abgeschlossen' : ''}
-            >
+            <Reiter gewaehlt={mode === 'inventory'} onClick={() => handleTabClick('inventory')} disabled={!isAdvancementUnlocked} title={!isAdvancementUnlocked ? 'Erst verfügbar wenn Erschaffung abgeschlossen' : ''} className="flex-1 min-w-[85px] py-2 sm:py-2.5 md:py-3 font-titel px-1.5 sm:px-3 uppercase tracking-normal sm:tracking-wider md:tracking-widest text-[11px] sm:text-xs md:text-sm">
               <span>Inventar</span>
-            </button>
+            </Reiter>
 
-            <button
-              onClick={() => handleTabClick('begleiter')}
-              disabled={!isAdvancementUnlocked}
-              className={`flex-1 min-w-[85px] min-h-11 py-2 sm:py-2.5 md:py-3 font-titel px-1.5 sm:px-3 text-center font-bold uppercase tracking-normal sm:tracking-wider md:tracking-widest text-[11px] sm:text-xs md:text-sm transition-all flex items-center justify-center select-none ${
-                mode === 'begleiter'
-                  ? 'text-gold border-b-2 border-gold'
-                  : 'text-leise border-b-2 border-transparent hover:text-schrift'
-              } ${!isAdvancementUnlocked ? 'opacity-50 cursor-not-allowed' : ''}`}
-              title={!isAdvancementUnlocked ? 'Erst verfügbar wenn Erschaffung abgeschlossen' : ''}
-            >
+            <Reiter gewaehlt={mode === 'begleiter'} onClick={() => handleTabClick('begleiter')} disabled={!isAdvancementUnlocked} title={!isAdvancementUnlocked ? 'Erst verfügbar wenn Erschaffung abgeschlossen' : ''} className="flex-1 min-w-[85px] py-2 sm:py-2.5 md:py-3 font-titel px-1.5 sm:px-3 uppercase tracking-normal sm:tracking-wider md:tracking-widest text-[11px] sm:text-xs md:text-sm">
               <span>Begleiter</span>
-            </button>
+            </Reiter>
           </div>
 
           {/* MAIN CONTENT */}

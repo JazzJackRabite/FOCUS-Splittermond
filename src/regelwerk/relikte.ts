@@ -269,6 +269,7 @@ export function reliktWerte(relikt: Relikt, bausteine: BausteinInfo[], basis: Au
     range: b.range as string | undefined, attributes: b.attributes as string | undefined, vtdBonus: b.vtdBonus as number | undefined,
     sr: b.sr as number | undefined, handicap: b.handicap as number | undefined, tickModifier: b.tickModifier as number | undefined,
     minStrength: b.minStrength as number | undefined,
+    hardness: b.hardness as number | undefined,
     weight: typeof b.load === 'number' ? b.load : parseInt(String(b.load ?? ''), 10) || 0,
   };
   const zeilen: string[] = []; const ueber: string[] = [];
@@ -310,7 +311,10 @@ export function reliktWerte(relikt: Relikt, bausteine: BausteinInfo[], basis: Au
         zeilen.push(i >= 0 && vorher !== stufe ? `Merkmal ${name} ${vorher ?? ''} → ${stufe ?? ''}`.replace(/\s+/g, ' ') : i >= 0 ? `Merkmal ${name}` : `Merkmal ${name}${stufe !== null ? ` ${stufe}` : ''} neu`);
         break;
       }
-      case 'haerte': zeilen.push(`Härte ${vz(n)}`); break;
+      case 'haerte': {
+        if (item.hardness === undefined) { zeilen.push(`Härte ${vz(n)}`); item.hardness = Math.max(0, n); break; }
+        const alt = item.hardness; item.hardness = Math.max(0, alt + n); zeilen.push(`Härte ${alt} → ${item.hardness}`); break;
+      }
       case 'schwerpunkt': break; // Bonus auf einen Schwerpunkt: Auswahl steht beim Baustein
       default: break; // gw/kw wirken auf den Charakter (reliktWiderstand)
     }
@@ -415,7 +419,7 @@ export function reliktAlsInventar(relikt: Relikt, bausteine: BausteinInfo[], bas
 }
 
 /** Spielwerte, die ein Relikt am Inventareintrag festlegt */
-const RELIKT_WERTFELDER = ['damage', 'wgs', 'sr', 'handicap', 'tickModifier', 'weight', 'attributes', 'type'] as const;
+const RELIKT_WERTFELDER = ['damage', 'wgs', 'sr', 'handicap', 'tickModifier', 'weight', 'hardness', 'attributes', 'type'] as const;
 
 /**
  * Inventareinträge von Relikten, deren Spielwerte nicht mehr zu den Regeln passen (z. B. vor Stand 21 gebaut oder

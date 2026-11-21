@@ -1,7 +1,6 @@
 import { calculateItemCost } from '../../utils/costCalculations';
-import { Dialogfenster, Dialoghintergrund } from '../../fundament';
+import { Dialogfenster, Dialoghintergrund, Knopf, Dialog } from '../../fundament';
 import { useHausregeln } from '../../fundament/hausregeln';
-import { Knopf, Dialog } from '../../fundament';
 import React, { useState, useEffect, useMemo } from 'react';
 import { getSpellDescription } from '../../utils/gameResourceManager';
 import { parseSpellPermissibleModifications } from '../../utils/magicRules';
@@ -147,14 +146,9 @@ export const SpellModal: React.FC<SpellModalProps> = ({
                 className="w-full p-2 pr-8 border border-rahmen rounded-knopf bg-flaeche text-xs text-schrift focus:ring-1 focus:ring-rahmen focus:border-rahmen outline-none"
               />
               {search && (
-                <button
-                  type="button"
-                  onClick={() => setSearch('')}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-leise hover:text-schaden text-xs font-bold w-5 h-5 flex items-center justify-center rounded-knopf hover:bg-black/5 cursor-pointer"
-                  title="Suche leeren"
-                >
+                <Knopf art="gefahr" nurSymbol onClick={() => setSearch('')} title="Suche leeren" className="absolute right-2 top-1/2 -translate-y-1/2" aria-label="Suche leeren">
                   ✕
-                </button>
+                </Knopf>
               )}
             </div>
             <select

@@ -4,5 +4,8 @@
   "regelnamen": [],
   "paketzugriffe": [
     "src/components/creation/ErschaffungRegelwerk.tsx"
-  ]
+  ],
+  "knoepfe": {
+    "src/components/play/PlaySharedVitals.tsx": 6
+  }
 }

@@ -1,7 +1,6 @@
 import { calculateItemCost } from '../../utils/costCalculations';
-import { Dialogfenster, Dialoghintergrund } from '../../fundament';
+import { Dialogfenster, Dialoghintergrund, Knopf, Dialog } from '../../fundament';
 import { useHausregeln } from '../../fundament/hausregeln';
-import { Knopf, Dialog } from '../../fundament';
 import React, { useState, useEffect, useMemo } from 'react';
 import { isMasteryRepeatable } from '../../data/masteries';
 import type { MasteryEntry as DbMasteryEntry } from '../../data/masteries';
@@ -286,14 +285,9 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
               {creationMode ? ' – Erstellung' : ` – Max Schwelle: S${maxTier}`})
             </div>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-knopf border border-rahmen bg-erhoeht text-schrift hover:border-gold transition-colors"
-            title="Schließen" aria-label="Schließen"
-          >
+          <Knopf art="sekundaer" nurSymbol onClick={onClose} title="Schließen" aria-label="Schließen">
             ✕
-          </button>
+          </Knopf>
         </div>
 
         <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-4 text-xs sm:text-sm custom-scrollbar modal-body-scroll">
@@ -328,14 +322,9 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
                 className="w-full p-2 pr-8 border border-rahmen rounded-knopf bg-seite text-schrift text-xs focus:ring-1 focus:ring-gold focus:border-gold outline-none"
               />
               {search && (
-                <button
-                  type="button"
-                  onClick={() => setSearch('')}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-leise hover:text-schrift text-xs font-bold w-5 h-5 flex items-center justify-center rounded-knopf hover:bg-rahmen cursor-pointer"
-                  title="Suche leeren"
-                >
+                <Knopf nurSymbol onClick={() => setSearch('')} title="Suche leeren" className="absolute right-2 top-1/2 -translate-y-1/2" aria-label="Suche leeren">
                   ✕
-                </button>
+                </Knopf>
               )}
             </div>
 

@@ -36,7 +36,7 @@ const VerbesserteAngriffe: React.FC<{ k: Katalog; b: Begleiter; va: NonNullable<
         <div className="flex flex-wrap gap-2">
           {va.kaeufe.map((x, i) => (
             <Marke key={`${x.schluessel}-${i}`}>{x.text} <span className="text-leise">({x.punkte} P.)</span>
-              <button type="button" className="ml-1 min-h-6" aria-label={`${x.text} entfernen`} onClick={() => aendern({ verbesserteAngriffe: liste.filter((_, j) => j !== i) })}><X size={12} aria-hidden /></button>
+              <Knopf nurSymbol aria-label={`${x.text} entfernen`} onClick={() => aendern({ verbesserteAngriffe: liste.filter((_, j) => j !== i) })} className="ml-1"><X size={12} aria-hidden /></Knopf>
             </Marke>
           ))}
         </div>

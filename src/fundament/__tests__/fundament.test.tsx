@@ -11,22 +11,23 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { FARBEN_ERLAUBT, WURZEL, farbtabelle, farbwerte, kontrast, kontrastBefunde, paketzugriffe, regelnamenImCode, regelquellen, regelquellenBefunde } from './pruefen';
-import { Abschnittstitel, Auswahl, Dialog, Eingabe, Karte, Knopf, Marke, Rauten, Rollbereich } from '..';
+import { FARBEN_ERLAUBT, WURZEL, eigeneKnoepfe, farbtabelle, farbwerte, kontrast, kontrastBefunde, paketzugriffe, regelnamenImCode, regelquellen, regelquellenBefunde } from './pruefen';
+import { Abschnittstitel, Auswahl, Dialog, Eingabe, Karte, Knopf, Marke, Rauten, Rollbereich, Wahlknopf } from '..';
 
 const ALTLASTEN = path.join(WURZEL, 'src/fundament/altlasten.json');
 
 describe('Fundament: Altlasten dürfen nur weniger werden', () => {
-  const ist = { farbwerte: farbwerte(), regelnamen: regelnamenImCode(), paketzugriffe: paketzugriffe() };
+  const ist = { farbwerte: farbwerte(), regelnamen: regelnamenImCode(), paketzugriffe: paketzugriffe(), knoepfe: eigeneKnoepfe() };
   if (process.env.FUNDAMENT_ALTLASTEN === 'schreiben') {
     fs.writeFileSync(ALTLASTEN, JSON.stringify({
       _hinweis: 'Bekannte Verstöße gegen FUNDAMENT.md. Wird nur kleiner: nach einer Umstellung mit FUNDAMENT_ALTLASTEN=schreiben npx vitest run src/fundament neu schreiben. Nie von Hand erweitern.',
       farbwerte: ist.farbwerte,
       regelnamen: ist.regelnamen,
       paketzugriffe: ist.paketzugriffe,
+      knoepfe: ist.knoepfe,
     }, null, 2) + '\n');
   }
-  const soll = JSON.parse(fs.readFileSync(ALTLASTEN, 'utf8')) as { farbwerte: Record<string, number>; regelnamen: string[]; paketzugriffe: string[] };
+  const soll = JSON.parse(fs.readFileSync(ALTLASTEN, 'utf8')) as { farbwerte: Record<string, number>; regelnamen: string[]; paketzugriffe: string[]; knoepfe?: Record<string, number> };
 
   it(`Farbwerte stehen nur in ${FARBEN_ERLAUBT}`, () => {
     const zuviel = Object.entries(ist.farbwerte)
@@ -82,6 +83,13 @@ describe('Fundament: Altlasten dürfen nur weniger werden', () => {
     expect(eigene, 'Dialoge verwenden Dialoghintergrund und Dialogfenster (oder gleich Dialog) aus src/fundament.').toEqual([]);
   });
 
+  it('Schaltflächen kommen aus den Bausteinen (Knopf, Wahlknopf)', () => {
+    const zuviel = Object.entries(ist.knoepfe)
+      .filter(([datei, n]) => n > (soll.knoepfe?.[datei] ?? 0))
+      .map(([datei, n]) => `${datei}: ${n} eigene <button> (erlaubt: ${soll.knoepfe?.[datei] ?? 0})`);
+    expect(zuviel, 'Neue selbst gebaute Schaltfläche. Knopf oder Wahlknopf aus src/fundament verwenden; fehlt ein Baustein, dort ergänzen.').toEqual([]);
+  });
+
   it('die Bausteine selbst enthalten keinen Farbwert', () => {
     expect(ist.farbwerte['src/fundament/bausteine.tsx'] ?? 0).toBe(0);
   });
@@ -96,6 +104,17 @@ describe('Fundament: Bausteine', () => {
     expect(knopf.className).toContain('bg-gold');
     fireEvent.click(knopf);
     fireEvent.click(screen.getByRole('button', { name: 'Gesperrt' }));
+    expect(klick).toHaveBeenCalledTimes(1);
+  });
+
+  it('Wahlknopf: auswählbar mit aria-pressed, mindestens 44 px hoch', () => {
+    const klick = vi.fn();
+    render(<><Wahlknopf gewaehlt onClick={klick}>Heilkunde</Wahlknopf><Wahlknopf gewaehlt={false}>Heilmagie</Wahlknopf></>);
+    const an = screen.getByRole('button', { name: 'Heilkunde' });
+    expect(an.getAttribute('aria-pressed')).toBe('true');
+    expect(an.className).toContain('min-h-11');
+    expect(screen.getByRole('button', { name: 'Heilmagie' }).getAttribute('aria-pressed')).toBe('false');
+    fireEvent.click(an);
     expect(klick).toHaveBeenCalledTimes(1);
   });
 

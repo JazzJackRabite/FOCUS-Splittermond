@@ -67,10 +67,9 @@ export const RegelpaketeTab: React.FC = () => {
           Wähle Grimoires aus (Dateien mit der Endung <code>.grim</code>, z. B. <code>magie.grim</code>, aus dem Ordner <code>Regelpakete/editor/grimoires</code>). Sie werden nur in diesem Browser gespeichert, nicht hochgeladen und nicht mit anderen geteilt.
           {!rw.dauerhaft && <strong className="block text-erschoepft mt-1">Dieser Browser erlaubt keine dauerhafte Speicherung; die Grimoires bleiben nur bis zum Neuladen.</strong>}
         </p>
-        <button type="button" disabled={laeuft} onClick={() => eingabe.current?.click()}
-          className="min-h-11 px-3 py-2 rounded-knopf border border-gold bg-erhoeht text-schrift hover:bg-rahmen hover:text-gold-hell transition-colors cursor-pointer text-sm font-bold flex items-center gap-2 disabled:opacity-50">
+        <Knopf art="sekundaer" disabled={laeuft} onClick={() => eingabe.current?.click()} className="text-sm font-bold">
           <Upload size={16} />{laeuft ? 'Lade …' : 'Grimoires auswählen'}
-        </button>
+        </Knopf>
         {bekannt.length > 0 && (
           <p className="text-xs text-leise mt-3">Noch nicht geladen: {bekannt.map(p => p.kuerzel).join(', ')}</p>
         )}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Knopf } from '../../fundament';
+import { Knopf, Wahlknopf } from '../../fundament';
 import { Sparkles, Delete, Check, X } from 'lucide-react';
 
 interface QuickNumberInputProps {
@@ -265,18 +265,9 @@ export const QuickNumberInput: React.FC<QuickNumberInputProps> = ({
               </div>
               <div className="grid grid-cols-6 gap-1">
                 {defaultPresets.slice(0, 12).map((num) => (
-                  <button
-                    key={num}
-                    type="button"
-                    onClick={() => handlePadPreset(num)}
-                    className={`min-h-11 py-1 rounded-knopf text-xs font-bold transition-all border cursor-pointer ${
-                      parseInt(padValue, 10) === num
-                        ? 'bg-erhoeht text-schrift border-rahmen '
-                        : 'bg-flaeche hover:bg-rahmen text-schrift border-rahmen'
-                    }`}
-                  >
+                  <Wahlknopf gewaehlt={parseInt(padValue, 10) === num} mittig key={num} onClick={() => handlePadPreset(num)} className="text-xs font-bold">
                     {num}
-                  </button>
+                  </Wahlknopf>
                 ))}
               </div>
             </div>

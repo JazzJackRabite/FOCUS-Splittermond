@@ -65,11 +65,12 @@ Felder stehen unter `daten` des jeweiligen Eintrags. **Was hier nicht steht, dar
 | Ausrüstung aus Grimoires | Ausrüstungseinträge; `modus` (ersetzt, ergänzt) | `regelwerk/ausruestung.ts` |
 | Relikte | `relikt_baukasten`, `baustein` | `regelwerk/relikte.ts` |
 | Begleiter: Tiere, beschworene Wesen, Dienste | `werte_berechnet`, `tabellenzeile`, `beschwoerbares_wesen_stufe`, `immer_verfuegbar` | `regelwerk/begleiter.ts`, `regelwerk/dienste.ts` |
-| Begleiter: Gefolge, erhobene Untote, Golems | `attribute`, `modulwerte`, `modifikationen`, `kosten_ep`, `baustein`, `felder`, `tabellen` | `regelwerk/gefolge.ts`, `regelwerk/untote.ts`, `regelwerk/golem.ts`, `regelwerk/modifikationen.ts` |
+| Begleiter: Gefolge, erhobene Untote, Golems | `strukturiert` (`gefolge`, `untote`, Golem-Regeln), `wertesaetze`, `attribute`, `modulwerte`, `modifikationen`, `kosten_ep`, `baustein`, `felder`, `tabellen` | `regelwerk/gefolge.ts`, `regelwerk/untote.ts`, `regelwerk/golem.ts`, `regelwerk/modifikationen.ts` |
 | Begleiter: Wesen-Baukasten (beschwörbare Wesen, Kreaturen) | Einträge `wesen_baukasten_basis`, `wesen_baukasten_modul`, `wesen_baukasten_rolle`; `beschwoerbares_wesen_stufe`, `ressource_kreatur`, `stufe_bonus`, `kosten_punkte`, `mehrfach`, `gruppe`, `voraussetzungen`, `moegliche_dienste`, `modifikationen`; Schritt 5: `strukturiert` | `regelwerk/wesenBaukasten.ts`, `regelwerk/modifikationen.ts` |
 | Begleiter: Abrichtungen mit Zahlen, Vertraute | Abrichtungen: `modifikationen`, `wahlen`, `werte_hinweis`; Vertrautenmagie: `vertrautenmagie` (Meisterschaften), `typus` (Zauber) | `regelwerk/abrichtungsWerte.ts`, `regelwerk/vertraute.ts` |
 | Baukästen: doppelte Merkmale, Verbesserte Angriffe | Feinschliff-Regeln: `strukturiert` (`merkmale_zusammenfuehren`, `verbesserte_angriffe`); Rolle: `verbesserter_angriff`; Waffen: `schaden`, `wgs`, `modus`, `merkmale_text` | `regelwerk/modifikationen.ts`, `regelwerk/wesenBaukasten.ts`, `regelwerk/golem.ts` |
 | Lebenspunkte und Stufen der Begleiter | Kernregeln: `strukturiert`; Merkmale: `beschreibung` | `regelwerk/vitals.ts` |
+| Schadens- und Heildialog | Splittergaben: `strukturiert.gaben`; Heilung: `strukturiert.pausen`, `ruheregeln`; Zustände: `hat_stufe`, `zustandswirkung`; Heilkunde: `auswirkungen` | `regelwerk/schadenUndHeilung.ts` |
 
 Ansichten (`components/`) greifen nicht selbst in die Paketdaten, sondern fragen die Module aus `regelwerk/`. Wo eine
 Ansicht das heute noch tut, steht sie in `src/fundament/altlasten.json` (`paketzugriffe`).
@@ -84,8 +85,6 @@ Datenseite wandern. Neue kommen nicht hinzu.
 | Rückfall ohne geladenes Paket: Listen des Grundregelwerks (Zauber, Meisterschaften, Stärken, Schwächen, Ressourcen, Ausrüstung, Sprachen) | `src/data/*.ts` | Werden nur noch gelesen, solange kein Paket geladen ist (Start der App, einzelne Tests); Tests halten sie gleich mit dem Paket (`grwListen.test.ts`, `ausruestung.test.ts`). Entfällt, sobald der Editor ohne Rückfall startet |
 | Rückfall ohne geladenes Paket: Attribute, Fertigkeiten mit Attributen, Rassen, Mondzeichen, Heldengrade, Gesundheitsstufen | `src/data/rules.ts` | Wie oben; nur noch über `regelwerk/grwListen.ts` und `steigerungsregeln.ts` gelesen |
 | Rückfall ohne geladenes Paket: Werte des Grundregelwerks für Proben (Würfel, Patzer, Triumph, EG-Stufen) und Zauber-EG (Optionen, Auslösezeit) | `regelwerk/proben.ts`, `regelwerk/zauberEg.ts` | Wie oben; mit Paket gelten nur dessen Werte |
-| Regelwerte für Gefolge, Untote und Golems (Kosten, Grenzen, Preisformel) | `regelwerk/gefolge.ts`, `untote.ts`, `golem.ts` | `strukturiert` an den Regeltexten |
-| Schadens- und Heildialog: Zustandsliste, Verschnaufpause | `components/play/TakeDamageModal.tsx`, `HealModal.tsx` | Zustände und Kernregeln des Pakets |
 
 Die genaue Liste der geduldeten Regelnamen steht in `src/fundament/altlasten.json` (`regelnamen`).
 Ohne geladenes Regelpaket rechnet der Editor mit diesen eingebauten Werten weiter (Rückfall). Die Beispielcharaktere
@@ -165,6 +164,8 @@ Fehlt einer, wird er dort ergänzt – nicht in der Ansicht nachgebaut.
 | Baustein | Zweck | Varianten |
 |---|---|---|
 | `Knopf` | jede Schaltfläche | `primaer` (Gold, eine je Ansicht), `sekundaer` (goldener Rahmen), `neutral`, `gefahr`, `erholung`; `nurSymbol` |
+| `Wahlknopf` | auswählbare Karte oder Filter (eine Wahl aus mehreren, Umschalter), `aria-pressed` | Ton im gewählten Zustand: `gold`, `erholung`, `gefahr`; `mittig` |
+| `Reiter` | Reiter einer Leiste (Hauptnavigation, Reiter in Dialogen), `role="tab"`, goldene Unterstreichung | – |
 | `Karte` | Fläche für einen zusammengehörigen Bereich | – |
 | `Abschnittstitel` | Titel eines Bereichs | `h2`, `h3` |
 | `Marke` | kleine Kennzeichnung: Zustand, Bonus, Kosten | Ton: `neutral`, `gold`, `unverletzt`, `erschoepft`, `schaden`, `kanalisiert`, `magie`, `temporaer`; `klein` |
@@ -179,9 +180,10 @@ Alle Ansichten verwenden die benannten Werte; fest eingetragene Farbwerte gibt e
 Übergangsdatei ist gelöscht. Gemeinsame Klassen, die keine Bausteine sind (Grundstil der Seite, Protokollkarten,
 Würfelbanner, Druck), stehen in `src/fundament/klassen.css` – ebenfalls ohne eigene Farbwerte.
 
-Noch nicht überall erreicht: Die Bausteine (`Dialog`, `Knopf`, `Karte` …) trägt bisher nur der Würfeldialog. Die übrigen
-Ansichten haben die Farben, Rundungen und Schriften des CI, bauen ihre Knöpfe und Dialograhmen aber noch selbst. Wer eine
-Ansicht anfasst, stellt sie dabei auf die Bausteine um (Mindesthöhe 44 Pixel, eine goldene Hauptaktion).
+Schaltflächen kommen aus den Bausteinen (`Knopf`, `Wahlknopf`, `Reiter`); eine Prüfung zählt selbst gebaute `<button>` je
+Datei (`knoepfe` in `src/fundament/altlasten.json`) und lässt sie nur weniger werden. Übrig sind die Kästchen der
+Lebenspunkte, des Fokus und der temporären LP sowie die Zähler in `PlaySharedVitals.tsx`. Dialograhmen kommen aus
+`Dialoghintergrund`/`Dialogfenster` oder `Dialog`; Karten und Titel bauen viele Ansichten noch selbst.
 
 ## 4. Arbeitsweise
 

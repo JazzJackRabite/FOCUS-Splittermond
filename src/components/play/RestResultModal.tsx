@@ -1,6 +1,5 @@
-import { Dialogfenster, Dialoghintergrund } from '../../fundament';
+import { Dialogfenster, Dialoghintergrund, Knopf, Dialog } from '../../fundament';
 import React, { useEffect } from 'react';
-import { Knopf, Dialog } from '../../fundament';
 import { X, Sun, Moon, Heart, Sparkles, Zap, ShieldCheck, CheckCircle2 } from 'lucide-react';
 
 export interface RestDetailItem {
@@ -63,14 +62,9 @@ export const RestResultModal: React.FC<RestResultModalProps> = ({ data, onClose 
               <p className="text-xs text-schrift font-medium">{data.durationText}</p>
             </div>
           </div>
-          <button
-            id="close-rest-result-modal-btn"
-            onClick={onClose}
-            className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-knopf border border-rahmen bg-erhoeht text-schrift hover:border-gold transition-colors"
-            title="Schließen" aria-label="Schließen"
-          >
+          <Knopf art="sekundaer" nurSymbol id="close-rest-result-modal-btn" onClick={onClose} title="Schließen" aria-label="Schließen">
             <X size={20} />
-          </button>
+          </Knopf>
         </div>
 
         {/* Content Body */}

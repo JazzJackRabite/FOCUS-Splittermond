@@ -1,4 +1,4 @@
-import { Dialogfenster, Dialoghintergrund } from '../../fundament';
+import { Dialogfenster, Dialoghintergrund, Wahlknopf, Knopf, Reiter } from '../../fundament';
 import React, { useState, useMemo } from 'react';
 import {
   Package,
@@ -164,6 +164,7 @@ export const InventoryView: React.FC = () => {
       handicap: item.handicap,
       tickModifier: item.tickModifier,
       minStrength: item.minStrength,
+      hardness: item.hardness,
       attributes: item.attributes,
     };
     dispatch({ type: 'ADD_INVENTORY_ITEM', payload: newItem });
@@ -263,31 +264,18 @@ export const InventoryView: React.FC = () => {
               title="Solare (Goldmünzen, 1 S = 100 L)"
             />
             <div className="flex flex-col -my-1 -mr-1 pl-1 border-l border-rahmen shrink-0">
-              <button
-                type="button"
-                onClick={(e) => {
+              <Knopf nurSymbol onClick={(e) => {
                   const delta = e.shiftKey ? 10 : 1;
                   handleModifyMoney('solare', delta);
-                }}
-                className="h-3.5 w-4 flex items-center justify-center text-gold hover:text-gold-hell hover:bg-rahmen rounded-tr transition-colors cursor-pointer"
-                title="+1 Solar (Shift+Klick: +10)"
-                aria-label="+1 Solar"
-              >
+                }} title="+1 Solar (Shift+Klick: +10)" aria-label="+1 Solar">
                 <ChevronUp size={11} strokeWidth={2.5} />
-              </button>
-              <button
-                type="button"
-                onClick={(e) => {
+              </Knopf>
+              <Knopf nurSymbol onClick={(e) => {
                   const delta = e.shiftKey ? -10 : -1;
                   handleModifyMoney('solare', delta);
-                }}
-                disabled={(money.solare ?? 0) <= 0}
-                className="h-3.5 w-4 flex items-center justify-center text-gold hover:text-gold-hell hover:bg-rahmen disabled:opacity-20 disabled:pointer-events-none rounded-br transition-colors cursor-pointer"
-                title="-1 Solar (Shift+Klick: -10)"
-                aria-label="-1 Solar"
-              >
+                }} disabled={(money.solare ?? 0) <= 0} title="-1 Solar (Shift+Klick: -10)" aria-label="-1 Solar">
                 <ChevronDown size={11} strokeWidth={2.5} />
-              </button>
+              </Knopf>
             </div>
           </div>
 
@@ -310,31 +298,18 @@ export const InventoryView: React.FC = () => {
               title="Lunare (Silbermünzen, 1 L = 100 T)"
             />
             <div className="flex flex-col -my-1 -mr-1 pl-1 border-l border-rahmen shrink-0">
-              <button
-                type="button"
-                onClick={(e) => {
+              <Knopf nurSymbol onClick={(e) => {
                   const delta = e.shiftKey ? 10 : 1;
                   handleModifyMoney('lunare', delta);
-                }}
-                className="h-3.5 w-4 flex items-center justify-center text-gold hover:text-gold-hell hover:bg-rahmen rounded-tr transition-colors cursor-pointer"
-                title="+1 Lunar (Shift+Klick: +10)"
-                aria-label="+1 Lunar"
-              >
+                }} title="+1 Lunar (Shift+Klick: +10)" aria-label="+1 Lunar">
                 <ChevronUp size={11} strokeWidth={2.5} />
-              </button>
-              <button
-                type="button"
-                onClick={(e) => {
+              </Knopf>
+              <Knopf nurSymbol onClick={(e) => {
                   const delta = e.shiftKey ? -10 : -1;
                   handleModifyMoney('lunare', delta);
-                }}
-                disabled={(money.lunare ?? 0) <= 0}
-                className="h-3.5 w-4 flex items-center justify-center text-gold hover:text-gold-hell hover:bg-rahmen disabled:opacity-20 disabled:pointer-events-none rounded-br transition-colors cursor-pointer"
-                title="-1 Lunar (Shift+Klick: -10)"
-                aria-label="-1 Lunar"
-              >
+                }} disabled={(money.lunare ?? 0) <= 0} title="-1 Lunar (Shift+Klick: -10)" aria-label="-1 Lunar">
                 <ChevronDown size={11} strokeWidth={2.5} />
-              </button>
+              </Knopf>
             </div>
           </div>
 
@@ -357,31 +332,18 @@ export const InventoryView: React.FC = () => {
               title="Telare (Kupfermünzen)"
             />
             <div className="flex flex-col -my-1 -mr-1 pl-1 border-l border-rahmen shrink-0">
-              <button
-                type="button"
-                onClick={(e) => {
+              <Knopf nurSymbol onClick={(e) => {
                   const delta = e.shiftKey ? 10 : 1;
                   handleModifyMoney('telare', delta);
-                }}
-                className="h-3.5 w-4 flex items-center justify-center text-gold hover:text-gold-hell hover:bg-rahmen rounded-tr transition-colors cursor-pointer"
-                title="+1 Telar (Shift+Klick: +10)"
-                aria-label="+1 Telar"
-              >
+                }} title="+1 Telar (Shift+Klick: +10)" aria-label="+1 Telar">
                 <ChevronUp size={11} strokeWidth={2.5} />
-              </button>
-              <button
-                type="button"
-                onClick={(e) => {
+              </Knopf>
+              <Knopf nurSymbol onClick={(e) => {
                   const delta = e.shiftKey ? -10 : -1;
                   handleModifyMoney('telare', delta);
-                }}
-                disabled={(money.telare ?? 0) <= 0}
-                className="h-3.5 w-4 flex items-center justify-center text-gold hover:text-gold-hell hover:bg-rahmen disabled:opacity-20 disabled:pointer-events-none rounded-br transition-colors cursor-pointer"
-                title="-1 Telar (Shift+Klick: -10)"
-                aria-label="-1 Telar"
-              >
+                }} disabled={(money.telare ?? 0) <= 0} title="-1 Telar (Shift+Klick: -10)" aria-label="-1 Telar">
                 <ChevronDown size={11} strokeWidth={2.5} />
-              </button>
+              </Knopf>
             </div>
           </div>
         </div>
@@ -466,18 +428,9 @@ export const InventoryView: React.FC = () => {
             { id: 'alchemika', label: 'Alchemika' },
             { id: 'other', label: 'Sonstiges' },
           ].map((cat) => (
-            <button
-              key={cat.id}
-              type="button"
-              onClick={() => setActiveCategory(cat.id)}
-              className={`min-h-11 px-3 py-1.5 rounded-knopf text-xs font-bold transition-all cursor-pointer ${
-                activeCategory === cat.id
-                  ? 'bg-erhoeht text-schrift '
-                  : 'text-schrift hover:bg-rahmen'
-              }`}
-            >
+            <Wahlknopf gewaehlt={activeCategory === cat.id} mittig key={cat.id} onClick={() => setActiveCategory(cat.id)} className="text-xs font-bold">
               {cat.label}
-            </button>
+            </Wahlknopf>
           ))}
         </div>
 
@@ -494,14 +447,10 @@ export const InventoryView: React.FC = () => {
             />
           </div>
 
-          <button
-            type="button"
-            onClick={() => setShowAddModal(true)}
-            className="min-h-11 bg-erhoeht hover:bg-rahmen text-schrift border border-gold px-3.5 py-1.5 rounded-knopf text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap active:scale-95"
-          >
+          <Knopf art="sekundaer" onClick={() => setShowAddModal(true)} className="text-xs font-bold shrink-0 whitespace-nowrap">
             <Plus size={14} className="text-gold" />
             <span>Gegenstand</span>
-          </button>
+          </Knopf>
         </div>
       </div>
 
@@ -569,6 +518,7 @@ export const InventoryView: React.FC = () => {
                               ]
                             : []),
                           ...(item.weight !== undefined ? [{ label: 'Last', value: item.weight }] : []),
+                          ...(item.hardness !== undefined ? [{ label: 'Härte', value: item.hardness }] : []),
                           ...(item.price ? [{ label: 'Preis', value: item.price }] : []),
                         ],
                       }}
@@ -581,6 +531,11 @@ export const InventoryView: React.FC = () => {
                       Last: <strong className="text-schrift">{(item.weight ?? 0) * (item.quantity ?? 1)}</strong>{' '}
                       {(item.quantity ?? 1) > 1 && `(${item.weight} je Stk.)`}
                     </span>
+                    {item.hardness !== undefined && (
+                      <span className="tabular-nums text-leise bg-seite border border-rahmen px-2 py-0.5 rounded-knopf text-[11px]">
+                        Härte: <strong className="text-schrift">{item.hardness}</strong>
+                      </span>
+                    )}
                     {item.type === 'weapon' && (
                       <div className="flex items-center gap-1.5 flex-wrap">
                         {item.weaponSkill && (
@@ -639,64 +594,36 @@ export const InventoryView: React.FC = () => {
                 <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
                   {/* Quantity Controls */}
                   <div className="flex items-center bg-seite rounded-knopf border border-rahmen px-1 py-0.5">
-                    <button
-                      type="button"
-                      onClick={() => handleAdjustQuantity(item, -1)}
-                      className="w-5 h-5 flex items-center justify-center font-bold text-leise hover:text-schrift cursor-pointer"
-                      title="Menge -1"
-                    >
+                    <Knopf nurSymbol onClick={() => handleAdjustQuantity(item, -1)} title="Menge -1" aria-label="Menge -1">
                       -
-                    </button>
+                    </Knopf>
                     <span className="w-8 text-center tabular-nums font-bold text-xs text-schrift">
                       {item.quantity ?? 1}x
                     </span>
-                    <button
-                      type="button"
-                      onClick={() => handleAdjustQuantity(item, 1)}
-                      className="w-5 h-5 flex items-center justify-center font-bold text-leise hover:text-schrift cursor-pointer"
-                      title="Menge +1"
-                    >
+                    <Knopf nurSymbol onClick={() => handleAdjustQuantity(item, 1)} title="Menge +1" aria-label="Menge +1">
                       +
-                    </button>
+                    </Knopf>
                   </div>
 
                   {/* Equip toggle if weapon or armor */}
                   {(item.type === 'weapon' || item.type === 'armor' || item.type === 'shield') && (
-                    <button
-                      type="button"
-                      onClick={() => dispatch({ type: 'TOGGLE_EQUIP_ITEM', payload: { id: item.id } })}
-                      className={`px-2.5 py-1 rounded-knopf border text-xs font-bold transition-all cursor-pointer ${
-                        item.equipped
-                          ? 'bg-erschoepft-grund text-erschoepft border-erschoepft hover:bg-erschoepft hover:text-seite'
-                          : 'bg-erhoeht text-schrift border-gold hover:bg-rahmen'
-                      }`}
-                    >
+                    <Wahlknopf gewaehlt={!!item.equipped} mittig onClick={() => dispatch({ type: 'TOGGLE_EQUIP_ITEM', payload: { id: item.id } })} className="text-xs font-bold">
                       {item.equipped ? 'Ablegen' : 'Ausrüsten'}
-                    </button>
+                    </Wahlknopf>
                   )}
 
                   {/* Edit button */}
-                  <button
-                    type="button"
-                    onClick={() => setEditingItem({ ...item })}
-                    className="p-1.5 rounded-knopf text-leise hover:text-gold-hell hover:bg-rahmen transition-all cursor-pointer"
-                    title="Gegenstand bearbeiten (inkl. Quelle & Seite)"
-                  >
+                  <Knopf nurSymbol onClick={() => setEditingItem({ ...item })} title="Gegenstand bearbeiten (inkl. Quelle & Seite)" aria-label="Gegenstand bearbeiten (inkl. Quelle & Seite)">
                     <Edit2 size={16} />
-                  </button>
+                  </Knopf>
 
                   {/* Delete button */}
-                  <button
-                    type="button"
-                    onClick={() => {
+                  <Knopf art="gefahr" nurSymbol onClick={() => {
                       dispatch({ type: 'REMOVE_INVENTORY_ITEM', payload: { id: item.id } });
                       toast.success(`'${item.name}' entfernt`);
-                    }}
-                    className="p-1.5 rounded-knopf text-leise hover:text-schrift hover:bg-schaden-grund transition-all cursor-pointer"
-                    title="Gegenstand löschen"
-                  >
+                    }} title="Gegenstand löschen" aria-label="Gegenstand löschen">
                     <Trash2 size={16} />
-                  </button>
+                  </Knopf>
                 </div>
               </div>
             );
@@ -716,39 +643,19 @@ export const InventoryView: React.FC = () => {
                 <Package size={20} className="text-gold" />
                 Gegenstand hinzufügen
               </h3>
-              <button
-                type="button"
-                onClick={() => setShowAddModal(false)}
-                className="text-leise hover:text-schrift font-bold text-lg px-2"
-              >
+              <Knopf nurSymbol onClick={() => setShowAddModal(false)}>
                 ✕
-              </button>
+              </Knopf>
             </div>
 
             {/* Modal Tabs */}
-            <div className="flex gap-2 border-b border-rahmen pb-2">
-              <button
-                type="button"
-                onClick={() => setModalTab('catalog')}
-                className={`min-h-11 px-4 py-1.5 rounded-knopf font-bold text-xs transition-all cursor-pointer ${
-                  modalTab === 'catalog'
-                    ? 'bg-erhoeht text-schrift border border-gold'
-                    : 'bg-erhoeht text-schrift border border-rahmen hover:bg-rahmen'
-                }`}
-              >
+            <div role="tablist" className="flex gap-2 border-b border-rahmen">
+              <Reiter gewaehlt={modalTab === 'catalog'} className="px-4 text-xs" onClick={() => setModalTab('catalog')}>
                 Splittermond Katalog ({ALL_EQUIPMENT.length} Gegenstände)
-              </button>
-              <button
-                type="button"
-                onClick={() => setModalTab('custom')}
-                className={`min-h-11 px-4 py-1.5 rounded-knopf font-bold text-xs transition-all cursor-pointer ${
-                  modalTab === 'custom'
-                    ? 'bg-erhoeht text-schrift border border-gold'
-                    : 'bg-erhoeht text-schrift border border-rahmen hover:bg-rahmen'
-                }`}
-              >
+              </Reiter>
+              <Reiter gewaehlt={modalTab === 'custom'} className="px-4 text-xs" onClick={() => setModalTab('custom')}>
                 Eigener Gegenstand
-              </button>
+              </Reiter>
             </div>
 
             {/* Tab 1: Catalog */}
@@ -844,13 +751,9 @@ export const InventoryView: React.FC = () => {
                           <p className="text-[11px] text-leise mt-1 line-clamp-1 italic">{catItem.desc}</p>
                         )}
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => handleAddCatalogItem(catItem)}
-                        className="min-h-11 bg-erhoeht hover:bg-rahmen text-schrift px-3 py-1 rounded-knopf font-bold text-xs shrink-0 cursor-pointer"
-                      >
+                      <Knopf onClick={() => handleAddCatalogItem(catItem)} className="font-bold text-xs shrink-0">
                         + Hinzufügen
-                      </button>
+                      </Knopf>
                     </div>
                   ))}
                   {filteredCatalog.length > 50 && (
@@ -999,19 +902,12 @@ export const InventoryView: React.FC = () => {
                 </div>
 
                 <div className="flex justify-end gap-2 pt-2 border-t border-rahmen">
-                  <button
-                    type="button"
-                    onClick={() => setShowAddModal(false)}
-                    className="min-h-11 px-4 py-1.5 rounded-knopf text-xs font-bold bg-erhoeht text-schrift hover:bg-rahmen"
-                  >
+                  <Knopf onClick={() => setShowAddModal(false)} className="text-xs font-bold">
                     Abbrechen
-                  </button>
-                  <button
-                    type="submit"
-                    className="min-h-11 bg-gold hover:bg-gold text-seite font-bold px-5 py-1.5 rounded-knopf text-xs "
-                  >
+                  </Knopf>
+                  <Knopf art="primaer" type="submit" className="font-bold text-xs">
                     Gegenstand erstellen
-                  </button>
+                  </Knopf>
                 </div>
               </form>
             )}
@@ -1028,13 +924,9 @@ export const InventoryView: React.FC = () => {
                 <Edit2 size={18} className="text-gold" />
                 Gegenstand bearbeiten: {editingItem.name}
               </h3>
-              <button
-                type="button"
-                onClick={() => setEditingItem(null)}
-                className="text-leise hover:text-schrift font-bold text-lg px-2 cursor-pointer"
-              >
+              <Knopf nurSymbol onClick={() => setEditingItem(null)}>
                 ✕
-              </button>
+              </Knopf>
             </div>
 
             <form
@@ -1077,6 +969,7 @@ export const InventoryView: React.FC = () => {
                       tickModifier: editingItem.tickModifier !== undefined && editingItem.tickModifier !== null && String(editingItem.tickModifier).trim() !== ''
                         ? parseInt(String(editingItem.tickModifier), 10) || 0
                         : undefined,
+                      hardness: editingItem.hardness,
                     },
                   },
                 });
@@ -1146,6 +1039,20 @@ export const InventoryView: React.FC = () => {
                     value={editingItem.weight ?? 0}
                     onChange={(e) =>
                       setEditingItem({ ...editingItem, weight: parseInt(e.target.value, 10) || 0 })
+                    }
+                    className="w-full bg-flaeche border border-rahmen rounded-knopf px-2 py-1.5 text-xs text-schrift"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-bold text-schrift block mb-1" htmlFor="bearbeiten-haerte">Härte</label>
+                  <input
+                    id="bearbeiten-haerte"
+                    type="number"
+                    min={0}
+                    value={editingItem.hardness ?? ''}
+                    onChange={(e) =>
+                      setEditingItem({ ...editingItem, hardness: e.target.value === '' ? undefined : Math.max(0, parseInt(e.target.value, 10) || 0) })
                     }
                     className="w-full bg-flaeche border border-rahmen rounded-knopf px-2 py-1.5 text-xs text-schrift"
                   />
@@ -1308,19 +1215,12 @@ export const InventoryView: React.FC = () => {
               </div>
 
               <div className="flex justify-end gap-2 pt-2 border-t border-rahmen">
-                <button
-                  type="button"
-                  onClick={() => setEditingItem(null)}
-                  className="min-h-11 px-4 py-1.5 rounded-knopf text-xs font-bold bg-erhoeht text-schrift hover:bg-rahmen cursor-pointer"
-                >
+                <Knopf onClick={() => setEditingItem(null)} className="text-xs font-bold">
                   Abbrechen
-                </button>
-                <button
-                  type="submit"
-                  className="min-h-11 bg-gold hover:bg-gold text-seite font-bold px-5 py-1.5 rounded-knopf text-xs cursor-pointer"
-                >
+                </Knopf>
+                <Knopf art="primaer" type="submit" className="font-bold text-xs">
                   Änderungen speichern
-                </button>
+                </Knopf>
               </div>
             </form>
           </Dialogfenster>

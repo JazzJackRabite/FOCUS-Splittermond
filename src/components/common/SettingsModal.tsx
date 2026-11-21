@@ -1,6 +1,5 @@
-import { Dialogfenster, Dialoghintergrund } from '../../fundament';
+import { Dialogfenster, Dialoghintergrund, Knopf, Dialog, Reiter } from '../../fundament';
 import { setzeHausregeln, useHausregeln } from '../../fundament/hausregeln';
-import { Knopf, Dialog } from '../../fundament';
 import React, { useState, useEffect } from 'react';
 import {
   X,
@@ -63,59 +62,30 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
           <div className="flex items-center gap-2">
             {/* Close Button */}
-            <button
-              type="button"
-              onClick={onClose}
-              className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-knopf border border-rahmen bg-erhoeht text-schrift hover:border-gold transition-colors"
-              aria-label="Schließen"
-            >
+            <Knopf art="sekundaer" nurSymbol onClick={onClose} aria-label="Schließen">
               <X size={22} />
-            </button>
+            </Knopf>
           </div>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex border-b border-rahmen mb-4 gap-1 shrink-0 overflow-x-auto custom-scrollbar">
-          <button
-            type="button"
-            onClick={() => setActiveTab('general')}
-            className={`min-h-11 shrink-0 whitespace-nowrap px-3 sm:px-4 py-2 text-xs sm:text-sm font-bold flex items-center gap-2 rounded-t-knopf transition-colors cursor-pointer ${
-              activeTab === 'general'
-                ? 'bg-erhoeht text-schrift border-t-2 border-gold'
-                : 'text-leise hover:text-gold-hell hover:bg-black/5'
-            }`}
-          >
+        <div role="tablist" className="flex border-b border-rahmen mb-4 gap-1 shrink-0 overflow-x-auto custom-scrollbar">
+          <Reiter gewaehlt={activeTab === 'general'} className="shrink-0 whitespace-nowrap px-3 sm:px-4 text-xs sm:text-sm" onClick={() => setActiveTab('general')}>
             <Sliders size={16} />
             <span>Allgemein</span>
-          </button>
+          </Reiter>
 
-          <button
-            type="button"
-            onClick={() => setActiveTab('regelpakete')}
-            className={`min-h-11 shrink-0 whitespace-nowrap px-3 sm:px-4 py-2 text-xs sm:text-sm font-bold flex items-center gap-2 rounded-t-knopf transition-colors cursor-pointer ${
-              activeTab === 'regelpakete'
-                ? 'bg-erhoeht text-schrift border-t-2 border-gold'
-                : 'text-leise hover:text-gold-hell hover:bg-black/5'
-            }`}
-          >
+          <Reiter gewaehlt={activeTab === 'regelpakete'} className="shrink-0 whitespace-nowrap px-3 sm:px-4 text-xs sm:text-sm" onClick={() => setActiveTab('regelpakete')}>
             <BookOpen size={16} />
             <span>Regelpakete</span>
-          </button>
+          </Reiter>
 
           
 
-          <button
-            type="button"
-            onClick={() => setActiveTab('info')}
-            className={`min-h-11 shrink-0 whitespace-nowrap px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold flex items-center gap-2 rounded-t-knopf transition-colors cursor-pointer ${
-              activeTab === 'info'
-                ? 'bg-erhoeht text-schrift border-t-2 border-gold'
-                : 'text-leise hover:text-schrift hover:bg-black/5'
-            }`}
-          >
+          <Reiter gewaehlt={activeTab === 'info'} className="shrink-0 whitespace-nowrap px-3 sm:px-4 text-xs sm:text-sm" onClick={() => setActiveTab('info')}>
             <Info size={16} />
             <span>Info</span>
-          </button>
+          </Reiter>
         </div>
 
         {/* ------------------------------------------------------------- */}

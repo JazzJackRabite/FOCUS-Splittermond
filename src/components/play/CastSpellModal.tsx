@@ -1,6 +1,5 @@
-import { Dialogfenster, Dialoghintergrund } from '../../fundament';
+import { Dialogfenster, Dialoghintergrund, Knopf, Dialog, Wahlknopf } from '../../fundament';
 import React, { useState, useEffect, useId, useMemo } from 'react';
-import { Knopf, Dialog } from '../../fundament';
 import {
   X,
   Sparkles,
@@ -608,13 +607,9 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
               </p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            aria-label="Schließen"
-            className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-knopf border border-rahmen bg-erhoeht text-schrift hover:border-gold transition-colors"
-          >
+          <Knopf art="sekundaer" nurSymbol onClick={onClose} aria-label="Schließen">
             <X className="w-5 h-5" />
-          </button>
+          </Knopf>
         </div>
 
         {/* Workflow Progress Steps */}
@@ -902,21 +897,12 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                 ].map((p) => {
                   const isActive = difficulty === p.val && selectedPreset === p.label;
                   return (
-                    <button
-                      key={p.label}
-                      type="button"
-                      onClick={() => {
+                    <Wahlknopf gewaehlt={isActive} mittig key={p.label} onClick={() => {
                         setDifficulty(p.val);
                         setSelectedPreset(p.label);
-                      }}
-                      className={`min-h-11 px-2.5 py-1 rounded-knopf border text-xs font-medium transition-all ${
-                        isActive
-                          ? 'bg-erhoeht text-schrift border-gold'
-                          : 'bg-flaeche text-schrift border-rahmen hover:bg-rahmen'
-                      }`}
-                    >
+                      }} className="text-xs font-medium">
                       {p.label}
-                    </button>
+                    </Wahlknopf>
                   );
                 })}
               </div>
@@ -996,19 +982,9 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                       { key: 'safe', label: 'Sicherheit' },
                       { key: 'risk', label: 'Risiko' },
                     ] as { key: RollType; label: string }[]).map(({ key, label }) => (
-                      <button
-                        key={key}
-                        type="button"
-                        onClick={() => setRollType(key)}
-                        disabled={isRolling}
-                        className={`min-h-11 flex-1 py-2 text-sm font-bold rounded-knopf border transition-all ${
-                          rollType === key
-                            ? 'bg-erhoeht text-schrift border-gold'
-                            : 'bg-flaeche text-schrift border-rahmen hover:bg-rahmen'
-                        }`}
-                      >
+                      <Wahlknopf gewaehlt={rollType === key} mittig key={key} onClick={() => setRollType(key)} disabled={isRolling} className="flex-1 text-sm font-bold">
                         {label}
-                      </button>
+                      </Wahlknopf>
                     ))}
                   </div>
                 </div>
@@ -1752,21 +1728,13 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                       <div>
                         <label className="block text-leise font-medium mb-1">Würfelanzahl</label>
                         <div className="flex items-center gap-1">
-                          <button
-                            type="button"
-                            onClick={() => setCustomDiceCount((c) => Math.max(1, c - 1))}
-                            className="w-6 h-6 border border-rahmen rounded-knopf flex items-center justify-center font-bold hover:bg-rahmen cursor-pointer"
-                          >
+                          <Knopf nurSymbol onClick={() => setCustomDiceCount((c) => Math.max(1, c - 1))}>
                             -
-                          </button>
+                          </Knopf>
                           <span className="tabular-nums font-bold w-6 text-center text-schrift">{customDiceCount}</span>
-                          <button
-                            type="button"
-                            onClick={() => setCustomDiceCount((c) => Math.min(20, c + 1))}
-                            className="w-6 h-6 border border-rahmen rounded-knopf flex items-center justify-center font-bold hover:bg-rahmen cursor-pointer"
-                          >
+                          <Knopf nurSymbol onClick={() => setCustomDiceCount((c) => Math.min(20, c + 1))}>
                             +
-                          </button>
+                          </Knopf>
                         </div>
                       </div>
 

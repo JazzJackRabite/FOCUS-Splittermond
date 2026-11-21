@@ -1,8 +1,8 @@
-import { Dialogfenster, Dialoghintergrund } from '../../fundament';
+import { Dialogfenster, Dialoghintergrund, Knopf, Wahlknopf, Dialog } from '../../fundament';
 import React, { useState, useMemo } from 'react';
-import { Knopf, Dialog } from '../../fundament';
 import { Heart, X, Plus, Minus, Check, Sparkles, Activity } from 'lucide-react';
 import type { HealthSlot, StatusCondition } from '../../types';
+import { heilkundeAuswirkungen, standardGesundheitsstufen, verschnaufpause } from '../../regelwerk/schadenUndHeilung';
 
 export interface HealModalProps {
   onClose: () => void;
@@ -24,16 +24,11 @@ export interface HealModalProps {
   }) => void;
 }
 
-type HealMethodType = 'manual' | 'erste_hilfe' | 'wundversorgung' | 'heilmagie' | 'heiltrank' | 'verschnaufpause';
+type HealMethodType = 'manual' | 'heilkunde' | 'heilmagie' | 'heiltrank' | 'verschnaufpause';
 type HealPriorityType = 'consumed_first' | 'exhausted_first' | 'only_consumed' | 'only_exhausted' | 'only_channeled';
 
-const GRW_STUFEN = [
-  { name: 'Unverletzt', wundabzug: 0 }, { name: 'Angeschlagen', wundabzug: -1 }, { name: 'Verletzt', wundabzug: -2 },
-  { name: 'Schwer verletzt', wundabzug: -4 }, { name: 'Todgeweiht', wundabzug: -8 },
-];
-
 export const HealModal: React.FC<HealModalProps> = ({
-  stufen = GRW_STUFEN,
+  stufen: stufenProp,
   begleiter,
   onClose,
   maxLP,
@@ -41,6 +36,9 @@ export const HealModal: React.FC<HealModalProps> = ({
   activeConditions,
   onApplyHeal,
 }) => {
+  const stufen = useMemo(() => stufenProp ?? standardGesundheitsstufen(), [stufenProp]);
+  const pause = useMemo(() => verschnaufpause(), []);
+  const heilkunde = useMemo(() => heilkundeAuswirkungen(), []);
   // Current slot damage counts
   const consumedCount = useMemo(
     () => currentHealthSlots.filter((s) => s.type === 'consumed').length,
@@ -74,24 +72,13 @@ export const HealModal: React.FC<HealModalProps> = ({
   // Handle method presets
   const handleSelectMethod = (selected: HealMethodType) => {
     setMethod(selected);
-    const newConditionsToRemove = new Set(conditionsToRemove);
-
-    // Auto-select "Blutend" removal if Erste Hilfe or Wundversorgung is selected (GRW S. 119–120)
-    if (selected === 'erste_hilfe' || selected === 'wundversorgung') {
-      activeConditions.forEach((c) => {
-        if (c.key === 'Blutend') {
-          newConditionsToRemove.add(c.id);
-        }
-      });
-      setConditionsToRemove(newConditionsToRemove);
-    }
-
+    // Welche Zustände eine Behandlung aufhebt, entscheidet der Spieltisch; der Dialog wählt nichts vor.
     if (selected === 'verschnaufpause') {
       setPriority('only_exhausted');
       setHealAmount(exhaustedCount > 0 ? exhaustedCount : 1);
     } else if (selected === 'heilmagie') {
       setPriority('consumed_first');
-    } else if (selected === 'wundversorgung') {
+    } else if (selected === 'heilkunde') {
       setPriority('consumed_first');
     }
   };
@@ -183,11 +170,10 @@ export const HealModal: React.FC<HealModalProps> = ({
 
     const methodNameMap: Record<HealMethodType, string> = {
       manual: 'Freie Eingabe',
-      erste_hilfe: 'Erste Hilfe (Heilkunde, GRW S. 119–120)',
-      wundversorgung: 'Wundversorgung (Heilkunde, GRW S. 119–120)',
+      heilkunde: 'Heilkunde',
       heilmagie: 'Heilmagie',
       heiltrank: 'Heiltrank / Elixier',
-      verschnaufpause: 'Verschnaufpause / Rast',
+      verschnaufpause: `Verschnaufpause (${pause.minuten} Minuten)`,
     };
 
     onApplyHeal({
@@ -221,14 +207,7 @@ export const HealModal: React.FC<HealModalProps> = ({
               </p>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-knopf border border-rahmen bg-erhoeht text-schrift hover:border-gold transition-colors"
-            title="Schließen" aria-label="Schließen"
-          >
-            <X size={20} />
-          </button>
+          <Knopf nurSymbol onClick={onClose} title="Schließen" aria-label="Schließen"><X size={20} /></Knopf>
         </div>
 
         {/* Scrollable Form Body */}
@@ -257,95 +236,39 @@ export const HealModal: React.FC<HealModalProps> = ({
           {/* 1. Heilmethode (GRW S. 119–120, 173–174) */}
           <div className="bg-seite border border-rahmen rounded-knopf p-3 sm:p-3.5 space-y-2">
             <label className="block text-xs font-bold text-unverletzt uppercase tracking-wider">
-              1. Heilmethode / Kontext (GRW S. 119–120, 173–174)
+              1. Heilmethode / Kontext
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
-              <button
-                type="button"
-                onClick={() => handleSelectMethod('manual')}
-                className={`min-h-11 p-2 rounded-knopf border text-left cursor-pointer transition-colors ${
-                  method === 'manual'
-                    ? 'bg-unverletzt-grund border-unverletzt text-schrift'
-                    : 'bg-seite border-rahmen text-schrift hover:bg-seite'
-                }`}
-              >
+              <Wahlknopf gewaehlt={method === 'manual'} ton="erholung" onClick={() => handleSelectMethod('manual')}>
                 <div className="font-bold text-xs">Freie Heilung</div>
                 <div className="text-[11px] text-leise leading-tight">Beliebige Punkte</div>
-              </button>
+              </Wahlknopf>
 
-              <button
-                type="button"
-                onClick={() => handleSelectMethod('erste_hilfe')}
-                className={`min-h-11 p-2 rounded-knopf border text-left cursor-pointer transition-colors ${
-                  method === 'erste_hilfe'
-                    ? 'bg-unverletzt-grund border-unverletzt text-schrift'
-                    : 'bg-seite border-rahmen text-schrift hover:bg-seite'
-                }`}
-              >
+              <Wahlknopf gewaehlt={method === 'heilkunde'} ton="erholung" onClick={() => handleSelectMethod('heilkunde')} title={[heilkunde['Gelungen'], heilkunde['Herausragend']].filter(Boolean).join(' ')}>
                 <div className="font-bold text-xs flex items-center justify-between">
-                  <span>Erste Hilfe</span>
+                  <span>Heilkunde</span>
                   <Activity size={12} className="text-unverletzt" />
                 </div>
-                <div className="text-[11px] text-leise leading-tight">Heilkunde, GRW S. 119–120</div>
-              </button>
+                <div className="text-[11px] text-leise leading-tight">Probe, Wunde versorgt</div>
+              </Wahlknopf>
 
-              <button
-                type="button"
-                onClick={() => handleSelectMethod('wundversorgung')}
-                className={`min-h-11 p-2 rounded-knopf border text-left cursor-pointer transition-colors ${
-                  method === 'wundversorgung'
-                    ? 'bg-unverletzt-grund border-unverletzt text-schrift'
-                    : 'bg-seite border-rahmen text-schrift hover:bg-seite'
-                }`}
-              >
-                <div className="font-bold text-xs flex items-center justify-between">
-                  <span>Wundversorgung</span>
-                  <Plus size={12} className="text-unverletzt" />
-                </div>
-                <div className="text-[11px] text-leise leading-tight">Heilkunde, GRW S. 119–120</div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleSelectMethod('heilmagie')}
-                className={`min-h-11 p-2 rounded-knopf border text-left cursor-pointer transition-colors ${
-                  method === 'heilmagie'
-                    ? 'bg-unverletzt-grund border-unverletzt text-schrift'
-                    : 'bg-seite border-rahmen text-schrift hover:bg-seite'
-                }`}
-              >
+              <Wahlknopf gewaehlt={method === 'heilmagie'} ton="erholung" onClick={() => handleSelectMethod('heilmagie')}>
                 <div className="font-bold text-xs flex items-center justify-between">
                   <span>Heilmagie</span>
                   <Sparkles size={12} className="text-unverletzt" />
                 </div>
                 <div className="text-[11px] text-leise leading-tight">Balsam, etc.</div>
-              </button>
+              </Wahlknopf>
 
-              <button
-                type="button"
-                onClick={() => handleSelectMethod('heiltrank')}
-                className={`min-h-11 p-2 rounded-knopf border text-left cursor-pointer transition-colors ${
-                  method === 'heiltrank'
-                    ? 'bg-unverletzt-grund border-unverletzt text-schrift'
-                    : 'bg-seite border-rahmen text-schrift hover:bg-seite'
-                }`}
-              >
+              <Wahlknopf gewaehlt={method === 'heiltrank'} ton="erholung" onClick={() => handleSelectMethod('heiltrank')}>
                 <div className="font-bold text-xs">Heiltrank / Elixier</div>
                 <div className="text-[11px] text-leise leading-tight">Alchemie</div>
-              </button>
+              </Wahlknopf>
 
-              <button
-                type="button"
-                onClick={() => handleSelectMethod('verschnaufpause')}
-                className={`min-h-11 p-2 rounded-knopf border text-left cursor-pointer transition-colors ${
-                  method === 'verschnaufpause'
-                    ? 'bg-unverletzt-grund border-unverletzt text-schrift'
-                    : 'bg-seite border-rahmen text-schrift hover:bg-seite'
-                }`}
-              >
-                <div className="font-bold text-xs">Erholung</div>
-                <div className="text-[11px] text-leise leading-tight">Alle Betäubung weg</div>
-              </button>
+              <Wahlknopf gewaehlt={method === 'verschnaufpause'} ton="erholung" onClick={() => handleSelectMethod('verschnaufpause')}>
+                <div className="font-bold text-xs">Verschnaufpause</div>
+                <div className="text-[11px] text-leise leading-tight">{pause.minuten} Minuten: {pause.wirkung}</div>
+              </Wahlknopf>
             </div>
           </div>
 
@@ -443,70 +366,30 @@ export const HealModal: React.FC<HealModalProps> = ({
               3. Zu heilende Schadensart / Priorität
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 text-xs">
-              <button
-                type="button"
-                onClick={() => setPriority('consumed_first')}
-                className={`min-h-11 p-2 rounded-knopf border text-left cursor-pointer transition-colors ${
-                  priority === 'consumed_first'
-                    ? 'bg-unverletzt-grund border-unverletzt text-schrift'
-                    : 'bg-seite border-rahmen text-schrift hover:bg-seite'
-                }`}
-              >
+              <Wahlknopf gewaehlt={priority === 'consumed_first'} ton="erholung" onClick={() => setPriority('consumed_first')}>
                 <div className="font-bold text-xs text-schrift">Echter Schaden zuerst</div>
                 <div className="text-[11px] text-leise">Rest auf Betäubung</div>
-              </button>
+              </Wahlknopf>
 
-              <button
-                type="button"
-                onClick={() => setPriority('exhausted_first')}
-                className={`min-h-11 p-2 rounded-knopf border text-left cursor-pointer transition-colors ${
-                  priority === 'exhausted_first'
-                    ? 'bg-unverletzt-grund border-unverletzt text-schrift'
-                    : 'bg-seite border-rahmen text-schrift hover:bg-seite'
-                }`}
-              >
+              <Wahlknopf gewaehlt={priority === 'exhausted_first'} ton="erholung" onClick={() => setPriority('exhausted_first')}>
                 <div className="font-bold text-xs text-schrift">Betäubung zuerst</div>
                 <div className="text-[11px] text-leise">Rest auf echten Schaden</div>
-              </button>
+              </Wahlknopf>
 
-              <button
-                type="button"
-                onClick={() => setPriority('only_consumed')}
-                className={`min-h-11 p-2 rounded-knopf border text-left cursor-pointer transition-colors ${
-                  priority === 'only_consumed'
-                    ? 'bg-unverletzt-grund border-unverletzt text-schrift'
-                    : 'bg-seite border-rahmen text-schrift hover:bg-seite'
-                }`}
-              >
+              <Wahlknopf gewaehlt={priority === 'only_consumed'} ton="erholung" onClick={() => setPriority('only_consumed')}>
                 <div className="font-bold text-xs text-schaden">Nur Echter Schaden</div>
                 <div className="text-[11px] text-leise">Kästen leeren</div>
-              </button>
+              </Wahlknopf>
 
-              <button
-                type="button"
-                onClick={() => setPriority('only_exhausted')}
-                className={`min-h-11 p-2 rounded-knopf border text-left cursor-pointer transition-colors ${
-                  priority === 'only_exhausted'
-                    ? 'bg-unverletzt-grund border-unverletzt text-schrift'
-                    : 'bg-seite border-rahmen text-schrift hover:bg-seite'
-                }`}
-              >
+              <Wahlknopf gewaehlt={priority === 'only_exhausted'} ton="erholung" onClick={() => setPriority('only_exhausted')}>
                 <div className="font-bold text-xs text-gold-hell">Nur Betäubung</div>
                 <div className="text-[11px] text-leise">Kästen leeren</div>
-              </button>
+              </Wahlknopf>
 
-              <button
-                type="button"
-                onClick={() => setPriority('only_channeled')}
-                className={`min-h-11 p-2 rounded-knopf border text-left cursor-pointer transition-colors ${
-                  priority === 'only_channeled'
-                    ? 'bg-unverletzt-grund border-unverletzt text-schrift'
-                    : 'bg-seite border-rahmen text-schrift hover:bg-seite'
-                }`}
-              >
+              <Wahlknopf gewaehlt={priority === 'only_channeled'} ton="erholung" onClick={() => setPriority('only_channeled')}>
                 <div className="font-bold text-xs text-kanalisiert">Nur Kanalisiert</div>
                 <div className="text-[11px] text-leise">Kästen leeren</div>
-              </button>
+              </Wahlknopf>
             </div>
 
             {/* Effective healing summary pill */}
@@ -536,7 +419,7 @@ export const HealModal: React.FC<HealModalProps> = ({
             {activeConditions.length > 0 ? (
               <div className="space-y-1.5 pt-1">
                 <p className="text-[11px] text-leise">
-                  Wähle Zustände aus, die durch die Versorgung (z. B. Verband bei <em>Blutend</em>) aufgehoben werden:
+                  Wähle die Zustände, die durch die Behandlung enden:
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                   {activeConditions.map((cond) => {
@@ -561,11 +444,6 @@ export const HealModal: React.FC<HealModalProps> = ({
                             {cond.key} {cond.level && cond.level > 1 ? `Stufe ${cond.level}` : ''}
                           </span>
                         </div>
-                        {cond.key === 'Blutend' && (
-                          <span className="text-[11px] text-gold-hell font-semibold px-1.5 py-0.2 rounded-knopf bg-erschoepft-grund border border-erschoepft">
-                            Wundversorgung
-                          </span>
-                        )}
                       </label>
                     );
                   })}
