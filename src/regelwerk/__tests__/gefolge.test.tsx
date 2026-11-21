@@ -10,7 +10,7 @@ import { CharacterContext } from '../../context/CharacterContext';
 import { BegleiterView } from '../../features/begleiter/BegleiterView';
 import { validateCharacterImport } from '../../utils/importValidation';
 import { Katalog } from '../katalog';
-import { basisAusDateien } from './hilfen';
+import { abschliessen, basisAusDateien, begleiterErstellen, weiter } from './hilfen';
 import { freieAttribute, freieZauberBei, gefolgeWerte, hoechsterZaubergrad, kulturWerte, meisterschaftsAngebot, zauberAngebot } from '../gefolge';
 import type { Begleiter, CharacterState } from '../../types';
 
@@ -105,42 +105,48 @@ const Rahmen: React.FC<{ start: Partial<CharacterState> }> = ({ start }) => {
 };
 
 describe('Tab „Begleiter“: Gefolge', () => {
-  it('Gefolgsmann hinzufügen, Kultur wählen, Fertigkeit anheben, Punkte zählen', () => {
+  it('Gefolgsmann im Assistenten: Rasse und Kultur, Fertigkeit anheben, Punkte zählen', () => {
     render(<Rahmen start={{ resourcesList: [{ name: 'Gefolge', level: 1, source: 'test' }] }} />);
-    const sek = screen.getByTestId('begleiter-gefolge');
-    expect(within(sek).getByText(/Ressource Gefolge: 1; verbraucht 0/)).toBeTruthy();
-    fireEvent.change(within(sek).getByLabelText('Rasse wählen'), { target: { value: 'grw:rasse:zwerge' } });
-    fireEvent.change(within(sek).getByLabelText('Kultur wählen'), { target: { value: 'grw:kultur:zwingard' } });
-    fireEvent.click(within(sek).getByRole('button', { name: /Gefolgsmann hinzufügen/ }));
-    fireEvent.click(within(sek).getByRole('button', { name: 'Gefolgsmann (Zwingard)' }));
-    fireEvent.change(within(sek).getByPlaceholderText('Leibdiener, Knappe …'), { target: { value: 'Knappe' } });
-    expect(within(sek).getByRole('button', { name: 'Knappe (Zwingard)' })).toBeTruthy();
-    fireEvent.change(within(sek).getByLabelText(/^Freier Attributbonus 1/), { target: { value: 'Stärke' } });
-    fireEvent.change(within(sek).getByLabelText('Kultur: Hiebwaffen oder Schusswaffen oder Stangenwaffen 1'), { target: { value: 'grw:fertigkeit:stangenwaffen' } });
-    // zwei Tabellen: Waffen (Waffenlos hat jeder) und Fertigkeiten
-    const tabellen = within(sek).getAllByRole('table');
-    expect(within(tabellen[0]).getByText('Waffenlos')).toBeTruthy();
-    const tabelle = tabellen[tabellen.length - 1];
-    expect(within(tabelle).getByText('Stangenwaffen')).toBeTruthy();
-    expect(within(sek).getByText('(Kultur)').parentElement!.textContent).toContain('Schnell wieder auf den Beinen');
-    expect(within(sek).getByText(/verbraucht 1\./)).toBeTruthy();
+    const d = begleiterErstellen('Gefolgsmann');
+    const punkte = () => within(d).getByTestId('gefolge-punkte').textContent ?? '';
+    expect(punkte()).toContain('Gefolge-Punkte 0/1');
+    fireEvent.change(within(d).getByLabelText('Rasse'), { target: { value: 'grw:rasse:zwerge' } });
+    fireEvent.change(within(d).getByLabelText('Kultur'), { target: { value: 'grw:kultur:zwingard' } });
+    expect(punkte()).toContain('Gefolge-Punkte 1/1');
+    weiter();
+    fireEvent.change(within(d).getByPlaceholderText('Leibdiener, Knappe …'), { target: { value: 'Knappe' } });
+    expect(screen.getByText('Gefolgsmann erstellen')).toBeTruthy();
+    fireEvent.change(within(d).getByLabelText(/^Freier Attributbonus 1/), { target: { value: 'Stärke' } });
+    fireEvent.change(within(d).getByLabelText('Kultur: Hiebwaffen oder Schusswaffen oder Stangenwaffen 1'), { target: { value: 'grw:fertigkeit:stangenwaffen' } });
+    weiter();
     // Stangenwaffen auf 6 anheben → 2 Punkte, mehr als die Ressource
-    const zeile = within(tabelle).getByText('Stangenwaffen').closest('tr')!;
+    const zeile = within(within(d).getByRole('table')).getByText('Stangenwaffen').closest('tr')!;
     // ohne Hausregeln gesperrt (FUNDAMENT, Grundsatz 7), mit Hausregeln nur eine Warnung
     fireEvent.click(within(zeile).getByRole('button', { name: /anheben/ }));
-    expect(within(sek).getByText(/verbraucht 1\./)).toBeTruthy();
+    expect(punkte()).toContain('Gefolge-Punkte 1/1');
     setzeHausregeln(true);
     fireEvent.click(within(zeile).getByRole('button', { name: /anheben/ }));
     expect(within(zeile).getAllByText(/^6/).length).toBeGreaterThan(0);
-    expect(within(sek).getByText(/verbraucht 2\./)).toBeTruthy();
-    expect(within(sek).getByText(/mehr Punkte, als die Ressource Gefolge hergibt/)).toBeTruthy();
+    expect(punkte()).toContain('Gefolge-Punkte 2/1');
+    expect(within(d).getByText(/Mehr Punkte, als die Ressource Gefolge hergibt/)).toBeTruthy();
+    weiter();
+    expect(within(d).getByText('Waffenlos')).toBeTruthy(); // hat jeder
+    weiter();
+    expect(within(d).getByText('(Kultur)').parentElement!.textContent).toContain('Schnell wieder auf den Beinen');
     // Meisterschaft der Schwelle ist frei
-    const sel = within(sek).getByLabelText('Meisterschaft für Gefolgsmann wählen') as HTMLSelectElement;
+    const sel = within(d).getByLabelText('Meisterschaft für Gefolgsmann wählen') as HTMLSelectElement;
     const verteidiger = [...sel.options].find(o => o.text.startsWith('Verteidiger'))!;
     fireEvent.change(sel, { target: { value: verteidiger.value } });
-    fireEvent.click(within(sek).getByRole('button', { name: /Meisterschaft hinzufügen/ }));
-    expect(within(sek).getByText(/frei durch Schwelle/)).toBeTruthy();
-    expect(within(sek).getByText(/verbraucht 2\./)).toBeTruthy();
+    fireEvent.click(within(d).getByRole('button', { name: /Meisterschaft hinzufügen/ }));
+    expect(within(d).getByText(/frei durch Schwelle/)).toBeTruthy();
+    expect(punkte()).toContain('Gefolge-Punkte 2/1');
+    abschliessen();
+    const blatt = screen.getByTestId('begleiter-blatt');
+    expect(within(blatt).getByRole('heading', { name: 'Knappe (Zwingard)' })).toBeTruthy();
+    expect(within(blatt).getByText('2 Gefolge-Punkte')).toBeTruthy();
+    expect(within(blatt).getByRole('button', { name: /^Angriff Waffenlos würfeln$/ })).toBeTruthy();
+    expect(screen.getByText(/Das Gefolge braucht mehr Punkte/)).toBeTruthy();
     setzeHausregeln(false);
   });
 });
+

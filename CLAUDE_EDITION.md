@@ -736,6 +736,33 @@ die Grimoires), Dateiendung `.grim`. Das Grundregelwerk ist kein Grimoire; es bl
   Code und weichen teils von der Tabelle Kampfpositionen (S. 170) ab; nur ein Manöver je Angriff wählbar (das GRW erlaubt
   mehrere); Würfelmechanik und Erfolgsgrad-Bezeichnungen (`calculateAttackEG`) noch im Code.
 
+## Stand 30 (21.11.2026): Begleiter-Tab neu – Blatt wie „Kampf & Magie“, Erstellen im Assistenten
+
+- **Blatt je Begleiter** (`components/begleiter/BegleiterBlatt.tsx`), aufgebaut wie „Kampf & Magie“: Kopf mit Name, Art,
+  Kurzangaben, „Bearbeiten“ und „Entfernen“ (mit Rückfrage); darunter „Lebenspunkte & Fokus“ (LP-Kästchen, Fokus,
+  Zustände, Pausen) neben „Werte“ (abgeleitete Werte und Attribute als Kacheln, Zustände eingerechnet); dann links
+  „Angriffe“ (Waffenkarten mit Kacheln und Knöpfen Angriff/Schaden) und „Fertigkeiten“ (Würfelknöpfe), rechts „Zauber“
+  (Wirken), „Fähigkeiten“ (Typus, Merkmale, Meisterschaften, Abrichtungen, Instruktionen, Dienste … je Art) und Notiz.
+  Eine Leiste im Kopf des Tabs wählt den Begleiter; dort auch Ressourcen und übergreifende Hinweise.
+- **Erstellen nur im Assistenten** (`components/begleiter/assistent/`): Knopf „Begleiter erstellen“ öffnet einen Dialog,
+  ein Schritt nach dem anderen mit Schrittleiste. Zuerst die Art (Tier, Gefolgsmann, Beschworenes Wesen, Erhobener
+  Untoter, Golem; ohne passendes Grimoire gesperrt mit Hinweis), dann die Schritte der Art:
+  Tier: Tier wählen (Katalog oder eigene Kreatur) · Grundangaben · Module · Abrichtungen · Übersicht;
+  Gefolgsmann: Rasse und Kultur · Grundangaben · Fertigkeiten · Waffen · Meisterschaften und Zauber · Übersicht;
+  Wesen: Wesen wählen · Name (und Dienste) · Module, Rollen und Dienste · Übersicht;
+  Untoter: Zauber und Wertesatz · Verstärkung und Abnormität · Steigerung · Freie Meisterschaften · Übersicht;
+  Golem: Korpus · Material und Animierung · Fähigkeiten und Rollen · Applikationen und Schwachpunkte ·
+  Instruktionen und Verfügungen · Sonderausstattung und Feinschliff · Übersicht.
+  Geändert wird ein Entwurf; erst „Erstellen“ bzw. „Übernehmen“ schreibt ihn in den Charakter. „Bearbeiten“ öffnet
+  denselben Assistenten ohne Art und Grundlage (Lebenspunkte, Zustände und Notiz bleiben). Sperren wie bisher
+  (`aenderungGesperrt`, `regelverstoss`; mit Hausregeln Warnung).
+- Gemeinsame Teile: `besitzer.ts` (Ressourcen, Meisterschaften, Zauber des Abenteurers), `ansicht.ts` (einheitliche Sicht
+  auf alle Arten für Blatt und Übersicht). Die alten Abschnitte (`Tier-/Gefolge-/Wesen-/Untot-/GolemAbschnitt.tsx`)
+  sind entfernt; ihre Bedienelemente stecken unverändert in den Schritten. Der Text mit festen EP-Kosten beim
+  Untoten ist entfallen (Zahlen nur aus dem Paket).
+- Tests: Oberflächentests auf den Assistenten umgestellt (Hilfen `begleiterErstellen`, `weiter`, `abschliessen`,
+  `blattWaehlen` in `__tests__/hilfen.ts`); 417 Tests grün mit den Grimoires vom 12.11. auf D:, Build läuft.
+
 ## Google AI Studio
 
 Unverändert eine Vite-/React-App mit `metadata.json` im Wurzelordner; Import über „Import from GitHub“, Hosting über Cloud Run.

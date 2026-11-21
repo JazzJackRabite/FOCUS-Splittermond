@@ -12,7 +12,7 @@ import { CharacterContext } from '../../context/CharacterContext';
 import { BegleiterView } from '../../features/begleiter/BegleiterView';
 import { validateCharacterImport } from '../../utils/importValidation';
 import { Katalog } from '../katalog';
-import { basisAusDateien, grimoireDatei } from './hilfen';
+import { abschliessen, basisAusDateien, begleiterErstellen, grimoireDatei, weiter } from './hilfen';
 import { erstelleKatalog, grimoireLesen } from '../laden';
 import { anwenden, iniPlus, leseModifikationen, mehrfachAusText, schadenPlus, werteblock } from '../modifikationen';
 import { attributKosten, erhebungen, fertigkeitKosten, freieSchwelle, grenzHeldengrad, untotWerte, ANGRIFF } from '../untote';
@@ -175,39 +175,52 @@ describe.skipIf(!MAGIE || !fs.existsSync(MAGIE))('Untote und Golems mit „Die M
     expect(golemWerte(KM, { ...golem, golemRessource: true }).applikationenExtra).toBe(0);
   });
 
-  it('Tab: Golem bauen und Untoten erheben', () => {
+  it('Assistent: Golem bauen und Untoten erheben', () => {
     kat.aktuell = KM;
     render(<Rahmen start={{ masteries: { Todesmagie: [{ id: 'm', name: 'Meister der Abnormitäten', tier: 1, cost: 0, isFree: false, isCreationBonus: false, source: 't', skill: 'Todesmagie' }] } }} />);
-    const gs = screen.getByTestId('begleiter-golems');
-    const sel = within(gs).getByLabelText('Korpus wählen') as HTMLSelectElement;
-    fireEvent.change(sel, { target: { value: 'magie:golem_baustein:klein' } });
-    fireEvent.click(within(gs).getByRole('button', { name: /Golem hinzufügen/ }));
-    fireEvent.click(within(gs).getByRole('button', { name: 'Golem (Klein)' }));
-    expect(within(gs).getByText('Golem 1')).toBeTruthy();
-    fireEvent.change(within(gs).getByLabelText(/Golemmaterial/), { target: { value: 'magie:material:holz' } });
-    const fa = within(gs).getByLabelText('Zusätzliche Fähigkeit wählen') as HTMLSelectElement;
+    let d = begleiterErstellen('Golem');
+    fireEvent.change(within(d).getByLabelText('Korpus (Schritt 1)'), { target: { value: 'magie:golem_baustein:klein' } });
+    weiter();
+    const stand = () => within(d).getByTestId('golem-stand').textContent ?? '';
+    expect(stand()).toContain('Golem 1');
+    fireEvent.change(within(d).getByLabelText(/Golemmaterial/), { target: { value: 'magie:material:holz' } });
+    weiter();
+    const fa = within(d).getByLabelText('Zusätzliche Fähigkeit wählen') as HTMLSelectElement;
     fireEvent.change(fa, { target: { value: [...fa.options].find(o => o.text.startsWith('Hände'))!.value } });
-    fireEvent.click(within(gs).getAllByRole('button', { name: /^Hinzufügen$/ })[0]); // erste Gruppe: Zusätzliche Fähigkeiten
-    expect(within(gs).getByText('Golem 2')).toBeTruthy();
-    expect(within(gs).getByText(/Animierung II/)).toBeTruthy();
+    fireEvent.click(within(d).getByRole('button', { name: /^Zusätzliche Fähigkeit hinzufügen$/ }));
+    expect(stand()).toContain('Golem 2');
+    fireEvent.click(screen.getByRole('button', { name: /Zurück/ }));
+    expect(within(d).getByText(/Animierung II/)).toBeTruthy();
+    abschliessen();
+    let blatt = screen.getByTestId('begleiter-blatt');
+    expect(within(blatt).getByRole('heading', { name: 'Golem (Klein)' })).toBeTruthy();
+    expect(within(blatt).getByText('Golem 2')).toBeTruthy();
+    expect(within(blatt).getByText('Hände')).toBeTruthy();
 
-    const us = screen.getByTestId('begleiter-untote');
-    fireEvent.change(within(us).getByLabelText('Erhebungszauber wählen'), { target: { value: 'magie:zauber:totentier' } });
-    fireEvent.change(within(us).getByLabelText('Wertesatz wählen'), { target: { value: 'Gruftkatze' } });
-    fireEvent.click(within(us).getByRole('button', { name: /Untoten hinzufügen/ }));
-    fireEvent.click(within(us).getByRole('button', { name: 'Gruftkatze' }));
-    fireEvent.change(within(us).getByLabelText('Anzahl Verstärkungen'), { target: { value: '1' } });
-    fireEvent.click(within(us).getByLabelText('KON steigern'));
-    expect(within(us).getByText('EP 10/10')).toBeTruthy();
+    d = begleiterErstellen('Erhobener Untoter');
+    fireEvent.change(within(d).getByLabelText('Erhebungszauber'), { target: { value: 'magie:zauber:totentier' } });
+    fireEvent.change(within(d).getByLabelText('Wertesatz'), { target: { value: 'Gruftkatze' } });
+    weiter();
+    fireEvent.change(within(d).getByLabelText('Anzahl Verstärkungen'), { target: { value: '1' } });
+    weiter();
+    fireEvent.click(within(d).getByLabelText('KON steigern'));
+    expect(within(d).getByText('EP 10/10')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: /Zurück/ }));
     // 15 EP bei 10 verfügbaren: ohne Hausregeln gesperrt, mit Hausregeln nur eine Warnung
-    fireEvent.change(within(us).getByLabelText('Abnormität'), { target: { value: 'magie:abnormitaet:mordlust' } });
-    expect(within(us).getByText('EP 10/10')).toBeTruthy();
+    fireEvent.change(within(d).getByLabelText('Abnormität'), { target: { value: 'magie:abnormitaet:mordlust' } });
+    expect(within(d).getByText('EP 10/10')).toBeTruthy();
     setzeHausregeln(true);
-    fireEvent.change(within(us).getByLabelText('Abnormität'), { target: { value: 'magie:abnormitaet:mordlust' } });
-    expect(within(us).getByText('EP 15/10')).toBeTruthy();
+    fireEvent.change(within(d).getByLabelText('Abnormität'), { target: { value: 'magie:abnormitaet:mordlust' } });
+    expect(within(d).getByText('EP 15/10')).toBeTruthy();
+    abschliessen();
+    blatt = screen.getByTestId('begleiter-blatt');
+    expect(within(blatt).getByRole('heading', { name: 'Gruftkatze' })).toBeTruthy();
+    expect(within(blatt).getByText('EP 15/10')).toBeTruthy();
+    expect(screen.getAllByRole('tab')).toHaveLength(2);
     setzeHausregeln(false);
   });
 });
+
 
 const Rahmen: React.FC<{ start: Partial<CharacterState> }> = ({ start }) => {
   const [state, dispatch] = React.useReducer(baseCharacterReducer, { ...DEFAULT_STATE, ...start });

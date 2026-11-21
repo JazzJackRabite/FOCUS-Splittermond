@@ -10,7 +10,7 @@ import { baseCharacterReducer, DEFAULT_STATE } from '../../hooks/useCharacterSta
 import { CharacterContext } from '../../context/CharacterContext';
 import { BegleiterView } from '../../features/begleiter/BegleiterView';
 import { Katalog } from '../katalog';
-import { basisAusDateien, GRIMOIRE_ORDNER, grimoireDatei } from './hilfen';
+import { abschliessen, basisAusDateien, begleiterErstellen, GRIMOIRE_ORDNER, grimoireDatei, weiter } from './hilfen';
 import { erstelleKatalog, grimoireLesen } from '../laden';
 import { setzeAktivenKatalog } from '../bruecke';
 import { basen, baukastenArt, wesenBaukastenWerte } from '../wesenBaukasten';
@@ -86,24 +86,30 @@ describe.skipIf(!GRIMOIRE_ORDNER || !fs.existsSync(datei('magie')) || !fs.exists
     expect(w.werte!.waffen[0].ini).toBe('7-1W6');
   });
 
-  it('Tab: Wesen bauen, Modul hinzufügen, zweites gleiches Modul gesperrt', () => {
+  it('Assistent: Wesen bauen, Modul hinzufügen, zweites gleiches Modul gesperrt', () => {
     render(<Rahmen />);
-    const sek = screen.getByTestId('begleiter-wesen');
-    fireEvent.change(within(sek).getByLabelText('Eigenes Wesen bauen: Korpus'), { target: { value: id('magie', 'Mittel', 'wesen_baukasten_basis') } });
-    fireEvent.click(within(sek).getByRole('button', { name: /Wesen bauen/ }));
-    fireEvent.click(within(sek).getByRole('button', { name: 'Eigenes Wesen (Mittel)' }));
-    const auswahl = within(sek).getByLabelText('Schritt 3: Zusätzliche Fähigkeiten: Baustein wählen') as HTMLSelectElement;
+    const d = begleiterErstellen('Beschworenes Wesen');
+    fireEvent.click(within(d).getByRole('button', { name: /^Eigenes Wesen bauen/ }));
+    fireEvent.change(within(d).getByLabelText('Korpus des Wesens'), { target: { value: id('magie', 'Mittel', 'wesen_baukasten_basis') } });
+    weiter();
+    weiter();
+    const auswahl = within(d).getByLabelText('Schritt 3: Zusätzliche Fähigkeiten: Baustein wählen') as HTMLSelectElement;
     const hinzu = () => {
       fireEvent.change(auswahl, { target: { value: id('magie', 'Bedrohlich') } });
       fireEvent.click(within(auswahl.closest('div')!.parentElement!.parentElement!).getByRole('button', { name: /Hinzufügen/ }));
     };
     hinzu();
-    expect(within(sek).getByText('Stufe 2')).toBeTruthy();
+    expect(within(d).getByText(/Beschwörbares Wesen 2 =/)).toBeTruthy();
     hinzu(); // höchstens einmal: gesperrt (ohne Hausregeln)
-    expect(within(sek).getByText('Stufe 2')).toBeTruthy();
-    expect(within(sek).getAllByRole('button', { name: /Bedrohlich entfernen/ })).toHaveLength(1);
+    expect(within(d).getByText(/Beschwörbares Wesen 2 =/)).toBeTruthy();
+    expect(within(d).getAllByRole('button', { name: /Bedrohlich entfernen/ })).toHaveLength(1);
+    abschliessen();
+    const blatt = screen.getByTestId('begleiter-blatt');
+    expect(within(blatt).getByRole('heading', { name: 'Eigenes Wesen (Mittel)' })).toBeTruthy();
+    expect(within(blatt).getByText('Stufe 2')).toBeTruthy();
   });
 });
+
 
 const Rahmen: React.FC = () => {
   const [state, dispatch] = React.useReducer(baseCharacterReducer, { ...DEFAULT_STATE } as CharacterState);

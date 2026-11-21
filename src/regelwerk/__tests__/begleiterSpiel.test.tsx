@@ -78,8 +78,8 @@ const Rahmen: React.FC<{ start: Partial<CharacterState> }> = ({ start }) => {
 describe('Tab „Begleiter“: würfeln und Lebenspunkte', () => {
   it('Wolf: Schaden setzt Wundabzug, Probe und Angriff öffnen die Modale', () => {
     render(<Rahmen start={{ begleiter: [{ id: 'grw:kreatur:wolf', art: 'tier', name: 'Wolf', rufname: 'Grauzahn' }] }} />);
-    const tiere = screen.getByTestId('begleiter-tiere');
-    fireEvent.click(within(tiere).getByRole('button', { name: 'Grauzahn (Wolf)' }));
+    const tiere = screen.getByTestId('begleiter-blatt'); // einziger Begleiter: sein Blatt ist gewählt
+    expect(within(tiere).getByRole('heading', { name: 'Grauzahn (Wolf)' })).toBeTruthy();
     const v = within(tiere).getByTestId('begleiter-vitals');
     const lp = Number(K.get('grw:kreatur:wolf')!.daten.abgeleitete_werte.LP);
     // Wolf ist Schwächlich: 3 Gesundheitsstufen (Unverletzt, Verletzt, Todgeweiht)
