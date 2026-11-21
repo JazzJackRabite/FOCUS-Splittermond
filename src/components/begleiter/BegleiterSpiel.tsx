@@ -218,7 +218,7 @@ const BegleiterZustaende: React.FC<{ spiel: ReturnType<typeof useBegleiterSpiel>
 };
 
 /** Lebenspunkte (je Gesundheitsstufe), Fokus und Zustände eines Begleiters */
-export const BegleiterVitals: React.FC<{ spiel: ReturnType<typeof useBegleiterSpiel>; daten: BegleiterSpielDaten }> = ({ spiel, daten: angaben }) => {
+export const BegleiterVitals: React.FC<{ spiel: ReturnType<typeof useBegleiterSpiel>; daten: BegleiterSpielDaten; rahmenlos?: boolean }> = ({ spiel, daten: angaben, rahmenlos }) => {
   const { lage, zustand: z, setze, log, stufenQuelle } = spiel;
   const [foMenge, setFoMenge] = useState(1);
   const k = aktiverKatalog();
@@ -238,7 +238,7 @@ export const BegleiterVitals: React.FC<{ spiel: ReturnType<typeof useBegleiterSp
   const farbe = { s: TON.schaden, b: TON.erschoepft, k: TON.kanalisiert, '': TON.unverletzt };
 
   return (
-    <div className="border border-rahmen rounded-knopf p-3 space-y-3 bg-flaeche" data-testid="begleiter-vitals">
+    <div className={rahmenlos ? 'space-y-4' : 'border border-rahmen rounded-knopf p-3 space-y-3 bg-flaeche'} data-testid="begleiter-vitals">
       {angaben.lp > 0 && (
         <div className="space-y-2">
           <div className="flex items-center gap-2 flex-wrap">

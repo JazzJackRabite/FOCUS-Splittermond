@@ -1,3 +1,4 @@
+import { fireEvent, screen, within } from '@testing-library/react';
 import fs from 'fs';
 import path from 'path';
 import type { Basis } from '../laden';
@@ -33,4 +34,26 @@ export const istGrimoireDatei = (f: string) => f.endsWith('.grim');
 /** Pfad eines Grimoires im Ordner (`<id>.grim`); leer ohne Ordner */
 export function grimoireDatei(id: string): string {
   return GRIMOIRE_ORDNER ? path.join(GRIMOIRE_ORDNER, `${id}.grim`) : '';
+}
+
+// ---------------------------------------------------------------- Assistent „Begleiter erstellen“ (Oberflächentests)
+
+/** Öffnet den Assistenten und wählt die Art (Wahlkarte, Name am Anfang) */
+export function begleiterErstellen(art: string): HTMLElement {
+  fireEvent.click(screen.getByRole('button', { name: /^Begleiter erstellen$/ }));
+  const d = screen.getByTestId('begleiter-assistent');
+  fireEvent.click(within(d).getByRole('button', { name: new RegExp(`^${art}`) }));
+  return d;
+}
+/** Nächster Schritt */
+export const weiter = () => fireEvent.click(screen.getByRole('button', { name: /^Weiter/ }));
+/** Bis zur Übersicht weiterklicken und erstellen bzw. übernehmen */
+export function abschliessen() {
+  while (screen.queryByRole('button', { name: /^Weiter/ })) weiter();
+  fireEvent.click(screen.getByRole('button', { name: /^(Erstellen|Übernehmen)$/ }));
+}
+/** Blatt eines Begleiters über die Leiste wählen */
+export function blattWaehlen(titel: string | RegExp): HTMLElement {
+  fireEvent.click(screen.getByRole('tab', { name: titel }));
+  return screen.getByTestId('begleiter-blatt');
 }

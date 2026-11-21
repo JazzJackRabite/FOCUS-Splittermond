@@ -1,5 +1,5 @@
 import React from 'react';
-import { Swords, ChevronDown, ChevronRight, Trash2, X } from 'lucide-react';
+import { Swords, X } from 'lucide-react';
 import type { Wertekasten } from '../../regelwerk/begleiter';
 import type { Aktionen } from './BegleiterSpiel';
 import DiceIcon from '../ui/DiceIcon';
@@ -40,7 +40,7 @@ export const WuerfelKnopf: React.FC<{ onClick: () => void; label: string; symbol
 const ZUSTANDSWERTE: string[] = ['GSW', 'VTD', 'SR', 'KW', 'GW', 'INI'];
 
 /** Angezeigter Wert mit eingerechneten Zuständen; Grundwert und Erklärung beim Überfahren mit der Maus */
-const ZWert: React.FC<{ name: string; text: string | number | undefined; zw: ReturnType<typeof zustandswerte> | null; testid?: string }> = ({ name, text, zw, testid }) => {
+export const ZWert: React.FC<{ name: string; text: string | number | undefined; zw: ReturnType<typeof zustandswerte> | null; testid?: string }> = ({ name, text, zw, testid }) => {
   if (!zw || !ZUSTANDSWERTE.includes(name)) return <>{text ?? '–'}</>;
   const r = textMitZustaenden(name as Wertname, text, zw);
   if (!r.geaendert) return <>{text ?? '–'}</>;
@@ -97,31 +97,6 @@ export const Werte: React.FC<{ w: Wertekasten; aktionen?: Aktionen; zustaende?: 
   </div>
   );
 };
-
-/** Kopfzeile eines aufklappbaren Begleiters (Name links, Marken und Aktionen rechts) */
-export const kopfzeile = 'flex items-center justify-between gap-2 flex-wrap';
-/** Rahmen eines einzelnen Begleiters in einer Liste */
-export const eintrag = 'border border-rahmen rounded-knopf p-3 bg-erhoeht';
-
-/** Hülle eines Begleiters: aufklappbarer Titel, Marken, Entfernen; Inhalt nur aufgeklappt */
-export const Eintrag: React.FC<{
-  titel: string; offen: boolean; umschalten: () => void; onEntfernen: () => void;
-  marken?: React.ReactNode; vor?: React.ReactNode; children?: React.ReactNode;
-}> = ({ titel, offen, umschalten, onEntfernen, marken, vor, children }) => (
-  <li className={eintrag}>
-    {vor}
-    <div className={kopfzeile}>
-      <Knopf className="border-transparent! bg-transparent! hover:bg-erhoeht! px-1 font-bold text-[15px]" onClick={umschalten} aria-expanded={offen}>
-        {offen ? <ChevronDown size={16} aria-hidden /> : <ChevronRight size={16} aria-hidden />}{titel}
-      </Knopf>
-      <span className="flex items-center gap-2 text-xs text-leise flex-wrap">
-        {marken}
-        <Knopf nurSymbol aria-label={`${titel} entfernen`} onClick={onEntfernen}><Trash2 size={16} aria-hidden /></Knopf>
-      </span>
-    </div>
-    {offen && <div className="mt-3 space-y-4 text-sm">{children}</div>}
-  </li>
-);
 
 /** Hinweisliste (Regelverstöße, offene Wahlen): Rahmen in der Bedeutungsfarbe, Text in Schrift */
 export const Hinweise: React.FC<{ liste: string[] }> = ({ liste }) => liste.length ? (

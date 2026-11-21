@@ -10,10 +10,10 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 import { baseCharacterReducer, DEFAULT_STATE } from '../../hooks/useCharacterState';
 import { CharacterContext } from '../../context/CharacterContext';
 import { BegleiterView } from '../../features/begleiter/BegleiterView';
-import { kreaturZuordnung } from '../../components/begleiter/TierAbschnitt';
+import { kreaturZuordnung } from '../../components/begleiter/besitzer';
 import { validateCharacterImport } from '../../utils/importValidation';
 import { Katalog } from '../katalog';
-import { basisAusDateien, grimoireDatei } from './hilfen';
+import { abschliessen, basisAusDateien, begleiterErstellen, blattWaehlen, grimoireDatei, weiter } from './hilfen';
 import { erstelleKatalog, grimoireLesen } from '../laden';
 import { bedingungsCharakter } from '../bruecke';
 import {
@@ -92,36 +92,50 @@ const Rahmen: React.FC<{ start: Partial<CharacterState> }> = ({ start }) => {
 };
 
 describe('Tab „Begleiter“ (nur GRW)', () => {
-  it('Tier hinzufügen: freie Ressource Kreatur wird zugeordnet, Werte und Felder aufklappbar', () => {
+  it('Tier erstellen im Assistenten: freie Ressource Kreatur wird zugeordnet, Blatt mit Werten', () => {
     kat.aktuell = K;
     render(<Rahmen start={{ resourcesList: [{ name: 'Kreatur', level: 3, source: 'test' }] }} />);
-    const sel = screen.getByLabelText('Tier wählen') as HTMLSelectElement;
+    expect(screen.getByText(/Noch keine Begleiter/)).toBeTruthy();
+    const d = begleiterErstellen('Tier');
+    const sel = within(d).getByLabelText('Tier wählen') as HTMLSelectElement;
     const opt = (n: string) => [...sel.options].find(o => o.text.startsWith(`${n} (`))!;
     expect(opt('Wolf').disabled).toBe(false); // auch zu hohe Tiere wählbar (dann ohne Ressource)
+    expect((screen.getByRole('button', { name: /^Weiter/ }) as HTMLButtonElement).disabled).toBe(true); // erst ein Tier wählen
     fireEvent.change(sel, { target: { value: opt('Pferd').value } });
-    fireEvent.click(screen.getByRole('button', { name: /Tier hinzufügen/ }));
-    const tiere = screen.getByTestId('begleiter-tiere');
-    expect(within(tiere).getByText('Kreatur 3')).toBeTruthy();
-    expect(within(tiere).getByText('Reittier')).toBeTruthy();
-    fireEvent.click(within(tiere).getByRole('button', { name: /^Pferd$/ }));
-    expect(screen.getByText('GSW')).toBeTruthy();
-    expect(screen.getByText(/Grimoire „Bestienmeister“/)).toBeTruthy();
-    fireEvent.change(screen.getByPlaceholderText('Pferd'), { target: { value: 'Blitz' } });
-    expect(within(tiere).getByRole('button', { name: 'Blitz (Pferd)' })).toBeTruthy();
+    weiter();
+    expect(within(d).getByText(/Grimoire „Bestienmeister“/)).toBeTruthy();
+    expect((within(d).getByLabelText('Ressource Kreatur') as HTMLSelectElement).value).toBe('3');
+    fireEvent.change(within(d).getByPlaceholderText('Pferd'), { target: { value: 'Blitz' } });
+    weiter();
+    expect(within(screen.getByTestId('assistent-uebersicht')).getByText('GSW')).toBeTruthy();
+    abschliessen();
+    expect(screen.queryByTestId('begleiter-assistent')).toBeNull();
+    const blatt = screen.getByTestId('begleiter-blatt');
+    expect(within(blatt).getByRole('heading', { name: 'Blitz (Pferd)' })).toBeTruthy();
+    expect(within(blatt).getByText('Kreatur 3')).toBeTruthy();
+    expect(within(blatt).getByText('Reittier')).toBeTruthy();
+    expect(within(blatt).getAllByTestId('begleiter-waffe').length).toBeGreaterThan(0);
 
-    // zweites Tier: keine freie Ressource mehr → ohne Ressource
-    fireEvent.change(sel, { target: { value: opt('Wolf').value } });
-    fireEvent.click(screen.getByRole('button', { name: /Tier hinzufügen/ }));
-    expect(within(tiere).getByText('ohne Ressource')).toBeTruthy();
+    // zweites Tier: keine freie Ressource mehr → ohne Ressource; das neue Blatt ist gewählt
+    begleiterErstellen('Tier');
+    fireEvent.change(screen.getByLabelText('Tier wählen'), { target: { value: opt('Wolf').value } });
+    abschliessen();
+    expect(within(screen.getByTestId('begleiter-blatt')).getByText('ohne Ressource')).toBeTruthy();
     fireEvent.click(screen.getByLabelText('Wolf entfernen'));
-    expect(within(tiere).queryByRole('button', { name: /^Wolf$/ })).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'OK' }));
+    expect(screen.queryByRole('tab', { name: 'Wolf' })).toBeNull();
+    expect(blattWaehlen('Blitz (Pferd)')).toBeTruthy();
   });
   it('Hinweis auf „Die Magie“ bei den Wesen', () => {
     kat.aktuell = K;
     render(<Rahmen start={{}} />);
-    expect(within(screen.getByTestId('begleiter-wesen')).getByText(/Grimoire „Die Magie“/)).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: /^Begleiter erstellen$/ }));
+    const karte = within(screen.getByTestId('begleiter-assistent')).getByRole('button', { name: /^Beschworenes Wesen/ }) as HTMLButtonElement;
+    expect(karte.disabled).toBe(true);
+    expect(within(karte).getByText(/Grimoire „Die Magie“/)).toBeTruthy();
   });
 });
+
 
 const MAGIE = grimoireDatei('magie');
 const BESTIEN = grimoireDatei('bestien');
@@ -191,17 +205,25 @@ describe.skipIf(!BESTIEN || !fs.existsSync(BESTIEN))('Abrichtungen mit „Bestie
       begleiter: [pferd],
       masteries: { 'Tierführung': [{ id: 'm1', name: 'Dompteur', tier: 1, cost: 0, isFree: false, isCreationBonus: false, source: 'test', skill: 'Tierführung' }] },
     }} />);
-    fireEvent.click(screen.getByRole('button', { name: /^Pferd$/ }));
+    fireEvent.click(screen.getByRole('button', { name: /^Bearbeiten$/ }));
+    weiter(); // Grundangaben → Abrichtungen
+    const d = screen.getByTestId('begleiter-assistent');
     const sel = screen.getByLabelText('Abrichtung wählen') as HTMLSelectElement;
     const r1 = [...sel.options].find(o => o.text.includes('Reittier I ('))!;
     expect(r1.text).not.toMatch(/Voraussetzung fehlt|Spielleitung/); // erfüllt: kein Zusatz (keine Symbole, FUNDAMENT)
     fireEvent.change(sel, { target: { value: r1.value } });
     fireEvent.click(screen.getByRole('button', { name: /Abrichtung hinzufügen/ }));
-    expect(screen.getByText('Potenzial 1/7')).toBeTruthy();
+    expect(within(d).getByText('Potenzial 1/7')).toBeTruthy();
     expect([...sel.options].find(o => o.value === r1.value)!.disabled).toBe(true);
-    expect(screen.getByText('erfüllt')).toBeTruthy();
+    expect(within(d).getByText('erfüllt')).toBeTruthy();
     fireEvent.click(screen.getByLabelText('Abrichtung Reittier I entfernen'));
-    expect(screen.getByText('Potenzial 0/7')).toBeTruthy();
+    expect(within(d).getByText('Potenzial 0/7')).toBeTruthy();
+    fireEvent.change(sel, { target: { value: r1.value } });
+    fireEvent.click(screen.getByRole('button', { name: /Abrichtung hinzufügen/ }));
+    abschliessen();
+    const blatt = screen.getByTestId('begleiter-blatt');
+    expect(within(blatt).getByText('Potenzial 1/7')).toBeTruthy();
+    expect(within(blatt).getByRole('button', { name: 'Reittier I' })).toBeTruthy();
     kat.aktuell = K;
   });
 });
