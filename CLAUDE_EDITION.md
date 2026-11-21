@@ -148,6 +148,12 @@ Repository `JazzJackRabite/FOKUS-1.0-claudeedition` (Branch `main`; entstanden a
 > Untote, Wesen-Baukasten, Relikte, Modifikationen, `components/begleiter/besitzer.ts`) wandert auf die Datenseite;
 > Schadens- und Heildialog, `ErschaffungRegelwerk.tsx`; Umstellung der Dialoge auf die Bausteine; Rückfall `src/data`.
 > Bitte diese Dateien bis zum Zusammenführen nicht ändern oder vorher hier eintragen, was ansteht.
+>
+> **Überschneidung (21.11.2026, 17:30, Sitzung „Begleiter/Alle 5“):** Zweig `stand33` (nicht in main) enthält bereits:
+> Schadens- und Heildialog aus dem Paket (`regelwerk/schadenUndHeilung.ts`), Umstellung von rund 120 `<button>` auf
+> `Knopf`/neu `Wahlknopf`/`Reiter` mit Altlast-Prüfung `knoepfe`, Härte als Inventarfeld (auch Relikte), Altlasten-Zeilen
+> Gefolge/Untote/Golems und Schaden/Heilung gestrichen. Datenseite auf D: geliefert: `kreatur_varianten.py`/`.json`
+> (Bakebakeku), Eintrag in `export.py` nach `tierwerte.py`. Vor dem Zusammenführen bitte abstimmen, welcher Stand gilt.
 
 Die geplanten Schritte sind erledigt. Offen bleiben Ideen wie Spielhilfen für bedingte Wirkungen (z. B. Bonus gegen Typus per Klick
 anwenden) oder Werte der Begleiter im Kampf.
