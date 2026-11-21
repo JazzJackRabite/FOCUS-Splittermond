@@ -144,6 +144,11 @@ Repository `JazzJackRabite/FOKUS-1.0-claudeedition` (Branch `main`; entstanden a
 
 ## Nächste Schritte
 
+> **In Arbeit (21.11.2026, Sitzung „Altlasten“, Zweig `altlasten-paketlesen`):** Textauslese aus `regelwerk/` (Golem, Gefolge,
+> Untote, Wesen-Baukasten, Relikte, Modifikationen, `components/begleiter/besitzer.ts`) wandert auf die Datenseite;
+> Schadens- und Heildialog, `ErschaffungRegelwerk.tsx`; Umstellung der Dialoge auf die Bausteine; Rückfall `src/data`.
+> Bitte diese Dateien bis zum Zusammenführen nicht ändern oder vorher hier eintragen, was ansteht.
+
 Die geplanten Schritte sind erledigt. Offen bleiben Ideen wie Spielhilfen für bedingte Wirkungen (z. B. Bonus gegen Typus per Klick
 anwenden) oder Werte der Begleiter im Kampf.
 
