@@ -870,6 +870,28 @@ Bakebakeku bleiben; die eingebauten Listen in `src/data`, die Stand 33 noch erg�
 - Tests: 456 grün mit allen Grimoires und Volltest, 420 ohne Bücher; Prüfsuite 0 neue Befunde, Praxistest 109/109; Build;
   im Browser geprüft (Ladeanzeige, Angriff, Schaden; Desktop und Handy).
 
+## Stand 35 (22.11.2026): Start ohne Netz, keine Altlasten, nachgerechnet, Typus des Ziels
+
+- **Start:** Das Grundregelwerk wird nach dem Laden im Browser gespeichert (IndexedDB `fokus-grundregelwerk`). Ist der
+  Server nicht erreichbar, startet der Editor mit der gespeicherten Fassung; sie wird gegen die Prüfsumme im Manifest
+  geprüft. Ein schließbarer Hinweis nennt das Datum der Fassung. Im Browser geprüft mit Unterpfad-Build (`--base=/fokus/`,
+  wie beim Hosting unter einem Pfad): Start mit Netz etwa 0,5 s, ohne Netz aus dem Speicher.
+- **Altlasten bei null:** neue Bausteine `Leistenknopf` (Plus/Minus und Beschriftung in farbigen Leisten) und `Feldknopf`
+  (Kästchen der LP-/Fokusleisten, mit Beschriftung); `PlaySharedVitals.tsx` hat keine eigenen `<button>` mehr. In den
+  Begleiter-Ansichten stehen die Entfernen-Knöpfe neben der Marke (`MarkeMitEntfernen`) statt darin.
+- **Nachgerechnet** (`regelwerk/__tests__/nachrechnen.test.ts`): Sollwerte von Hand nach dem GRW für alle sieben
+  Beispielcharaktere (Rassenmodifikatoren S. 33–37, abgeleitete Werte S. 13–15, Stärken S. 71–74), Steigerungskosten
+  (S. 25, 86–87), Erfolgsgrade beim Angriff (S. 17–18), Erfolgsgrade bei Zaubern (S. 221–222), Ruhephase (S. 173–174, 196).
+  Dazu für das GRW und jedes Grimoire: Jeder feste Bonus einer Stärke oder Meisterschaft auf abgeleitete Werte oder
+  Fertigkeiten kommt genau so im Editor an (ohne Regelnamen aus den Erweiterungen im Code). Keine Abweichungen gefunden.
+- **Spielhilfen:** In Probe, Angriff und Zauber gibt es „Typus des Ziels“, sobald ein Bonus nur gegen einen Typus gilt
+  (Paketfeld `gegen_typus`, z. B. Untotenjäger gegen Untote): Die Wahl wählt die passenden Boni aus und blendet die
+  übrigen typusgebundenen aus.
+- **Begleiter:** Probe, Angriff und Zauber eines Begleiters laufen weiter über dieselben Dialoge, zeigen aber nicht mehr
+  die Stärken, Meisterschaften und Relikte des Helden (`wuerfelnder`, `angreifer`, `zaubernder` = `begleiter`).
+- Tests: 496 grün mit allen Grimoires und Volltest, 448 ohne Bücher; Build; im Browser geprüft (Start ohne Netz,
+  Spielen-Ansicht auf Handy und Desktop ohne Querscrollen).
+
 ## Google AI Studio
 
 Unverändert eine Vite-/React-App mit `metadata.json` im Wurzelordner; Import über „Import from GitHub“, Hosting über Cloud Run.
