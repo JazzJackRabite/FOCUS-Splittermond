@@ -1,4 +1,4 @@
-import { Dialogfenster, Dialoghintergrund } from '../../fundament';
+import { Dialogfenster, Dialoghintergrund, Dialogkopf, useEscape } from '../../fundament';
 import React, { useState, useEffect, useId, useMemo } from 'react';
 import { Knopf, Dialog } from '../../fundament';
 import {
@@ -580,6 +580,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
     });
   };
 
+  useEscape(onClose);
   return (
     <Dialoghintergrund
       role="dialog"
@@ -593,29 +594,14 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
         id="cast-spell-modal-dialog" breite="2xl" className="lg:max-w-3xl text-erschoepft sm:max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="text-schrift px-4 sm:px-5 py-3 sm:py-3.5 flex justify-between items-center border-b border-gold shrink-0">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-knopf bg-rahmen border border-gold flex items-center justify-center shrink-0">
-              <Sparkles className="w-4 h-4 text-gold" />
-            </div>
-            <div className="min-w-0">
-              <h3 id={modalHeadingId} className="font-bold text-base md:text-lg fantasy-font tracking-wide truncate">
-                {spell.name}
-              </h3>
-              <p className="text-xs text-schrift truncate">
-                {spell.school} · Grad {spell.grade} {spell.source ? `· ${spell.source}` : ''}
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            aria-label="Schließen"
-            className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-knopf border border-rahmen bg-erhoeht text-schrift hover:border-gold transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+        <Dialogkopf
+          titelId={modalHeadingId}
+          symbol={<Sparkles className="w-4 h-4" />}
+          ton="magie"
+          titel={spell.name}
+          untertitel={`${spell.school} · Grad ${spell.grade}${spell.source ? ` · ${spell.source}` : ''}`}
+          onSchliessen={onClose}
+        />
 
         {/* Workflow Progress Steps */}
         <div className="border-b border-gold px-3 sm:px-4 py-2 flex items-center justify-between text-xs font-semibold text-leise overflow-x-auto gap-1.5 sm:gap-2 shrink-0">
@@ -1752,21 +1738,9 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                       <div>
                         <label className="block text-leise font-medium mb-1">Würfelanzahl</label>
                         <div className="flex items-center gap-1">
-                          <button
-                            type="button"
-                            onClick={() => setCustomDiceCount((c) => Math.max(1, c - 1))}
-                            className="w-6 h-6 border border-rahmen rounded-knopf flex items-center justify-center font-bold hover:bg-rahmen cursor-pointer"
-                          >
-                            -
-                          </button>
+                          <Knopf nurSymbol aria-label="Ein Würfel weniger" onClick={() => setCustomDiceCount((c) => Math.max(1, c - 1))}>−</Knopf>
                           <span className="tabular-nums font-bold w-6 text-center text-schrift">{customDiceCount}</span>
-                          <button
-                            type="button"
-                            onClick={() => setCustomDiceCount((c) => Math.min(20, c + 1))}
-                            className="w-6 h-6 border border-rahmen rounded-knopf flex items-center justify-center font-bold hover:bg-rahmen cursor-pointer"
-                          >
-                            +
-                          </button>
+                          <Knopf nurSymbol aria-label="Ein Würfel mehr" onClick={() => setCustomDiceCount((c) => Math.min(20, c + 1))}>+</Knopf>
                         </div>
                       </div>
 

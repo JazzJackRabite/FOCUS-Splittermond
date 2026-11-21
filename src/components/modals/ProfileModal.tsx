@@ -1,5 +1,5 @@
-import { Dialogfenster, Dialoghintergrund } from '../../fundament';
-import React, { useState } from 'react';
+import { Dialogfenster, Dialoghintergrund, Dialogkopf, useEscape } from '../../fundament';
+import React, { useId, useState } from 'react';
 import { Knopf, Dialog } from '../../fundament';
 import { User, Plus, Copy, Trash2, Check, Sparkles, X, Upload, Download, BookOpenText } from 'lucide-react';
 import {
@@ -169,19 +169,13 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ onClose, onSelectPro
     toast.success('Profil gelöscht!');
   };
 
+  const titelId = useId();
+  useEscape(onClose);
   return (
     <Dialoghintergrund>
-      <Dialogfenster id="profile-modal-dialog" breite="2xl">
+      <Dialogfenster role="dialog" aria-modal="true" aria-labelledby={titelId} id="profile-modal-dialog" breite="2xl">
         {/* Header */}
-        <div className="bg-erhoeht text-schrift p-4 flex justify-between items-center border-b-2 border-gold">
-          <div className="flex items-center gap-2">
-            <User className="text-gold" size={24} />
-            <h2 className="text-[17px] font-bold fantasy-font">Charakter-Profile & Vorlagen</h2>
-          </div>
-          <button onClick={onClose} className="hover:text-schrift transition-colors">
-            <X size={20} />
-          </button>
-        </div>
+        <Dialogkopf titelId={titelId} symbol={<User size={22} />} titel="Charakter-Profile & Vorlagen" onSchliessen={onClose} />
 
         {/* Navigation Tabs */}
         <div className="flex border-b border-rahmen bg-seite">

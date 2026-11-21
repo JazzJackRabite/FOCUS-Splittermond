@@ -1,4 +1,4 @@
-import { Dialogfenster, Dialoghintergrund } from '../../fundament';
+import { Dialogfenster, Dialoghintergrund, Dialogkopf } from '../../fundament';
 import React, { useState, useEffect } from 'react';
 import { Knopf, Dialog } from '../../fundament';
 import { Sun, Moon, RotateCcw, Settings, Heart, Sparkles, X, Check, Clock } from 'lucide-react';
@@ -324,37 +324,12 @@ export const RestSection: React.FC<RestSectionProps> = ({
             id="rest-options-modal-card" breite="lg" className="animate-in zoom-in-95 duration-150"
           >
             {/* Modal Header */}
-            <div className="text-schrift p-4 flex items-center justify-between border-b border-gold">
-              <div className="flex items-center gap-2.5">
-                <div className="p-1.5 rounded-knopf bg-rahmen border border-rahmen">
-                  {activeModal === 'verschnaufpause' ? (
-                    <Sun size={20} className="text-gold" />
-                  ) : (
-                    <Moon size={20} className="text-gold" />
-                  )}
-                </div>
-                <div>
-                  <h4 className="font-bold text-base sm:text-lg fantasy-font">
-                    {activeModal === 'verschnaufpause'
-                      ? 'Optionen: Verschnaufpause'
-                      : 'Optionen: Ruhephase'}
-                  </h4>
-                  <span className="text-xs text-schrift">
-                    {activeModal === 'verschnaufpause'
-                      ? `Verschnaufpause (${vpDuration})`
-                      : `Ruhephase (${ruhephaseDuration})`}
-                  </span>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setActiveModal(null)}
-                className="p-1.5 rounded-knopf text-schrift hover:text-schrift hover:bg-rahmen transition-colors cursor-pointer"
-                title="Schließen"
-              >
-                <X size={20} />
-              </button>
-            </div>
+            <Dialogkopf
+              symbol={activeModal === 'verschnaufpause' ? <Sun size={20} /> : <Moon size={20} />}
+              titel={activeModal === 'verschnaufpause' ? 'Optionen: Verschnaufpause' : 'Optionen: Ruhephase'}
+              untertitel={activeModal === 'verschnaufpause' ? `Verschnaufpause (${vpDuration})` : `Ruhephase (${ruhephaseDuration})`}
+              onSchliessen={() => setActiveModal(null)}
+            />
 
             {/* Modal Content */}
             <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-4 text-xs sm:text-sm custom-scrollbar modal-body-scroll">

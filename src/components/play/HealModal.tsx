@@ -1,7 +1,7 @@
 import { ruheregeln } from '../../regelwerk/spielwirkungen';
 import { grwGesundheitsstufen } from '../../regelwerk/grwListen';
-import { Dialogfenster, Dialoghintergrund } from '../../fundament';
-import React, { useState, useMemo } from 'react';
+import { Dialogfenster, Dialoghintergrund, Dialogkopf, useEscape } from '../../fundament';
+import React, { useId, useState, useMemo } from 'react';
 import { Knopf, Dialog } from '../../fundament';
 import { Heart, X, Plus, Minus, Check, Sparkles, Activity } from 'lucide-react';
 import type { HealthSlot, StatusCondition } from '../../types';
@@ -190,33 +190,19 @@ export const HealModal: React.FC<HealModalProps> = ({
     onClose();
   };
 
+  const titelId = useId();
+  useEscape(onClose);
   return (
     <Dialoghintergrund>
-      <Dialogfenster breite="lg">
-        {/* Header */}
-        <div className="px-4 sm:px-5 py-3.5 border-b border-gold flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-full bg-unverletzt-grund border border-unverletzt flex items-center justify-center text-unverletzt">
-              <Heart size={18} />
-            </div>
-            <div>
-              <h3 className="fantasy-font text-[17px] text-gold-hell font-bold leading-tight">
-                {begleiter ? `${begleiter}: Heilung anwenden` : 'Heilung anwenden'}
-              </h3>
-              <p className="text-[11px] text-unverletzt leading-tight">
-                Grundregelwerk (GRW S. 119–120 Heilkunde, S. 173–174 Heilung)
-              </p>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-knopf border border-rahmen bg-erhoeht text-schrift hover:border-gold transition-colors"
-            title="Schließen" aria-label="Schließen"
-          >
-            <X size={20} />
-          </button>
-        </div>
+      <Dialogfenster breite="lg" role="dialog" aria-modal="true" aria-labelledby={titelId}>
+        <Dialogkopf
+          titelId={titelId}
+          symbol={<Heart size={18} />}
+          ton="unverletzt"
+          titel={begleiter ? `${begleiter}: Heilung anwenden` : 'Heilung anwenden'}
+          untertitel="Grundregelwerk (GRW S. 119–120 Heilkunde, S. 173–174 Heilung)"
+          onSchliessen={onClose}
+        />
 
         {/* Scrollable Form Body */}
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 custom-scrollbar">

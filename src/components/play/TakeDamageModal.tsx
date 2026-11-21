@@ -1,7 +1,7 @@
 import { grwGesundheitsstufen } from '../../regelwerk/grwListen';
 import { alleZustaende, zustandHatStufe, zustandQuelle } from '../../regelwerk/zustaende';
-import { Dialogfenster, Dialoghintergrund } from '../../fundament';
-import React, { useState, useMemo } from 'react';
+import { Dialogfenster, Dialoghintergrund, Dialogkopf, useEscape } from '../../fundament';
+import React, { useId, useState, useMemo } from 'react';
 import { Knopf, Dialog } from '../../fundament';
 import { Flame, Shield, Sparkles, X, Plus, Minus, AlertTriangle, Heart, Check } from 'lucide-react';
 import type { HealthSlot } from '../../types';
@@ -167,33 +167,19 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
     onClose();
   };
 
+  const titelId = useId();
+  useEscape(onClose);
   return (
     <Dialoghintergrund>
-      <Dialogfenster breite="lg">
-        {/* Header */}
-        <div className="px-4 sm:px-5 py-3.5 border-b border-gold flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-full bg-schaden-grund border border-schaden flex items-center justify-center text-schrift">
-              <Flame size={18} />
-            </div>
-            <div>
-              <h3 className="fantasy-font text-[17px] text-gold-hell font-bold leading-tight">
-                {begleiter ? `${begleiter}: Schaden erleiden` : 'Schaden erleiden'}
-              </h3>
-              <p className="text-[11px] text-gold leading-tight">
-                Grundregelwerk (GRW S. 172–173 &amp; S. 81)
-              </p>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-knopf border border-rahmen bg-erhoeht text-schrift hover:border-gold transition-colors"
-            title="Schließen" aria-label="Schließen"
-          >
-            <X size={20} />
-          </button>
-        </div>
+      <Dialogfenster breite="lg" role="dialog" aria-modal="true" aria-labelledby={titelId}>
+        <Dialogkopf
+          titelId={titelId}
+          symbol={<Flame size={18} />}
+          ton="schaden"
+          titel={begleiter ? `${begleiter}: Schaden erleiden` : 'Schaden erleiden'}
+          untertitel="Grundregelwerk (GRW S. 172–173 & S. 81)"
+          onSchliessen={onClose}
+        />
 
         {/* Scrollable Body */}
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 custom-scrollbar">
@@ -413,7 +399,7 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
                 aria-label="Zustand"
                 value={extraCondition}
                 onChange={(e) => setExtraCondition(e.target.value)}
-                className="bg-seite border border-rahmen rounded-knopf px-2 py-1 text-xs text-schrift font-medium focus:outline-none focus:border-gold flex-1 min-w-[120px]"
+                className="min-h-11 bg-seite border border-rahmen rounded-knopf px-2 py-1 text-xs text-schrift font-medium focus:outline-none focus:border-gold flex-1 min-w-[120px]"
               >
                 {alleZustaende().map((cond) => (
                   <option key={cond} value={cond} title={`Quelle: ${zustandQuelle(cond)}`}>

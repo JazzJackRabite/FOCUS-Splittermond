@@ -1,8 +1,8 @@
 import { calculateItemCost } from '../../utils/costCalculations';
-import { Dialogfenster, Dialoghintergrund } from '../../fundament';
+import { Dialogfenster, Dialoghintergrund, Dialogkopf, useEscape } from '../../fundament';
 import { useHausregeln } from '../../fundament/hausregeln';
 import { Knopf, Dialog } from '../../fundament';
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useEffect, useId, useMemo, useState } from 'react';
 import { getSpellDescription } from '../../utils/gameResourceManager';
 import { parseSpellPermissibleModifications } from '../../utils/magicRules';
 import type { Spell } from '../../types';
@@ -114,19 +114,14 @@ export const SpellModal: React.FC<SpellModalProps> = ({
     }
   };
 
+  const titelId = useId();
+  useEscape(onClose);
   return (
     <Dialoghintergrund>
-      <Dialogfenster
+      <Dialogfenster role="dialog" aria-modal="true" aria-labelledby={titelId}
         id="spell-modal-dialog" breite="lg"
       >
-        <div className="px-5 py-4 border-b border-gold shrink-0">
-          <h3 className="fantasy-font text-[17px] font-bold text-gold-hell tracking-wide uppercase">
-            Zauber hinzufügen
-          </h3>
-          <div className="text-xs text-leise mt-0.5">
-            für {schoolName || 'Zauber'}
-          </div>
-        </div>
+        <Dialogkopf titelId={titelId} titel="Zauber hinzufügen" untertitel={`für ${schoolName || 'Zauber'}`} onSchliessen={onClose} />
 
         <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-4 custom-scrollbar modal-body-scroll">
           <div>

@@ -110,7 +110,7 @@ describe('Tab „Begleiter“: würfeln und Lebenspunkte', () => {
     fireEvent.click(within(tiere).getByRole('button', { name: /^Probe Wahrnehmung würfeln$/ }));
     expect(screen.getAllByText(/Erschöpft/).length).toBeGreaterThan(1); // auch im Probe-Modal
     expect(screen.getByText(/Grauzahn: Wahrnehmung/)).toBeTruthy();
-    fireEvent.click(screen.getByTitle('Schließen'));
+    fireEvent.click(screen.getAllByRole('button', { name: 'Schließen' })[0]);
     expect(screen.queryByText(/Grauzahn: Wahrnehmung/)).toBeNull();
     fireEvent.click(within(v).getByRole('button', { name: 'Zustand Erschöpft beenden' }));
     expect(within(v).queryByText(/Erschöpft 2/)).toBeNull();

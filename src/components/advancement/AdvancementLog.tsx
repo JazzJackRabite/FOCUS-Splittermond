@@ -1,4 +1,4 @@
-import { Dialogfenster, Dialoghintergrund } from '../../fundament';
+import { Dialogfenster, Dialoghintergrund, Dialogkopf } from '../../fundament';
 import React, { useState, useMemo } from 'react';
 import { Knopf, Dialog } from '../../fundament';
 import {
@@ -509,13 +509,8 @@ export const AdvancementLog: React.FC<AdvancementLogProps> = ({
       {/* Add Custom Note Modal */}
       {showAddNoteModal && (
         <Dialoghintergrund>
-          <Dialogfenster id="advancement-log-note-dialog" breite="md" className="p-5 sm:p-6">
-            <div className="flex items-center gap-2 border-b border-gold pb-3 mb-4">
-              <FileText className="w-5 h-5 text-gold" />
-              <h3 className="fantasy-font text-[17px] font-bold text-gold-hell">
-                Notiz zum Protokoll hinzufügen
-              </h3>
-            </div>
+          <Dialogfenster id="advancement-log-note-dialog" breite="md" className="[&>*:not(:first-child)]:mx-5 [&>*:last-child]:my-5">
+            <Dialogkopf symbol={<FileText className="w-5 h-5" />} titel="Notiz zum Protokoll hinzufügen" onSchliessen={() => setShowAddNoteModal(false)} />
             <form onSubmit={handleAddCustomNote} className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-leise mb-1 uppercase tracking-wide">

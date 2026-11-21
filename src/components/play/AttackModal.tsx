@@ -1,6 +1,5 @@
-import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import React, { useState, useMemo, useEffect, useId, useContext } from 'react';
-import { Knopf, Dialog } from '../../fundament';
+import { Dialogfenster, Dialoghintergrund, Dialogkopf, Knopf, Marke, useEscape } from '../../fundament';
 import {
   Sword,
   Shield,
@@ -183,6 +182,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
     setGewaehlteManoever((g) => (g.every((m) => availableManeuvers.some((a) => a.id === m.id)) ? g : g.filter((m) => availableManeuvers.some((a) => a.id === m.id))));
   }, [availableManeuvers]);
   const kombi = useMemo(() => kombiniereManoever(gewaehlteManoever, regeln), [gewaehlteManoever, regeln]);
+  useEscape(onClose);
   const selectedManeuver = kombi.gesamt;
   const umschaltenManoever = (m: CombatManeuver) => {
     if (m.type !== 'mastery') { setGewaehlteManoever([]); return; }
@@ -528,70 +528,32 @@ export const AttackModal: React.FC<AttackModalProps> = ({
       aria-labelledby={modalHeadingId} className="animate-fadeIn"
     >
       <Dialogfenster breite="2xl">
-        {/* ── HEADER ── */}
-        <div className="p-4 sm:p-5 border-b border-gold flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-karte bg-schaden-grund border border-schaden flex items-center justify-center shrink-0">
-              <Sword size={22} className="text-schaden" />
-            </div>
-            <div className="min-w-0">
-              <h3 id={modalHeadingId} className="font-bold text-lg sm:text-xl fantasy-font text-gold-hell truncate flex items-center gap-2">
-                <span>Angriff: {weapon.name}</span>
-                <span className="text-xs bg-erhoeht text-gold px-2 py-0.5 rounded-knopf border border-rahmen tabular-nums font-semibold">
-                  {skillName}
-                </span>
-              </h3>
-              <p className="text-xs text-schrift tabular-nums flex items-center gap-2 mt-0.5 flex-wrap">
-                <span>
-                  Basis-AT: <strong className="text-schrift">{skillTotal}</strong>
-                </span>
-                <span>·</span>
-                <span>
-                  Schaden: <strong className="text-schaden">{weapon.damage || '1W6'}</strong>
-                </span>
-                {weapon.wgs && (
-                  <>
-                    <span>·</span>
-                    <span>WGS: {weapon.wgs} Ticks</span>
-                  </>
-                )}
-                {weapon.attributes && (
-                  <>
-                    <span>·</span>
-                    <span className="italic text-leise truncate max-w-[180px]" title={weapon.attributes}>
-                      {weapon.attributes}
-                    </span>
-                  </>
-                )}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 shrink-0">
-            {splitterpunkte > 0 && (
-              <button
-                type="button"
-                onClick={() => {
-                  onSpendSplitterpunkt();
-                  setExtraSPBonus((prev) => prev + 3);
-                }}
-                className="min-h-11 bg-erschoepft-grund hover:bg-erschoepft text-gold-hell border border-erschoepft px-2.5 py-1 rounded-knopf text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
-                title="Splitterpunkt einsetzen: +3 auf den Wurf"
-              >
-                <Sparkles size={13} className="text-gold" />
-                <span>+3 (SP: {splitterpunkte})</span>
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={onClose}
-              className="min-h-11 min-w-11 inline-flex items-center justify-center text-leise hover:text-schrift hover:bg-rahmen rounded-knopf transition-colors cursor-pointer"
-              title="Schließen (Esc)" aria-label="Schließen"
+        <Dialogkopf
+          titelId={modalHeadingId}
+          symbol={<Sword size={22} />}
+          ton="schaden"
+          titel={<>Angriff: {weapon.name} <Marke klein>{skillName}</Marke></>}
+          untertitel={
+            <span className="tabular-nums flex items-center gap-2 flex-wrap">
+              <span>Basis-AT: <strong className="text-schrift">{skillTotal}</strong></span>
+              <span>·</span>
+              <span>Schaden: <strong className="text-schrift">{weapon.damage || '1W6'}</strong></span>
+              {weapon.wgs && (<><span>·</span><span>WGS: {weapon.wgs} Ticks</span></>)}
+              {weapon.attributes && (<><span>·</span><span className="italic truncate max-w-[180px]" title={weapon.attributes}>{weapon.attributes}</span></>)}
+            </span>
+          }
+          aktionen={splitterpunkte > 0 && (
+            <Knopf
+              art="sekundaer"
+              onClick={() => { onSpendSplitterpunkt(); setExtraSPBonus((prev) => prev + 3); }}
+              title="Splitterpunkt einsetzen: +3 auf den Wurf"
             >
-              <X size={20} />
-            </button>
-          </div>
-        </div>
+              <Sparkles size={13} aria-hidden="true" />
+              <span>+3 (SP: {splitterpunkte})</span>
+            </Knopf>
+          )}
+          onSchliessen={onClose}
+        />
 
         {/* ── MODAL BODY (Scrollable) ── */}
         <div className="p-4 sm:p-5 overflow-y-auto space-y-4 text-schrift">
@@ -1314,9 +1276,9 @@ export const AttackModal: React.FC<AttackModalProps> = ({
             {hasRolled && (
               trifft && attackCausesDamage && !damageRollResult ? (
                 <div className="flex items-center gap-2">
-                  <Knopf art="primaer"
+                  <Knopf art="neutral"
                     onClick={handleCompleteAttack}
-                    className="text-xs underline decoration-dotted"
+                    className="text-xs"
                     title="Angriff abschließen ohne Schaden auszuwürfeln"
                   >
                     Ohne Schaden vollenden

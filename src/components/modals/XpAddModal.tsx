@@ -1,5 +1,5 @@
-import { Dialogfenster, Dialoghintergrund } from '../../fundament';
-import React, { useState } from 'react';
+import { Dialogfenster, Dialoghintergrund, Dialogkopf, useEscape } from '../../fundament';
+import React, { useId, useState } from 'react';
 import { Dialog, Knopf } from '../../fundament';
 import { Plus, Minus, Sparkles } from 'lucide-react';
 
@@ -21,17 +21,14 @@ export const XpAddModal: React.FC<XpAddModalProps> = ({ onClose, onAdd }) => {
     onClose();
   };
 
+  const titelId = useId();
+  useEscape(onClose);
   return (
     <Dialoghintergrund>
-      <Dialogfenster
+      <Dialogfenster role="dialog" aria-modal="true" aria-labelledby={titelId}
         id="xp-add-modal-dialog" breite="md"
       >
-        <div className="px-5 py-4 border-b border-gold flex items-center gap-2 shrink-0">
-          <Sparkles className="w-5 h-5 text-gold" />
-          <h3 className="fantasy-font text-[17px] font-bold text-gold-hell">
-            Erfahrungspunkte (EP) hinzufügen
-          </h3>
-        </div>
+        <Dialogkopf titelId={titelId} symbol={<Sparkles className="w-5 h-5" />} titel="Erfahrungspunkte (EP) hinzufügen" onSchliessen={onClose} />
 
         <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
           <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-4 custom-scrollbar modal-body-scroll">

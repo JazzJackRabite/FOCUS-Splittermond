@@ -1,7 +1,7 @@
-import { Dialogfenster, Dialoghintergrund } from '../../fundament';
+import { Dialogfenster, Dialoghintergrund, Dialogkopf, useEscape } from '../../fundament';
 import { useHausregeln } from '../../fundament/hausregeln';
 import { Knopf, Dialog } from '../../fundament';
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useEffect, useId, useMemo, useState } from 'react';
 import {
   getStrengthDescription,
   getWeaknessDescription,
@@ -242,16 +242,14 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({
     onClose();
   };
 
+  const titelId = useId();
+  useEscape(onClose);
   return (
     <Dialoghintergrund>
-      <Dialogfenster
+      <Dialogfenster role="dialog" aria-modal="true" aria-labelledby={titelId}
         id="add-item-modal-dialog" breite="md"
       >
-        <div className="px-5 py-4 border-b border-gold shrink-0">
-          <h3 className="fantasy-font text-[17px] font-bold text-gold-hell">
-            {title} hinzufügen
-          </h3>
-        </div>
+        <Dialogkopf titelId={titelId} titel={`${title} hinzufügen`} onSchliessen={onClose} />
 
         <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-4 custom-scrollbar modal-body-scroll">
           <div>

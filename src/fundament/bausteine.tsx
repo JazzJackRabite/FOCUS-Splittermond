@@ -163,24 +163,60 @@ export const Dialogfenster = React.forwardRef<HTMLDivElement, React.HTMLAttribut
 ));
 Dialogfenster.displayName = 'Dialogfenster';
 
-/** Dialog über der Ansicht: Titelzeile mit goldener Linie, rollender Inhalt, Fußzeile mit Aktionen. Schließt mit Escape. */
-export const Dialog: React.FC<DialogProps> = ({ titel, untertitel, onSchliessen, fuss, breite = 'mittel', children }) => {
-  const titelId = useId();
+/** Escape schließt den Dialog */
+export function useEscape(onSchliessen: () => void) {
   useEffect(() => {
     const taste = (e: KeyboardEvent) => { if (e.key === 'Escape') onSchliessen(); };
     document.addEventListener('keydown', taste);
     return () => document.removeEventListener('keydown', taste);
   }, [onSchliessen]);
+}
+
+export interface DialogkopfProps {
+  titel: React.ReactNode;
+  titelId?: string;
+  untertitel?: React.ReactNode;
+  /** Symbol links vom Titel (lucide-react) */
+  symbol?: React.ReactNode;
+  /** Bedeutung des Symbolrahmens */
+  ton?: Exclude<Ton, 'gold'>;
+  /** weitere Knöpfe rechts vor „Schließen“ */
+  aktionen?: React.ReactNode;
+  onSchliessen: () => void;
+}
+
+/** Titelzeile eines Dialogs: Symbol, Titel, Untertitel, Aktionen, Schließen-Knopf; goldene Linie darunter */
+export const Dialogkopf: React.FC<DialogkopfProps> = ({ titel, titelId, untertitel, symbol, ton = 'neutral', aktionen, onSchliessen }) => (
+  <div className="flex items-center justify-between gap-3 px-4 sm:px-5 py-3.5 border-b border-gold shrink-0">
+    <div className="flex items-center gap-3 min-w-0">
+      {symbol && <div className={zusammen('hidden sm:flex w-10 h-10 rounded-karte border items-center justify-center shrink-0', SYMBOLTON[ton])} aria-hidden="true">{symbol}</div>}
+      <div className="min-w-0">
+        <h2 id={titelId} className="m-0 font-titel font-bold text-[17px] tracking-[0.06em] text-schrift leading-tight">{titel}</h2>
+        {untertitel && <div className="text-xs text-leise mt-0.5">{untertitel}</div>}
+      </div>
+    </div>
+    <div className="flex items-center gap-2 shrink-0">
+      {aktionen}
+      <Knopf nurSymbol aria-label="Schließen" title="Schließen (Esc)" onClick={onSchliessen}><X size={16} aria-hidden="true" /></Knopf>
+    </div>
+  </div>
+);
+
+const SYMBOLTON: Record<Exclude<Ton, 'gold'>, string> = {
+  neutral: 'bg-erhoeht border-rahmen text-schrift', unverletzt: 'bg-unverletzt-grund border-unverletzt text-schrift',
+  erschoepft: 'bg-erschoepft-grund border-erschoepft text-schrift', schaden: 'bg-schaden-grund border-schaden text-schrift',
+  kanalisiert: 'bg-kanalisiert-grund border-kanalisiert text-schrift', magie: 'bg-magie-grund border-magie text-schrift',
+  temporaer: 'bg-temporaer-grund border-temporaer text-schrift',
+};
+
+/** Dialog über der Ansicht: Titelzeile mit goldener Linie, rollender Inhalt, Fußzeile mit Aktionen. Schließt mit Escape. */
+export const Dialog: React.FC<DialogProps> = ({ titel, untertitel, onSchliessen, fuss, breite = 'mittel', children }) => {
+  const titelId = useId();
+  useEscape(onSchliessen);
   return (
     <Dialoghintergrund onMouseDown={(e) => { if (e.target === e.currentTarget) onSchliessen(); }}>
       <Dialogfenster role="dialog" aria-modal="true" aria-labelledby={titelId} breite={({ schmal: 'md', mittel: 'xl', breit: '3xl' } as const)[breite]} className="font-text text-sm">
-        <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-gold">
-          <div className="min-w-0">
-            <h2 id={titelId} className="m-0 font-titel font-bold text-lg tracking-[0.06em] text-schrift">{titel}</h2>
-            {untertitel && <div className="text-xs text-leise">{untertitel}</div>}
-          </div>
-          <Knopf nurSymbol aria-label="Schließen" title="Schließen" onClick={onSchliessen}><X size={16} aria-hidden="true" /></Knopf>
-        </div>
+        <Dialogkopf titel={titel} titelId={titelId} untertitel={untertitel} onSchliessen={onSchliessen} />
         <div className="p-5 overflow-y-auto flex flex-col gap-3.5">{children}</div>
         {fuss && <div className="flex flex-wrap justify-end gap-2.5 px-5 py-4 border-t border-rahmen">{fuss}</div>}
       </Dialogfenster>

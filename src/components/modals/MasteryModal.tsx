@@ -1,8 +1,8 @@
 import { calculateItemCost } from '../../utils/costCalculations';
-import { Dialogfenster, Dialoghintergrund } from '../../fundament';
+import { Dialogfenster, Dialoghintergrund, Dialogkopf, useEscape } from '../../fundament';
 import { useHausregeln } from '../../fundament/hausregeln';
 import { Knopf, Dialog } from '../../fundament';
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useEffect, useId, useMemo, useState } from 'react';
 import type { MasteryEntry as DbMasteryEntry } from '../../types/regeldaten';
 
 import { validateFreeMasteryAssignment } from '../../utils/validation';
@@ -269,31 +269,19 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
     onClose();
   };
 
+  const titelId = useId();
+  useEscape(onClose);
   return (
     <Dialoghintergrund>
-      <Dialogfenster
+      <Dialogfenster role="dialog" aria-modal="true" aria-labelledby={titelId}
         id="mastery-modal-dialog" breite="lg"
       >
-        <div className="px-5 py-4 border-b border-gold flex justify-between items-start shrink-0">
-          <div>
-            <h3 className="fantasy-font text-[17px] font-bold text-gold-hell tracking-wide uppercase">
-              Meisterschaft hinzufügen
-            </h3>
-            <div className="text-xs text-leise mt-0.5">
-              für <span className="font-semibold text-schrift">{skillName}</span> (Fertigkeitspunkte:{' '}
-              <span className="font-bold text-gold tabular-nums">{skillVal}</span>
-              {creationMode ? ' – Erstellung' : ` – Max Schwelle: S${maxTier}`})
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-knopf border border-rahmen bg-erhoeht text-schrift hover:border-gold transition-colors"
-            title="Schließen" aria-label="Schließen"
-          >
-            ✕
-          </button>
-        </div>
+        <Dialogkopf
+          titelId={titelId}
+          titel="Meisterschaft hinzufügen"
+          untertitel={<>für <span className="font-semibold text-schrift">{skillName}</span> (Fertigkeitspunkte: <span className="font-bold text-schrift tabular-nums">{skillVal}</span>{creationMode ? ' – Erstellung' : ` – Max Schwelle: S${maxTier}`})</>}
+          onSchliessen={onClose}
+        />
 
         <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-4 text-xs sm:text-sm custom-scrollbar modal-body-scroll">
           {/* Search & Filter bar */}

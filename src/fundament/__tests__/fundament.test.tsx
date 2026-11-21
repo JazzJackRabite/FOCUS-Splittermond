@@ -11,7 +11,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { FARBEN_ERLAUBT, WURZEL, farbtabelle, farbwerte, kontrast, kontrastBefunde, paketzugriffe, regelnamenImCode, regelquellen, regelquellenBefunde, suchmuster } from './pruefen';
+import { FARBEN_ERLAUBT, WURZEL, farbtabelle, farbwerte, kontrast, kontrastBefunde, paketzugriffe, regelnamenImCode, regelquellen, regelquellenBefunde, suchmuster, dialogeOhneKopf } from './pruefen';
 import { Abschnittstitel, Auswahl, Dialog, Eingabe, Karte, Knopf, Marke, Rauten, Rollbereich } from '..';
 
 const ALTLASTEN = path.join(WURZEL, 'src/fundament/altlasten.json');
@@ -39,6 +39,11 @@ describe('Fundament: Altlasten dürfen nur weniger werden', () => {
   it('keine neuen Regelnamen im Programmcode', () => {
     const neu = ist.regelnamen.filter((x) => !soll.regelnamen.includes(x));
     expect(neu, 'Ein Zauber-, Meisterschafts- oder Stärkenname steht als Text im Code. Regeln kommen aus den Regelpaketen (FUNDAMENT.md, Regelquellen): den Wert ins Paket legen und über die ID oder das Datenfeld lesen.').toEqual([]);
+  });
+
+  it('jeder Dialog hat die Titelzeile aus den Bausteinen (Dialogkopf oder Dialog)', () => {
+    // Ausnahme: das Quellen-Popover am Handy ist kein Dialog mit Titel
+    expect(dialogeOhneKopf().filter((d) => d !== 'src/components/ui/SourceBadge.tsx')).toEqual([]);
   });
 
   it('keine Suchmuster, die Regeltext lesen (Grundsatz 3)', () => {

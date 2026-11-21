@@ -1,4 +1,4 @@
-import { Dialogfenster, Dialoghintergrund } from '../../fundament';
+import { Dialogfenster, Dialoghintergrund, Dialogkopf } from '../../fundament';
 import { setzeHausregeln, useHausregeln } from '../../fundament/hausregeln';
 import { Knopf, Dialog } from '../../fundament';
 import React, { useState, useEffect } from 'react';
@@ -43,36 +43,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         aria-labelledby="settings-modal-title"
       >
         {/* Header with Title, Mode Switch Button without text, and Close Button */}
-        <div className="flex items-center justify-between border-b border-gold pb-3 mb-3 shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-knopf bg-erhoeht text-gold">
-              <Settings size={22} />
-            </div>
-            <div>
-              <h2
-                id="settings-modal-title"
-                className="text-xl sm:text-2xl font-bold fantasy-font text-gold-hell"
-              >
-                Einstellungen
-              </h2>
-              <p className="text-xs sm:text-sm text-leise">
-                Datenspeicherung, Regelpakete und Informationen zur App.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            {/* Close Button */}
-            <button
-              type="button"
-              onClick={onClose}
-              className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-knopf border border-rahmen bg-erhoeht text-schrift hover:border-gold transition-colors"
-              aria-label="Schließen"
-            >
-              <X size={22} />
-            </button>
-          </div>
-        </div>
+        <Dialogkopf titelId="settings-modal-title" symbol={<Settings size={22} />} titel="Einstellungen" untertitel="Datenspeicherung, Regelpakete und Informationen zur App." onSchliessen={onClose} />
 
         {/* Tab Navigation */}
         <div className="flex border-b border-rahmen mb-4 gap-1 shrink-0 overflow-x-auto custom-scrollbar">

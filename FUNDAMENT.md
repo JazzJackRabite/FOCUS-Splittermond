@@ -165,6 +165,7 @@ Fehlt einer, wird er dort ergänzt – nicht in der Ansicht nachgebaut.
 | `Eingabe`, `Auswahl` | beschriftete Felder | Beschriftung sichtbar oder verborgen |
 | `Rollbereich` | Bereich mit eigenem Scrollbalken | – |
 | `Dialog` | Fenster über der Ansicht: Titelzeile mit goldener Linie, Inhalt, Fußzeile mit Aktionen | `schmal`, `mittel`, `breit` |
+| `Dialogkopf` | Titelzeile eines Dialogs mit eigenem Aufbau (Symbol, Titel, Untertitel, Aktionen, Schließen-Knopf); dazu `Dialoghintergrund`, `Dialogfenster`, `useEscape` | Ton des Symbols wie bei `Marke` |
 | `Rauten` | Zählbare Punkte wie Splitterpunkte: gefüllte Raute = vorhanden, nur Rand = verbraucht; mit Beschriftung für Vorleseprogramme | – |
 
 ### Stand der Umstellung
@@ -173,9 +174,10 @@ Alle Ansichten verwenden die benannten Werte; fest eingetragene Farbwerte gibt e
 Übergangsdatei ist gelöscht. Gemeinsame Klassen, die keine Bausteine sind (Grundstil der Seite, Protokollkarten,
 Würfelbanner, Druck), stehen in `src/fundament/klassen.css` – ebenfalls ohne eigene Farbwerte.
 
-Noch nicht überall erreicht: Die Bausteine (`Dialog`, `Knopf`, `Karte` …) trägt bisher nur der Würfeldialog. Die übrigen
-Ansichten haben die Farben, Rundungen und Schriften des CI, bauen ihre Knöpfe und Dialograhmen aber noch selbst. Wer eine
-Ansicht anfasst, stellt sie dabei auf die Bausteine um (Mindesthöhe 44 Pixel, eine goldene Hauptaktion).
+Alle Dialoge haben die Titelzeile aus den Bausteinen (`Dialog` oder `Dialogkopf`, eine Prüfung hält das fest), schließen mit
+Escape und haben einen Schließen-Knopf mit Beschriftung für Vorleseprogramme. Auswahlkacheln (Methoden, Manöver, Mengen)
+bleiben eigene `<button>`-Elemente mit mindestens 44 Pixel Höhe; einfache Aktionen sind `Knopf`. Wer eine Ansicht anfasst,
+stellt verbliebene eigene Knöpfe dabei auf `Knopf` um (eine goldene Hauptaktion je Ansicht).
 
 ## 4. Arbeitsweise
 

@@ -1,5 +1,5 @@
-import { Dialogfenster, Dialoghintergrund } from '../../fundament';
-import React, { useEffect } from 'react';
+import { Dialogfenster, Dialoghintergrund, Dialogkopf } from '../../fundament';
+import React, { useEffect, useId } from 'react';
 import { Knopf, Dialog } from '../../fundament';
 import { X, Sun, Moon, Heart, Sparkles, Zap, ShieldCheck, CheckCircle2 } from 'lucide-react';
 
@@ -36,6 +36,7 @@ export const RestResultModal: React.FC<RestResultModalProps> = ({ data, onClose 
 
   const isVp = data.restType === 'verschnaufpause';
 
+  const titelId = useId();
   return (
     <Dialoghintergrund
       id="rest-result-modal-backdrop" className="animate-in fade-in duration-200"
@@ -44,34 +45,15 @@ export const RestResultModal: React.FC<RestResultModalProps> = ({ data, onClose 
       }}
     >
       <Dialogfenster
-        id="rest-result-modal-card" breite="md"
+        id="rest-result-modal-card" breite="md" role="dialog" aria-modal="true" aria-labelledby={titelId}
       >
-        {/* Header Banner */}
-        <div className="text-schrift p-5 flex items-center justify-between border-b border-gold">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-karte bg-rahmen border border-rahmen">
-              {isVp ? (
-                <Sun size={24} className="text-gold animate-spin-slow" />
-              ) : (
-                <Moon size={24} className="text-gold" />
-              )}
-            </div>
-            <div>
-              <h2 className="text-[17px] font-bold fantasy-font tracking-wide flex items-center gap-2">
-                {data.title}
-              </h2>
-              <p className="text-xs text-schrift font-medium">{data.durationText}</p>
-            </div>
-          </div>
-          <button
-            id="close-rest-result-modal-btn"
-            onClick={onClose}
-            className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-knopf border border-rahmen bg-erhoeht text-schrift hover:border-gold transition-colors"
-            title="Schließen" aria-label="Schließen"
-          >
-            <X size={20} />
-          </button>
-        </div>
+        <Dialogkopf
+          titelId={titelId}
+          symbol={isVp ? <Sun size={22} /> : <Moon size={22} />}
+          titel={data.title}
+          untertitel={data.durationText}
+          onSchliessen={onClose}
+        />
 
         {/* Content Body */}
         <div className="p-5 space-y-4 overflow-y-auto custom-scroll modal-body-scroll flex-1">

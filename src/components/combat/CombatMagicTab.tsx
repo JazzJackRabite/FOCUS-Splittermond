@@ -1,5 +1,5 @@
 import { mitZustaenden, zustandsErklaerung, zustandswerte } from '../../regelwerk/zustandswerte';
-import { Dialogfenster, Dialoghintergrund } from '../../fundament';
+import { Dialogfenster, Dialoghintergrund, Dialogkopf } from '../../fundament';
 import React, { useState, useMemo, useRef, useLayoutEffect } from 'react';
 import { Knopf, Dialog } from '../../fundament';
 import {
@@ -1067,20 +1067,8 @@ export const CombatMagicTab: React.FC = () => {
       {/* ── MODAL: Waffe hinzufügen ── */}
       {showAddWeaponModal && (
         <Dialoghintergrund>
-          <Dialogfenster breite="2xl" className="p-5 space-y-4">
-            <div className="flex justify-between items-center border-b border-gold pb-2">
-              <h3 className="font-bold text-[17px] text-gold-hell fantasy-font flex items-center gap-2">
-                <Swords size={20} className="text-gold" />
-                Waffe auswählen oder erstellen
-              </h3>
-              <button
-                type="button"
-                onClick={() => setShowAddWeaponModal(false)}
-                className="text-leise hover:text-schrift font-bold text-lg px-2"
-              >
-                ✕
-              </button>
-            </div>
+          <Dialogfenster breite="2xl" className="[&>*:not(:first-child)]:mx-5 [&>*:last-child]:mb-5 space-y-4">
+            <Dialogkopf symbol={<Swords size={20} />} titel="Waffe auswählen oder erstellen" onSchliessen={() => setShowAddWeaponModal(false)} />
 
             {/* Search & Filter */}
             <div className="flex gap-2">
@@ -1233,20 +1221,8 @@ export const CombatMagicTab: React.FC = () => {
       {/* ── MODAL: Rüstung oder Schild hinzufügen ── */}
       {showAddArmorModal && (
         <Dialoghintergrund>
-          <Dialogfenster breite="2xl" className="p-5 space-y-4">
-            <div className="flex justify-between items-center border-b border-gold pb-2">
-              <h3 className="font-bold text-[17px] text-gold-hell fantasy-font flex items-center gap-2">
-                <Shield size={20} className="text-gold" />
-                Rüstung oder Schild auswählen
-              </h3>
-              <button
-                type="button"
-                onClick={() => setShowAddArmorModal(false)}
-                className="text-leise hover:text-schrift font-bold text-lg px-2"
-              >
-                ✕
-              </button>
-            </div>
+          <Dialogfenster breite="2xl" className="[&>*:not(:first-child)]:mx-5 [&>*:last-child]:mb-5 space-y-4">
+            <Dialogkopf symbol={<Shield size={20} />} titel="Rüstung oder Schild auswählen" onSchliessen={() => setShowAddArmorModal(false)} />
 
             {/* Filter buttons */}
             <div className="flex gap-2">

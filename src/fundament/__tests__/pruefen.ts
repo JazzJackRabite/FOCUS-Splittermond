@@ -94,6 +94,17 @@ export function suchmuster(): string[] {
   return [...out].sort();
 }
 
+/** Dialoge, die ein Dialogfenster bauen, aber keinen Dialogkopf (Titelzeile mit Schließen-Knopf) verwenden */
+export function dialogeOhneKopf(): string[] {
+  const out: string[] = [];
+  for (const p of dateien(path.join(SRC, 'components'))) {
+    if (!p.endsWith('.tsx')) continue;
+    const t = fs.readFileSync(p, 'utf8');
+    if (t.includes('<Dialogfenster') && !t.includes('<Dialogkopf') && !/<Dialog[\s>]/.test(t)) out.push(rel(p));
+  }
+  return out.sort();
+}
+
 /** Zeilen der Tabelle „Regelquellen“ aus FUNDAMENT.md: Felder (Spalte 2) und Dateien (Spalte 3) */
 export function regelquellen(): { bereich: string; felder: string[]; dateien: string[] }[] {
   const md = fs.readFileSync(path.join(WURZEL, 'FUNDAMENT.md'), 'utf8');

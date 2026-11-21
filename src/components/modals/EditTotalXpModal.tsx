@@ -1,5 +1,5 @@
-import { Dialogfenster, Dialoghintergrund } from '../../fundament';
-import React, { useState } from 'react';
+import { Dialogfenster, Dialoghintergrund, Dialogkopf, useEscape } from '../../fundament';
+import React, { useId, useState } from 'react';
 import { Knopf, Dialog } from '../../fundament';
 import { Edit3, Plus, Minus, ArrowRight, Info, AlertTriangle } from 'lucide-react';
 
@@ -33,17 +33,14 @@ export const EditTotalXpModal: React.FC<EditTotalXpModalProps> = ({
     setNewTotal((prev) => Math.max(0, prev + amount));
   };
 
+  const titelId = useId();
+  useEscape(onClose);
   return (
     <Dialoghintergrund>
-      <Dialogfenster
+      <Dialogfenster role="dialog" aria-modal="true" aria-labelledby={titelId}
         id="edit-total-xp-modal-dialog" breite="lg"
       >
-        <div className="px-5 py-4 border-b border-gold flex items-center gap-2 shrink-0">
-          <Edit3 className="w-5 h-5 text-gold" />
-          <h3 className="fantasy-font text-[17px] font-bold text-gold-hell">
-            Gesamt-EP editieren
-          </h3>
-        </div>
+        <Dialogkopf titelId={titelId} symbol={<Edit3 className="w-5 h-5" />} titel="Gesamt-EP editieren" onSchliessen={onClose} />
 
         <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
           <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-4 custom-scrollbar modal-body-scroll">
