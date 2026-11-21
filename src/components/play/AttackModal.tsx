@@ -118,6 +118,8 @@ export interface AttackModalProps {
   onRecordRoll?: (roll: RollEntry) => void;
   onAttackSuccess: (result: AttackSuccessResult) => void;
   onAttackFailure: (result: AttackFailureResult) => void;
+  /** Wer greift an: beim Begleiter keine Stärken, Meisterschaften und Relikte des Helden */
+  angreifer?: 'held' | 'begleiter';
 }
 
 type RollType = 'standard' | 'safe' | 'risk';
@@ -160,10 +162,11 @@ export const AttackModal: React.FC<AttackModalProps> = ({
   onRecordRoll,
   onAttackSuccess,
   onAttackFailure,
+  angreifer = 'held',
 }) => {
   const modalHeadingId = useId();
   const { weapon, skillName, skillTotal } = target;
-  const situativ = useSituativeBoni('angriff', skillName);
+  const situativ = useSituativeBoni('angriff', skillName, angreifer === 'begleiter');
 
   // Available Maneuvers (Free + Masteries) filtered strictly by weapon category & skill
   const availableManeuvers = useMemo(() => {

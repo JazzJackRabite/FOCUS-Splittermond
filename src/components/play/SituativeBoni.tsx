@@ -10,8 +10,10 @@ import { situativeBoni, zauberAnpassungen, type KostenDelta, type SituativerBonu
  * Bedingte Wirkungen aus Stärken, Meisterschaften und Relikten (Schwerpunkt) für einen Wurf: zum Anklicken, wenn die Lage zutrifft.
  * Ohne Regelpakete oder ohne passende Wirkungen liefert der Hook eine leere Liste.
  */
-export function useSituativeBoni(art: WurfArtKontext, fertigkeit: string) {
-  const ctx = useContext(CharacterContext);
+/** aus: keine Wirkungen des Helden (etwa wenn ein Begleiter würfelt) */
+export function useSituativeBoni(art: WurfArtKontext, fertigkeit: string, aus = false) {
+  const heldCtx = useContext(CharacterContext);
+  const ctx = aus ? null : heldCtx;
   const liste = ctx?.calc?.wirkungen?.liste;
   const attribute = ctx?.calc?.currentAttributes;
   const relikte = ctx?.state?.relikte;
@@ -107,8 +109,9 @@ export const SituativeBoni: React.FC<{
  * Wirkungen auf Zaubermechanik (Kosten, Zauberdauer; Schwierigkeit, Reichweite … als Hinweis) für einen Zauber der Schule.
  * Gewählte Kostenänderungen und Zauberdauer-Änderungen werden vom Zauber-Dialog verrechnet.
  */
-export function useZauberAnpassungen(schule: string, kanalisiert: boolean) {
-  const ctx = useContext(CharacterContext);
+export function useZauberAnpassungen(schule: string, kanalisiert: boolean, aus = false) {
+  const heldCtx = useContext(CharacterContext);
+  const ctx = aus ? null : heldCtx;
   const liste = ctx?.calc?.wirkungen?.liste;
   const anpassungen = useMemo(() => {
     const k = aktiverKatalog();

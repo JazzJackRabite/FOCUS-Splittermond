@@ -103,11 +103,11 @@ export function useBegleiterSpiel(b: Begleiter, index: number, angaben: Begleite
   const modale = (
     <OhneCharakterBoni>
       {probe && (
-        <RollModal skillName={`${angaben.name}: ${probe.name}`} baseValue={probe.wert} woundPenalty={lage.wundabzug} healthLevelName={lage.stufenName}
+        <RollModal wuerfelnder="begleiter" skillName={`${angaben.name}: ${probe.name}`} baseValue={probe.wert} woundPenalty={lage.wundabzug} healthLevelName={lage.stufenName}
           conditions={z.zustaende ?? []} splitterPoints={0} onClose={() => setProbe(null)} onRecordRoll={wurfLog} />
       )}
       {angriff && (
-        <AttackModal target={angriff} conditions={z.zustaende ?? []} woundPenalty={lage.wundabzug} splitterpunkte={0} onClose={() => setAngriff(null)} onSpendSplitterpunkt={() => {}}
+        <AttackModal angreifer="begleiter" target={angriff} conditions={z.zustaende ?? []} woundPenalty={lage.wundabzug} splitterpunkte={0} onClose={() => setAngriff(null)} onSpendSplitterpunkt={() => {}}
           onRecordRoll={wurfLog}
           onAttackSuccess={r => {
             log('combat', `Angriff getroffen: ${r.weapon.name} (${r.eg} EG)${r.damageRoll ? ` · ${r.damageRoll.netDamage} Schaden` : ''}`,
@@ -121,7 +121,7 @@ export function useBegleiterSpiel(b: Begleiter, index: number, angaben: Begleite
           }} />
       )}
       {zauber && (
-        <CastSpellModal spell={zauber.spell} conditions={z.zustaende ?? []} schoolSkillTotal={zauber.wert} schoolSkillName={zauber.spell.school}
+        <CastSpellModal zaubernder="begleiter" spell={zauber.spell} conditions={z.zustaende ?? []} schoolSkillTotal={zauber.wert} schoolSkillName={zauber.spell.school}
           availableFocus={Math.max(0, fokusFrei(angaben.fo, z) - fokusDurchZustaende(angaben.fo, zustandswerte(z.zustaende ?? [])))} maxFO={angaben.fo}
           focusState={{ exhausted: fokus.erschoepft ?? 0, channeled: fokus.kanalisiert ?? 0, consumed: fokus.verzehrt ?? 0 }}
           woundPenalty={lage.wundabzug} splitterpunkte={0} onSpendSplitterpunkt={() => {}} onClose={() => setZauber(null)} onRecordRoll={wurfLog}

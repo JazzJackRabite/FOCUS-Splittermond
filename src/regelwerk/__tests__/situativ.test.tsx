@@ -10,6 +10,7 @@ import { setzeAktivenKatalog } from '../bruecke';
 import { situativeBoni, wirkungenDesCharakters } from '../wirkungen';
 import { CharacterContext } from '../../context/CharacterContext';
 import { RollModal } from '../../components/play/RollModal';
+import { AttackModal } from '../../components/play/AttackModal';
 import { DEFAULT_STATE } from '../../hooks/useCharacterState';
 
 const b = basisAusDateien();
@@ -70,6 +71,21 @@ describe('Probendialog', () => {
     fireEvent.change(screen.getByLabelText('Typus des Ziels'), { target: { value: '' } });
     expect(knopf()?.getAttribute('aria-pressed')).toBe('false');
     expect(screen.queryByText('Gesamt-Modifikator:')).toBeNull();
+  });
+
+  it('Begleiter würfeln ohne die Stärken und Meisterschaften des Helden', () => {
+    const calc = { wirkungen: { liste, fertigkeitsBoni: {} } } as never;
+    const ziel = { weapon: { name: 'Biss', damage: '1W6', wgs: 7 }, skillName: 'Klingenwaffen', skillTotal: 10 };
+    const mit = (angreifer: 'held' | 'begleiter') => render(
+      <CharacterContext.Provider value={{ state: DEFAULT_STATE, dispatch: () => {}, calc }}>
+        <AttackModal angreifer={angreifer} target={ziel} splitterpunkte={0} onClose={() => {}} onSpendSplitterpunkt={() => {}} onAttackSuccess={() => {}} onAttackFailure={() => {}} />
+      </CharacterContext.Provider>,
+    );
+    const a = mit('held');
+    expect(screen.queryByTestId('situative-boni')).toBeTruthy();
+    a.unmount();
+    mit('begleiter');
+    expect(screen.queryByTestId('situative-boni')).toBeNull();
   });
 
   it('ohne Charakterkontext kein Abschnitt', () => {

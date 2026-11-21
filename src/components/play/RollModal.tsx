@@ -54,6 +54,8 @@ function calcEG(
 
 export interface RollModalProps {
   skillName: string;
+  /** Wer würfelt: beim Begleiter keine Stärken, Meisterschaften und Relikte des Helden */
+  wuerfelnder?: 'held' | 'begleiter';
   baseValue: number;
   woundPenalty?: number;
   healthLevelName?: string;
@@ -110,6 +112,7 @@ const D10Face: React.FC<{ value: number; dimmed?: boolean }> = ({ value, dimmed 
 
 export const RollModal: React.FC<RollModalProps> = ({
   skillName,
+  wuerfelnder = 'held',
   baseValue,
   woundPenalty = 0,
   healthLevelName = 'Unverletzt',
@@ -145,7 +148,7 @@ export const RollModal: React.FC<RollModalProps> = ({
   }, [activeModifiers, conditions, woundPenalty, healthLevelName, behinderung, skillName]);
 
   const [modifiersList, setModifiersList] = useState<ActiveRollModifier[]>(initialModifiers);
-  const situativ = useSituativeBoni('probe', skillName);
+  const situativ = useSituativeBoni('probe', skillName, wuerfelnder === 'begleiter');
 
   // Splittermond GRW: Aktive kanalisierte Zauber-Boni (automatisch aktiv)
   const spellBonuses = useMemo(() => {

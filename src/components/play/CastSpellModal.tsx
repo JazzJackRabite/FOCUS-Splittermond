@@ -118,6 +118,8 @@ interface CastSpellModalProps {
   onCastFailure: (result: CastSpellFailureResult) => void;
   onSpendSplitterpunkt: () => void;
   onRecordRoll?: (roll: RollEntry) => void;
+  /** Wer zaubert: beim Begleiter keine Stärken und Meisterschaften des Helden */
+  zaubernder?: 'held' | 'begleiter';
 }
 
 type RollType = 'standard' | 'safe' | 'risk';
@@ -133,6 +135,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
   schoolSkillTotal,
   schoolSkillName,
   grossmeister = false,
+  zaubernder = 'held',
   availableFocus,
   maxFO,
   focusState: _focusState,
@@ -179,7 +182,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
   }, [candidateEquipment, selectedEquipmentId]);
   const grundkosten = useMemo(() => parseFocusCost(spell.cost), [spell.cost]);
   // Kosten- und Zauberdauer-Änderungen aus Meisterschaften (nur mit Regelpaketen)
-  const zauberWirk = useZauberAnpassungen(schoolSkillName, grundkosten.isChanneled);
+  const zauberWirk = useZauberAnpassungen(schoolSkillName, grundkosten.isChanneled, zaubernder === 'begleiter');
   const baseCost = useMemo(() => kostenAnwenden(grundkosten, zauberWirk.kosten), [grundkosten, zauberWirk.kosten]);
   const kostenGeaendert = baseCost !== grundkosten;
   const zauberdauer = useMemo(() => zauberdauerAnpassen(spell.castTime, zauberWirk.dauer), [spell.castTime, zauberWirk.dauer]);
@@ -226,7 +229,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
   }, [conditionMods]);
 
   // Total skill modifier
-  const situativ = useSituativeBoni('zauber', schoolSkillName);
+  const situativ = useSituativeBoni('zauber', schoolSkillName, zaubernder === 'begleiter');
   const totalRollModifier = schoolSkillTotal + woundPenalty + totalConditionPenalty + situationalMod + situativ.summe;
 
   // Step 2: Roll execution & state
