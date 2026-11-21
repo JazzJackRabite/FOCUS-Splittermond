@@ -3,31 +3,16 @@ import { Knopf } from '../../fundament';
 import { AlertTriangle, CheckCircle2, Info, XCircle } from 'lucide-react';
 import { useCharacter } from '../../context/CharacterContext';
 import { useRegelwerk } from '../../regelwerk/RegelwerkContext';
-import { modulGruppen, modulWerte, pruefeErschaffungImEditor, type ModulGruppe } from '../../regelwerk/erschaffungEditor';
+import { freieErschaffungText, modulAuswahlListe, modulBeschreibungen, moduleDerArt, modulGruppen, modulWerte, pruefeErschaffungImEditor, type ModulGruppe } from '../../regelwerk/erschaffungEditor';
 import type { Katalog } from '../../regelwerk/katalog';
 import type { ErschaffungsModulWahl, ErschaffungsModulZustand } from '../../types';
 
 type Art = 'kultur' | 'abstammung';
 const TITEL: Record<Art, string> = { kultur: 'Kultur (Schritt 3)', abstammung: 'Abstammung (Schritt 4)' };
-const FREI: Record<Art, string> = {
-  kultur: 'Frei: 15 Fertigkeitspunkte (je höchstens +2, eine Magieschule +1), 1 Stärke für 1 Punkt, 1 Meisterschaft (GRW S. 23)',
-  abstammung: 'Frei: 5 Fertigkeitspunkte (je höchstens +1, keine Magieschule), 4 Ressourcenpunkte (GRW S. 23)',
-};
-
-const auswahlListe = (k: Katalog, gr: ModulGruppe) => {
-  const feste = gr.optionen.filter(o => o.id).map(o => ({ id: o.id!, text: o.text }));
-  const platz = gr.optionen.filter(o => o.auswahl).map(o => o.auswahl!);
-  const extra = k.nachTyp('fertigkeit').filter(e => !feste.some(f => f.id === e.id) && (
-    (platz.includes('magieschule') && e.daten.kategorie === 'Magieschule') ||
-    ((platz.includes('kampffertigkeit') || platz.includes('nahkampffertigkeit')) && e.daten.kategorie === 'Kampffertigkeit')))
-    .map(e => ({ id: e.id, text: e.name }));
-  return [...feste, ...extra];
-};
-
 const ModulAuswahl: React.FC<{ art: Art; k: Katalog }> = ({ art, k }) => {
   const { state, dispatch } = useCharacter();
   const zustand = state.erschaffung?.[art] ?? null;
-  const module = useMemo(() => k.nachTyp(art).filter(e => e.daten.modulwerte).sort((a, b) => a.name.localeCompare(b.name, 'de')), [k, art]);
+  const module = useMemo(() => moduleDerArt(k, art), [k, art]);
   const g = zustand?.modul ? modulGruppen(k, zustand.modul) : null;
   const ergebnis = zustand?.modul ? modulWerte(k, zustand.modul, zustand.wahl) : null;
   const eingetragen = !!zustand?.angewendet;
@@ -36,15 +21,12 @@ const ModulAuswahl: React.FC<{ art: Art; k: Katalog }> = ({ art, k }) => {
 
   const eintragen = () => {
     if (!ergebnis || ergebnis.fehlend.length) return;
-    const beschreibungen: Record<string, string> = {};
-    for (const e of [...k.nachTyp('ressource'), ...k.nachTyp('staerke')]) beschreibungen[e.name] = e.daten.beschreibung ?? '';
-    const m = ergebnis.werte.meisterschaft;
-    if (m) { const id = k.nachTyp('meisterschaft').find(e => `${e.name} (S${e.daten.schwelle})` === m.name); if (id) beschreibungen[m.name] = id.daten.beschreibung ?? ''; }
+    const beschreibungen = modulBeschreibungen(k, ergebnis.werte.meisterschaft ?? undefined);
     dispatch({ type: 'ERSCHAFFUNG_MODUL_EINTRAGEN', payload: { art, werte: ergebnis.werte, beschreibungen } });
   };
 
   const gruppe = (feld: 'fertigkeiten' | 'ressourcen', gr: ModulGruppe) => {
-    const opts = auswahlListe(k, gr);
+    const opts = modulAuswahlListe(k, gr);
     if (opts.length <= 1 && gr.restVon === undefined) return <li key={`${feld}${gr.index}`}>{gr.text}</li>;
     const wert = zustand?.wahl?.[feld]?.[String(gr.index)] ?? '';
     return (
@@ -69,7 +51,7 @@ const ModulAuswahl: React.FC<{ art: Art; k: Katalog }> = ({ art, k }) => {
         <option value="">Frei verteilen</option>
         {module.map(m => <option key={m.id} value={m.id}>{m.name}{m.quelle.paket !== 'grw' ? ` (${k.pakete[m.quelle.paket]?.kuerzel ?? m.quelle.paket})` : ''}</option>)}
       </select>
-      {!zustand?.modul && <p className="text-xs text-leise">{FREI[art]}</p>}
+      {!zustand?.modul && <p className="text-xs text-leise">{freieErschaffungText(k, art)}</p>}
       {g && (
         <div className="text-xs text-schrift bg-erhoeht border border-dashed border-rahmen rounded-knopf p-2 space-y-1">
           <ul className="list-disc list-inside space-y-0.5">

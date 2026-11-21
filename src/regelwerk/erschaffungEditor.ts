@@ -8,7 +8,7 @@
  * - pruefeErschaffungImEditor(): Ergebnis mit Namen statt IDs.
  */
 import type { Katalog } from './katalog';
-import { pruefeErschaffung, type Bau, type ErschaffungsBefund, type ModulWahl } from './erschaffung';
+import { ERSCHAFFUNG_ID, pruefeErschaffung, type Bau, type ErschaffungsBefund, type ModulWahl } from './erschaffung';
 import { aktiverKatalog, ATTRIBUT_NAME, fertigkeitId, idNachName, meisterschaftId, RASSE_ID } from './bruecke';
 import type { CharacterState } from '../types';
 
@@ -266,4 +266,44 @@ export function pruefeErschaffungImEditor(state: CharacterState, k: Katalog | nu
   const { befunde } = pruefeErschaffung(k, bau);
   const lesbar = (t: string) => t.replace(/\b([a-z0-9]+:[a-z_]+:[a-z0-9:-]+)/g, (i) => k.get(i)?.name ?? i);
   return { befunde: befunde.map(([s, t]) => [s, lesbar(t)] as ErschaffungsBefund), hinweise: [...new Set(hinweise)], verteilung };
+}
+
+// ---------------------------------------------------------------- Für die Ansicht der Module (Kultur, Abstammung)
+
+/** Text zur freien Erschaffung statt eines Moduls, aus den Kernregeln (`strukturiert.kultur_frei`/`abstammung_frei`, GRW S. 23) */
+export function freieErschaffungText(k: Katalog, art: 'kultur' | 'abstammung'): string {
+  const e = k.get(ERSCHAFFUNG_ID);
+  const s = e?.daten.strukturiert?.[`${art}_frei`];
+  if (!s) return '';
+  const seite = s.belege?.[0]?.buch_seite ? ` (GRW S. ${s.belege[0].buch_seite})` : '';
+  if (art === 'kultur') {
+    const ms = s.meisterschaften_schwelle_1 ? `, ${s.meisterschaften_schwelle_1} Meisterschaft` : '';
+    const schule = s.magieschulen_max_anzahl ? `, ${s.magieschulen_max_anzahl === 1 ? 'eine' : s.magieschulen_max_anzahl} Magieschule +${s.magieschule_max_punkte}` : ', keine Magieschule';
+    return `Frei: ${s.fertigkeitspunkte} Fertigkeitspunkte (je höchstens +${s.max_je_fertigkeit}${schule}), 1 Stärke für ${s.staerke_punkte} Punkt${ms}${seite}`;
+  }
+  return `Frei: ${s.fertigkeitspunkte} Fertigkeitspunkte (je höchstens +${s.max_je_fertigkeit}${s.magieschulen_erlaubt ? '' : ', keine Magieschule'}), ${s.ressourcenpunkte} Ressourcenpunkte${seite}`;
+}
+
+/** Module einer Art mit Modulwerten, alphabetisch */
+export function moduleDerArt(k: Katalog, art: 'kultur' | 'abstammung') {
+  return k.nachTyp(art).filter(e => e.daten.modulwerte).sort((a, b) => a.name.localeCompare(b.name, 'de'));
+}
+
+/** Wählbare Einträge einer Modulgruppe: feste Optionen und Platzhalter (Magieschule, Kampffertigkeit) aus den Fertigkeiten */
+export function modulAuswahlListe(k: Katalog, gr: ModulGruppe): { id: string; text: string }[] {
+  const feste = gr.optionen.filter(o => o.id).map(o => ({ id: o.id!, text: o.text }));
+  const platz = gr.optionen.filter(o => o.auswahl).map(o => o.auswahl!);
+  const extra = k.nachTyp('fertigkeit').filter(e => !feste.some(f => f.id === e.id) && (
+    (platz.includes('magieschule') && e.daten.kategorie === 'Magieschule') ||
+    ((platz.includes('kampffertigkeit') || platz.includes('nahkampffertigkeit')) && e.daten.kategorie === 'Kampffertigkeit')))
+    .map(e => ({ id: e.id, text: e.name }));
+  return [...feste, ...extra];
+}
+
+/** Beschreibungen der Stärken, Ressourcen und der Meisterschaft, die ein Modul einträgt */
+export function modulBeschreibungen(k: Katalog, meisterschaft?: { name: string }): Record<string, string> {
+  const b: Record<string, string> = {};
+  for (const e of [...k.nachTyp('ressource'), ...k.nachTyp('staerke')]) b[e.name] = e.daten.beschreibung ?? '';
+  if (meisterschaft) { const e = k.nachTyp('meisterschaft').find(x => `${x.name} (S${x.daten.schwelle})` === meisterschaft.name); if (e) b[meisterschaft.name] = e.daten.beschreibung ?? ''; }
+  return b;
 }

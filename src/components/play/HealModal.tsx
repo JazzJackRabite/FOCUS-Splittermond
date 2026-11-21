@@ -1,3 +1,5 @@
+import { ruheregeln } from '../../regelwerk/spielwirkungen';
+import { grwGesundheitsstufen } from '../../regelwerk/grwListen';
 import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import React, { useState, useMemo } from 'react';
 import { Knopf, Dialog } from '../../fundament';
@@ -27,13 +29,9 @@ export interface HealModalProps {
 type HealMethodType = 'manual' | 'erste_hilfe' | 'wundversorgung' | 'heilmagie' | 'heiltrank' | 'verschnaufpause';
 type HealPriorityType = 'consumed_first' | 'exhausted_first' | 'only_consumed' | 'only_exhausted' | 'only_channeled';
 
-const GRW_STUFEN = [
-  { name: 'Unverletzt', wundabzug: 0 }, { name: 'Angeschlagen', wundabzug: -1 }, { name: 'Verletzt', wundabzug: -2 },
-  { name: 'Schwer verletzt', wundabzug: -4 }, { name: 'Todgeweiht', wundabzug: -8 },
-];
 
 export const HealModal: React.FC<HealModalProps> = ({
-  stufen = GRW_STUFEN,
+  stufen = grwGesundheitsstufen(),
   begleiter,
   onClose,
   maxLP,
@@ -74,17 +72,6 @@ export const HealModal: React.FC<HealModalProps> = ({
   // Handle method presets
   const handleSelectMethod = (selected: HealMethodType) => {
     setMethod(selected);
-    const newConditionsToRemove = new Set(conditionsToRemove);
-
-    // Auto-select "Blutend" removal if Erste Hilfe or Wundversorgung is selected (GRW S. 119–120)
-    if (selected === 'erste_hilfe' || selected === 'wundversorgung') {
-      activeConditions.forEach((c) => {
-        if (c.key === 'Blutend') {
-          newConditionsToRemove.add(c.id);
-        }
-      });
-      setConditionsToRemove(newConditionsToRemove);
-    }
 
     if (selected === 'verschnaufpause') {
       setPriority('only_exhausted');
@@ -187,7 +174,7 @@ export const HealModal: React.FC<HealModalProps> = ({
       wundversorgung: 'Wundversorgung (Heilkunde, GRW S. 119–120)',
       heilmagie: 'Heilmagie',
       heiltrank: 'Heiltrank / Elixier',
-      verschnaufpause: 'Verschnaufpause / Rast',
+      verschnaufpause: 'Verschnaufpause',
     };
 
     onApplyHeal({
@@ -343,8 +330,8 @@ export const HealModal: React.FC<HealModalProps> = ({
                     : 'bg-seite border-rahmen text-schrift hover:bg-seite'
                 }`}
               >
-                <div className="font-bold text-xs">Erholung</div>
-                <div className="text-[11px] text-leise leading-tight">Alle Betäubung weg</div>
+                <div className="font-bold text-xs">Verschnaufpause</div>
+                <div className="text-[11px] text-leise leading-tight" title={ruheregeln().quelle}>{ruheregeln().verschnaufMinuten} Minuten: Betäubungsschaden geheilt</div>
               </button>
             </div>
           </div>

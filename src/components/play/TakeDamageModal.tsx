@@ -1,3 +1,4 @@
+import { grwGesundheitsstufen } from '../../regelwerk/grwListen';
 import { alleZustaende, zustandHatStufe, zustandQuelle } from '../../regelwerk/zustaende';
 import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import React, { useState, useMemo } from 'react';
@@ -26,22 +27,9 @@ export interface TakeDamageModalProps {
   }) => void;
 }
 
-const COMMON_DAMAGE_CONDITIONS: Array<{ key: string; hasLevel: boolean; maxLevel?: number; label: string }> = [
-  { key: 'Blutend', hasLevel: true, maxLevel: 2, label: 'Blutend (Schnitt/Stich)' },
-  { key: 'Brennend', hasLevel: true, maxLevel: 3, label: 'Brennend (Feuerschaden)' },
-  { key: 'Benommen', hasLevel: true, maxLevel: 2, label: 'Benommen (Wucht/Schock)' },
-  { key: 'Liegend', hasLevel: false, label: 'Liegend (zu Boden geworfen)' },
-  { key: 'Erschöpft', hasLevel: true, maxLevel: 3, label: 'Erschöpft (Kälte/Ausdauer)' },
-  { key: 'Vergiftet', hasLevel: false, label: 'Vergiftet (nur Markierung, kein GRW-Zustand)' },
-];
-
-const GRW_STUFEN = [
-  { name: 'Unverletzt', wundabzug: 0 }, { name: 'Angeschlagen', wundabzug: -1 }, { name: 'Verletzt', wundabzug: -2 },
-  { name: 'Schwer verletzt', wundabzug: -4 }, { name: 'Todgeweiht', wundabzug: -8 },
-];
 
 export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
-  stufen = GRW_STUFEN,
+  stufen = grwGesundheitsstufen(),
   begleiter,
   onClose,
   maxLP,
@@ -65,16 +53,7 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
   const [useSplitter, setUseSplitter] = useState<boolean>(false);
 
   // Zustände durch Schaden (GRW S. 168–169)
-  const [activeConditions, setActiveConditions] = useState<Record<string, { active: boolean; level: number }>>({
-    Blutend: { active: false, level: 1 },
-    Brennend: { active: false, level: 1 },
-    Benommen: { active: false, level: 1 },
-    Liegend: { active: false, level: 1 },
-    Erschöpft: { active: false, level: 1 },
-    Vergiftet: { active: false, level: 1 },
-  });
-
-  const [extraCondition, setExtraCondition] = useState<string>('Geblendet');
+  const [extraCondition, setExtraCondition] = useState<string>(() => alleZustaende()[0] ?? '');
   const [extraLevel, setExtraLevel] = useState<number>(1);
   const [extraConditionsList, setExtraConditionsList] = useState<Array<{ key: string; level?: number }>>([]);
 
@@ -156,27 +135,6 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
     };
   }, [currentHealthSlots, maxLP, damageHittingHealth, damageKind, stufen]);
 
-  // Handlers
-  const handleToggleCommonCondition = (key: string) => {
-    setActiveConditions((prev) => ({
-      ...prev,
-      [key]: {
-        ...prev[key],
-        active: !prev[key]?.active,
-      },
-    }));
-  };
-
-  const handleLevelChange = (key: string, lvl: number) => {
-    setActiveConditions((prev) => ({
-      ...prev,
-      [key]: {
-        ...prev[key],
-        level: Math.max(1, lvl),
-      },
-    }));
-  };
-
   const handleAddExtraCondition = () => {
     if (!extraCondition) return;
     const hasLvl = zustandHatStufe(extraCondition);
@@ -194,17 +152,6 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
     if (e) e.preventDefault();
 
     const selectedConds: Array<{ key: string; level?: number }> = [];
-
-    // Collect common active conditions
-    Object.entries(activeConditions).forEach(([key, val]) => {
-      if (val.active) {
-        const condDef = COMMON_DAMAGE_CONDITIONS.find((c) => c.key === key);
-        selectedConds.push({
-          key,
-          level: condDef?.hasLevel ? val.level : undefined,
-        });
-      }
-    });
 
     // Add extra conditions
     selectedConds.push(...extraConditionsList);
@@ -460,60 +407,10 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
               5. Zustände durch den Treffer (GRW S. 168–169)
             </label>
 
-            {/* Quick condition toggles */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {COMMON_DAMAGE_CONDITIONS.map((cond) => {
-                const isActive = activeConditions[cond.key]?.active;
-                const level = activeConditions[cond.key]?.level ?? 1;
-
-                return (
-                  <div
-                    key={cond.key}
-                    className={`rounded-knopf border p-2 transition-all flex flex-col justify-between ${
-                      isActive
-                        ? 'bg-erschoepft-grund border-gold text-schrift'
-                        : 'bg-seite border-rahmen text-schrift'
-                    }`}
-                  >
-                    <label className="flex items-center gap-1.5 cursor-pointer select-none">
-                      <input
-                        type="checkbox"
-                        checked={isActive}
-                        onChange={() => handleToggleCommonCondition(cond.key)}
-                        className="rounded-knopf text-gold focus:ring-0 cursor-pointer w-3.5 h-3.5"
-                      />
-                      <span className="text-xs font-bold truncate">{cond.key}</span>
-                    </label>
-
-                    {cond.hasLevel && isActive && (
-                      <div className="mt-1.5 pt-1.5 border-t border-erschoepft flex items-center justify-between">
-                        <span className="text-[11px] text-leise">Stufe:</span>
-                        <div className="flex items-center gap-1">
-                          {[1, 2, ...(cond.maxLevel && cond.maxLevel >= 3 ? [3] : [])].map((lvl) => (
-                            <button
-                              key={lvl}
-                              type="button"
-                              onClick={() => handleLevelChange(cond.key, lvl)}
-                              className={`w-5 h-5 rounded-knopf text-[11px] font-bold flex items-center justify-center cursor-pointer transition-colors ${
-                                level === lvl
-                                  ? 'bg-gold text-seite'
-                                  : 'bg-flaeche text-schrift hover:bg-erhoeht hover:text-schrift'
-                              }`}
-                            >
-                              {lvl}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Additional condition dropdown */}
-            <div className="pt-2 border-t border-rahmen flex items-center gap-2">
+            {/* Zustände aus den geladenen Paketen */}
+            <div className="flex items-center gap-2">
               <select
+                aria-label="Zustand"
                 value={extraCondition}
                 onChange={(e) => setExtraCondition(e.target.value)}
                 className="bg-seite border border-rahmen rounded-knopf px-2 py-1 text-xs text-schrift font-medium focus:outline-none focus:border-gold flex-1 min-w-[120px]"
@@ -528,8 +425,8 @@ export const TakeDamageModal: React.FC<TakeDamageModalProps> = ({
               {zustandHatStufe(extraCondition) && (
                 <input
                   type="number"
+                  aria-label="Stufe"
                   min={1}
-                  max={6}
                   value={extraLevel}
                   onChange={(e) => setExtraLevel(Math.max(1, parseInt(e.target.value, 10) || 1))}
                   className="w-12 bg-seite border border-rahmen rounded-knopf px-1.5 py-1 text-center text-xs tabular-nums font-bold text-schrift focus:outline-none focus:border-gold"

@@ -74,7 +74,7 @@ describe('HealModal (GRW S. 165-167)', () => {
     expect(onClose).toHaveBeenCalled();
   });
 
-  it('auto-selects Blutend condition removal when Erste Hilfe is chosen (GRW S. 165)', () => {
+  it('Erste Hilfe hebt keinen Zustand von selbst auf; Blutend wird von Hand behandelt (GRW: Stufe sinkt je EG)', () => {
     const onApplyHeal = vi.fn();
     const onClose = vi.fn();
 
@@ -92,9 +92,9 @@ describe('HealModal (GRW S. 165-167)', () => {
     const ersteHilfeBtn = screen.getByRole('button', { name: /Erste Hilfe/i });
     fireEvent.click(ersteHilfeBtn);
 
-    // The Blutend checkbox should now be checked
     const blutendCheckbox = screen.getByLabelText(/Blutend/i) as HTMLInputElement;
-    expect(blutendCheckbox.checked).toBe(true);
+    expect(blutendCheckbox.checked).toBe(false);
+    fireEvent.click(blutendCheckbox);
 
     // Submit
     const applyButton = screen.getByRole('button', { name: /heilen/i });

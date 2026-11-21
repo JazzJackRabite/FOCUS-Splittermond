@@ -5,7 +5,7 @@
 import { describe, expect, it } from 'vitest';
 import { Katalog } from '../katalog';
 import { basisAusDateien } from './hilfen';
-import { bauAusEditor, modulWerte, pruefeErschaffungImEditor } from '../erschaffungEditor';
+import { bauAusEditor, freieErschaffungText, modulWerte, pruefeErschaffungImEditor } from '../erschaffungEditor';
 import { baseCharacterReducer, DEFAULT_STATE } from '../../hooks/useCharacterState';
 import type { CharacterAction, CharacterState, Mastery, Spell } from '../../types';
 
@@ -122,5 +122,12 @@ describe('Regelprüfung der Erschaffung im Editor', () => {
     expect([summe(verteilung.kultur), summe(verteilung.abstammung), summe(verteilung.ausbildung), summe(verteilung.schritt7)]).toEqual([15, 5, 30, 5]);
     const t = pruefeErschaffungImEditor(s, K)!.befunde.map(b => b[1]);
     expect(t.filter(x => /Fertigkeitspunkte|höchstens \+/.test(x))).toEqual([]);
+  });
+});
+
+describe('Freie Erschaffung: Text aus den Kernregeln (GRW S. 23)', () => {
+  it('Kultur und Abstammung', () => {
+    expect(freieErschaffungText(K, 'kultur')).toBe('Frei: 15 Fertigkeitspunkte (je höchstens +2, eine Magieschule +1), 1 Stärke für 1 Punkt, 1 Meisterschaft (GRW S. 23)');
+    expect(freieErschaffungText(K, 'abstammung')).toBe('Frei: 5 Fertigkeitspunkte (je höchstens +1, keine Magieschule), 4 Ressourcenpunkte (GRW S. 23)');
   });
 });

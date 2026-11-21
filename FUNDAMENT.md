@@ -85,7 +85,6 @@ Datenseite wandern. Neue kommen nicht hinzu.
 | Rückfall ohne geladenes Paket: Attribute, Fertigkeiten mit Attributen, Rassen, Mondzeichen, Heldengrade, Gesundheitsstufen | `src/data/rules.ts` | Wie oben; nur noch über `regelwerk/grwListen.ts` und `steigerungsregeln.ts` gelesen |
 | Rückfall ohne geladenes Paket: Werte des Grundregelwerks für Proben (Würfel, Patzer, Triumph, EG-Stufen) und Zauber-EG (Optionen, Auslösezeit) | `regelwerk/proben.ts`, `regelwerk/zauberEg.ts` | Wie oben; mit Paket gelten nur dessen Werte |
 | Regelwerte für Gefolge, Untote und Golems (Kosten, Grenzen, Preisformel) | `regelwerk/gefolge.ts`, `untote.ts`, `golem.ts` | `strukturiert` an den Regeltexten |
-| Schadens- und Heildialog: Zustandsliste, Verschnaufpause | `components/play/TakeDamageModal.tsx`, `HealModal.tsx` | Zustände und Kernregeln des Pakets |
 
 Die genaue Liste der geduldeten Regelnamen steht in `src/fundament/altlasten.json` (`regelnamen`).
 Ohne geladenes Regelpaket rechnet der Editor mit diesen eingebauten Werten weiter (Rückfall). Die Beispielcharaktere
