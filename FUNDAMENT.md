@@ -7,7 +7,7 @@ Gemini in Google AI Studio – liest diese Datei zuerst und hält sich daran.
 - Die Prüfungen in `src/fundament/__tests__/` setzen diese Datei durch. Schlägt eine fehl, ist der Code zu ändern, nicht die Prüfung.
 - Änderungen an dieser Datei entscheidet der Projektinhaber.
 
-> **Stand 21.11.2026 (Stand 31).** Teil 2 (Regelquellen) ist gegen den Code geprüft; eine Prüfung hält Tabelle und Code seitdem
+> **Stand 21.11.2026 (Stand 34).** Teil 2 (Regelquellen) ist gegen den Code geprüft; eine Prüfung hält Tabelle und Code seitdem
 > zusammen (`src/fundament/__tests__`).
 
 ---
