@@ -8,7 +8,6 @@ beforeAll(() => { const b = basisAusDateien(); setzeAktivenKatalog(new Katalog(b
 afterAll(() => setzeAktivenKatalog(null, false));
 import {
   parseFocusCost,
-  STANDARD_SPELL_ENHANCEMENTS,
   lookupSpellInDb,
   getFullSpellInfo,
   calculateSpellEG,
@@ -84,12 +83,17 @@ describe('magicRules - parseFocusCost', () => {
   });
 });
 
+import { zauberEgRegeln } from '../regelwerk/zauberEg';
+const KB = basisAusDateien();
+const K = new Katalog(KB.manifest, [KB.basis]);
+
 describe('magicRules - enhancements & info', () => {
-  it('provides standard spell enhancements', () => {
-    expect(STANDARD_SPELL_ENHANCEMENTS.length).toBeGreaterThanOrEqual(4);
-    const rangeEnh = STANDARD_SPELL_ENHANCEMENTS.find((e) => e.id === 'range');
-    expect(rangeEnh).toBeDefined();
-    expect(rangeEnh?.focusDelta).toBe(2);
+  it('EG-Optionen und Auslösezeit aus dem Paket (GRW S. 221–222)', () => {
+    const r = zauberEgRegeln(K);
+    expect([r.erschoepft.eg, r.kanalisiert.eg, r.verzehrt.eg, r.schaden.eg, r.reichweite.eg, r.wirkungsdauer.eg, r.wirkungsbereich.eg, r.ausloesezeit.eg]).toEqual([1, 2, 3, 1, 1, 2, 3, 3]);
+    expect(r.ausloesezeit).toMatchObject({ hoechstens: 2, minimum: 1 });
+    expect(r.grundAusloesezeit).toBe(3);
+    expect(zauberEgRegeln(null)).toEqual({ ...r, quelle: r.quelle });
   });
 
   it('retrieves spell info from database', () => {

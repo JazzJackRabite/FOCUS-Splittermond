@@ -4,6 +4,8 @@ import type { RaceData } from '../types';
 export const ATTRIBUTES = { AUS: 'Ausstrahlung', BEW: 'Beweglichkeit', INT: 'Intuition', KON: 'Konstitution', MYS: 'Mystik', STA: 'Stärke', VER: 'Verstand', WIL: 'Willenskraft' };
 
 export const BASE_STRENGTH_POINTS = 6;
+/** Stärke, die die Kultur kostenlos für die Heimatregion gibt (GRW S. 23); Rückfall ohne Paket, maßgeblich ist gratisStaerkeDerKultur() */
+export const GRATIS_STAERKE_DER_KULTUR = 'Kulturkunde';
 
 export const RACES: Record<string, RaceData> = {
     Mensch: { gk: 5, mods: {}, freeMods: 2, strengths: ['Zusätzliche Splitterpunkte'], traits: [{ id: 'zusaetzliche_staerkenpunkte', label: 'Zusätzliche Stärkenpunkte', modifiers: { strengthPoints: 2 } }] },

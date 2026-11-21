@@ -214,7 +214,7 @@ describe('Splittermond GRW – Umfassende Regelprüfung, 5 Testcharaktere & Kamp
       expect(attackCalc.isSuccess).toBe(true);
       expect(attackCalc.differenz).toBe(7); // 25 - 18 = 7
       expect(attackCalc.eg).toBe(2); // Diff 7 entspricht 2 EG (Diff 6..8 = 2 EG)
-      expect(attackCalc.outcomeLabel).toContain('Herausragender Treffer');
+      expect(attackCalc.outcomeLabel).toBe('Gelungen'); // 1 bis 2 EG (GRW S. 17)
 
       // Cederion setzt beide EG für das freie Manöver Wuchtangriff ein: +1 Schaden je EG
       // (GRW S. 161; Beispiel dort: 1 EG macht aus 1W6+4 dann 1W6+5). Nur Waffen mit dem Merkmal Wuchtig geben +2.

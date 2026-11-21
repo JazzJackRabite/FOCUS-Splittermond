@@ -1,6 +1,7 @@
 /**
  * Probenwurf nach GRW S. 16–19 und Großmeister (S. 92) – gemeinsam für Probe, Angriff und Zauber.
- * - Standardwurf: 2W10 addieren; Patzer bei Augensumme ≤ 3, Triumph ab 19.
+ * Anzahl der Würfel je Wurfart und die Grenzen kommen aus dem Paket (regelwerk/proben.ts).
+ * - Standardwurf: 2W10 addieren; Patzer bei Augensumme ≤ 3, Triumph ab 19 (Grenzen aus dem Paket: regelwerk/proben.ts).
  * - Sicherheitswurf: 2W10, nur der höhere zählt; kein Patzer, kein Triumph.
  * - Risikowurf: 4W10; die niedrigsten 2 zusammen ≤ 3 = Patzer, sonst zählen die höchsten 2 (Triumph ab 19).
  * - Großmeister (ab 15 Fertigkeitspunkten): ein zusätzlicher W10. Er zählt nicht für den Patzer und ist nur ohne Patzer
@@ -20,27 +21,32 @@ export interface WurfErgebnis {
 const w10 = (rnd: () => number) => Math.floor(rnd() * 10) + 1;
 const besteZwei = (l: number[]) => [...l].sort((a, b) => b - a).slice(0, 2).reduce((a, b) => a + b, 0);
 
-export function wuerfeln(art: WurfArt, grossmeister = false, rnd: () => number = Math.random): WurfErgebnis {
+import { wurfgrenzen } from '../regelwerk/proben';
+
+/** Grenzen für Patzer (Summe der niedrigsten zwei höchstens …) und Triumph (Summe der höchsten zwei mindestens …) aus dem Paket */
+export function wuerfeln(art: WurfArt, grossmeister = false, rnd: () => number = Math.random, grenzen: { patzer: number; triumph: number; wuerfel?: { standard: number; safe: number; risk: number } } = wurfgrenzen()): WurfErgebnis {
+  const anzahl = grenzen.wuerfel ?? wurfgrenzen().wuerfel;
+  const werfe = (n: number) => Array.from({ length: n }, () => w10(rnd));
   if (art === 'safe') {
-    const d = [w10(rnd), w10(rnd)];
+    const d = werfe(anzahl.safe);
     const g = grossmeister ? w10(rnd) : undefined;
     const alle = g !== undefined ? [...d, g] : d;
     return { dice: alle, result: Math.max(...alle), isCrit: false, isFumble: false, grossmeisterWuerfel: g };
   }
   if (art === 'risk') {
-    const d = Array.from({ length: 4 }, () => w10(rnd)).sort((a, b) => a - b);
+    const d = werfe(anzahl.risk).sort((a, b) => a - b);
     const g = grossmeister ? w10(rnd) : undefined;
     const alle = g !== undefined ? [...d, g] : d;
     const low = d[0] + d[1];
-    if (low <= 3) return { dice: alle, result: low, isFumble: true, isCrit: false, grossmeisterWuerfel: g };
+    if (low <= grenzen.patzer) return { dice: alle, result: low, isFumble: true, isCrit: false, grossmeisterWuerfel: g };
     const high = besteZwei(alle);
-    return { dice: alle, result: high, isFumble: false, isCrit: high >= 19, grossmeisterWuerfel: g };
+    return { dice: alle, result: high, isFumble: false, isCrit: high >= grenzen.triumph, grossmeisterWuerfel: g };
   }
-  const d = [w10(rnd), w10(rnd)];
+  const d = werfe(anzahl.standard);
   const g = grossmeister ? w10(rnd) : undefined;
   const alle = g !== undefined ? [...d, g] : d;
-  const summe = d[0] + d[1];
-  if (summe <= 3) return { dice: alle, result: summe, isFumble: true, isCrit: false, grossmeisterWuerfel: g };
+  const summe = [...d].sort((a, b) => a - b).slice(0, 2).reduce((a, b) => a + b, 0);
+  if (summe <= grenzen.patzer) return { dice: alle, result: summe, isFumble: true, isCrit: false, grossmeisterWuerfel: g };
   const best = besteZwei(alle);
-  return { dice: alle, result: best, isFumble: false, isCrit: best >= 19, grossmeisterWuerfel: g };
+  return { dice: alle, result: best, isFumble: false, isCrit: best >= grenzen.triumph, grossmeisterWuerfel: g };
 }

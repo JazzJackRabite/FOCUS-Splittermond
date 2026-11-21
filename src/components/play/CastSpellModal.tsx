@@ -53,6 +53,7 @@ import { getActiveRollModifiers } from '../../utils/conditionModifiers';
 import { wuerfeln } from '../../utils/wuerfeln';
 import { SituativeBoni, useSituativeBoni, useZauberAnpassungen, ZauberAnpassungen } from './SituativeBoni';
 import { kostenAnwenden, zauberdauerAnpassen } from '../../regelwerk/wirkungen';
+import { wurfgrenzen } from '../../regelwerk/proben';
 
 export interface CastSpellSuccessResult {
   spell: Spell;
@@ -435,8 +436,9 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
     setRollType('standard');
     setRollDice([Math.floor(val / 2), Math.ceil(val / 2)]);
     setDiceSum(val);
-    setIsFumble(val <= 3);
-    setIsCrit(val >= 19);
+    const grenzen = wurfgrenzen();
+    setIsFumble(val <= grenzen.patzer);
+    setIsCrit(val >= grenzen.triumph);
     setExtraSPBonus(0);
     setHasRolled(true);
     setCustomFailureFocus(null);
@@ -852,7 +854,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
                   type="text"
                   value={spellTargetNote}
                   onChange={(e) => setSpellTargetNote(e.target.value)}
-                  placeholder="Ziel oder Anmerkung (z. B. 'Verbündeter', 'Reisegruppe', 'Lichtkugel')..."
+                  placeholder="Ziel oder Anmerkung (z. B. Verbündeter, Reisegruppe) …"
                   className="w-full text-xs px-3 py-1.5 border border-rahmen rounded-knopf bg-erhoeht focus:outline-none focus:ring-2 focus:ring-rahmen text-schrift placeholder-leise"
                 />
               </div>

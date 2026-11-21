@@ -346,68 +346,7 @@ export function checkMasteryPrerequisites(
           };
         }
 
-        // Check: Verbessertes Entwaffnen (Block, Meisterschaft Entwaffnen in Handgemenge)
-        if (text.includes('Block') && text.includes('Entwaffnen')) {
-          const hasBlock = hasMasteryInSkill('Block', 'Handgemenge');
-          const hasEntwaffnen = hasMasteryInSkill('Entwaffnen', 'Handgemenge');
-          if (hasBlock && hasEntwaffnen) return { satisfied: true };
-          return {
-            satisfied: false,
-            reason: `Meisterschaften "Block" und "Entwaffnen" in Handgemenge`,
-          };
-        }
-
-        // Check: Freiheit der Form (Bevorzugte Gestalt + Kleintierform oder Tierform)
-        if (text.includes('Bevorzugte Gestalt') && (text.includes('Kleintierform') || text.includes('Tierform'))) {
-          const hasMasteryReq = hasMastery('Bevorzugte Gestalt');
-          const hasSpellReq = hasSpell('Kleintierform') || hasSpell('Tierform');
-          if (hasMasteryReq && hasSpellReq) return { satisfied: true };
-          return {
-            satisfied: false,
-            reason: `Meisterschaft "Bevorzugte Gestalt" und Zauber "Kleintierform" oder "Tierform"`,
-          };
-        }
-
-        // Check: Spezialist für alle Wesen (Tierarzt + Arkane Kunde 6 oder Geschichte und Mythen 6)
-        if (text.includes('Tierarzt')) {
-          const hasTierarzt = hasMastery('Tierarzt');
-          const arkaneVal = getSkillVal('Arkane Kunde');
-          const mythenVal = getSkillVal('Geschichte und Mythen');
-          if (hasTierarzt && (arkaneVal >= 6 || mythenVal >= 6)) return { satisfied: true };
-          return {
-            satisfied: false,
-            reason: `Meisterschaft "Tierarzt" und Fertigkeitspunkte in Arkane Kunde 6 oder Geschichte und Mythen 6`,
-          };
-        }
-
-        // Check: Geselle / Fachmann / Meister im jeweiligen Schwerpunkt
-        if (text.includes('im jeweiligen Schwerpunkt')) {
-          if (text.includes('Geselle')) {
-            const hasGeselle = (context.allCharacterMasteries || []).some((m) => {
-              const mName = typeof m === 'string' ? m : m.name;
-              return mName.toLowerCase().includes('geselle');
-            });
-            if (hasGeselle) return { satisfied: true };
-            return { satisfied: false, reason: `Meisterschaft "Geselle" in dieser Fertigkeit` };
-          }
-          if (text.includes('Fachmann')) {
-            const hasFachmann = (context.allCharacterMasteries || []).some((m) => {
-              const mName = typeof m === 'string' ? m : m.name;
-              return mName.toLowerCase().includes('fachmann');
-            });
-            if (hasFachmann) return { satisfied: true };
-            return { satisfied: false, reason: `Meisterschaft "Fachmann" in dieser Fertigkeit` };
-          }
-          if (text.includes('Meister') && !text.includes('Meisterwerk')) {
-            const hasMeister = (context.allCharacterMasteries || []).some((m) => {
-              const mName = typeof m === 'string' ? m : m.name;
-              const norm = mName.toLowerCase();
-              return norm.includes('meister') && !norm.includes('meisterwerk');
-            });
-            if (hasMeister) return { satisfied: true };
-            return { satisfied: false, reason: `Meisterschaft "Meister" in dieser Fertigkeit` };
-          }
-        }
+        // Einzelne Meisterschaften nach Namen stehen hier nicht mehr: das Paket hat alle Voraussetzungen formal (voraussetzungen_formal).
 
         // Check: mind. ein Schwerpunkt für eine Stadt (Wie meine Westentasche)
         if (text.includes('Schwerpunkt für eine Stadt') || text.includes('Stadt')) {

@@ -31,12 +31,13 @@ import { CharacterContext } from '../../context/CharacterContext';
 import {
   calculateAttackEG,
   getAvailableCombatManeuvers,
-  FREE_COMBAT_MANEUVERS,
   parseWeaponDamage,
   executeAttackDamageRoll,
   isMeleeWeapon,
   manoeverRegeln,
   wuchtangriffJeEg,
+  kombiniereManoever,
+  manoeverHinzufuegbar,
   type AngreiferWerte,
   type CombatManeuver,
   type AttackEGCalculation,
@@ -79,8 +80,14 @@ export interface AttackSuccessResult {
   egStoerendSpent: number;
   /** Betäubungsschlag (1 EG): Schaden als Betäubungsschaden */
   betaeubungsschlag: boolean;
-  /** weitere EG für das angesagte Manöver (z. B. Abdrängen je 0,5 m) */
+  /** alle angesagten Meisterschafts-Manöver (GRW S. 161: mehrere gegen denselben Widerstand) */
+  maneuvers: CombatManeuver[];
+  /** weitere EG für angesagte Manöver (z. B. Abdrängen je 0,5 m), Summe */
   egManoeverExtra: number;
+  /** weitere EG je Manöver */
+  egManoeverExtraJe: Record<string, number>;
+  /** EG, die für die Deckung des Ziels nötig waren (Fernkampf, GRW S. 163) */
+  egDeckung: number;
   /** zu wenige EG für das angesagte Manöver: Streiftreffer (GRW S. 161) */
   streiftreffer: boolean;
   isCrit: boolean;
@@ -117,6 +124,8 @@ export interface AttackModalProps {
 type RollType = 'standard' | 'safe' | 'risk';
 import { wuerfeln } from '../../utils/wuerfeln';
 import { SituativeBoni, useSituativeBoni } from './SituativeBoni';
+import { wurfgrenzen } from '../../regelwerk/proben';
+import { ignoriertSituation, kampfsituationen, positionsModifikator, positionsNamen, vorbereitungsBonus } from '../../regelwerk/kampflage';
 
 
 /** Stabile leere Liste: ein `= []` als Vorgabe erzeugt bei jedem Rendern ein neues Array und löst über den Effekt unten eine Endlosschleife aus. */
@@ -124,17 +133,17 @@ const KEINE_ZAUBER: ChanneledSpell[] = [];
 const KEINE_WERTE: AngreiferWerte = {};
 const WIDERSTAND_TEXT: Record<'VTD' | 'KW' | 'GW', string> = { VTD: 'Verteidigung (VTD)', KW: 'Körperlicher Widerstand (KW)', GW: 'Geistiger Widerstand (GW)' };
 
-/** Zähler für Erfolgsgrade (−/+), mindestens 44 Pixel hohe Knöpfe */
-const EgZaehler: React.FC<{ titel: string; text: string; wert: number; setze: (f: (v: number) => number) => void; mehrMoeglich: boolean; testid: string }> = ({ titel, text, wert, setze, mehrMoeglich, testid }) => (
+/** Zähler (−/+) für Erfolgsgrade und Lage, mindestens 44 Pixel hohe Knöpfe */
+const EgZaehler: React.FC<{ titel: string; text: string; wert: number; setze: (f: (v: number) => number) => void; mehrMoeglich: boolean; testid: string; einheit?: string }> = ({ titel, text, wert, setze, mehrMoeglich, testid, einheit = 'EG' }) => (
   <div className="bg-seite p-2.5 rounded-knopf border border-rahmen flex items-center justify-between gap-2" data-testid={testid}>
     <div>
       <span className="font-bold text-schrift block">{titel}</span>
       <span className="text-[11px] text-leise">{text}</span>
     </div>
     <div className="flex items-center gap-1.5">
-      <Knopf nurSymbol aria-label={`${titel}: ein EG weniger`} disabled={wert <= 0} onClick={() => setze((v) => Math.max(0, v - 1))}>−</Knopf>
+      <Knopf nurSymbol aria-label={`${titel}: ein ${einheit} weniger`} disabled={wert <= 0} onClick={() => setze((v) => Math.max(0, v - 1))}>−</Knopf>
       <span className="w-6 text-center tabular-nums font-bold text-schrift" data-testid={`${testid}-wert`}>{wert}</span>
-      <Knopf nurSymbol aria-label={`${titel}: ein EG mehr`} disabled={!mehrMoeglich} onClick={() => setze((v) => (mehrMoeglich ? v + 1 : v))}>+</Knopf>
+      <Knopf nurSymbol aria-label={`${titel}: ein ${einheit} mehr`} disabled={!mehrMoeglich} onClick={() => setze((v) => (mehrMoeglich ? v + 1 : v))}>+</Knopf>
     </div>
   </div>
 );
@@ -168,22 +177,40 @@ export const AttackModal: React.FC<AttackModalProps> = ({
   const stoerend = regeln.freie.find((f) => f.je_eg?.entschlossenheit_erschwert);
   const betaeubung = regeln.freie.find((f) => f.betaeubungsschaden && (!f.nur_nahkampf || nahkampf));
 
-  const [selectedManeuver, setSelectedManeuver] = useState<CombatManeuver>(availableManeuvers[0] || FREE_COMBAT_MANEUVERS[0]);
-
-  // Keep selected maneuver valid if available maneuvers change
+  // Angesagte Meisterschafts-Manöver; leer = Angriff ohne Meisterschafts-Manöver (GRW S. 161)
+  const [gewaehlteManoever, setGewaehlteManoever] = useState<CombatManeuver[]>([]);
   useEffect(() => {
-    if (!availableManeuvers.some((m) => m.id === selectedManeuver.id)) {
-      setSelectedManeuver(availableManeuvers[0] || FREE_COMBAT_MANEUVERS[0]);
-    }
-  }, [availableManeuvers, selectedManeuver.id]);
+    setGewaehlteManoever((g) => (g.every((m) => availableManeuvers.some((a) => a.id === m.id)) ? g : g.filter((m) => availableManeuvers.some((a) => a.id === m.id))));
+  }, [availableManeuvers]);
+  const kombi = useMemo(() => kombiniereManoever(gewaehlteManoever, regeln), [gewaehlteManoever, regeln]);
+  const selectedManeuver = kombi.gesamt;
+  const umschaltenManoever = (m: CombatManeuver) => {
+    if (m.type !== 'mastery') { setGewaehlteManoever([]); return; }
+    setGewaehlteManoever((g) => {
+      if (g.some((x) => x.id === m.id)) return g.filter((x) => x.id !== m.id);
+      return manoeverHinzufuegbar(g, m, regeln) ? (regeln.kombination.mehrere ? g : [m]) : [...g, m];
+    });
+  };
 
   // Step 1: Target Defense & Modifiers
   const [targetVTD, setTargetVTD] = useState<number>(target.targetVTD ?? 15);
   const [targetArmor, setTargetArmor] = useState<number>(0);
   const [situationalMod, setSituationalMod] = useState<number>(0);
-  const [targetLying, setTargetLying] = useState<boolean>(false);
-  const [targetCover, setTargetCover] = useState<boolean>(false);
-  const [advantageFlank, setAdvantageFlank] = useState<boolean>(false);
+  // Lage beim Angriff aus dem Paket (GRW S. 162–163, 170–171)
+  const lage = useMemo(() => kampfsituationen(), []);
+  const positionen = useMemo(() => positionsNamen(), []);
+  const art = nahkampf ? 'nahkampf' as const : 'fernkampf' as const;
+  const [eigenePosition, setEigenePosition] = useState<string>(positionen[0] ?? '');
+  const [zielPosition, setZielPosition] = useState<string>(positionen[0] ?? '');
+  const [taktischeVorteile, setTaktischeVorteile] = useState<number>(0);
+  const [ueberzahl, setUeberzahl] = useState<number>(0);
+  const [vorbereitungTicks, setVorbereitungTicks] = useState<number>(0);
+  const [deckung, setDeckung] = useState<'keine' | 'leicht' | 'schwer'>('keine');
+  const [kampfgetuemmel, setKampfgetuemmel] = useState<boolean>(false);
+  const scharfschuetze = useMemo(
+    () => (nahkampf ? null : ignoriertSituation('kampfgetuemmel', characterMasteries, skillName)),
+    [nahkampf, characterMasteries, skillName],
+  );
   const [attackNote, setAttackNote] = useState<string>('');
 
   // Active condition modifiers
@@ -203,19 +230,24 @@ export const AttackModal: React.FC<AttackModalProps> = ({
     }, 0);
   }, [conditionMods, activeConditionsState]);
 
-  // Situational adjustments based on checkboxes
-  const situationPresetBonus = useMemo(() => {
-    let bonus = 0;
-    if (targetLying) bonus += 2; // +2 on melee vs. prone
-    if (advantageFlank) bonus += 1; // +1 flanking / higher ground
-    return bonus;
-  }, [targetLying, advantageFlank]);
+  // Modifikatoren der Lage, alle Zahlen aus dem Paket
+  const lageTeile = useMemo(() => {
+    const t: { text: string; wert: number }[] = [];
+    const pe = eigenePosition ? positionsModifikator(eigenePosition, art, 'eigene', weapon.name) : 0;
+    if (pe) t.push({ text: `eigene Position ${eigenePosition}`, wert: pe });
+    const pz = zielPosition ? positionsModifikator(zielPosition, art, 'gegnerisch', weapon.name) : 0;
+    if (pz) t.push({ text: `Ziel ${zielPosition}`, wert: pz });
+    if (lage.taktischerVorteil && taktischeVorteile > 0) t.push({ text: `Taktischer Vorteil ×${taktischeVorteile}`, wert: taktischeVorteile * lage.taktischerVorteil.bonus });
+    if (nahkampf && lage.ueberzahl && ueberzahl > 0) t.push({ text: 'Überzahl', wert: Math.min(lage.ueberzahl.hoechstens, ueberzahl * lage.ueberzahl.bonusJeKaempfer) });
+    const vb = vorbereitungsBonus(vorbereitungTicks, art);
+    if (vb) t.push({ text: nahkampf ? 'Lücke suchen' : 'Zielen', wert: vb });
+    if (!nahkampf && lage.kampfgetuemmel && kampfgetuemmel && !scharfschuetze) t.push({ text: 'Kampfgetümmel', wert: -lage.kampfgetuemmel.malus });
+    return t;
+  }, [eigenePosition, zielPosition, art, weapon.name, lage, taktischeVorteile, nahkampf, ueberzahl, vorbereitungTicks, kampfgetuemmel, scharfschuetze]);
+  const situationPresetBonus = lageTeile.reduce((s, t) => s + t.wert, 0);
+  const egDeckung = !nahkampf && lage.deckung && deckung !== 'keine' ? lage.deckung[deckung] : 0;
 
-  const effectiveTargetVTD = useMemo(() => {
-    let vtd = targetVTD;
-    if (targetCover) vtd += 2; // +2 VTD for cover
-    return vtd;
-  }, [targetVTD, targetCover]);
+  const effectiveTargetVTD = targetVTD;
 
   // Splittermond GRW: Aktive kanalisierte Zauber (Aura des Anführers, Beflügelte Waffe, Flammende Waffe etc.)
   // Waffenlose Angriffe kommen ohne Ausrüstungs-ID an – sonst träfen Waffenzauber ohne Zielangabe auch sie.
@@ -292,21 +324,27 @@ export const AttackModal: React.FC<AttackModalProps> = ({
   const [egDamageSpent, setEgDamageSpent] = useState<number>(0);
   const [egStoerendSpent, setEgStoerendSpent] = useState<number>(0);
   const [betaeubungsschlag, setBetaeubungsschlag] = useState<boolean>(false);
-  const [egManoeverExtra, setEgManoeverExtra] = useState<number>(0);
+  const [egManoeverExtraJe, setEgManoeverExtraJe] = useState<Record<string, number>>({});
+  const egManoeverExtra = Object.values(egManoeverExtraJe).reduce((a, b) => a + b, 0);
 
-  const totalEgAvailable = egCalculation?.eg ?? 0;
-  // Ein angesagtes Meisterschafts-Manöver kostet EG; reichen sie nicht, ist es ein Streiftreffer und alle EG verfallen
-  const manoeverKosten = selectedManeuver.egCost ?? 0;
-  const streiftreffer = !!egCalculation?.isSuccess && totalEgAvailable < manoeverKosten;
+  // Deckung (Fernkampf): zusätzliche EG für einen Treffer, sonst trifft der Angriff die Deckung (GRW S. 163)
+  const egGesamt = egCalculation?.eg ?? 0;
+  const trifftDeckung = !!egCalculation?.isSuccess && egGesamt < egDeckung;
+  const trifft = !!egCalculation?.isSuccess && !trifftDeckung;
+  const totalEgAvailable = Math.max(0, egGesamt - egDeckung);
+  // Jedes angesagte Meisterschafts-Manöver kostet EG; reichen sie nicht, ist es ein Streiftreffer und alle EG verfallen
+  const manoeverKosten = kombi.egKosten;
+  const streiftreffer = trifft && totalEgAvailable < manoeverKosten;
   const freieEg = streiftreffer ? 0 : Math.max(0, totalEgAvailable - manoeverKosten);
   const totalEgAllocated = egDamageSpent + egStoerendSpent + (betaeubungsschlag ? (betaeubung?.eg ?? 1) : 0) + egManoeverExtra;
   const remainingEG = Math.max(0, freieEg - totalEgAllocated);
   const verteileStandard = (eg: number, erfolg: boolean) => {
-    const frei = erfolg && eg >= manoeverKosten ? eg - manoeverKosten : 0;
+    const nachDeckung = eg - egDeckung;
+    const frei = erfolg && nachDeckung >= manoeverKosten ? nachDeckung - manoeverKosten : 0;
     setEgDamageSpent(frei);
     setEgStoerendSpent(0);
     setBetaeubungsschlag(false);
-    setEgManoeverExtra(0);
+    setEgManoeverExtraJe({});
   };
 
   // Step 4: Integrated Damage Roll
@@ -361,8 +399,10 @@ export const AttackModal: React.FC<AttackModalProps> = ({
     const d2 = val - d1;
     setRollDice([d1, d2]);
     setDiceSum(val);
-    setIsFumble(val === 2);
-    setIsCrit(val === 20);
+    // Patzer und Triumph nach den Grenzen des Pakets (GRW S. 18: Summe ≤ 3 bzw. ≥ 19)
+    const grenzen = wurfgrenzen();
+    setIsFumble(val <= grenzen.patzer);
+    setIsCrit(val >= grenzen.triumph);
     setHasRolled(true);
     setManualInputOpen(false);
     setDamageRollResult(null);
@@ -370,8 +410,8 @@ export const AttackModal: React.FC<AttackModalProps> = ({
     const calc = calculateAttackEG(
       val + totalAttackModifier + extraSPBonus,
       effectiveTargetVTD,
-      val === 2,
-      val === 20
+      val <= grenzen.patzer,
+      val >= grenzen.triumph
     );
     verteileStandard(calc.eg, calc.isSuccess);
   };
@@ -379,19 +419,17 @@ export const AttackModal: React.FC<AttackModalProps> = ({
   // Perform the Damage Roll
   const handleRollDamage = () => {
     const egBonus = streiftreffer ? 0 : egDamageSpent * wuchtJeEg;
-    const angesagt = selectedManeuver.type === 'mastery' ? 1 : 0;
-
     const res = executeAttackDamageRoll({
       baseFormula: weapon.damage || '1W6',
-      // Beim Streiftreffer bleiben die Effekte der Manöver aus; Schadenseinschränkungen (halber Schaden) gelten weiter
-      maneuverExtraFormula: streiftreffer ? undefined : selectedManeuver.extraDamageFormula,
-      maneuverFixedDamage: streiftreffer ? 0 : selectedManeuver.fixedExtraDamage,
+      // Beim Streiftreffer bleiben die Effekte der Manöver aus; Schadenseinschränkungen (halber Schaden) gelten für den ganzen Angriff weiter
+      maneuverExtraFormulas: streiftreffer ? [] : kombi.extraDamageFormulas,
+      maneuverFixedDamage: streiftreffer ? 0 : kombi.fixedExtraDamage,
       egBonusDamage: egBonus + extraSpellDmg,
-      damageMultiplier: selectedManeuver.damageMultiplier ?? 1,
+      damageMultiplier: kombi.damageMultiplier,
       targetArmorReduction: targetArmor,
-      maneuverCondition: streiftreffer ? undefined : selectedManeuver.inflictsCondition,
+      maneuverConditions: streiftreffer ? [] : kombi.zustaende,
       stunDamage: betaeubungsschlag && !streiftreffer,
-      streiftrefferAbzug: streiftreffer ? angesagt * regeln.streiftrefferSchaden : 0,
+      streiftrefferAbzug: streiftreffer ? kombi.angesagt * regeln.streiftrefferSchaden : 0,
     });
 
     setDamageRollResult(res);
@@ -403,7 +441,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
   const handleCompleteAttack = () => {
     if (!egCalculation) return;
 
-    if (egCalculation.isSuccess) {
+    if (trifft) {
       // Record to dice protocol
       if (onRecordRoll) {
         const activeSpellLabels = spellAttackBonuses
@@ -431,6 +469,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
       onAttackSuccess({
         weapon,
         maneuver: selectedManeuver,
+        maneuvers: kombi.angesagt ? kombi.manoever : [],
         totalRoll: totalRollResult,
         targetVTD: effectiveTargetVTD,
         differenz: egCalculation.differenz,
@@ -439,6 +478,8 @@ export const AttackModal: React.FC<AttackModalProps> = ({
         egStoerendSpent,
         betaeubungsschlag,
         egManoeverExtra,
+        egManoeverExtraJe,
+        egDeckung,
         streiftreffer,
         isCrit,
         damageRoll: damageRollResult || undefined,
@@ -460,7 +501,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
           total: totalRollResult,
           isTriumph: false,
           isPatzer: isFumble,
-          outcome: `${egCalculation.outcomeLabel} (Diff: ${egCalculation.differenz} vs. VTD ${effectiveTargetVTD})`,
+          outcome: `${trifftDeckung ? 'Trifft die Deckung' : egCalculation.outcomeLabel} (Diff: ${egCalculation.differenz} vs. VTD ${effectiveTargetVTD})`,
         });
       }
 
@@ -471,10 +512,10 @@ export const AttackModal: React.FC<AttackModalProps> = ({
         targetVTD: effectiveTargetVTD,
         differenz: egCalculation.differenz,
         isFumble,
-        notes: attackNote,
+        notes: trifftDeckung ? ['Trifft die Deckung', attackNote].filter(Boolean).join(' · ') : attackNote,
       });
 
-      toast(`Angriff mit ${weapon.name} verfehlt (Diff ${egCalculation.differenz}).`);
+      toast(trifftDeckung ? `Angriff mit ${weapon.name} trifft die Deckung (${egGesamt} von ${egDeckung} EG).` : `Angriff mit ${weapon.name} verfehlt (Diff ${egCalculation.differenz}).`);
     }
 
     onClose();
@@ -700,66 +741,79 @@ export const AttackModal: React.FC<AttackModalProps> = ({
               </div>
             )}
 
-            {/* Situational Toggles */}
-            <div className="flex flex-wrap gap-2 pt-2 border-t border-rahmen text-xs">
-              <button
-                type="button"
-                onClick={() => setTargetLying((prev) => !prev)}
-                className={`min-h-11 px-2.5 py-1 rounded-knopf border transition-all flex items-center gap-1.5 cursor-pointer font-semibold ${
-                  targetLying
-                    ? 'bg-magie-grund text-schrift border-magie'
-                    : 'bg-seite text-leise border-rahmen hover:bg-seite'
-                }`}
-              >
-                <span>{targetLying ? '✓' : '+'}</span>
-                <span>Gegner liegt (+2 Nahkampf)</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setAdvantageFlank((prev) => !prev)}
-                className={`min-h-11 px-2.5 py-1 rounded-knopf border transition-all flex items-center gap-1.5 cursor-pointer font-semibold ${
-                  advantageFlank
-                    ? 'bg-magie-grund text-schrift border-magie'
-                    : 'bg-seite text-leise border-rahmen hover:bg-seite'
-                }`}
-              >
-                <span>{advantageFlank ? '✓' : '+'}</span>
-                <span>Vorteil / Überzahl (+1)</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setTargetCover((prev) => !prev)}
-                className={`min-h-11 px-2.5 py-1 rounded-knopf border transition-all flex items-center gap-1.5 cursor-pointer font-semibold ${
-                  targetCover
-                    ? 'bg-erschoepft-grund text-gold-hell border-erschoepft'
-                    : 'bg-seite text-leise border-rahmen hover:bg-seite'
-                }`}
-              >
-                <span>{targetCover ? '✓' : '+'}</span>
-                <span>Ziel in Deckung (+2 VTD)</span>
-              </button>
-
-              <div className="flex items-center gap-1 ml-auto">
-                <span className="text-leise text-xs">Situations-Mod:</span>
-                <button
-                  type="button"
-                  onClick={() => setSituationalMod((prev) => prev - 1)}
-                  className="w-6 h-6 rounded-knopf bg-seite hover:bg-rahmen text-schrift font-bold flex items-center justify-center border border-rahmen cursor-pointer"
-                >
-                  −
-                </button>
+            {/* Lage beim Angriff: alle Werte aus dem GRW-Paket (Kampfpositionen S. 170, Situationen S. 162–163, 170–171) */}
+            <div className="pt-2 border-t border-rahmen space-y-2 text-xs" data-testid="kampflage">
+              {positionen.length > 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <label className="flex flex-col gap-1" title={lage.quellen.positionen}>
+                    <span className="text-leise">Eigene Position</span>
+                    <select value={eigenePosition} onChange={(e) => setEigenePosition(e.target.value)} data-testid="position-eigene"
+                      className="min-h-11 bg-seite border border-rahmen rounded-knopf px-2 text-schrift">
+                      {positionen.map((p) => { const w = positionsModifikator(p, art, 'eigene', weapon.name); return <option key={p} value={p}>{p}{w ? ` (${w > 0 ? '+' : ''}${w})` : ''}</option>; })}
+                    </select>
+                  </label>
+                  <label className="flex flex-col gap-1" title={lage.quellen.positionen}>
+                    <span className="text-leise">Position des Ziels</span>
+                    <select value={zielPosition} onChange={(e) => setZielPosition(e.target.value)} data-testid="position-ziel"
+                      className="min-h-11 bg-seite border border-rahmen rounded-knopf px-2 text-schrift">
+                      {positionen.map((p) => { const w = positionsModifikator(p, art, 'gegnerisch', weapon.name); return <option key={p} value={p}>{p}{w ? ` (${w > 0 ? '+' : ''}${w})` : ''}</option>; })}
+                    </select>
+                  </label>
+                </div>
+              )}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {lage.taktischerVorteil && (
+                  <EgZaehler titel="Taktische Vorteile" text={`+${lage.taktischerVorteil.bonus} je Vorteil (${lage.quellen.vorteil})`}
+                    wert={taktischeVorteile} setze={setTaktischeVorteile} mehrMoeglich testid="lage-vorteil" einheit="Vorteil" />
+                )}
+                {nahkampf && lage.ueberzahl && (
+                  <EgZaehler titel="Überzahl" text={`+${lage.ueberzahl.bonusJeKaempfer} je überzähligem Kämpfer, höchstens +${lage.ueberzahl.hoechstens} (${lage.quellen.ueberzahl})`}
+                    wert={ueberzahl} setze={setUeberzahl} mehrMoeglich={ueberzahl * lage.ueberzahl.bonusJeKaempfer < lage.ueberzahl.hoechstens} testid="lage-ueberzahl" einheit="Kämpfer" />
+                )}
+                {(nahkampf ? lage.lueckeSuchen : lage.zielen) && (() => {
+                  const r = (nahkampf ? lage.lueckeSuchen : lage.zielen)!;
+                  return (
+                    <EgZaehler titel={nahkampf ? 'Lücke suchen' : 'Zielen'} text={`+${r.bonus} je ${r.ticks} Ticks, höchstens +${r.hoechstens} (${nahkampf ? lage.quellen.nah : lage.quellen.fern})`}
+                      wert={vorbereitungTicks} setze={setVorbereitungTicks} mehrMoeglich={vorbereitungsBonus(vorbereitungTicks, art) < r.hoechstens} testid="lage-ticks" einheit="Tick" />
+                  );
+                })()}
+                {!nahkampf && lage.deckung && (
+                  <div className="bg-seite p-2.5 rounded-knopf border border-rahmen" title={lage.quellen.fern}>
+                    <span className="font-bold text-schrift block mb-1">Deckung des Ziels</span>
+                    <div className="flex gap-1" role="group" aria-label="Deckung des Ziels">
+                      {(['keine', 'leicht', 'schwer'] as const).map((d) => (
+                        <Knopf key={d} art={deckung === d ? 'primaer' : 'neutral'} aria-pressed={deckung === d} onClick={() => setDeckung(d)} data-testid={`deckung-${d}`}>
+                          {d === 'keine' ? 'Keine' : `${d === 'leicht' ? 'Leicht' : 'Schwer'} (+${lage.deckung![d]} EG)`}
+                        </Knopf>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {!nahkampf && lage.kampfgetuemmel && (
+                  <div className="bg-seite p-2.5 rounded-knopf border border-rahmen flex items-center justify-between gap-2" title={lage.quellen.fern}>
+                    <div>
+                      <span className="font-bold text-schrift block">Ziel im Kampfgetümmel</span>
+                      <span className="text-[11px] text-leise">{scharfschuetze ? `entfällt (${scharfschuetze})` : `−${lage.kampfgetuemmel.malus} auf den Angriff`}</span>
+                    </div>
+                    <Knopf art={kampfgetuemmel ? 'primaer' : 'neutral'} aria-pressed={kampfgetuemmel} onClick={() => setKampfgetuemmel((v) => !v)} data-testid="lage-getuemmel">
+                      {kampfgetuemmel ? 'Ja' : 'Nein'}
+                    </Knopf>
+                  </div>
+                )}
+              </div>
+              {(lageTeile.length > 0 || egDeckung > 0) && (
+                <div className="text-leise" data-testid="lage-summe">
+                  Lage: {lageTeile.map((t) => `${t.text} ${t.wert > 0 ? '+' : ''}${t.wert}`).join(', ')}
+                  {egDeckung > 0 && `${lageTeile.length ? ' · ' : ''}Deckung: ${egDeckung} EG zusätzlich für einen Treffer`}
+                </div>
+              )}
+              <div className="flex items-center gap-1">
+                <span className="text-leise text-xs">Sonstiger Modifikator (Spielleitung):</span>
+                <Knopf nurSymbol aria-label="Modifikator −1" onClick={() => setSituationalMod((prev) => prev - 1)}>−</Knopf>
                 <span className="w-7 text-center tabular-nums font-bold text-xs text-schrift">
                   {situationalMod >= 0 ? `+${situationalMod}` : situationalMod}
                 </span>
-                <button
-                  type="button"
-                  onClick={() => setSituationalMod((prev) => prev + 1)}
-                  className="w-6 h-6 rounded-knopf bg-seite hover:bg-rahmen text-schrift font-bold flex items-center justify-center border border-rahmen cursor-pointer"
-                >
-                  +
-                </button>
+                <Knopf nurSymbol aria-label="Modifikator +1" onClick={() => setSituationalMod((prev) => prev + 1)}>+</Knopf>
               </div>
             </div>
 
@@ -801,25 +855,27 @@ export const AttackModal: React.FC<AttackModalProps> = ({
               <span className="text-xs font-bold uppercase tracking-wider text-gold fantasy-font flex items-center gap-1.5">
                 <Zap size={14} /> 2. Meisterschafts-Manöver ansagen
               </span>
-              <span className="text-xs text-leise font-medium">
-                {availableManeuvers.filter((m) => m.type === 'mastery').length} erlernte Meisterschaften
+              <span className="text-xs text-leise font-medium" title={regeln.quelle}>
+                {regeln.kombination.mehrere ? 'mehrere gegen denselben Widerstand möglich' : `${availableManeuvers.filter((m) => m.type === 'mastery').length} erlernte Meisterschaften`}
               </span>
             </div>
 
             {/* Maneuvers Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {availableManeuvers.map((m) => {
-                const isSelected = selectedManeuver.id === m.id;
                 const isMastery = m.type === 'mastery';
+                const isSelected = isMastery ? gewaehlteManoever.some((g) => g.id === m.id) : gewaehlteManoever.length === 0;
+                const sperre = isMastery && !isSelected && regeln.kombination.mehrere ? manoeverHinzufuegbar(gewaehlteManoever, m, regeln) : null;
                 return (
                   <button
                     key={m.id}
                     type="button"
-                    onClick={() => setSelectedManeuver(m)}
-                    title={[m.page ? `${m.source ?? 'GRW'} S. ${m.page}` : '', ...(m.belege ?? [])].filter(Boolean).join('\n') || undefined}
+                    onClick={() => umschaltenManoever(m)}
+                    disabled={!!sperre}
+                    title={[sperre ?? '', m.page ? `${m.source ?? 'GRW'} S. ${m.page}` : '', ...(m.belege ?? [])].filter(Boolean).join('\n') || undefined}
                     aria-pressed={isSelected}
                     data-testid={`manoever-${m.id}`}
-                    className={`min-h-11 text-left p-2.5 rounded-knopf border transition-all cursor-pointer relative flex flex-col justify-between ${
+                    className={`min-h-11 text-left p-2.5 rounded-knopf border transition-all cursor-pointer relative flex flex-col justify-between disabled:opacity-50 disabled:cursor-not-allowed ${
                       isSelected
                         ? 'bg-flaeche border-gold ring-1 ring-rahmen'
                         : 'bg-seite border-rahmen hover:bg-seite hover:border-rahmen'
@@ -847,17 +903,29 @@ export const AttackModal: React.FC<AttackModalProps> = ({
               })}
             </div>
 
-            {/* Beschreibung und Voraussetzungen des gewählten Manövers (aus dem Paket) */}
-            {selectedManeuver && selectedManeuver.description && (
+            {/* Beschreibung und Voraussetzungen der angesagten Manöver (aus dem Paket) */}
+            {kombi.angesagt > 0 && (
               <div className="bg-seite p-2.5 rounded-knopf border border-rahmen text-xs text-schrift mt-1 space-y-1">
-                <div>
-                  <span className="font-bold text-gold-hell">{selectedManeuver.name}</span>
-                  {selectedManeuver.page ? <span className="text-leise"> ({selectedManeuver.source ?? 'GRW'} S. {selectedManeuver.page})</span> : null}:{' '}
-                  <span>{selectedManeuver.description}</span>
-                </div>
-                {selectedManeuver.requires === 'zielen' && <div data-testid="manoever-voraussetzung">Voraussetzung: mindestens eine Zielen-Aktion vor dem Angriff.</div>}
-                {selectedManeuver.requires === 'ringend' && <div data-testid="manoever-voraussetzung">Voraussetzung: Angreifer und Ziel sind ringend.</div>}
-                {selectedManeuver.hoechstensGk && <div>Nur gegen Ziele bis Größenklasse {selectedManeuver.hoechstensGk}.</div>}
+                {kombi.manoever.map((m) => (
+                  <div key={m.id}>
+                    <span className="font-bold text-gold-hell">{m.name}</span>
+                    {m.page ? <span className="text-leise"> ({m.source ?? 'GRW'} S. {m.page})</span> : null}:{' '}
+                    <span>{m.description}</span>
+                    {m.hoechstensGk && <span> Nur gegen Ziele bis Größenklasse {m.hoechstensGk}.</span>}
+                  </div>
+                ))}
+                {kombi.angesagt > 1 && (
+                  <div data-testid="manoever-kombination">
+                    Zusammen: {kombi.egKosten} EG, gegen {WIDERSTAND_TEXT[kombi.widerstand]}
+                    {kombi.damageMultiplier !== 1 && regeln.kombination.schadenFuerAngriff && `, ${kombi.damageMultiplier === 0 ? 'kein Schaden' : 'halber Schaden'} für den ganzen Angriff`}.
+                  </div>
+                )}
+                {kombi.voraussetzungen.includes('zielen') && (
+                  <div data-testid="manoever-voraussetzung" className={!nahkampf && vorbereitungTicks === 0 ? 'text-schaden font-semibold' : ''}>
+                    Voraussetzung: mindestens eine Zielen-Aktion vor dem Angriff{!nahkampf && vorbereitungTicks === 0 ? ' – bei „Zielen“ oben sind noch keine Ticks eingetragen.' : '.'}
+                  </div>
+                )}
+                {kombi.voraussetzungen.includes('ringend') && <div data-testid="manoever-voraussetzung">Voraussetzung: Angreifer und Ziel sind ringend.</div>}
               </div>
             )}
           </div>
@@ -1001,7 +1069,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                   <div className="text-right">
                     <span
                       className={`text-sm font-bold fantasy-font tracking-wide px-2.5 py-0.5 rounded-knopf border ${
-                        egCalculation.isSuccess
+                        trifft
                           ? isCrit
                             ? 'bg-erschoepft-grund text-gold-hell border-erschoepft'
                             : 'bg-unverletzt-grund text-unverletzt border-unverletzt'
@@ -1010,13 +1078,14 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                     >
                       {egCalculation.outcomeLabel}
                     </span>
+                    {trifftDeckung && <div className="text-xs text-schaden font-semibold mt-0.5" data-testid="trifft-deckung">Trifft die Deckung ({egGesamt} von {egDeckung} EG)</div>}
                     <div className="text-xs text-leise tabular-nums mt-0.5">
                       Diff: {egCalculation.differenz >= 0 ? `+${egCalculation.differenz}` : egCalculation.differenz} vs. VTD {effectiveTargetVTD}
                     </div>
                   </div>
                 </div>
 
-                {egCalculation.isSuccess && (
+                {trifft && (
                   <div className="mt-2.5 pt-2.5 border-t border-rahmen flex items-center justify-between text-xs">
                     <span className="font-semibold text-schrift">
                       Erfolgsgrade (EG):{' '}
@@ -1041,27 +1110,32 @@ export const AttackModal: React.FC<AttackModalProps> = ({
           </div>
 
           {/* ── ROW 4: ERFOLGSGRADE EINSETZEN (WENN TREFFER) – freie Manöver und Kosten des Manövers aus dem Paket, GRW S. 161 ── */}
-          {hasRolled && egCalculation && egCalculation.isSuccess && (
+          {hasRolled && egCalculation && trifft && (
             <div className="bg-seite border border-rahmen rounded-karte p-3.5 space-y-3">
               <div className="flex justify-between items-center">
                 <span className="text-xs font-bold uppercase tracking-wider text-gold fantasy-font flex items-center gap-1.5">
-                  <Award size={14} /> 4. Erfolgsgrade einsetzen ({egCalculation.eg} EG)
+                  <Award size={14} /> 4. Erfolgsgrade einsetzen ({egCalculation.eg} EG{egDeckung > 0 ? `, davon ${egDeckung} für die Deckung` : ''})
                 </span>
                 <span className="text-xs tabular-nums text-leise">
                   Eingesetzt: {totalEgAllocated + (streiftreffer ? 0 : manoeverKosten)} / {totalEgAvailable} EG
                 </span>
               </div>
 
-              {selectedManeuver.type === 'mastery' && (
+              {egDeckung > 0 && (
+                <div className="p-2.5 rounded-knopf bg-erhoeht border border-rahmen text-xs text-schrift" data-testid="eg-deckung" title={lage.quellen.fern}>
+                  Deckung: {egDeckung} EG zusätzlich für den Treffer
+                </div>
+              )}
+              {kombi.angesagt > 0 && (
                 streiftreffer ? (
                   <div className="p-2.5 rounded-knopf bg-schaden-grund border border-schaden text-xs text-schrift" data-testid="streiftreffer" title={regeln.quelle}>
-                    <strong>Streiftreffer:</strong> {selectedManeuver.name} braucht {manoeverKosten} EG. Die Wirkung des Manövers bleibt aus,
-                    alle Erfolgsgrade verfallen, und der Schaden sinkt um {regeln.streiftrefferSchaden} (alternativ {regeln.streiftrefferBetaeubung} Punkte
+                    <strong>Streiftreffer:</strong> {selectedManeuver.name} {kombi.angesagt > 1 ? 'brauchen' : 'braucht'} {manoeverKosten} EG. Die Wirkung {kombi.angesagt > 1 ? 'der Manöver' : 'des Manövers'} bleibt aus,
+                    alle Erfolgsgrade verfallen, und der Schaden sinkt um {kombi.angesagt * regeln.streiftrefferSchaden} (alternativ {kombi.angesagt * regeln.streiftrefferBetaeubung} Punkte
                     Betäubungsschaden für den Angreifer) – {regeln.quelle}.
                   </div>
                 ) : (
                   <div className="p-2.5 rounded-knopf bg-erhoeht border border-rahmen text-xs text-schrift" data-testid="manoever-kosten">
-                    {selectedManeuver.name}: {manoeverKosten} EG für das angesagte Manöver
+                    {selectedManeuver.name}: {manoeverKosten} EG für {kombi.angesagt > 1 ? 'die angesagten Manöver' : 'das angesagte Manöver'}
                   </div>
                 )
               )}
@@ -1108,23 +1182,24 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                   </div>
                 )}
 
-                {/* Weitere EG für das angesagte Manöver */}
-                {selectedManeuver.jeWeiteremEg && !streiftreffer && (
+                {/* Weitere EG je angesagtem Manöver */}
+                {!streiftreffer && kombi.manoever.filter((m) => m.jeWeiteremEg).map((m) => (
                   <EgZaehler
-                    titel={selectedManeuver.name}
-                    text={`Je weiterem EG: ${selectedManeuver.jeWeiteremEg}`}
-                    wert={egManoeverExtra}
-                    setze={setEgManoeverExtra}
+                    key={m.id}
+                    titel={m.name}
+                    text={`Je weiterem EG: ${m.jeWeiteremEg}`}
+                    wert={egManoeverExtraJe[m.id] ?? 0}
+                    setze={(f) => setEgManoeverExtraJe((alt) => ({ ...alt, [m.id]: f(alt[m.id] ?? 0) }))}
                     mehrMoeglich={remainingEG > 0}
-                    testid="eg-manoever"
+                    testid={kombi.manoever.filter((x) => x.jeWeiteremEg).length > 1 ? `eg-manoever-${m.id}` : 'eg-manoever'}
                   />
-                )}
+                ))}
               </div>
             </div>
           )}
 
           {/* ── ROW 5: DIREKTER SCHADENSWURF (INTEGRIERTER SCHADEN) ── */}
-          {hasRolled && egCalculation && egCalculation.isSuccess && (
+          {hasRolled && egCalculation && trifft && (
             <div className="bg-seite border border-rahmen rounded-karte p-3.5 space-y-3">
               <div className="flex justify-between items-center">
                 <span className="text-xs font-bold uppercase tracking-wider text-gold fantasy-font flex items-center gap-1.5">
@@ -1237,7 +1312,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
 
           <div className="flex items-center gap-2">
             {hasRolled && (
-              egCalculation?.isSuccess && attackCausesDamage && !damageRollResult ? (
+              trifft && attackCausesDamage && !damageRollResult ? (
                 <div className="flex items-center gap-2">
                   <Knopf art="primaer"
                     onClick={handleCompleteAttack}

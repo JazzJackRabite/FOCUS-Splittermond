@@ -27489,7 +27489,11 @@
     "manoever": false,
     "beschreibung": "Der Angreifer kann bei Verwendung von Schusswaffen die Modifikatoren für Schüsse ins Kampfgetümmel ignorieren.",
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "ignoriert_situation": {
+     "situation": "kampfgetuemmel",
+     "beleg": "die Modifikatoren für Schüsse ins Kampfgetümmel ignorieren"
+    }
    }
   },
   {
@@ -31772,7 +31776,11 @@
     "manoever": false,
     "beschreibung": "Der Angreifer kann bei Verwendung von Wurfwaffen die Modifikatoren für Schüsse ins Kampfgetümmel ignorieren.",
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "ignoriert_situation": {
+     "situation": "kampfgetuemmel",
+     "beleg": "die Modifikatoren für Schüsse ins Kampfgetümmel ignorieren"
+    }
    }
   },
   {
@@ -75545,6 +75553,38 @@
       }
      ],
      "quelle": "Tabelle im Abschnitt"
+    },
+    "kampfsituationen": {
+     "deckung": {
+      "leicht": {
+       "zusaetzliche_eg": 1
+      },
+      "schwer": {
+       "zusaetzliche_eg": 2
+      },
+      "nur": "fernkampf",
+      "belege": [
+       "erhält es Leichte Deckung, wodurch für einen Treffer 1 zusätzlicher Erfolgsgrad erforderlich ist",
+       "erhält es Schwere Deckung, wodurch für einen Treffer 2 zusätzliche Erfolgsgrade erforderlich sind",
+       "trifft der Fernkampfangriff die Deckung"
+      ]
+     },
+     "kampfgetuemmel": {
+      "malus": 6,
+      "nur": "fernkampf",
+      "belege": [
+       "erhält die Probe für den Fernkampfangriff einen Malus in Höhe von 6 Punkten"
+      ]
+     },
+     "zielen": {
+      "ticks": 2,
+      "bonus": 1,
+      "hoechstens": 3,
+      "nur": "fernkampf",
+      "belege": [
+       "Für je 2 zusätzlich aufgebrachte Ticks erhält er einen Bonus in Höhe von 1 Punkt auf seinen Fernkampfangriff, wobei maximal 3 Bonuspunkte angesammelt werden können"
+      ]
+     }
     }
    },
    "hinweise": [
@@ -76035,7 +76075,51 @@
     "hinweise": [
      "Ergänzt am 04.11.2026 (Kernregeln für Proben, Kampf und Zauberei; Anlass: Simulationstest)."
     ],
-    "regelbereich": "kampf_regeln"
+    "regelbereich": "kampf_regeln",
+    "kampfpositionen": [
+     {
+      "position": "Stehend",
+      "angriff": "beide",
+      "eigene": 0,
+      "gegnerisch": 0
+     },
+     {
+      "position": "Kniend",
+      "angriff": "fernkampf",
+      "eigene": 0,
+      "gegnerisch": -3
+     },
+     {
+      "position": "Kniend",
+      "angriff": "nahkampf",
+      "eigene": -3,
+      "gegnerisch": 3
+     },
+     {
+      "position": "Liegend",
+      "angriff": "armbrust",
+      "eigene": 0,
+      "gegnerisch": -6
+     },
+     {
+      "position": "Liegend",
+      "angriff": "fernkampf",
+      "eigene": -6,
+      "gegnerisch": -6
+     },
+     {
+      "position": "Liegend",
+      "angriff": "nahkampf",
+      "eigene": -6,
+      "gegnerisch": 6
+     },
+     {
+      "position": "Fliegend",
+      "angriff": "beide",
+      "eigene": 3,
+      "gegnerisch": -3
+     }
+    ]
    },
    "hinweise": [
     "Ergänzt am 04.11.2026 (Kernregeln für Proben, Kampf und Zauberei; Anlass: Simulationstest)."
@@ -76307,6 +76391,12 @@
        }
       }
      ],
+     "kombination": {
+      "mehrere": true,
+      "gleicher_widerstand": true,
+      "schadenseinschraenkung_gilt_fuer_angriff": true,
+      "je_manoever_einmal": true
+     },
      "belege": [
       "Der Effekt solcher Manöver tritt nur dann ein, wenn für jedes angesagte Manöver 1 Erfolgsgrad erzielt und verwendet wird",
       "muss der Kämpfer seinen verursachten Schaden um 2 Punkte für jedes angesagte Manöver senken",
@@ -76314,8 +76404,22 @@
       "Für jeden aufgewendeten Erfolgsgrad richtet der Angriff einen zusätzlichen Punkt Schaden an",
       "Für 1 Erfolgsgrad richtet der Angriff keinen regulären Schaden an. Stattdessen fügt er dem Gegner Betäubungsschaden in derselben Höhe zu",
       "Dieses freie Manöver ist nur bei Nahkampfangriffen einsetzbar",
-      "um die Entschlossenheit-Probe seines Gegners gegen die Unterbrechung (siehe S. 167) jeweils um zusätzliche 3 Punkte zu erschweren"
+      "um die Entschlossenheit-Probe seines Gegners gegen die Unterbrechung (siehe S. 167) jeweils um zusätzliche 3 Punkte zu erschweren",
+      "Es können mehrere Manöver gleichzeitig genutzt werden, sofern sie sich in der Kampfsituation glaubwürdig kombinieren lassen und alle Manöver gegen denselben Widerstandswert gehen",
+      "Sollten in einer Kombination Manöver angewendet werden, die Einschränkungen in Bezug auf Schaden haben (also etwa den Schaden halbieren), gilt dies für alle Manöver bzw. den gesamten Angriff",
+      "Jedes Meisterschafts-Manöver kann nur einmal pro Nahkampfangriff gegen denselben Gegner eingesetzt werden"
      ]
+    },
+    "kampfsituationen": {
+     "luecke_suchen": {
+      "ticks": 2,
+      "bonus": 1,
+      "hoechstens": 3,
+      "nur": "nahkampf",
+      "belege": [
+       "Für je 2 vor einem Nahkampfangriff im Rahmen einer kontinuierlichen Aktion aufgewendete Ticks erhält er einen Bonus in Höhe von 1 Punkt auf seinen Nahkampfangriff, wobei maximal 3 Bonuspunkte angesammelt werden können"
+      ]
+     }
     }
    },
    "hinweise": [
@@ -77001,7 +77105,17 @@
     "hinweise": [
      "Ergänzt am 04.11.2026 (Kernregeln für Proben, Kampf und Zauberei; Anlass: Simulationstest)."
     ],
-    "regelbereich": "kampf_regeln"
+    "regelbereich": "kampf_regeln",
+    "kampfsituationen": {
+     "taktischer_vorteil": {
+      "bonus": 3,
+      "mehrfach": true,
+      "belege": [
+       "bekommt er einen Bonus in Höhe von 3 Punkten auf alle Kampffertigkeiten",
+       "Es ist dabei möglich, gleichzeitig von mehreren Taktischen Vorteilen zu profitieren"
+      ]
+     }
+    }
    },
    "hinweise": [
     "Ergänzt am 04.11.2026 (Kernregeln für Proben, Kampf und Zauberei; Anlass: Simulationstest)."
@@ -77039,7 +77153,18 @@
     "hinweise": [
      "Ergänzt am 04.11.2026 (Kernregeln für Proben, Kampf und Zauberei; Anlass: Simulationstest)."
     ],
-    "regelbereich": "kampf_regeln"
+    "regelbereich": "kampf_regeln",
+    "kampfsituationen": {
+     "ueberzahl": {
+      "bonus_je_kaempfer": 1,
+      "hoechstens": 3,
+      "nur": "nahkampf",
+      "belege": [
+       "erhalten die Nahkampfangriffe ihrer Mitglieder einen Bonus in Höhe von jeweils 1 Punkt pro überzähligen Kämpfer",
+       "Maximal können sie hierdurch einen Bonus in Höhe von 3 Punkten erhalten"
+      ]
+     }
+    }
    },
    "hinweise": [
     "Ergänzt am 04.11.2026 (Kernregeln für Proben, Kampf und Zauberei; Anlass: Simulationstest)."
@@ -81053,7 +81178,16 @@
     "hinweise": [
      "Bei der Prüfung am 28.10.2026 ergänzt (Regeltext fehlte in der Datenbank)."
     ],
-    "regelbereich": "zauber_regeln"
+    "regelbereich": "zauber_regeln",
+    "strukturiert": {
+     "ausloesezeit_ticks": 3,
+     "belege": [
+      {
+       "id": "grw:regel:zauber-regeln:erlaeuterung-der-zauberbeschreibungen",
+       "text": "Um den Zauber letztendlich auszulösen, ist immer noch eine zusätzliche sofortige Aktion von standardmäßig 3 Ticks Dauer nötig"
+      }
+     ]
+    }
    },
    "hinweise": [
     "Bei der Prüfung am 28.10.2026 ergänzt (Regeltext fehlte in der Datenbank)."

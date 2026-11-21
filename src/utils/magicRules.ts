@@ -6,6 +6,8 @@ import type { Katalog } from '../regelwerk/katalog';
 import { aktiverKatalog, idNachName } from '../regelwerk/bruecke';
 import { istVerstaerkt, istWaffenlos, kampfwerte, lpWirkung, probenboni, spielwerteDesZaubers, waffenschaden, zielTrifft, geltenderWert } from '../regelwerk/zauberwerte';
 import { grwFertigkeitsattribute, grwZauber } from '../regelwerk/grwListen';
+import { erfolgsgrade } from '../regelwerk/proben';
+import { zauberEgRegeln } from '../regelwerk/zauberEg';
 
 export interface ParsedFocusCost {
   isChanneled: boolean;
@@ -155,59 +157,14 @@ export function calculateSpellEG(
   isFumble = false,
   isCrit = false
 ): SpellCastEGCalculation {
-  const differenz = totalRoll - difficulty;
-  const isSuccess = differenz >= 0 && !isFumble;
-
-  if (isSuccess) {
-    let eg = Math.floor(differenz / 3);
-    if (isCrit) {
-      eg += 3;
-    }
-    return {
-      isSuccess: true,
-      differenz,
-      eg: Math.max(0, eg),
-      negativeEG: 0,
-      exhaustedFocusLostOnFailure: 0,
-      isFumble: false,
-      isCrit,
-    };
+  // Erfolgsgrade nach den Probenregeln des Pakets (regelwerk/proben.ts): Patzer EG −3 (höchstens −1), Triumph +3 nur bei Erfolg;
+  // knapp misslungen (−1/−2) ergibt 0 negative EG
+  const r = erfolgsgrade(totalRoll, difficulty, isFumble, isCrit);
+  if (r.gelungen) {
+    return { isSuccess: true, differenz: r.differenz, eg: Math.max(0, r.eg), negativeEG: 0, exhaustedFocusLostOnFailure: 0, isFumble: false, isCrit: r.triumph };
   }
-
-  // Failure
-  // PDF S. 17 & 198:
-  // Knapp misslungen (Diff -1 bis -2): 0 EG. Bei Kampf und Zauberei keine negativen Folgen (0 Fokusverlust).
-  // Misslungen (Diff <= -3): negative EG = Math.floor(abs(diff) / 3)
-  // Patzer (S. 18): Probe immer misslungen, zusätzlicher Abzug von -3 EG (maximal -1 EG).
-  let negativeEG = 0;
-  if (!isFumble) {
-    if (differenz <= -3) {
-      negativeEG = Math.floor(Math.abs(differenz) / 3);
-    } else {
-      // Differenz -1 or -2: Knapp misslungen -> 0 negative EG
-      negativeEG = 0;
-    }
-  } else {
-    // Patzer (fumble)
-    if (differenz >= 0) {
-      const baseEG = Math.floor(differenz / 3);
-      negativeEG = Math.max(1, 3 - baseEG);
-    } else if (differenz >= -2) {
-      negativeEG = 3;
-    } else {
-      negativeEG = Math.floor(Math.abs(differenz) / 3) + 3;
-    }
-  }
-
-  return {
-    isSuccess: false,
-    differenz,
-    eg: 0,
-    negativeEG,
-    exhaustedFocusLostOnFailure: negativeEG,
-    isFumble,
-    isCrit: false,
-  };
+  const negativeEG = Math.max(0, -r.eg);
+  return { isSuccess: false, differenz: r.differenz, eg: 0, negativeEG, exhaustedFocusLostOnFailure: negativeEG, isFumble, isCrit: false };
 }
 
 export interface SpecificSpellEnhancement {
@@ -351,15 +308,16 @@ export function parseSpellPermissibleModifications(
   };
 }
 
+/** Anzahl gewählter Optionen je Art; EG je Option stehen im Paket (regelwerk/zauberEg.ts, GRW S. 221–222) */
 export interface SpellEGAllocations {
-  saveExhaustedFocus: number; // 1 EG per 1 exhausted FO saved
-  saveChanneledFocus: number;  // 2 EG per 1 channeled FO saved
-  saveConsumedFocus: number;   // 3 EG per 1 consumed FO saved (Splittermond standard)
-  increaseDamage: number;      // 1 EG per +1 damage
-  increaseRange: number;       // 1 EG per base range increase
-  increaseDuration: number;    // 2 EG per base duration increase
-  reduceCastTime: number;      // 3 EG per -1 tick cast time reduction (max 2)
-  expandArea: number;          // 3 EG per base area increase (GRW S. 221–222)
+  saveExhaustedFocus: number;
+  saveChanneledFocus: number;
+  saveConsumedFocus: number;
+  increaseDamage: number;
+  increaseRange: number;
+  increaseDuration: number;
+  reduceCastTime: number;
+  expandArea: number;
   selectedEnhancementIds: string[]; // List of specific enhancement IDs selected
   customEnhancementEG: number; // EG spent on spell-specific enhancement
   customEnhancementText: string;
@@ -400,15 +358,17 @@ export function calculateTotalEGSpent(
     }
   }
 
+  // EG je Option aus dem Paket (GRW S. 221–222)
+  const r = zauberEgRegeln();
   return (
-    (allocations.saveExhaustedFocus || 0) * 1 +
-    (allocations.saveChanneledFocus || 0) * 2 +
-    (allocations.saveConsumedFocus || 0) * 3 +
-    (allocations.increaseDamage || 0) * 1 +
-    (allocations.increaseRange || 0) * 1 +
-    (allocations.increaseDuration || 0) * 2 +
-    (allocations.reduceCastTime || 0) * 3 +
-    (allocations.expandArea || 0) * 3 + // GRW S. 221–222: Wirkungsbereich je 3 EG
+    (allocations.saveExhaustedFocus || 0) * r.erschoepft.eg +
+    (allocations.saveChanneledFocus || 0) * r.kanalisiert.eg +
+    (allocations.saveConsumedFocus || 0) * r.verzehrt.eg +
+    (allocations.increaseDamage || 0) * r.schaden.eg +
+    (allocations.increaseRange || 0) * r.reichweite.eg +
+    (allocations.increaseDuration || 0) * r.wirkungsdauer.eg +
+    (allocations.reduceCastTime || 0) * r.ausloesezeit.eg +
+    (allocations.expandArea || 0) * r.wirkungsbereich.eg +
     specificEG +
     (allocations.customEnhancementEG || 0)
   );
@@ -432,18 +392,19 @@ export function calculateFinalSpellCosts(
   allocations: SpellEGAllocations,
   availableEnhancements?: SpecificSpellEnhancement[]
 ): FinalSpellCosts {
-  // 1 EG saves 1 exhausted focus (minimum cost: 1 if originally > 0)
+  const r = zauberEgRegeln();
+  // Erschöpfter Fokus: Mindestkosten aus dem Paket (1 erschöpfter Punkt)
   let effectiveExhausted = parsedBase.exhausted;
   if (effectiveExhausted > 0 && allocations.saveExhaustedFocus > 0) {
-    const maxReduction = Math.max(0, effectiveExhausted - 1);
+    const maxReduction = Math.max(0, effectiveExhausted - (r.erschoepft.minimum ?? 0));
     const reduction = Math.min(maxReduction, allocations.saveExhaustedFocus);
     effectiveExhausted -= reduction;
   }
 
-  // 2 EG saves 1 channeled focus (minimum cost: 1 if originally > 0)
+  // Kanalisierter Fokus: Mindestkosten aus dem Paket (1 kanalisierter Punkt)
   let effectiveChanneled = parsedBase.channeled;
   if (effectiveChanneled > 0 && allocations.saveChanneledFocus > 0) {
-    const maxReduction = Math.max(0, effectiveChanneled - 1);
+    const maxReduction = Math.max(0, effectiveChanneled - (r.kanalisiert.minimum ?? 0));
     const reduction = Math.min(maxReduction, allocations.saveChanneledFocus);
     effectiveChanneled -= reduction;
   }
@@ -452,8 +413,9 @@ export function calculateFinalSpellCosts(
   // Fokuspunkt“). Der verzehrte Anteil darf also ganz entfallen, solange ein nicht verzehrter Punkt bleibt.
   let effectiveConsumed = parsedBase.consumed;
   if (effectiveConsumed > 0 && allocations.saveConsumedFocus > 0) {
-    const restBleibt = effectiveExhausted + effectiveChanneled >= 1;
-    const maxReduction = restBleibt ? effectiveConsumed : Math.max(0, effectiveConsumed - 1);
+    const mindest = r.verzehrt.minimum ?? 0;
+    const restBleibt = effectiveExhausted + effectiveChanneled >= mindest;
+    const maxReduction = restBleibt ? effectiveConsumed : Math.max(0, effectiveConsumed - mindest);
     const reduction = Math.min(maxReduction, allocations.saveConsumedFocus);
     effectiveConsumed -= reduction;
   }
@@ -461,28 +423,28 @@ export function calculateFinalSpellCosts(
   // Apply extra focus from selected specific enhancements
   const modificationsSummary: string[] = [];
   if (allocations.saveExhaustedFocus > 0) {
-    modificationsSummary.push(`-${allocations.saveExhaustedFocus} Erschöpfter Fokus (${allocations.saveExhaustedFocus} EG)`);
+    modificationsSummary.push(`-${allocations.saveExhaustedFocus} Erschöpfter Fokus (${allocations.saveExhaustedFocus * r.erschoepft.eg} EG)`);
   }
   if (allocations.saveChanneledFocus > 0) {
-    modificationsSummary.push(`-${allocations.saveChanneledFocus} Kanalisierter Fokus (${allocations.saveChanneledFocus * 2} EG)`);
+    modificationsSummary.push(`-${allocations.saveChanneledFocus} Kanalisierter Fokus (${allocations.saveChanneledFocus * r.kanalisiert.eg} EG)`);
   }
   if (allocations.saveConsumedFocus > 0) {
-    modificationsSummary.push(`-${allocations.saveConsumedFocus} Verzehrter Fokus (${allocations.saveConsumedFocus * 3} EG)`);
+    modificationsSummary.push(`-${allocations.saveConsumedFocus} Verzehrter Fokus (${allocations.saveConsumedFocus * r.verzehrt.eg} EG)`);
   }
   if (allocations.increaseDamage > 0) {
-    modificationsSummary.push(`+${allocations.increaseDamage} Schaden (${allocations.increaseDamage} EG)`);
+    modificationsSummary.push(`+${allocations.increaseDamage} Schaden (${allocations.increaseDamage * r.schaden.eg} EG)`);
   }
   if (allocations.increaseRange > 0) {
-    modificationsSummary.push(`+${allocations.increaseRange}x Grundreichweite (${allocations.increaseRange} EG)`);
+    modificationsSummary.push(`+${allocations.increaseRange}x Grundreichweite (${allocations.increaseRange * r.reichweite.eg} EG)`);
   }
   if (allocations.increaseDuration > 0) {
-    modificationsSummary.push(`+${allocations.increaseDuration}x Grundwirkungsdauer (${allocations.increaseDuration * 2} EG)`);
+    modificationsSummary.push(`+${allocations.increaseDuration}x Grundwirkungsdauer (${allocations.increaseDuration * r.wirkungsdauer.eg} EG)`);
   }
   if (allocations.reduceCastTime > 0) {
-    modificationsSummary.push(`-${allocations.reduceCastTime} Ticks Auslösezeit (${allocations.reduceCastTime * 3} EG)`);
+    modificationsSummary.push(`-${allocations.reduceCastTime} Ticks Auslösezeit (${allocations.reduceCastTime * r.ausloesezeit.eg} EG)`);
   }
   if (allocations.expandArea > 0) {
-    modificationsSummary.push(`+${allocations.expandArea}x Grundwirkungsbereich (${allocations.expandArea * 3} EG)`);
+    modificationsSummary.push(`+${allocations.expandArea}x Grundwirkungsbereich (${allocations.expandArea * r.wirkungsbereich.eg} EG)`);
   }
 
   if (allocations.selectedEnhancementIds && availableEnhancements) {
@@ -515,7 +477,9 @@ export function calculateFinalSpellCosts(
     );
   }
 
-  const effectiveCastTicks = Math.max(1, 3 - (allocations.reduceCastTime || 0));
+  // Auslösezeit (GRW S. 194–195, 221–222): Grundwert, höchstens zweimal senkbar, Minimum aus dem Paket
+  const senkung = Math.min(allocations.reduceCastTime || 0, r.ausloesezeit.hoechstens ?? Infinity);
+  const effectiveCastTicks = Math.max(r.ausloesezeit.minimum ?? 0, r.grundAusloesezeit - senkung);
 
   return {
     baseCost: parsedBase,
@@ -527,73 +491,6 @@ export function calculateFinalSpellCosts(
     modificationsSummary,
   };
 }
-
-export interface SpellEnhancementOption {
-  id: string;
-  name: string;
-  shortLabel: string;
-  description: string;
-  focusDelta: number;
-  focusType: 'exhausted' | 'channeled' | 'consumed';
-  icon: string;
-}
-
-export const STANDARD_SPELL_ENHANCEMENTS: SpellEnhancementOption[] = [
-  {
-    id: 'duration',
-    name: 'Wirkungsdauer erhöhen',
-    shortLabel: '+Wirkungsdauer',
-    description: 'Verlängert die Wirkungsdauer um eine Stufe (+2 FO)',
-    focusDelta: 2,
-    focusType: 'exhausted',
-    icon: '⏱',
-  },
-  {
-    id: 'range',
-    name: 'Reichweite verdoppeln',
-    shortLabel: '+Reichweite',
-    description: 'Verdoppelt die Reichweite des Zaubers (+2 FO)',
-    focusDelta: 2,
-    focusType: 'exhausted',
-    icon: '',
-  },
-  {
-    id: 'area',
-    name: 'Wirkungsbereich vergrößern / Mehrere Ziele',
-    shortLabel: '+Bereich/Ziele',
-    description: 'Erhöht Wirkungsbereich (+1m / +1 Ziel) (+2 FO)',
-    focusDelta: 2,
-    focusType: 'exhausted',
-    icon: '',
-  },
-  {
-    id: 'potency',
-    name: 'Schaden / Effekt verstärken',
-    shortLabel: '+Wirkung',
-    description: 'Erhöht Schaden, Schutz oder Effektstufe (+2 FO)',
-    focusDelta: 2,
-    focusType: 'exhausted',
-    icon: '',
-  },
-  {
-    id: 'speed',
-    name: 'Zauberdauer verkürzen (Schnellzaubern)',
-    shortLabel: 'Schnellzaubern',
-    description: 'Verkürzt Zauberdauer um z. B. 3 Ticks (+2 FO)',
-    focusDelta: 2,
-    focusType: 'exhausted',
-    icon: '',
-  },
-  {
-    id: 'focus_saving',
-    name: 'Fokus einsparen (Meisterschaft / EG)',
-    shortLabel: '-1 Fokus',
-    description: 'Reduziert den Fokusaufwand um 1 Punkt (-1 FO)',
-    focusDelta: -1,
-    focusType: 'exhausted',
-    icon: '',
-  },
-];
 
 export interface ParsedSpellDamage {
   hasDamage: boolean;
@@ -620,14 +517,15 @@ export function parseSpellDamage(description?: string, spellName?: string): Pars
   // Detect damage type
   let damageType = 'Schaden';
   const lower = text.toLowerCase();
-  if (lower.includes('feuerschaden') || lower.includes('feuer')) {
+  // Lichtschaden zuerst: „Licht…blitz“ ist kein Blitzschaden
+  if (lower.includes('lichtschaden')) {
+    damageType = 'Lichtschaden';
+  } else if (lower.includes('feuerschaden') || lower.includes('feuer')) {
     damageType = 'Feuerschaden';
   } else if (lower.includes('kälteschaden') || lower.includes('kälte') || lower.includes('eis')) {
     damageType = 'Kälteschaden';
   } else if (lower.includes('blitzschaden') || lower.includes('blitz') || lower.includes('elektrizität')) {
     damageType = 'Blitzschaden';
-  } else if (lower.includes('lichtschaden') || lower.includes('lichtblitz')) {
-    damageType = 'Lichtschaden';
   } else if (lower.includes('echten schaden') || lower.includes('echter schaden')) {
     damageType = 'Echter Schaden';
   } else if (lower.includes('direkten schaden') || lower.includes('direkter schaden')) {

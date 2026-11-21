@@ -1,3 +1,6 @@
+import { Katalog } from '../regelwerk/katalog';
+import { setzeAktivenKatalog } from '../regelwerk/bruecke';
+import { basisAusDateien } from '../regelwerk/__tests__/hilfen';
 import { describe, it, expect } from 'vitest';
 import {
   checkMasteryPrerequisites,
@@ -273,7 +276,12 @@ describe('prerequisiteValidator - Thresholds & Prerequisites', () => {
     expect(resFocusPass.canLearn).toBe(true);
   });
 
+  // Voraussetzungen einzelner Meisterschaften stehen formal im Paket, nicht mehr nach Namen im Code
   it('enforces spell-based prerequisites (Freiheit der Form)', () => {
+    const b = basisAusDateien(); setzeAktivenKatalog(new Katalog(b.manifest, [b.basis]), false);
+    try { pruefeFreiheit(); } finally { setzeAktivenKatalog(null, false); }
+  });
+  const pruefeFreiheit = () => {
     const freiheit = MASTERIES_DB['Verwandlungsmagie'].find((m) => m.name.startsWith('Freiheit der Form'))!;
     expect(freiheit).toBeDefined();
 
@@ -294,5 +302,5 @@ describe('prerequisiteValidator - Thresholds & Prerequisites', () => {
       mode: 'xp',
     });
     expect(resSpellPass.canLearn).toBe(true);
-  });
+  };
 });

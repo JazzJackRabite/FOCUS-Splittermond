@@ -3,7 +3,7 @@ import React, { useMemo, useState } from 'react';
 import { BookOpen, Hammer, Plus, X } from 'lucide-react';
 import { regelverstoss } from '../../../fundament/hausregeln';
 import {
-  abrichtungen as alleAbrichtungen, alleTiere, kreaturStufe, potenzial, potenzialVerbraucht, pruefeAbrichtung, tierTraeger, TIER_QUALITAET,
+  abrichtungen as alleAbrichtungen, alleTiere, kreaturStufe, potenzial, potenzialVerbraucht, pruefeAbrichtung, tierTraeger, tierQualitaeten,
 } from '../../../regelwerk/begleiter';
 import { baukastenArt, basen, wesenBaukastenWerte } from '../../../regelwerk/wesenBaukasten';
 import { abrichtungWerteText, allgemeineFertigkeitenListe, istMagieschule, tierGrundwerte, tierWerte, type OffeneWahl } from '../../../regelwerk/abrichtungsWerte';
@@ -69,9 +69,11 @@ const Grundangaben: React.FC<SchrittProps> = ({ k, b, aendern, besitzer }) => (
         <option value={0}>keine (gekauft, gezähmt …)</option>
         {[...new Set([...besitzer.kreatur, b.kreatur ?? 0])].filter(x => x > 0).sort((x, y) => x - y).map(x => <option key={x} value={x}>Kreatur {x}</option>)}
       </Auswahl>
-      <Auswahl beschriftung="Qualität" value={b.qualitaet ?? 1} onChange={ev => aendern({ qualitaet: Number(ev.target.value) > 1 ? Number(ev.target.value) : undefined })}>
-        {TIER_QUALITAET.map(q => <option key={q.potenzial} value={q.potenzial}>{q.name} (Potenzial {q.potenzial})</option>)}
-      </Auswahl>
+      {tierQualitaeten(k).length > 0 && (
+        <Auswahl beschriftung="Qualität" value={b.qualitaet ?? tierQualitaeten(k)[0].potenzial} onChange={ev => aendern({ qualitaet: Number(ev.target.value) > tierQualitaeten(k)[0].potenzial ? Number(ev.target.value) : undefined })}>
+          {tierQualitaeten(k).map(q => <option key={q.potenzial} value={q.potenzial}>{q.name} (Potenzial {q.potenzial})</option>)}
+        </Auswahl>
+      )}
     </div>
     <label className={`flex items-center gap-2 min-h-11 ${besitzer.tiervertrauter || b.vertrauter ? '' : 'text-leise'}`} title={besitzer.tiervertrauter ? undefined : 'Erfordert die Stärke Tiervertrauter'}>
       <input type="checkbox" className="w-5 h-5 accent-gold" checked={!!b.vertrauter} disabled={!besitzer.tiervertrauter && !b.vertrauter} onChange={ev => aendern({ vertrauter: ev.target.checked || undefined })} />

@@ -763,6 +763,51 @@ die Grimoires), Dateiendung `.grim`. Das Grundregelwerk ist kein Grimoire; es bl
 - Tests: Oberflächentests auf den Assistenten umgestellt (Hilfen `begleiterErstellen`, `weiter`, `abschliessen`,
   `blattWaehlen` in `__tests__/hilfen.ts`); 417 Tests grün mit den Grimoires vom 12.11. auf D:, Build läuft.
 
+## Stand 31 (21.11.2026): Lage beim Angriff, mehrere Manöver, Proben und Zauber-EG aus dem Paket
+
+- **Lage beim Angriff** (`regelwerk/kampflage.ts`, Datenseite `Werkzeuge/regelpakete/kampfsituationen.py` + `.json`): die
+  erfundenen Knöpfe „Gegner liegt +2“, „Vorteil +1“, „Ziel in Deckung +2 VTD“ sind entfernt. Neu im Angriffsdialog, alle
+  Zahlen aus dem GRW-Paket: eigene Position und Position des Ziels nach der Tabelle Kampfpositionen (S. 170, mit eigener
+  Zeile für Armbrüste), Taktische Vorteile (+3 je Vorteil), Überzahl (+1 je Kämpfer, höchstens +3, nur Nahkampf), Lücke
+  suchen bzw. Zielen (+1 je 2 Ticks, höchstens +3), im Fernkampf Deckung (leicht 1, schwer 2 zusätzliche EG, sonst „trifft
+  die Deckung“) und Kampfgetümmel (−6; entfällt mit Scharfschütze, `ignoriert_situation`). Hinweis, wenn ein Manöver Zielen
+  voraussetzt und keine Ticks eingetragen sind.
+- **Mehrere Meisterschafts-Manöver je Angriff** (GRW S. 161; `manoever_regeln.kombination` mit Belegsätzen):
+  nur gegen denselben Widerstand, jedes einmal, EG-Kosten addiert, Zusatzschaden und Zustände gesammelt, Schadens-
+  einschränkung (halb/kein Schaden) für den ganzen Angriff, Streiftreffer −2 je angesagtem Manöver, weitere EG je Manöver.
+  `kombiniereManoever` und `manoeverHinzufuegbar` in `combatRules.ts`; gesperrte Karten nennen den Grund.
+- **Proben** (`regelwerk/proben.ts`): Würfelanzahl je Wurfart, Patzer- und Triumphgrenzen, EG je 3 Punkte und die
+  Einstufungen aus den Kernregeln (S. 16–18). Korrigiert: Triumph gibt +3 EG und nur, wenn die Probe rechnerisch gelingt
+  (vorher +1 und automatisch gelungen); Patzer EG −3, höchstens −1. Gilt für Proben, Angriffe und Zauber.
+- **Zauber-EG** (`regelwerk/zauberEg.ts`): EG je Option, Höchstzahl, Mindestwerte und die Grunddauer des Auslösens (3 Ticks,
+  neu als `strukturiert.ausloesezeit_ticks`, Beleg S. 194) aus dem Paket; die erfundene Liste `STANDARD_SPELL_ENHANCEMENTS`
+  („+2 FO“) ist entfernt.
+- **Potenzial von Tieren** (Bestienmeister S. 15) stand mit Zahlen im Code; jetzt `strukturiert.potenzial` im Grimoire
+  (`begleiter_regeln.json`, Tabellenzellen gelten als Beleg). Ohne Bestienmeister kein Potenzial und keine Qualitätsauswahl.
+- **Regelnamen im Code 16 → 0** (Voraussetzungsprüfung ohne Namenssonderfälle, das Paket hat alle formal; Lichtschaden vor
+  Blitzschaden erkannt). Altlasten-Tabelle: Würfelmechanik, Fokuskosten und Regelnamen gestrichen.
+- Tests: 437 grün mit allen Grimoires und Volltest, 406 ohne Bücher; Prüfsuite 0 neue Befunde, Praxistest 109/109; Build läuft.
+
+## Stand 32 (21.11.2026): Begleiter-Werte – Abrichtungen, Vertraute, doppelte Merkmale, Verbesserte Angriffe
+
+- **Abrichtungen mit Zahlen** (Bestienmeister S. 16–23; Datenseite `Werkzeuge/regelpakete/begleiter_werte.py` + `.json`,
+  jeder Wert mit Belegsatz): 14 Abrichtungen tragen `daten.modifikationen` (z. B. Angreifer, Kämpfer, Gefestigt, Renner,
+  Reittier I/II) und `daten.wahlen` (Merkmal-Option, Meisterschaft mit Schwelle oder nach Kampfabrichter, Fertigkeit +N).
+  `regelwerk/abrichtungsWerte.ts` rechnet sie in Werte, Angriffe und Fertigkeiten des Tieres ein; der Assistent fragt die
+  Wahlen im Schritt Abrichtungen ab und zeigt „Werte: …“ je Abrichtung. Neu in der Schreibweise: „Merkmal X N oder +M“.
+- **Vertraute**: eigene Karte „Vertrauter“ im Assistenten (gesperrt ohne Stärke Tiervertrauter, mit Hausregeln Warnung).
+  Auf dem Blatt „Vertrautenmagie“: Meisterschaften mit `daten.vertrautenmagie` (über die formalen Voraussetzungen ab
+  Tiervertrauter, dazu Vertrauter des Glaubens I) und Zauber mit Typus „Vertrauter“ (`regelwerk/vertraute.ts`).
+  „Die Magie“ hat zu Vertrauten nur Verweise.
+- **Doppelte Merkmale** in den Baukästen (Wesen S. 196, Golem S. 207, Kreatur Bestienmeister S. 58):
+  `strukturiert.merkmale_zusammenfuehren` – Ersetzungen, Stufen addieren, gegenseitiges Aufheben, LP je „robuster“.
+  `merkmaleZusammenfuehren` in `modifikationen.ts`, genutzt von Wesen-Baukasten, Golem und Kreatur.
+- **Verbesserte Angriffe** (Die Magie S. 196–197): Punkte aus der Rolle Kämpfer und dem Korpus, Kauf von Wertesets,
+  „stumpf“ und Waffen (Kosten aus der Tabelle) im Wesen-Baukasten; Überziehen gibt einen Hinweis.
+- **Begleiter-Leiste**: jeder Chip zeigt LP, Fokus, kampfunfähig und Zustände, verletzte Begleiter mit rotem Rand.
+- `write.py`: Ohne PDF beim Bau bleibt die volle Prüfsumme aus dem bisherigen Paket erhalten.
+- Tests: 439 grün mit allen Grimoires (5 übersprungen), 408 ohne Bücher; Prüfsuite regelpakete 0 Befunde; Build läuft.
+
 ## Google AI Studio
 
 Unverändert eine Vite-/React-App mit `metadata.json` im Wurzelordner; Import über „Import from GitHub“, Hosting über Cloud Run.

@@ -182,7 +182,7 @@ export const HealModal: React.FC<HealModalProps> = ({
     if (e) e.preventDefault();
 
     const methodNameMap: Record<HealMethodType, string> = {
-      manual: 'Heilung',
+      manual: 'Freie Eingabe',
       erste_hilfe: 'Erste Hilfe (Heilkunde, GRW S. 119–120)',
       wundversorgung: 'Wundversorgung (Heilkunde, GRW S. 119–120)',
       heilmagie: 'Heilmagie',
