@@ -13,7 +13,7 @@ import type { Eintrag } from './typen';
 import type { Begleiter } from '../types';
 import type { Traeger } from './bedingungen';
 import { erfuellt } from './bedingungen';
-import { anwenden, leseModifikationen, summe, werteblock, type Werteblock } from './modifikationen';
+import { anwenden, leseModifikationen, merkmalRegel, summe, werteblock, type Werteblock } from './modifikationen';
 import { leseWahlen, wahlenAnwenden, type GolemWahl } from './golem';
 import type { Ergebnis } from './typen';
 
@@ -84,6 +84,47 @@ export function feinschliffBeschwoerbar(k: Katalog, stufe: number): { schwelle: 
   return { schwelle: zeile?.schwelle ?? null, grad: zeile?.grad ?? null, dienste: s?.dienste_anzahl ?? null };
 }
 
+/** Regeln zum Zusammenführen doppelter Merkmale (Feinschliff des Baukastens): Die Magie S. 196, Bestienmeister S. 58 */
+const MERKMAL_REGEL: Record<BaukastenArt, string> = {
+  beschwoerbar: 'magie:regel:regeln:baukasten-fuer-beschwoerbare-wesen-merkmale',
+  kreatur: 'bestien:regel:regeln:schritt-6-feinschliff',
+};
+
+/** Verbesserte Angriffe (Die Magie S. 196–197): Regeln aus `strukturiert.verbesserte_angriffe` */
+const VA_REGEL = 'magie:regel:regeln:baukasten-fuer-beschwoerbare-wesen-verbesserte-angriffe';
+export interface VaRegel {
+  wertesets: { punkte: number; schaden: string; wgs: number; merkmale: string }[];
+  sonstiges: { punkte: number; art: 'stumpf_entfaellt' | 'waffe'; modus?: string; zweihaendig?: boolean; schild?: boolean }[];
+  korpus_bonus: Record<string, number>;
+}
+export function vaRegel(k: Katalog): VaRegel | null { return k.get(VA_REGEL)?.daten.strukturiert?.verbesserte_angriffe ?? null; }
+
+/** Ein Kauf mit Punkten Verbesserter Angriff: „set:<Punkte>“, „stumpf“ oder „waffe:<Katalog-ID>“ */
+export interface VaKauf { schluessel: string; text: string; punkte: number }
+export function vaKauf(k: Katalog, R: VaRegel, schluessel: string): VaKauf | null {
+  const [art, wert] = [schluessel.split(':')[0], schluessel.slice(schluessel.indexOf(':') + 1)];
+  if (art === 'set') { const s = R.wertesets.find(x => String(x.punkte) === wert); return s ? { schluessel, text: `Werteset ${s.schaden}, WGS ${s.wgs}, ${s.merkmale}`, punkte: s.punkte } : null; }
+  if (art === 'stumpf') { const s = R.sonstiges.find(x => x.art === 'stumpf_entfaellt'); return s ? { schluessel, text: 'Merkmal Stumpf entfällt', punkte: s.punkte } : null; }
+  if (art === 'waffe') {
+    const e = k.get(wert); const s = e && waffenKosten(R, e);
+    return e && s ? { schluessel, text: `Angriff mit den Werten von ${e.name}`, punkte: s } : null;
+  }
+  return null;
+}
+/** Punkte für eine Katalogwaffe nach Modus und Zweihändigkeit (Tabelle „Sonstiges“) */
+export function waffenKosten(R: VaRegel, e: Eintrag): number | null {
+  const zweih = /Zweihändig/.test(String(e.daten.merkmale_text ?? ''));
+  const z = R.sonstiges.find(x => x.art === 'waffe' && (e.typ === 'schild' ? x.schild : x.modus === e.daten.modus && (x.zweihaendig === undefined || x.zweihaendig === zweih)));
+  return z?.punkte ?? null;
+}
+/** Katalogwaffen, die mit Verbesserter Angriff wählbar sind */
+export function vaWaffen(k: Katalog, R: VaRegel): { e: Eintrag; punkte: number }[] {
+  return Object.values(k.eintraege)
+    .filter(e => (e.typ === 'waffe' || (e.typ === 'schild' && e.daten.schaden)) && e.daten.schaden)
+    .map(e => ({ e, punkte: waffenKosten(R, e) ?? 0 })).filter(x => x.punkte > 0)
+    .sort((a, b) => a.punkte - b.punkte || a.e.name.localeCompare(b.e.name, 'de'));
+}
+
 export interface BausteinZeile { e: Eintrag; anzahl: number; beitrag: number | null; voraussetzung: Ergebnis | null }
 
 export interface WesenBaukastenWerte {
@@ -102,6 +143,8 @@ export interface WesenBaukastenWerte {
   wahlen: GolemWahl[];
   /** höchste Schwelle und höchster Zaubergrad im Feinschliff (beschwörbare Wesen) */
   schritt5: { schwelle: number | null; grad: number | null; dienste: string | null } | null;
+  /** Punkte Verbesserter Angriff (Rolle Kämpfer, Korpus-Bonus) und die Käufe */
+  verbesserteAngriffe: { punkte: number; verbraucht: number; kaeufe: VaKauf[] } | null;
   hinweise: { text: string; schluessel: string; mass: number }[];
 }
 
@@ -125,7 +168,7 @@ export function wesenBaukastenWerte(k: Katalog, b: Begleiter): WesenBaukastenWer
   const art = baukastenArt(basis);
   const gewaehlt = (b.bausteine ?? []).map(i => k.get(i)).filter((e): e is Eintrag => !!e && (e.typ === MODUL_TYP || e.typ === ROLLE_TYP));
   const hinweise: WesenBaukastenWerte['hinweise'] = [];
-  if (!basis || !art) return { basis, art, stufe: 0, posten: [], ohneZahl: [], gewaehlt, werte: null, dienste: [], feinschliff: [], wahlen: [], schritt5: null, hinweise };
+  if (!basis || !art) return { basis, art, stufe: 0, posten: [], ohneZahl: [], gewaehlt, werte: null, dienste: [], feinschliff: [], wahlen: [], schritt5: null, verbesserteAngriffe: null, hinweise };
 
   const posten = [{ text: basis.name, wert: grundstufe(basis, art) }];
   const ohneZahl: Eintrag[] = [];
@@ -152,7 +195,32 @@ export function wesenBaukastenWerte(k: Katalog, b: Begleiter): WesenBaukastenWer
     wahlen.push(...w.wahlen); feinschliff.push(...w.text.map(t => `${e.name}: ${t}`)); feste.push(...w.feste);
     return { ...m, rest: [] };
   });
-  let werte = anwenden(k, werteblock(k, basis.daten), summe(...mods));
+  // Verbesserte Angriffe: Punkte aus Rollen (+ Korpus-Bonus), neue Wertesets vor den Modifikationen (sie gelten für alle Angriffe)
+  const grundwerte = werteblock(k, basis.daten);
+  const R = vaRegel(k);
+  const vaPunkte = gewaehlt.reduce((s2, e) => s2 + (Number(e.daten.verbesserter_angriff) || 0), 0);
+  let va: WesenBaukastenWerte['verbesserteAngriffe'] = null;
+  const summeMods = summe(...mods);
+  if (R && (vaPunkte > 0 || (b.verbesserteAngriffe ?? []).length)) {
+    const punkte = vaPunkte > 0 ? vaPunkte + (R.korpus_bonus[basis.id] ?? 0) : 0;
+    const kaeufe = (b.verbesserteAngriffe ?? []).map(x => vaKauf(k, R, x)).filter((x): x is VaKauf => !!x);
+    const verbraucht = kaeufe.reduce((s2, x) => s2 + x.punkte, 0);
+    if (verbraucht > punkte) hinweise.push({ text: `Verbesserte Angriffe: ${verbraucht} von ${punkte} Punkten verwendet`, schluessel: 'va:punkte', mass: verbraucht - punkte });
+    const vorbild = grundwerte.waffen[0];
+    for (const x of kaeufe) {
+      const art2 = x.schluessel.split(':')[0];
+      if (art2 === 'stumpf') { summeMods.waffenmerkmaleWeg.push('Stumpf'); continue; }
+      const set = art2 === 'set' ? R.wertesets.find(s3 => `set:${s3.punkte}` === x.schluessel) : null;
+      const e = art2 === 'waffe' ? k.get(x.schluessel.slice(6)) : null;
+      grundwerte.waffen.push({
+        name: set ? `Werteset ${set.punkte} P.` : e!.name, wert: vorbild?.wert ?? 0, ini: vorbild?.ini ?? '',
+        schaden: set ? set.schaden : String(e!.daten.schaden), wgs: String(set ? set.wgs : e!.daten.wgs ?? ''),
+        merkmale: set ? set.merkmale : String(e!.daten.merkmale_text ?? '–'),
+      });
+    }
+    va = { punkte, verbraucht, kaeufe };
+  }
+  let werte = anwenden(k, grundwerte, summeMods, merkmalRegel(k, MERKMAL_REGEL[art]));
   const merkmalName = art === 'beschwoerbar' ? /^Beschwörbares Wesen \d+$/ : /^Kreatur \d+$/;
   werte = { ...werte, merkmale: werte.merkmale.map(x => (merkmalName.test(x) ? x.replace(/\d+$/, String(stufe)) : x)) };
   wahlenAnwenden(k, werte, wahlen, feste, b.feinschliff ?? {}, (text, schluessel, mass = 1) => hinweise.push({ text, schluessel, mass }), 'das Wesen');
@@ -173,7 +241,7 @@ export function wesenBaukastenWerte(k: Katalog, b: Begleiter): WesenBaukastenWer
   return {
     basis, art, stufe, posten, ohneZahl, gewaehlt, werte,
     dienste: [...dienste].map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name, 'de')),
-    feinschliff, wahlen, schritt5, hinweise,
+    feinschliff, wahlen, schritt5, verbesserteAngriffe: va, hinweise,
   };
 }
 

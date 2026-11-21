@@ -3,7 +3,7 @@
  * Wertekasten, würfelbare Fertigkeiten, Zauber, Kurzangaben, Hinweise und die Angaben, die nur diese Art hat.
  * Rechnet mit denselben Regelwerk-Funktionen wie bisher die Abschnitte (Tiere, Gefolge, Wesen, Untote, Golems).
  */
-import { Bot, PawPrint, Skull, Sparkles, Users, type LucideIcon } from 'lucide-react';
+import { Bot, Feather, PawPrint, Skull, Sparkles, Users, type LucideIcon } from 'lucide-react';
 import {
   abrichtungen as alleAbrichtungen, istReittier, kreaturStufe, potenzial, potenzialVerbraucht, wertekasten, wesenStufe, type Wertekasten,
 } from '../../regelwerk/begleiter';
@@ -16,6 +16,8 @@ import { zauberAlsSpell } from '../../regelwerk/bruecke';
 import type { Katalog } from '../../regelwerk/katalog';
 import type { Begleiter, Spell } from '../../types';
 import { fertigkeitenAusText } from './Wertekasten';
+import { tierGrundwerte, tierWerte } from '../../regelwerk/abrichtungsWerte';
+import { alleVertrautenMeisterschaften, alleVertrautenZauber, kurzText, vertrautenMeisterschaften, vertrautenZauber } from '../../regelwerk/vertraute';
 import type { Besitzer } from './besitzer';
 
 export type BegleiterArt = Begleiter['art'];
@@ -29,6 +31,8 @@ export const ARTEN: { art: BegleiterArt; name: string; symbol: LucideIcon; text:
   { art: 'golem', name: 'Golem', symbol: Bot, text: 'Golem aus dem Baukasten: Korpus, Material, Fähigkeiten, Rollen und Feinschliff.' },
 ];
 export const artInfo = (art: BegleiterArt) => ARTEN.find(a => a.art === art)!;
+/** Vertrauter: ein Tier mit der Stärke Tiervertrauter (eigene Wahl im Assistenten) */
+export const VERTRAUTER = { name: 'Vertrauter', symbol: Feather, text: 'Tier, das über die Stärke Tiervertrauter an den Zauberer gebunden ist; mit Vertrautenmagie und Abrichtungen für Vertraute.' };
 
 export interface Kurzangabe { text: string; ton?: 'neutral' | 'erschoepft' | 'schaden'; titel?: string }
 export interface Fertigkeit { name: string; wert: number | null }
@@ -68,8 +72,10 @@ export function begleiterAnsicht(k: Katalog, b: Begleiter, besitzer: Besitzer): 
 
   if (b.art === 'tier' || b.art === 'wesen') {
     const bk = e && baukastenArt(e) ? wesenBaukastenWerte(k, b) : null;
-    const w = bk?.werte ? alsWertekasten(bk.werte) : e ? wertekasten(e) : null;
-    const a: Ansicht = { ...leer, w, fertigkeiten: ausText(w), hinweise: (bk?.hinweise ?? []).map(h => h.text) };
+    // Tier: Abrichtungen mit Zahlen einrechnen (Bestienmeister); sonst der Wertekasten des Pakets
+    const tw = b.art === 'tier' ? tierWerte(k, b, bk ? bk.werte : tierGrundwerte(k, e), besitzer.msIds) : null;
+    const w = tw?.geaendert && tw.werte ? alsWertekasten(tw.werte) : bk?.werte ? alsWertekasten(bk.werte) : e ? wertekasten(e) : null;
+    const a: Ansicht = { ...leer, w, fertigkeiten: ausText(w), hinweise: [...(bk?.hinweise ?? []).map(h => h.text), ...(tw?.hinweise ?? [])] };
     if (b.art === 'tier') {
       const st = bk ? bk.stufe : e ? kreaturStufe(e) : null;
       if (istReittier(k, b)) a.kurz.push({ text: 'Reittier' });
@@ -77,6 +83,15 @@ export function begleiterAnsicht(k: Katalog, b: Begleiter, besitzer: Besitzer): 
       a.kurz.push({ text: b.kreatur ? `Kreatur ${b.kreatur}` : 'ohne Ressource' });
       if (bk) a.kurz.push({ text: `Baukasten, Kreatur ${bk.stufe}` });
       if (b.kreatur && st !== null && st > b.kreatur) a.hinweise.push(`Das Tier braucht Kreatur ${st}.`);
+      if (b.vertrauter) {
+        const ms = vertrautenMeisterschaften(k, besitzer.msIds); const zs = vertrautenZauber(k, besitzer.zauber);
+        const alle = alleVertrautenMeisterschaften(k).length + alleVertrautenZauber(k).length;
+        a.angaben.push({
+          titel: 'Vertrautenmagie', leer: alle ? `Noch nichts gelernt (${alle} Meisterschaften und Zauber für Vertraute in den Paketen).` : 'Keine Vertrautenmagie in den Paketen.',
+          eintraege: [...ms.map(e2 => ({ name: e2.name, text: kurzText(e2), zusatz: 'Meisterschaft' })), ...zs.map(e2 => ({ name: e2.name, text: kurzText(e2), zusatz: 'Zauber' }))],
+        });
+        if (!besitzer.tiervertrauter) a.hinweise.push('Vertrauter ohne die Stärke Tiervertrauter.');
+      }
       const liste = alleAbrichtungen(k);
       if (liste.length) {
         const gewaehlt = b.abrichtungen ?? [];
@@ -88,7 +103,8 @@ export function begleiterAnsicht(k: Katalog, b: Begleiter, besitzer: Besitzer): 
           titel: 'Abrichtungen', leer: 'Keine Abrichtungen.',
           eintraege: gewaehlt.map(id => ({ name: info.get(id)?.name ?? k.get(id)?.name ?? id, text: info.get(id)?.beschreibung })),
         });
-        a.text.push('Boni aus Abrichtungen sind im Wertekasten nicht eingerechnet: Die Einträge im Paket haben dafür noch keine Zahlenwerte.');
+        if (tw?.geaendert) a.text.push('Boni der Abrichtungen sind in Werten, Angriffen und Fertigkeiten eingerechnet.');
+        a.text.push(...(tw?.texte ?? []));
       }
     } else {
       a.kurz.push({ text: `Stufe ${bk ? bk.stufe : wesenStufe(e) ?? '?'}` });

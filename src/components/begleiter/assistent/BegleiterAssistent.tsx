@@ -16,7 +16,8 @@ import { erhebungen, untotWerte } from '../../../regelwerk/untote';
 import { golemWerte, korpusse } from '../../../regelwerk/golem';
 import type { Katalog } from '../../../regelwerk/katalog';
 import type { Begleiter } from '../../../types';
-import { ARTEN, artInfo, begleiterTitel, type BegleiterArt } from '../ansicht';
+import { ARTEN, VERTRAUTER, artInfo, begleiterTitel, type BegleiterArt } from '../ansicht';
+import { useHausregeln } from '../../../fundament/hausregeln';
 import { gefolgeVerbraucht, type Besitzer } from '../besitzer';
 import { Erklaerung, Wahlkarte } from './teile';
 import { tierSchritte } from './tier';
@@ -47,19 +48,28 @@ function schritteFuer(k: Katalog, b: Begleiter): Schritt[] {
   }
 }
 
-const ArtWahl: React.FC<{ k: Katalog; art: BegleiterArt | null; waehlen: (a: BegleiterArt) => void }> = ({ k, art, waehlen }) => (
-  <div className="space-y-3">
-    <Erklaerung>Welche Art von Begleiter möchtest du erstellen?</Erklaerung>
-    <div className="grid sm:grid-cols-2 gap-3" role="group" aria-label="Art des Begleiters">
-      {ARTEN.map(a => {
-        const grund = artVerfuegbar(k, a.art);
-        const Symbol = a.symbol;
-        return <Wahlkarte key={a.art} gewaehlt={art === a.art} onClick={() => waehlen(a.art)} disabled={!!grund} hinweis={grund ?? undefined}
-          symbol={<Symbol size={22} />} titel={a.name} text={a.text} />;
-      })}
+const ArtWahl: React.FC<{ k: Katalog; art: BegleiterArt | null; vertrauter: boolean; besitzer: Besitzer; waehlen: (a: BegleiterArt, vertrauter?: boolean) => void }> = ({ k, art, vertrauter, besitzer, waehlen }) => {
+  const hausregeln = useHausregeln();
+  const tierGrund = artVerfuegbar(k, 'tier');
+  const vGrund = tierGrund ?? (besitzer.tiervertrauter || hausregeln ? null : 'Erfordert die Stärke Tiervertrauter.');
+  return (
+    <div className="space-y-3">
+      <Erklaerung>Welche Art von Begleiter möchtest du erstellen?</Erklaerung>
+      <div className="grid sm:grid-cols-2 gap-3" role="group" aria-label="Art des Begleiters">
+        {ARTEN.map(a => {
+          const grund = artVerfuegbar(k, a.art);
+          const Symbol = a.symbol;
+          const karte = <Wahlkarte key={a.art} gewaehlt={art === a.art && !vertrauter} onClick={() => waehlen(a.art)} disabled={!!grund} hinweis={grund ?? undefined}
+            symbol={<Symbol size={22} />} titel={a.name} text={a.text} />;
+          if (a.art !== 'tier') return karte;
+          const V = VERTRAUTER.symbol;
+          return [karte, <Wahlkarte key="vertrauter" gewaehlt={art === 'tier' && vertrauter} onClick={() => waehlen('tier', true)} disabled={!!vGrund} hinweis={vGrund ?? undefined}
+            symbol={<V size={22} />} titel={VERTRAUTER.name} text={VERTRAUTER.text} />];
+        })}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 /** Schrittleiste: Nummer bzw. Häkchen und Titel; erreichbare Schritte anklickbar */
 const Schrittleiste: React.FC<{ titel: string[]; aktuell: number; erreichbar: number; gehe: (i: number) => void }> = ({ titel, aktuell, erreichbar, gehe }) => (
@@ -154,7 +164,8 @@ export const BegleiterAssistent: React.FC<{
   };
 
   const Inhalt = aktuell?.inhalt;
-  const titel = neu ? (entwurf ? `${artInfo(entwurf.art).name} erstellen` : 'Begleiter erstellen') : `${begleiterTitel(entwurf!)} bearbeiten`;
+  const artName = entwurf?.vertrauter && entwurf.art === 'tier' ? VERTRAUTER.name : entwurf ? artInfo(entwurf.art).name : '';
+  const titel = neu ? (entwurf ? `${artName} erstellen` : 'Begleiter erstellen') : `${begleiterTitel(entwurf!)} bearbeiten`;
 
   return (
     <Dialog titel={titel} breite="breit" onSchliessen={onSchliessen}
@@ -171,7 +182,8 @@ export const BegleiterAssistent: React.FC<{
       <div data-testid="begleiter-assistent" className="space-y-5">
         {schritte.length > 1 && <div className="pb-4 border-b border-rahmen"><Schrittleiste titel={schritte.map(s => s.titel)} aktuell={stelle} erreichbar={erreichbar} gehe={gehe} /></div>}
         {istArt ? (
-          <ArtWahl k={k} art={entwurf?.art ?? null} waehlen={art => { if (entwurf?.art !== art) { setEntwurf({ id: '', art, name: '' }); setWeitest(0); } gehe(1); }} />
+          <ArtWahl k={k} art={entwurf?.art ?? null} vertrauter={!!entwurf?.vertrauter} besitzer={besitzer}
+            waehlen={(art, v) => { if (entwurf?.art !== art || !!entwurf?.vertrauter !== !!v) { setEntwurf({ id: '', art, name: '', ...(v ? { vertrauter: true } : {}) }); setWeitest(0); } gehe(1); }} />
         ) : entwurf && Inhalt ? (
           <Inhalt k={k} b={entwurf} aendern={aendern} besitzer={besitzer} alle={alle} index={index} />
         ) : null}

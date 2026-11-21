@@ -542,6 +542,9 @@ export function validateCharacterImport(data: unknown): Partial<CharacterState> 
         ...(typeof x.qualitaet === 'number' && x.qualitaet >= 1 ? { qualitaet: x.qualitaet } : {}),
         ...(x.vertrauter === true ? { vertrauter: true } : {}),
         ...(Array.isArray(x.abrichtungen) ? { abrichtungen: texte(x.abrichtungen) } : {}),
+        ...(x.abrichtungWahlen && typeof x.abrichtungWahlen === 'object' && !Array.isArray(x.abrichtungWahlen) ? { abrichtungWahlen: Object.fromEntries(Object.entries(x.abrichtungWahlen as Record<string, unknown>)
+          .flatMap(([kk, v]): [string, string | string[]][] => typeof v === 'string' ? [[kk, v]] : Array.isArray(v) ? [[kk, texte(v)]] : [])) } : {}),
+        ...(Array.isArray(x.verbesserteAngriffe) ? { verbesserteAngriffe: texte(x.verbesserteAngriffe) } : {}),
         ...(typeof x.aufgabe === 'string' ? { aufgabe: x.aufgabe } : {}),
         ...(typeof x.rasse === 'string' ? { rasse: x.rasse } : {}),
         ...(Array.isArray(x.attributFrei) ? { attributFrei: texte(x.attributFrei) } : {}),

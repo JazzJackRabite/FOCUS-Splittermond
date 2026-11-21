@@ -10,7 +10,7 @@ import { ABGELEITET_ID } from './abgeleitet';
 import type { Eintrag } from './typen';
 import type { Begleiter } from '../types';
 import {
-  anwenden, leer, leseModifikationen, mehrfachAusText, summe, werteblock, type Modifikationen, type Werteblock,
+  anwenden, leer, leseModifikationen, mehrfachAusText, merkmalRegel, summe, werteblock, type Modifikationen, type Werteblock,
 } from './modifikationen';
 
 export const BAUSTEIN_ARTEN = ['Zusätzliche Fähigkeit', 'Rolle', 'Applikation', 'Schwachpunkt', 'Instruktion', 'Verfügung'] as const;
@@ -274,7 +274,8 @@ export function golemWerte(k: Katalog, b: Begleiter): GolemWerte {
     for (const e of gewaehlt.Schwachpunkt) mods.push(schwachpunktModifikation(e));
     sa.forEach((s2, i) => mods.push(mitWahl(leseModifikationen(k, s2), 'Sonderausstattung', `sa:${i}`)));
     const m = summe(...mods);
-    werte = anwenden(k, grund, m);
+    // doppelte Merkmale nach Schritt 5 zusammenführen (Die Magie S. 207)
+    werte = anwenden(k, grund, m, merkmalRegel(k, 'magie:regel:regeln:baukasten-schritt-5-feinschliff'));
     // Mindestwerte der Schwachpunkte (z. B. Geschwindigkeit nicht unter einen Wert)
     for (const e of [...gewaehlt.Schwachpunkt, ...(matSp ? [matSp] : [])])
       for (const [w, min] of Object.entries(e.daten.baustein_werte?.mindestwert ?? {}))

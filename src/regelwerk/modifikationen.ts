@@ -26,12 +26,26 @@ export interface Modifikationen {
   waffenmerkmaleWeg: string[];
   /** „etwaiges Merkmal Zerbrechlich wird zu Schwächlich oder etwaiges Merkmal Schwächlich entfällt“ (sonst LP +1, Magie S. 207) */
   robuster: number;
+  /** „Merkmal Furchterregend 15 oder +5“: fehlt das Merkmal, kommt es mit Stufe `neu` dazu, sonst steigt es um `plus` */
+  merkmaleStufe: { name: string; neu: number; plus: number }[];
+  /** dasselbe für Waffenmerkmale aller Angriffe („Waffenmerkmal Kritisch 1 oder +1“) */
+  waffenmerkmaleStufe: { name: string; neu: number; plus: number }[];
   /** nicht als feste Zahl lesbare Teile */
   rest: string[];
 }
 
+/** Zusammenführen doppelter Merkmale nach der Feinschliff-Regel eines Baukastens (`strukturiert.merkmale_zusammenfuehren`) */
+export interface MerkmalRegel {
+  ersetzen: { merkmal: string; ab: number; wird: string }[];
+  stufen_addieren: boolean;
+  andere_doppelte_entfallen: boolean;
+  beide_entfallen: string[][];
+  beide_entfallen_ausser_mehrfach?: string[];
+  robuster_lp: number;
+}
+
 export const leer = (): Modifikationen => ({
-  attribute: {}, abgeleitet: {}, hoechstens: {}, angriff: 0, schaden: 0, wgs: 0, fertigkeiten: {}, merkmaleDazu: [], merkmaleWeg: [], waffenmerkmale: [], waffenmerkmaleWeg: [], robuster: 0, rest: [],
+  attribute: {}, abgeleitet: {}, hoechstens: {}, angriff: 0, schaden: 0, wgs: 0, fertigkeiten: {}, merkmaleDazu: [], merkmaleWeg: [], waffenmerkmale: [], waffenmerkmaleWeg: [], robuster: 0, merkmaleStufe: [], waffenmerkmaleStufe: [], rest: [],
 });
 
 const zahl = (s: string) => Number(s.replace(/[−–]/g, '-').replace('+', ''));
@@ -71,6 +85,8 @@ export function leseModifikationen(k: Katalog, text: string | null | undefined, 
     if (doppel >= 0) m.rest.push(stuecke.splice(doppel).join(', '));
     for (const teil of stuecke) {
       if (/^etwaiges Merkmal Zerbrechlich wird zu Schwächlich/.test(teil)) { m.robuster++; continue; }
+      const stufe = teil.match(/^(Waffenmerkmal|Merkmal) (.+?) (\d+) oder \+(\d+)$/);
+      if (stufe) { (stufe[1] === 'Merkmal' ? m.merkmaleStufe : m.waffenmerkmaleStufe).push({ name: stufe[2], neu: Number(stufe[3]), plus: Number(stufe[4]) }); continue; }
       const wmWeg = teil.match(/^(?:etwaiges )?Waffenmerkmal (.+?) entfällt$/);
       if (wmWeg) { m.waffenmerkmaleWeg.push(wmWeg[1]); continue; }
       const wm = teil.match(/^(?:zusätzliches |Angriffe erhalten )?Waffenmerkmal (.+)$/);
@@ -106,7 +122,7 @@ export function summe(...liste: Modifikationen[]): Modifikationen {
     for (const [a, v] of Object.entries(m.fertigkeiten)) plus(s.fertigkeiten, a, v);
     for (const [a, v] of Object.entries(m.hoechstens)) s.hoechstens[a] = Math.min(s.hoechstens[a] ?? Infinity, v);
     s.angriff += m.angriff; s.schaden += m.schaden; s.wgs += m.wgs;
-    s.merkmaleDazu.push(...m.merkmaleDazu); s.merkmaleWeg.push(...m.merkmaleWeg); s.waffenmerkmale.push(...m.waffenmerkmale); s.waffenmerkmaleWeg.push(...m.waffenmerkmaleWeg); s.robuster += m.robuster; s.rest.push(...m.rest);
+    s.merkmaleDazu.push(...m.merkmaleDazu); s.merkmaleWeg.push(...m.merkmaleWeg); s.waffenmerkmale.push(...m.waffenmerkmale); s.waffenmerkmaleWeg.push(...m.waffenmerkmaleWeg); s.robuster += m.robuster; s.merkmaleStufe.push(...m.merkmaleStufe); s.waffenmerkmaleStufe.push(...m.waffenmerkmaleStufe); s.rest.push(...m.rest);
   }
   return s;
 }
@@ -160,8 +176,52 @@ export function wgsPlus(s: string, v: number): string {
   return m ? `${Number(m[1]) + v}${m[2]}` : s;
 }
 
-/** Wendet Modifikationen an (ohne Neuberechnung: die Baukästen nennen abgeleitete Änderungen ausdrücklich) */
-export function anwenden(k: Katalog, w: Werteblock, m: Modifikationen): Werteblock {
+/** Regel zum Zusammenführen doppelter Merkmale am Regeltext `id` (Feinschliff eines Baukastens) */
+export function merkmalRegel(k: Katalog, id: string): MerkmalRegel | null {
+  return k.get(id)?.daten.strukturiert?.merkmale_zusammenfuehren ?? null;
+}
+
+/** „Merkmal X N oder +M“ auf eine Merkmalsliste: vorhandene Stufe erhöhen, sonst mit Stufe N hinzufügen */
+function stufeAnwenden(liste: string[], x: { name: string; neu: number; plus: number }): string[] {
+  const i = liste.findIndex(y => y.replace(/\s*\+?\d+$/, '').trim() === x.name);
+  if (i < 0) return [...liste, `${x.name} ${x.neu}`];
+  const alt = Number((liste[i].match(/(\d+)$/) ?? [])[1] ?? 0);
+  return liste.map((y, j) => (j === i ? `${x.name} ${alt + x.plus}` : y));
+}
+
+/**
+ * Doppelte Merkmale nach der Regel des Baukastens zusammenführen: Ersetzungen („zweimal Dämmersicht wird Dunkelsicht“),
+ * Stufen addieren, gegenseitig aufhebende Merkmale, übrige Doppelte entfallen. `liste` enthält jedes Vorkommen.
+ */
+export function merkmaleZusammenfuehren(liste: string[], regel: MerkmalRegel): string[] {
+  const grund = (x: string) => x.replace(/\s*\+?\d+$/, '').trim();
+  const anzahl = (name: string) => liste.filter(x => grund(x) === name).length;
+  let l = [...liste];
+  for (const e of regel.ersetzen) if (anzahl(e.merkmal) >= e.ab) l = [...l.filter(x => grund(x) !== e.merkmal), e.wird];
+  if (regel.stufen_addieren) {
+    const summe = new Map<string, number>();
+    for (const x of l) { const m = x.match(/^(.*?)\s+(\d+)$/); if (m) summe.set(m[1], (summe.get(m[1]) ?? 0) + Number(m[2])); }
+    const gesehen = new Set<string>();
+    l = l.flatMap(x => {
+      const m = x.match(/^(.*?)\s+(\d+)$/);
+      if (!m || (l.filter(y => grund(y) === m[1]).length < 2)) return [x];
+      if (gesehen.has(m[1])) return []; gesehen.add(m[1]); return [`${m[1]} ${summe.get(m[1])}`];
+    });
+  }
+  for (const paar of regel.beide_entfallen) {
+    if (!paar.every(p => l.some(x => grund(x) === p))) continue;
+    const bleibt = paar.filter(p => (regel.beide_entfallen_ausser_mehrfach ?? []).includes(p) && l.filter(x => grund(x) === p).length > 1);
+    l = l.filter(x => !paar.includes(grund(x)) || bleibt.includes(grund(x)));
+  }
+  if (regel.andere_doppelte_entfallen) l = l.filter((x, i) => l.indexOf(x) === i);
+  return l;
+}
+
+/**
+ * Wendet Modifikationen an (ohne Neuberechnung: die Baukästen nennen abgeleitete Änderungen ausdrücklich).
+ * Mit `regel` werden doppelte Merkmale nach der Feinschliff-Regel des Baukastens zusammengeführt.
+ */
+export function anwenden(k: Katalog, w: Werteblock, m: Modifikationen, regel?: MerkmalRegel | null): Werteblock {
   const attribute = { ...w.attribute };
   for (const [a, v] of Object.entries(m.attribute)) attribute[a] = (attribute[a] ?? 0) + v;
   const abgeleitet = { ...w.abgeleitet };
@@ -177,17 +237,25 @@ export function anwenden(k: Katalog, w: Werteblock, m: Modifikationen): Werteblo
     const l = [...alt, ...m.waffenmerkmale];
     return l.length ? l.join(', ') : '–';
   };
-  const waffen = w.waffen.map(x => ({ ...x, wert: x.wert + m.angriff, schaden: schadenPlus(x.schaden, m.schaden), wgs: wgsPlus(x.wgs, m.wgs), ini: iniPlus(x.ini, ini), merkmale: wm(x.merkmale) }));
+  const wmStufe = (x: string) => {
+    if (!m.waffenmerkmaleStufe.length) return x;
+    let l = teile(x, ',').filter(y => y && y !== '–' && y !== '−');
+    for (const s2 of m.waffenmerkmaleStufe) l = stufeAnwenden(l, s2);
+    return l.join(', ');
+  };
+  const waffen = w.waffen.map(x => ({ ...x, wert: x.wert + m.angriff, schaden: schadenPlus(x.schaden, m.schaden), wgs: wgsPlus(x.wgs, m.wgs), ini: iniPlus(x.ini, ini), merkmale: wmStufe(wm(x.merkmale)) }));
   const fertigkeiten = w.fertigkeiten.map(f => ({ ...f, wert: f.wert + (f.id ? m.fertigkeiten[f.id] ?? 0 : 0) }));
   for (const [id, v] of Object.entries(m.fertigkeiten)) if (!fertigkeiten.some(f => f.id === id)) fertigkeiten.push({ id, name: k.get(id)?.name ?? id, wert: v });
   fertigkeiten.sort((a, b) => a.name.localeCompare(b.name, 'de'));
   const grund = (x: string) => x.replace(/\s*\(?\d+.*$/, '').trim();
   let merkmale = w.merkmale.filter(x => !m.merkmaleWeg.some(y => grund(y) === grund(x)));
-  for (const x of m.merkmaleDazu) if (!merkmale.some(y => y === x)) merkmale = [...merkmale, x];
+  if (regel) merkmale = merkmaleZusammenfuehren([...merkmale, ...m.merkmaleDazu.filter(x => !m.merkmaleWeg.some(y => grund(y) === grund(x)))], regel);
+  else for (const x of m.merkmaleDazu) if (!merkmale.some(y => y === x)) merkmale = [...merkmale, x];
+  for (const x of m.merkmaleStufe) merkmale = stufeAnwenden(merkmale, x);
   for (let i = 0; i < m.robuster; i++) {
     if (merkmale.includes('Zerbrechlich')) merkmale = merkmale.map(x => (x === 'Zerbrechlich' ? 'Schwächlich' : x));
     else if (merkmale.includes('Schwächlich')) merkmale = merkmale.filter(x => x !== 'Schwächlich');
-    else if (abgeleitet.LP !== undefined) abgeleitet.LP += 1;
+    else if (abgeleitet.LP !== undefined) abgeleitet.LP += regel?.robuster_lp ?? 1;
   }
   return { ...w, attribute, abgeleitet, waffen, fertigkeiten, merkmale };
 }

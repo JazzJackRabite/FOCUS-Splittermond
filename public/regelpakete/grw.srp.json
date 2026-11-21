@@ -26210,7 +26210,8 @@
       "gruppe": "B"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "vertrautenmagie": true
    }
   },
   {
@@ -26243,7 +26244,8 @@
      }
     },
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "vertrautenmagie": true
    }
   },
   {
@@ -26276,7 +26278,8 @@
      }
     },
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "vertrautenmagie": true
    }
   },
   {

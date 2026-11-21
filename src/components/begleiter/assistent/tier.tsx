@@ -6,6 +6,9 @@ import {
   abrichtungen as alleAbrichtungen, alleTiere, kreaturStufe, potenzial, potenzialVerbraucht, pruefeAbrichtung, tierTraeger, TIER_QUALITAET,
 } from '../../../regelwerk/begleiter';
 import { baukastenArt, basen, wesenBaukastenWerte } from '../../../regelwerk/wesenBaukasten';
+import { abrichtungWerteText, allgemeineFertigkeitenListe, istMagieschule, tierGrundwerte, tierWerte, type OffeneWahl } from '../../../regelwerk/abrichtungsWerte';
+import { golemMeisterschaften } from '../../../regelwerk/golem';
+import type { Begleiter } from '../../../types';
 import type { Katalog } from '../../../regelwerk/katalog';
 import type { Ergebnis } from '../../../regelwerk/typen';
 import { Auswahl, Eingabe, Knopf, Marke } from '../../../fundament';
@@ -87,6 +90,72 @@ const Status: React.FC<{ e: Ergebnis; text?: string }> = ({ e, text }) => (
 );
 const ergebnisWort = (e: Ergebnis) => (e === true ? '' : e === false ? ' – Voraussetzung fehlt' : ' – Spielleitung');
 
+/** Wahlen nach dem Entfernen der Abrichtung an Stelle `weg` neu zuordnen (Schlüssel „<Stelle>:<Nr>“) */
+function wahlenOhne(w: Begleiter['abrichtungWahlen'], weg: number): Begleiter['abrichtungWahlen'] {
+  const neu: NonNullable<Begleiter['abrichtungWahlen']> = {};
+  for (const [s, v] of Object.entries(w ?? {})) {
+    const [i, n] = s.split(':').map(Number);
+    if (i === weg) continue;
+    neu[`${i > weg ? i - 1 : i}:${n}`] = v;
+  }
+  return Object.keys(neu).length ? neu : undefined;
+}
+
+/** Bedienung einer Wahl einer Abrichtung (Merkmal, Meisterschaft, Meisterschaften, Fertigkeit) */
+const WahlFeld: React.FC<{ k: Katalog; o: OffeneWahl; wert: string | string[] | undefined; setze: (v: string | string[] | undefined) => void; fertigkeiten: { id?: string; name: string }[] }> = ({ k, o, wert, setze, fertigkeiten }) => {
+  const [neu, setNeu] = useState('');
+  const { w } = o;
+  const label = `${o.abrichtung}: ${w.text}`;
+  if (w.art === 'option') {
+    return (
+      <Auswahl beschriftung={label} value={typeof wert === 'string' ? wert : ''} onChange={e => setze(e.target.value || undefined)}>
+        <option value="">wählen …</option>
+        {(w.optionen ?? []).map((x, i) => <option key={i} value={String(i)}>{x.text}</option>)}
+      </Auswahl>
+    );
+  }
+  if (w.art === 'fertigkeit') {
+    const liste = w.nur === 'magieschule_vorhanden'
+      ? fertigkeiten.filter(f => istMagieschule(k, f.id)).map(f => ({ id: f.id!, name: f.name }))
+      : allgemeineFertigkeitenListe(k);
+    return (
+      <Auswahl beschriftung={label} value={typeof wert === 'string' ? wert : ''} onChange={e => setze(e.target.value || undefined)}>
+        <option value="">{liste.length ? 'Fertigkeit wählen …' : 'keine passende Fertigkeit'}</option>
+        {liste.map(x => <option key={x.id} value={x.id}>{x.name}</option>)}
+      </Auswahl>
+    );
+  }
+  const schwelle = w.art === 'meisterschaft' ? (o.schwelle ?? 4) : Math.max(...(w.varianten ?? []).map(x => x.schwelle), 1);
+  const angebot = golemMeisterschaften(k, w.fertigkeit ? [{ id: w.fertigkeit, name: '' }] : fertigkeiten, Math.max(schwelle, 1));
+  if (w.art === 'meisterschaft') {
+    return (
+      <div className="space-y-1">
+        <Auswahl beschriftung={label} value={typeof wert === 'string' ? wert : ''} onChange={e => setze(e.target.value || undefined)} disabled={o.schwelle === 0}>
+          <option value="">{o.schwelle === 0 ? 'Abrichter ohne passende Meisterschaft' : 'Meisterschaft wählen …'}</option>
+          {angebot.map(m => <option key={m.id} value={m.id}>{m.name} ({m.fertigkeit}, S{m.schwelle})</option>)}
+        </Auswahl>
+        {o.schwelle !== null && o.schwelle > 0 && w.schwelle_nach && <p className="text-xs text-leise m-0">Bis Schwelle {o.schwelle} (Meisterschaft des Abrichters).</p>}
+      </div>
+    );
+  }
+  const liste = Array.isArray(wert) ? wert : [];
+  return (
+    <div className="space-y-2">
+      <div className="text-sm">{label} <span className="text-leise">({(w.varianten ?? []).map(x => `${x.anzahl === 1 ? 'eine' : x.anzahl} der Schwelle ${x.schwelle}`).join(' oder ')})</span></div>
+      <div className="flex flex-wrap gap-2">
+        {liste.map((id, i) => <Marke key={`${id}-${i}`}>{k.get(id)?.name ?? id} <button type="button" className="ml-1 min-h-6" aria-label={`${k.get(id)?.name ?? id} entfernen`} onClick={() => setze(liste.filter((_, j) => j !== i))}><X size={12} aria-hidden /></button></Marke>)}
+      </div>
+      <div className="flex flex-wrap gap-2 items-end">
+        <Auswahl beschriftung={`${o.abrichtung}: Meisterschaft hinzufügen`} value={neu} onChange={e => setNeu(e.target.value)}>
+          <option value="">Meisterschaft wählen …</option>
+          {angebot.map(m => <option key={m.id} value={m.id} disabled={liste.includes(m.id)}>{m.name} ({m.fertigkeit}, S{m.schwelle})</option>)}
+        </Auswahl>
+        <Knopf disabled={!neu} onClick={() => { setze([...liste, neu]); setNeu(''); }}><Plus size={14} aria-hidden />Hinzufügen</Knopf>
+      </div>
+    </div>
+  );
+};
+
 const Abrichtungen: React.FC<SchrittProps> = ({ k, b, aendern, besitzer }) => {
   const liste = useMemo(() => alleAbrichtungen(k), [k]);
   const [wahl, setWahl] = useState('');
@@ -106,6 +175,13 @@ const Abrichtungen: React.FC<SchrittProps> = ({ k, b, aendern, besitzer }) => {
     return { a, voll: n >= grenze, ergebnis: pruefeAbrichtung(k, a, besitzer.char, tierTraeger(k, b), n) };
   });
   const gruppen = [...new Set(liste.map(a => a.gruppe))];
+  const e0 = k.get(b.id);
+  const tw = tierWerte(k, b, e0 && baukastenArt(e0) ? wesenBaukastenWerte(k, b).werte : tierGrundwerte(k, e0), besitzer.msIds);
+  const wahlWerte = b.abrichtungWahlen ?? {};
+  const setzeWahl = (s2: string, v: string | string[] | undefined) => {
+    const neu = { ...wahlWerte }; if (v === undefined) delete neu[s2]; else neu[s2] = v;
+    aendern({ abrichtungWahlen: Object.keys(neu).length ? neu : undefined });
+  };
   const x = angebot.find(y => y.a.id === wahl);
   return (
     <div className="space-y-4">
@@ -114,6 +190,7 @@ const Abrichtungen: React.FC<SchrittProps> = ({ k, b, aendern, besitzer }) => {
         <span className="text-sm text-leise">{pot.posten.map(p => `${p.text} ${p.wert}`).join(' + ')} (Bestienmeister S. 15)</span>
       </div>
       {verbraucht > pot.gesamt && <Hinweise liste={['Mehr Abrichtungen, als das Potenzial erlaubt.']} />}
+      {tw.hinweise.length > 0 && <Hinweise liste={tw.hinweise} />}
       {gewaehlt.length > 0 ? (
         <ul className="space-y-2">
           {gewaehlt.map((id, i) => {
@@ -126,8 +203,14 @@ const Abrichtungen: React.FC<SchrittProps> = ({ k, b, aendern, besitzer }) => {
                   </Knopf>
                   <Status e={pruefung[i]} text={a?.voraussetzung?.text} />
                   <span className="text-leise text-sm">{a ? `${a.grundausbildung ? 'Grundausbildung, ' : ''}${a.kosten} P.` : 'nicht im Katalog'}</span>
-                  <Knopf nurSymbol className="ml-auto" aria-label={`Abrichtung ${a?.name ?? id} entfernen`} onClick={() => aendern({ abrichtungen: gewaehlt.filter((_, j) => j !== i) })}><X size={16} aria-hidden /></Knopf>
+                  <Knopf nurSymbol className="ml-auto" aria-label={`Abrichtung ${a?.name ?? id} entfernen`} onClick={() => aendern({ abrichtungen: gewaehlt.filter((_, j) => j !== i), abrichtungWahlen: wahlenOhne(b.abrichtungWahlen, i) })}><X size={16} aria-hidden /></Knopf>
                 </div>
+                {abrichtungWerteText(k, id) && <p className="text-xs text-leise m-0 pl-1">Werte: {abrichtungWerteText(k, id)}</p>}
+                {tw.wahlen.filter(o => o.stelle === i).map(o => (
+                  <div key={o.schluessel} className="mt-2 max-w-xl">
+                    <WahlFeld k={k} o={o} wert={wahlWerte[o.schluessel]} setze={v => setzeWahl(o.schluessel, v)} fertigkeiten={tw.werte?.fertigkeiten ?? []} />
+                  </div>
+                ))}
                 {text[i] && a && <p className="mt-1 text-sm">{a.beschreibung}{a.voraussetzung ? <span className="block text-leise">Voraussetzung: {a.voraussetzung.text}</span> : null}</p>}
               </li>
             );
@@ -160,7 +243,7 @@ const Abrichtungen: React.FC<SchrittProps> = ({ k, b, aendern, besitzer }) => {
           </span>}
         </p>
       )}
-      <p className="text-xs text-leise m-0">Boni aus Abrichtungen sind im Wertekasten nicht eingerechnet: Die Einträge im Paket haben dafür noch keine Zahlenwerte.</p>
+      <p className="text-xs text-leise m-0">Abrichtungen mit Zahlenwerten (Angriff, VTD, GSW, Fertigkeiten, Merkmale) sind in den Werten des Tiers eingerechnet; die übrigen gelten für den Tierführer oder sind Aktionen.</p>
     </div>
   );
 };

@@ -2,6 +2,7 @@
  * Begleiter: Tiergefährten aus dem GRW (Ressource Kreatur, S. 78; Tierwerte S. 284–287), Tab „Begleiter“,
  * Abrichtungen und Potenzial (Bestienmeister S. 15–23, lokal mit FOKUS_GRIMOIRES).
  */
+import { setzeHausregeln } from '../../fundament/hausregeln';
 import React from 'react';
 import fs from 'fs';
 import path from 'path';
@@ -123,8 +124,9 @@ describe('Tab „Begleiter“ (nur GRW)', () => {
     expect(within(screen.getByTestId('begleiter-blatt')).getByText('ohne Ressource')).toBeTruthy();
     fireEvent.click(screen.getByLabelText('Wolf entfernen'));
     fireEvent.click(screen.getByRole('button', { name: 'OK' }));
-    expect(screen.queryByRole('tab', { name: 'Wolf' })).toBeNull();
-    expect(blattWaehlen('Blitz (Pferd)')).toBeTruthy();
+    expect(screen.queryByRole('tab', { name: /^Wolf/ })).toBeNull();
+    expect(within(blattWaehlen(/^Blitz \(Pferd\)/)).getByText('Kreatur 3')).toBeTruthy();
+    expect(screen.getByRole('tab', { name: /^Blitz \(Pferd\)\s*LP \d+\/\d+/ })).toBeTruthy(); // Kurzstand in der Leiste
   });
   it('Hinweis auf „Die Magie“ bei den Wesen', () => {
     kat.aktuell = K;
@@ -224,6 +226,36 @@ describe.skipIf(!BESTIEN || !fs.existsSync(BESTIEN))('Abrichtungen mit „Bestie
     const blatt = screen.getByTestId('begleiter-blatt');
     expect(within(blatt).getByText('Potenzial 1/7')).toBeTruthy();
     expect(within(blatt).getByRole('button', { name: 'Reittier I' })).toBeTruthy();
+    kat.aktuell = K;
+  });
+  it('Tab: Vertrauter erstellen, Abrichtung mit Wahl (Gefestigt) wirkt auf das Blatt', () => {
+    kat.aktuell = KB;
+    const { unmount } = render(<Rahmen start={{}} />);
+    fireEvent.click(screen.getByRole('button', { name: /^Begleiter erstellen$/ }));
+    expect((within(screen.getByTestId('begleiter-assistent')).getByRole('button', { name: /^Vertrauter/ }) as HTMLButtonElement).disabled).toBe(true);
+    unmount();
+    render(<Rahmen start={{ strengthsList: [{ name: 'Tiervertrauter', source: 'test' }] as never }} />);
+    const d = begleiterErstellen('Vertrauter');
+    expect(screen.getByText('Vertrauter erstellen')).toBeTruthy();
+    const sel = within(d).getByLabelText('Tier wählen') as HTMLSelectElement;
+    fireEvent.change(sel, { target: { value: [...sel.options].find(o => o.text.startsWith('Wolf ('))!.value } });
+    weiter();
+    expect((within(d).getByLabelText(/^Vertrauter/) as HTMLInputElement).checked).toBe(true);
+    weiter(); // → Abrichtungen
+    const ab = within(d).getByLabelText('Abrichtung wählen') as HTMLSelectElement;
+    fireEvent.change(ab, { target: { value: [...ab.options].find(o => o.text.startsWith('Gefestigt ('))!.value } });
+    setzeHausregeln(true); // Voraussetzungen des Führers hier nicht erfüllt
+    fireEvent.click(within(d).getByRole('button', { name: /Abrichtung hinzufügen/ }));
+    setzeHausregeln(false);
+    fireEvent.change(within(d).getByLabelText('Gefestigt: Merkmal'), { target: { value: '2' } }); // Feigling entfällt
+    abschliessen();
+    const blatt = screen.getByTestId('begleiter-blatt');
+    expect(within(blatt).getAllByText('Vertrauter').length).toBeGreaterThan(0);
+    expect(within(blatt).getByText('Vertrautenmagie')).toBeTruthy();
+    expect(within(blatt).getByText(/Noch nichts gelernt/)).toBeTruthy();
+    const merkmale = within(blatt).getByText('Merkmale').parentElement!.textContent!;
+    expect(merkmale).not.toMatch(/Feigling/);
+    expect(within(blatt).getByText(/Boni der Abrichtungen sind in Werten/)).toBeTruthy();
     kat.aktuell = K;
   });
 });

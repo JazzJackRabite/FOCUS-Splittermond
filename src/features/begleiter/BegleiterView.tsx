@@ -7,13 +7,29 @@ import { Abschnittstitel, Karte, Knopf } from '../../fundament';
 import { BegleiterBlatt } from '../../components/begleiter/BegleiterBlatt';
 import { BegleiterAssistent } from '../../components/begleiter/assistent/BegleiterAssistent';
 import { Hinweise } from '../../components/begleiter/Wertekasten';
-import { artInfo, begleiterTitel } from '../../components/begleiter/ansicht';
+import { artInfo, begleiterAnsicht, begleiterTitel } from '../../components/begleiter/ansicht';
+import { spielDaten } from '../../components/begleiter/BegleiterSpiel';
+import { fokusFrei, gesundheitsstufen, lebenslage } from '../../regelwerk/vitals';
+import type { Begleiter as BegleiterTyp } from '../../types';
+import type { Besitzer } from '../../components/begleiter/besitzer';
 import { gefolgeVerbraucht, kreaturZuordnung, useBesitzer } from '../../components/begleiter/besitzer';
 
 /**
  * Tab „Begleiter“: je Begleiter ein Blatt wie „Kampf & Magie“ (Leiste oben wählt den Begleiter).
  * Erstellt und bearbeitet wird ausschließlich im Assistenten (Dialog, ein Schritt nach dem anderen). Braucht die Regelpakete.
  */
+/** Kurzstand in der Leiste: Lebenspunkte, Fokus, Zustände (Wort und Rahmen, nicht nur Farbe) */
+function kurzStand(k: Katalog, b: BegleiterTyp, besitzer: Besitzer): { text: string; verletzt: boolean } | null {
+  const sd = spielDaten(b, begleiterAnsicht(k, b, besitzer).w);
+  if (!sd.lp) return null;
+  const lage = lebenslage(sd.lp, gesundheitsstufen(k, sd.merkmale).stufen, b.zustand ?? {});
+  const z = b.zustand?.zustaende?.length ?? 0;
+  return {
+    text: [`LP ${lage.frei}/${lage.gesamt}`, sd.fo ? `FO ${fokusFrei(sd.fo, b.zustand ?? {})}/${sd.fo}` : null, lage.ausser ? 'kampfunfähig' : null, z ? `${z} ${z === 1 ? 'Zustand' : 'Zustände'}` : null].filter(Boolean).join(' · '),
+    verletzt: lage.ausser || lage.wundabzug !== 0 || z > 0,
+  };
+}
+
 const Begleiter: React.FC<{ k: Katalog }> = ({ k }) => {
   const { state } = useCharacter();
   const besitzer = useBesitzer(k);
@@ -51,10 +67,15 @@ const Begleiter: React.FC<{ k: Katalog }> = ({ k }) => {
           <div className="flex flex-wrap gap-2" role="tablist" aria-label="Begleiter wählen">
             {alle.map((b, i) => {
               const Symbol = artInfo(b.art).symbol;
+              const stand = kurzStand(k, b, besitzer);
               return (
                 <Knopf key={i} role="tab" aria-selected={i === aktiv} onClick={() => setWahl(i)}
-                  className={i === aktiv ? 'border-gold! bg-erhoeht! text-schrift font-bold' : ''}>
-                  <Symbol size={16} className={i === aktiv ? 'text-gold' : ''} aria-hidden />{begleiterTitel(b)}
+                  className={`h-auto! py-1.5 ${i === aktiv ? 'border-gold! bg-erhoeht! text-schrift' : ''} ${stand?.verletzt ? 'border-l-4! border-l-schaden!' : ''}`}>
+                  <Symbol size={16} className={`shrink-0 ${i === aktiv ? 'text-gold' : ''}`} aria-hidden />
+                  <span className="flex flex-col items-start leading-tight text-left">
+                    <span className={i === aktiv ? 'font-bold' : ''}>{begleiterTitel(b)}</span>
+                    {stand && <span className="text-[11px] text-leise font-normal">{stand.text}</span>}
+                  </span>
                 </Knopf>
               );
             })}

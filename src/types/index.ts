@@ -256,6 +256,10 @@ export interface Begleiter {
   // ---- Golem (Die Magie S. 197–207); id = Korpus
   /** Golemmaterial (Katalog-ID) */
   material?: string;
+  /** Wesen-Baukasten: Käufe mit Punkten Verbesserter Angriff („set:3“, „stumpf“, „waffe:<ID>“; Die Magie S. 196–197) */
+  verbesserteAngriffe?: string[];
+  /** Wahlen der Abrichtungen je Abrichtung und Wahl („<Stelle der Abrichtung>:<Nr. der Wahl>“ → Wert) */
+  abrichtungWahlen?: Record<string, string | string[]>;
   /** Golem-Bausteine (IDs, Wiederholung = mehrfach gewählt) */
   bausteine?: string[];
   /** gewählte Sonderausstattung je Platz (Text der Möglichkeit, z. B. „SR +2“) */

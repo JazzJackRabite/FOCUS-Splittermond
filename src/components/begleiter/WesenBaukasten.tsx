@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Plus, X } from 'lucide-react';
 import { aenderungGesperrt } from '../../fundament/hausregeln';
 import {
-  bausteinText, bausteinVorab, bausteineFuer, beitrag, gruppe, hoechstzahl, kostenText, voraussetzungText, wesenBaukastenWerte, type WesenBaukastenWerte,
+  bausteinText, bausteinVorab, bausteineFuer, beitrag, gruppe, hoechstzahl, kostenText, vaRegel, vaWaffen, voraussetzungText, wesenBaukastenWerte, type WesenBaukastenWerte,
 } from '../../regelwerk/wesenBaukasten';
 import type { Katalog } from '../../regelwerk/katalog';
 import type { Begleiter } from '../../types';
@@ -11,6 +11,46 @@ import { Feinschliff } from './Feinschliff';
 import { Hinweise } from './Wertekasten';
 
 const Titel3: React.FC<{ children: React.ReactNode }> = ({ children }) => <Abschnittstitel als="h3" className="text-[15px]">{children}</Abschnittstitel>;
+
+/** Verbesserte Angriffe (Die Magie S. 196–197): Punkte der Rolle Kämpfer für Wertesets, „Stumpf entfällt“ oder eine Waffe */
+const VerbesserteAngriffe: React.FC<{ k: Katalog; b: Begleiter; va: NonNullable<WesenBaukastenWerte['verbesserteAngriffe']>; aendern: (a: Partial<Begleiter>) => void }> = ({ k, b, va, aendern }) => {
+  const [wahl, setWahl] = useState('');
+  const R = vaRegel(k);
+  const waffen = useMemo(() => (R ? vaWaffen(k, R) : []), [k, R]);
+  if (!R) return null;
+  const liste = b.verbesserteAngriffe ?? [];
+  const frei = va.punkte - va.verbraucht;
+  const angebot = [
+    ...R.wertesets.map(s2 => ({ schluessel: `set:${s2.punkte}`, text: `Werteset ${s2.schaden}, WGS ${s2.wgs}, ${s2.merkmale}`, punkte: s2.punkte })),
+    ...R.sonstiges.filter(s2 => s2.art === 'stumpf_entfaellt').map(s2 => ({ schluessel: 'stumpf', text: 'Merkmal Stumpf entfällt', punkte: s2.punkte })),
+    ...waffen.map(x => ({ schluessel: `waffe:${x.e.id}`, text: `Angriff wie ${x.e.name}`, punkte: x.punkte })),
+  ];
+  return (
+    <div className="space-y-2" data-testid="verbesserte-angriffe">
+      <Titel3>Verbesserte Angriffe</Titel3>
+      <div className="flex items-center gap-2 flex-wrap">
+        <Marke ton={frei < 0 ? 'schaden' : 'neutral'}>Punkte {va.verbraucht}/{va.punkte}</Marke>
+        <span className="text-sm text-leise">aus der Rolle Kämpfer, bei Korpus Mittel oder Groß mehr; neue Angriffe zählen zusätzlich, Änderungen der Module gelten für alle.</span>
+      </div>
+      {va.kaeufe.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {va.kaeufe.map((x, i) => (
+            <Marke key={`${x.schluessel}-${i}`}>{x.text} <span className="text-leise">({x.punkte} P.)</span>
+              <button type="button" className="ml-1 min-h-6" aria-label={`${x.text} entfernen`} onClick={() => aendern({ verbesserteAngriffe: liste.filter((_, j) => j !== i) })}><X size={12} aria-hidden /></button>
+            </Marke>
+          ))}
+        </div>
+      )}
+      <div className="flex flex-wrap gap-2 items-end">
+        <Auswahl beschriftung="Verbesserter Angriff" value={wahl} onChange={ev => setWahl(ev.target.value)}>
+          <option value="">wählen …</option>
+          {angebot.map(x => <option key={x.schluessel} value={x.schluessel} disabled={x.punkte > frei || (x.schluessel === 'stumpf' && liste.includes('stumpf'))}>{x.text} ({x.punkte} P.)</option>)}
+        </Auswahl>
+        <Knopf disabled={!wahl} onClick={() => { aendern({ verbesserteAngriffe: [...liste, wahl] }); setWahl(''); }}><Plus size={14} aria-hidden />Kaufen</Knopf>
+      </div>
+    </div>
+  );
+};
 
 /** Editor eines im Baukasten gebauten Wesens: Module und Rollen je Gruppe, Dienste, Feinschliff */
 export const WesenBaukasten: React.FC<{ k: Katalog; b: Begleiter; w: WesenBaukastenWerte; aendern: (a: Partial<Begleiter>) => void }> = ({ k, b, w, aendern }) => {
@@ -106,6 +146,8 @@ export const WesenBaukasten: React.FC<{ k: Katalog; b: Begleiter; w: WesenBaukas
           )}
         </div>
       )}
+
+      {w.verbesserteAngriffe && <VerbesserteAngriffe k={k} b={b} va={w.verbesserteAngriffe} aendern={aendern} />}
 
       {(w.wahlen.length > 0 || w.feinschliff.length > 0) && (
         <div className="space-y-2">
