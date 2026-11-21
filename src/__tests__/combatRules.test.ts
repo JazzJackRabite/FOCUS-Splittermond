@@ -3,9 +3,16 @@ import {
   calculateAttackEG,
   FREE_COMBAT_MANEUVERS,
   getAvailableCombatManeuvers,
+  manoeverRegeln,
   parseWeaponDamage,
   executeAttackDamageRoll,
+  wuchtangriffJeEg,
 } from '../utils/combatRules';
+import { Katalog } from '../regelwerk/katalog';
+import { basisAusDateien } from '../regelwerk/__tests__/hilfen';
+
+const B = basisAusDateien();
+const K = new Katalog(B.manifest, [B.basis]);
 
 describe('Splittermond Combat Rules & Attack Calculations', () => {
   describe('calculateAttackEG (GRW S. 17 & 158-161)', () => {
@@ -61,132 +68,91 @@ describe('Splittermond Combat Rules & Attack Calculations', () => {
     });
   });
 
-  describe('FREE_COMBAT_MANEUVERS (GRW S. 160-161)', () => {
-    it('provides standard maneuvers to all characters', () => {
-      const ids = FREE_COMBAT_MANEUVERS.map((m) => m.id);
-      expect(ids).toContain('none');
-      expect(ids).toContain('wuchtangriff');
-      expect(ids).toContain('gezielter_schlag');
-      expect(ids).toContain('defensiver_angriff');
-      expect(ids).toContain('finte');
-      expect(ids).toContain('umreissen');
+  describe('Freie Manöver und Manöverregeln aus dem Paket (GRW S. 160–161)', () => {
+    it('ohne angesagtes Meisterschafts-Manöver gibt es nur den Angriff selbst; freie Manöver folgen mit EG', () => {
+      expect(FREE_COMBAT_MANEUVERS.map((m) => m.id)).toEqual(['none']);
+      expect(FREE_COMBAT_MANEUVERS[0].egCost).toBe(0);
     });
 
-    it('Wuchtangriff has egDamageRate of 2', () => {
-      const wucht = FREE_COMBAT_MANEUVERS.find((m) => m.id === 'wuchtangriff');
-      expect(wucht?.egDamageRate).toBe(2);
+    it('genau drei freie Manöver: Wuchtangriff (+1 je EG), Betäubungsschlag (1 EG, nur Nahkampf), Störender Angriff (+3 je EG)', () => {
+      const r = manoeverRegeln(K);
+      expect(r.freie.map((f) => f.name).sort()).toEqual(['Betäubungsschlag', 'Störender Angriff', 'Wuchtangriff']);
+      expect(r.freie.find((f) => f.name === 'Wuchtangriff')?.je_eg?.schaden).toBe(1);
+      expect(r.freie.find((f) => f.name === 'Betäubungsschlag')).toMatchObject({ eg: 1, nur_nahkampf: true });
+      expect(r.freie.find((f) => f.name === 'Störender Angriff')?.je_eg?.entschlossenheit_erschwert).toBe(3);
+      expect(r).toMatchObject({ egJeManoever: 1, streiftrefferSchaden: 2, streiftrefferBetaeubung: 2 });
     });
 
-    it('Umreißen inflicts condition Liegend', () => {
-      const umreissen = FREE_COMBAT_MANEUVERS.find((m) => m.id === 'umreissen');
-      expect(umreissen?.inflictsCondition).toBe('Liegend');
+    it('Wuchtangriff: +1 Schaden je EG, mit dem Merkmal Wuchtig +2 (GRW S. 161, 186)', () => {
+      expect(wuchtangriffJeEg('Scharf 2', K)).toBe(1);
+      expect(wuchtangriffJeEg('Wuchtig, Zweihändig', K)).toBe(2);
+      expect(wuchtangriffJeEg(undefined, K)).toBe(1);
     });
   });
 
-  describe('getAvailableCombatManeuvers with character masteries', () => {
-    it('returns free maneuvers when no masteries learned', () => {
-      const maneuvers = getAvailableCombatManeuvers([], 'Klingenwaffen');
-      expect(maneuvers.length).toBe(FREE_COMBAT_MANEUVERS.length);
+  describe('Meisterschafts-Manöver des Charakters (aus dem Paket)', () => {
+    it('ohne Meisterschaften nur der Angriff selbst', () => {
+      expect(getAvailableCombatManeuvers([], 'Klingenwaffen', undefined, {}, K).map((m) => m.id)).toEqual(['none']);
     });
 
-    it('includes learned mastery maneuvers like Hammerschlag or Schmetterschlag', () => {
-      const characterMasteries = [
-        { name: 'Hammerschlag (S2)', skill: 'Hiebwaffen' },
-        { name: 'Schmetterschlag (S2)', skill: 'Hiebwaffen' },
-      ];
-      const maneuvers = getAvailableCombatManeuvers(characterMasteries, 'Hiebwaffen');
-      const names = maneuvers.map((m) => m.name);
-      expect(names).toContain('Hammerschlag');
-      expect(names).toContain('Schmetterschlag');
+    it('Hiebwaffen: Hammerschlag +1W6, Schmetterschlag Benommen 1 für 30 Ticks (GRW S. 97)', () => {
+      const m = getAvailableCombatManeuvers([{ name: 'Hammerschlag (S2)', skill: 'Hiebwaffen' }, { name: 'Schmetterschlag (S2)', skill: 'Hiebwaffen' }], 'Hiebwaffen', 'Nahkampf', {}, K);
+      const ham = m.find((x) => x.name === 'Hammerschlag')!;
+      expect(ham).toMatchObject({ extraDamageFormula: '1W6', egCost: 1, damageMultiplier: 1, targetResistance: 'VTD' });
+      expect(m.find((x) => x.name === 'Schmetterschlag')?.inflictsCondition).toBe('Benommen 1 (30 Ticks)');
+      expect(ham.belege.join(' ')).toContain('1W6');
     });
 
-    it('NEVER allows Scharfschütze or Meisterschuss for Hellebarde / Stangenwaffen', () => {
-      // Character has learned various masteries across different skills
-      const characterMasteries = [
-        { name: 'Scharfschütze (S1)', skill: 'Schusswaffen' },
+    it('Manöver gegen KW oder GW mit halbem Schaden: Abdrängen, Umklammern (beide ringend), Verwirrung (GRW S. 95–98)', () => {
+      const m = getAvailableCombatManeuvers([
+        { name: 'Abdrängen (S1)', skill: 'Allgemeine Nahkampfmeisterschaften' },
+        { name: 'Umklammern (S1)', skill: 'Allgemeine Nahkampfmeisterschaften' },
+        { name: 'Verwirrung (S1)', skill: 'Handgemenge' },
+      ], 'Handgemenge', 'Nahkampf', {}, K);
+      expect(m.find((x) => x.name === 'Abdrängen')).toMatchObject({ targetResistance: 'KW', damageMultiplier: 0.5, hoechstensGk: 7 });
+      expect(m.find((x) => x.name === 'Umklammern')).toMatchObject({ targetResistance: 'KW', damageMultiplier: 0.5, inflictsCondition: 'Ringend', selfCondition: 'Ringend' });
+      expect(m.find((x) => x.name === 'Verwirrung')).toMatchObject({ targetResistance: 'GW', damageMultiplier: 0.5 });
+    });
+
+    it('Zusatzschaden aus Werten des Angreifers: Vorstürmen halbe GSW (höchstens 8), Würgegriff STÄ, Meisterwurf INT', () => {
+      const w = { GSW: 19, STA: 4, INT: 3 };
+      expect(getAvailableCombatManeuvers([{ name: 'Vorstürmen', skill: 'Allgemeine Nahkampfmeisterschaften' }], 'Klingenwaffen', 'Nahkampf', w, K)[1]).toMatchObject({ fixedExtraDamage: 8 });
+      expect(getAvailableCombatManeuvers([{ name: 'Vorstürmen', skill: 'Allgemeine Nahkampfmeisterschaften' }], 'Klingenwaffen', 'Nahkampf', { GSW: 11 }, K)[1].fixedExtraDamage).toBe(6); // 5,5 kaufmännisch
+      expect(getAvailableCombatManeuvers([{ name: 'Würgegriff', skill: 'Handgemenge' }], 'Handgemenge', 'Nahkampf', w, K)[1]).toMatchObject({ fixedExtraDamage: 4, requires: 'ringend' });
+      expect(getAvailableCombatManeuvers([{ name: 'Meisterwurf', skill: 'Wurfwaffen' }], 'Wurfwaffen', 'Fernkampf', w, K)[1]).toMatchObject({ fixedExtraDamage: 3, requires: 'zielen' });
+    });
+
+    it('Ausfall: Ziel verliert 3 Ticks; Entwaffnen und Schildbrecher: kein Schaden', () => {
+      const m = getAvailableCombatManeuvers([{ name: 'Ausfall', skill: 'Klingenwaffen' }, { name: 'Entwaffnen', skill: 'Allgemeine Nahkampfmeisterschaften' }], 'Klingenwaffen', 'Nahkampf', {}, K);
+      expect(m.find((x) => x.name === 'Ausfall')?.zielVerliertTicks).toBe(3);
+      expect(m.find((x) => x.name === 'Entwaffnen')?.damageMultiplier).toBe(0);
+    });
+
+    it('eine Meisterschaft gilt nur in ihrer Fertigkeit; allgemeine Nahkampfmeisterschaften nur im Nahkampf', () => {
+      const gelernt = [
         { name: 'Meisterschuss (S3)', skill: 'Schusswaffen' },
         { name: 'Ausfall (S1)', skill: 'Stangenwaffen' },
         { name: 'Rundumschlag (S2)', skill: 'Allgemeine Nahkampfmeisterschaften' },
         { name: 'Hammerschlag (S2)', skill: 'Hiebwaffen' },
       ];
-
-      // Test with Hellebarde (Stangenwaffen / Nahkampf)
-      const maneuvers = getAvailableCombatManeuvers(characterMasteries, 'Stangenwaffen', 'Nahkampf');
-      const names = maneuvers.map((m) => m.name);
-
-      // Scharfschütze and Meisterschuss MUST NOT be in the maneuvers list
-      expect(names).not.toContain('Scharfschütze');
-      expect(names).not.toContain('Meisterschuss');
-
-      // Hammerschlag is Hiebwaffen/Kettenwaffen only, so not on Stangenwaffen
-      expect(names).not.toContain('Hammerschlag');
-
-      // Allowed maneuvers for Stangenwaffen MUST be present
-      expect(names).toContain('Ausfall');
-      expect(names).toContain('Rundumschlag');
-      expect(names).toContain('Standardangriff');
-      expect(names).toContain('Wuchtangriff');
-      expect(names).toContain('Gezielter Schlag / Schuss');
-      expect(names).toContain('Defensiver Angriff');
-      expect(names).toContain('Finte');
-      expect(names).toContain('Zu Boden werfen / Umreißen');
+      const stange = getAvailableCombatManeuvers(gelernt, 'Stangenwaffen', 'Nahkampf', {}, K).map((m) => m.name);
+      expect(stange).toContain('Ausfall');
+      expect(stange).toContain('Rundumschlag');
+      expect(stange).not.toContain('Meisterschuss');
+      expect(stange).not.toContain('Hammerschlag');
+      const bogen = getAvailableCombatManeuvers(gelernt, 'Schusswaffen', 'Fernkampf', {}, K).map((m) => m.name);
+      expect(bogen).toContain('Meisterschuss');
+      expect(bogen).not.toContain('Rundumschlag');
+      expect(bogen).not.toContain('Ausfall');
     });
 
-    it('handles Schusswaffen correctly: allows only ranged maneuvers and no melee maneuvers', () => {
-      const characterMasteries = [
-        { name: 'Scharfschütze (S1)', skill: 'Schusswaffen' },
-        { name: 'Meisterschuss (S3)', skill: 'Schusswaffen' },
-        { name: 'Ausfall (S1)', skill: 'Klingenwaffen' },
-        { name: 'Rundumschlag (S2)', skill: 'Allgemeine Nahkampfmeisterschaften' },
-        { name: 'Hammerschlag (S2)', skill: 'Hiebwaffen' },
-      ];
-
-      const maneuvers = getAvailableCombatManeuvers(characterMasteries, 'Schusswaffen', 'Fernkampf');
-      const names = maneuvers.map((m) => m.name);
-
-      // Ranged masteries allowed
-      expect(names).toContain('Scharfschütze');
-      expect(names).toContain('Meisterschuss');
-
-      // Free ranged maneuvers
-      expect(names).toContain('Standardangriff');
-      expect(names).toContain('Gezielter Schuss');
-
-      // Melee-only maneuvers MUST NOT be present
-      expect(names).not.toContain('Wuchtangriff'); // GRW S. 160: not allowed with Schusswaffen
-      expect(names).not.toContain('Defensiver Angriff');
-      expect(names).not.toContain('Finte');
-      expect(names).not.toContain('Zu Boden werfen / Umreißen');
-      expect(names).not.toContain('Ausfall');
-      expect(names).not.toContain('Rundumschlag');
-      expect(names).not.toContain('Hammerschlag');
+    it('Scharfschütze ist kein Manöver (GRW S. 99): erscheint nicht in der Liste', () => {
+      const m = getAvailableCombatManeuvers([{ name: 'Scharfschütze (S1)', skill: 'Schusswaffen' }], 'Schusswaffen', 'Fernkampf', {}, K).map((x) => x.name);
+      expect(m).not.toContain('Scharfschütze');
     });
 
-    it('handles Wurfwaffen correctly: allows Wuchtangriff, Gezielter Wurf, and thrown masteries', () => {
-      const characterMasteries = [
-        { name: 'Scharfschütze (S1)', skill: 'Wurfwaffen' },
-        { name: 'Meisterwurf (S3)', skill: 'Wurfwaffen' },
-        { name: 'Meisterschuss (S3)', skill: 'Schusswaffen' },
-        { name: 'Hammerschlag (S2)', skill: 'Hiebwaffen' },
-      ];
-
-      const maneuvers = getAvailableCombatManeuvers(characterMasteries, 'Wurfwaffen', 'Fernkampf');
-      const names = maneuvers.map((m) => m.name);
-
-      // Thrown masteries allowed
-      expect(names).toContain('Scharfschütze');
-      expect(names).toContain('Meisterwurf');
-
-      // Free thrown maneuvers (Wuchtangriff allowed per GRW S. 160)
-      expect(names).toContain('Standardangriff');
-      expect(names).toContain('Wuchtangriff');
-      expect(names).toContain('Gezielter Wurf');
-
-      // Melee & Bow masteries rejected
-      expect(names).not.toContain('Meisterschuss');
-      expect(names).not.toContain('Hammerschlag');
-      expect(names).not.toContain('Defensiver Angriff');
-      expect(names).not.toContain('Finte');
+    it('ohne Paket keine Meisterschafts-Manöver (keine Manöver nach Namen im Code)', () => {
+      expect(getAvailableCombatManeuvers([{ name: 'Hammerschlag', skill: 'Hiebwaffen' }], 'Hiebwaffen', 'Nahkampf', {}, null).map((m) => m.id)).toEqual(['none']);
     });
   });
 
@@ -211,31 +177,28 @@ describe('Splittermond Combat Rules & Attack Calculations', () => {
   });
 
   describe('executeAttackDamageRoll', () => {
-    it('calculates gross damage, armor penetration and net damage', () => {
-      const result = executeAttackDamageRoll({
-        baseFormula: '1W6+4',
-        egBonusDamage: 4, // e.g. 2 EG with Wuchtangriff (+2 per EG)
-        targetArmorReduction: 3,
-        armorPenetrationEG: 2, // 2 points armor penetrated
-        damageType: 'Schnitt',
-      });
-
-      expect(result.grossDamage).toBeGreaterThanOrEqual(9); // at least 1 (min die) + 4 (bonus) + 4 (EG) = 9
-      expect(result.effectiveArmor).toBe(1); // 3 - 2 = 1
-      expect(result.netDamage).toBe(result.grossDamage - 1);
-      expect(result.breakdownText).toBeDefined();
+    it('Bruttoschaden, Rüstung und Nettoschaden', () => {
+      const result = executeAttackDamageRoll({ baseFormula: '1W6+4', egBonusDamage: 2, targetArmorReduction: 3, damageType: 'Schnitt' });
+      expect(result.grossDamage).toBeGreaterThanOrEqual(7);
+      expect(result.effectiveArmor).toBe(3);
+      expect(result.netDamage).toBe(Math.max(0, result.grossDamage - 3));
     });
 
-    it('includes conditions when Umreißen or mastery maneuver is used', () => {
-      const result = executeAttackDamageRoll({
-        baseFormula: '1W6+2',
-        egBonusDamage: 0,
-        maneuverCondition: 'Verwundet 1',
-        tripCondition: true,
-      });
+    it('Zustand des Manövers, fester Zusatzschaden, Betäubungsschlag', () => {
+      const r = executeAttackDamageRoll({ baseFormula: '1W6+2', egBonusDamage: 0, maneuverFixedDamage: 4, maneuverCondition: 'Benommen 1 (30 Ticks)', stunDamage: true });
+      expect(r.appliedConditions).toEqual(['Benommen 1 (30 Ticks)']);
+      expect(r.grossDamage).toBeGreaterThanOrEqual(7);
+      expect(r.damageType).toBe('Betäubung');
+    });
 
-      expect(result.appliedConditions).toContain('Verwundet 1');
-      expect(result.appliedConditions).toContain('Liegend');
+    it('halber Schaden kaufmännisch gerundet, kein Schaden bleibt 0, Streiftreffer −2 (GRW S. 11, 161)', () => {
+      for (let i = 0; i < 20; i++) {
+        const h = executeAttackDamageRoll({ baseFormula: '1W6+4', egBonusDamage: 0, damageMultiplier: 0.5 });
+        expect(h.grossDamage).toBe(Math.round((h.baseDiceSum + 4) / 2));
+        const st = executeAttackDamageRoll({ baseFormula: '1W6+4', egBonusDamage: 0, streiftrefferAbzug: 2 });
+        expect(st.grossDamage).toBe(Math.max(0, st.baseDiceSum + 4 - 2));
+      }
+      expect(executeAttackDamageRoll({ baseFormula: '1W6+4', egBonusDamage: 3, damageMultiplier: 0 }).grossDamage).toBe(0);
     });
   });
 });

@@ -16304,7 +16304,20 @@
     "manoever": true,
     "beschreibung": "Der Kämpfer versucht, seinen Gegner mit ausholenden Schlägen wegzudrängen. Dazu würfelt er einen Nahkampfangriff gegen den Körperlichen Widerstand des Gegners. Trifft er seinen Gegner, erleidet dieser nur den halben Schaden, muss aber einen Meter zurückweichen. Der Angreifer kann weitere Erfolgsgrade nutzen, um seinen Gegner jeweils einen weiteren halben Meter zurückzudrängen. Falls der Gegner zurückgedrängt wird, kann der Angreifer ohne Tickaufwand bis zu 2 Meter nachrücken. Sollte nicht ausreichend Platz zum Zurückweichen vorhanden sein, etwa weil der Gegner an eine Wand gedrängt wird oder einen Abhang hinunterstürzen würde, geht er stattdessen vor dem Hindernis zu Boden und gilt als liegend. Dieses Manöver funktioniert nur gegen Gegner bis maximal Größenklasse 7.",
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "manoeverwirkung": {
+     "widerstand": "KW",
+     "schaden": "halb",
+     "hoechstens_gk": 7,
+     "hinweis": "Ziel weicht 1 m zurück; liegend, wenn kein Platz ist",
+     "je_weiterem_eg": "Ziel 0,5 m weiter zurückgedrängt",
+     "belege": [
+      "würfelt er einen Nahkampfangriff gegen den Körperlichen Widerstand des Gegners",
+      "erleidet dieser nur den halben Schaden, muss aber einen Meter zurückweichen",
+      "um seinen Gegner jeweils einen weiteren halben Meter zurückzudrängen",
+      "Dieses Manöver funktioniert nur gegen Gegner bis maximal Größenklasse 7"
+     ]
+    }
    }
   },
   {
@@ -16408,7 +16421,16 @@
      }
     ],
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "manoeverwirkung": {
+     "schaden": "kein",
+     "hinweis": "Dauer 5 Ticks + halbe WGS; Ziel legt Athletik oder Fingerfertigkeit gegen 20 + Fertigkeitspunkte des Angreifers ab, sonst fällt die Waffe",
+     "belege": [
+      "Dieses Manöver benötigt fünf Ticks zuzüglich der halben Waffengeschwindigkeit",
+      "erleidet der Gegner zwar keinen Schaden, kann aber entwaffnet werden",
+      "gegen 20 + die Fertigkeitspunkte des Angreifers in der verwendeten Nahkampffertigkeit ablegen"
+     ]
+    }
    }
   },
   {
@@ -16611,7 +16633,18 @@
      }
     ],
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "manoeverwirkung": {
+     "schaden": "halb",
+     "zusaetzliche_ziele": 2,
+     "hinweis": "Trifft bis zu 2 weitere Gegner mit höchstens derselben Verteidigung; nur zweihändig",
+     "je_weiterem_eg": "2 weitere Ziele",
+     "belege": [
+      "auch gegen bis zu zwei weitere nebenstehende Gegner, sofern diese maximal dieselbe Verteidigung wie das Hauptziel besitzen",
+      "Jeder der Getroffenen und das ursprüngliche Ziel erleiden den halben normalen Schaden des Nahkampfangriffs",
+      "um zwei zusätzliche, sich in Nahkampfentfernung befindliche Feinde"
+     ]
+    }
    }
   },
   {
@@ -16637,7 +16670,20 @@
     "manoever": true,
     "beschreibung": "Ist dieser Nahkampfangriff gegen den Körperlichen Widerstand des Gegners (bis max. GK 7) erfolgreich, erleidet der Getroffene nur halben Schaden und beide Beteiligte gelten als Ringend. Dieses Manöver ist nur im unbewaffneten Nahkampf oder mit Waffen mit dem Merkmal Umklammern auszuführen. Wie eine Umklammerung gelöst werden kann, wird auf S. 164 beschrieben.",
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "manoeverwirkung": {
+     "widerstand": "KW",
+     "schaden": "halb",
+     "hoechstens_gk": 7,
+     "zustand": {
+      "id": "grw:zustand:ringend",
+      "auch_selbst": true
+     },
+     "hinweis": "Nur unbewaffnet oder mit Waffen mit dem Merkmal Umklammern",
+     "belege": [
+      "Ist dieser Nahkampfangriff gegen den Körperlichen Widerstand des Gegners (bis max. GK 7) erfolgreich, erleidet der Getroffene nur halben Schaden und beide Beteiligte gelten als Ringend"
+     ]
+    }
    }
   },
   {
@@ -16690,7 +16736,21 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "manoeverwirkung": {
+     "widerstand": "KW",
+     "schaden": "halb",
+     "hoechstens_gk": 7,
+     "hinweis": "Ziel legt Akrobatik oder Athletik gegen 15 + Fertigkeitspunkte des Angreifers ab: gelungen Benommen 1 für 20 Ticks, sonst liegend",
+     "je_weiterem_eg": "−5 auf die Probe des Ziels",
+     "belege": [
+      "Dieses Manöver richtet sich gegen den Körperlichen Widerstand des Gegners (bis max. GK 7)",
+      "erleidet das Opfer nur halben Schaden",
+      "gegen 15 + die Fertigkeitspunkte des Angreifers",
+      "erhält es für 20 Ticks den Zustand Benommen 1",
+      "um dem Opfer einen Malus in Höhe von jeweils 5 Punkten auf die Probe zu erteilen"
+     ]
+    }
    }
   },
   {
@@ -16760,7 +16820,20 @@
      }
     ],
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "manoeverwirkung": {
+     "zusatzschaden": {
+      "wert": "GSW",
+      "faktor": 0.5,
+      "hoechstens": 8
+     },
+     "hinweis": "Nur nach mindestens 2 m Anlauf in gerader Linie",
+     "belege": [
+      "mindestens 2 m Anlauf in gerader Linie",
+      "kann er seine halbe Geschwindigkeit zum Waffenschaden addieren",
+      "Der maximale Schadensbonus beträgt 8 Punkte"
+     ]
+    }
    }
   },
   {
@@ -21940,7 +22013,16 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "manoeverwirkung": {
+     "zustand": {
+      "id": "grw:zustand:lahm",
+      "dauer_ticks": 60
+     },
+     "belege": [
+      "für 60 Ticks den Zustand Lahm"
+     ]
+    }
    }
   },
   {
@@ -22086,7 +22168,18 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "manoeverwirkung": {
+     "widerstand": "GW",
+     "schaden": "halb",
+     "hinweis": "Nächster Angriff gegen dasselbe Ziel +2",
+     "je_weiterem_eg": "+1 auf den nächsten Angriff",
+     "belege": [
+      "Dieser Nahkampfangriff geht gegen den Geistigen Widerstand und richtet bei Erfolg nur halben Schaden an",
+      "einen Bonus in Höhe von 2 Punkten",
+      "um den Bonus um 1 je Erfolgsgrad zu erhöhen"
+     ]
+    }
    }
   },
   {
@@ -22130,7 +22223,18 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "manoeverwirkung": {
+     "zusatzschaden": {
+      "attribut": "STÄ"
+     },
+     "voraussetzung": "ringend",
+     "hinweis": "Nur wenn beide nach Umklammern ringend sind",
+     "belege": [
+      "Der Nahkampfangriff verursacht Bonusschaden in Höhe der Stärke des Angreifers",
+      "wenn der Angreifer sein Opfer vorher mit dem Manöver Umklammern angegriffen hat und beide ringend sind"
+     ]
+    }
    }
   },
   {
@@ -23327,7 +23431,15 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "manoeverwirkung": {
+     "zusatzschaden": {
+      "wuerfel": "1W6"
+     },
+     "belege": [
+      "verursacht der Abenteurer 1W6 Schaden zusätzlich"
+     ]
+    }
    }
   },
   {
@@ -23375,7 +23487,16 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "manoeverwirkung": {
+     "zustand": {
+      "id": "grw:zustand:verwundet",
+      "stufe": 1
+     },
+     "belege": [
+      "den Zustand Verwundet 1"
+     ]
+    }
    }
   },
   {
@@ -23488,7 +23609,15 @@
     "manoever": true,
     "beschreibung": "Dieser Angriff zielt auf den Schild des Gegners. Ein erfolgreicher Schildbrecher fügt keinen Schaden zu, beschädigt aber einen Schild dessen Härte höchstens 3 beträgt, sodass dieser als angeschlagen gilt. Um einen härteren Schild zu beschädigen, wird ein weiterer Erfolgsgrad pro Punkt Härte benötigt. Wird die doppelte Anzahl an Erfolgsgraden erreicht oder ein angeschlagener Schild ein weiteres Mal mit einem erfolgreichen Schildbrecher mit den benötigten Erfolgsgraden getroffen, ist er demoliert und kann nicht mehr verwendet werden.",
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "manoeverwirkung": {
+     "schaden": "kein",
+     "hinweis": "Schild bis Härte 3 angeschlagen; je Härtepunkt darüber 1 EG mehr; doppelte EG: demoliert",
+     "belege": [
+      "Ein erfolgreicher Schildbrecher fügt keinen Schaden zu, beschädigt aber einen Schild dessen Härte höchstens 3 beträgt",
+      "wird ein weiterer Erfolgsgrad pro Punkt Härte benötigt"
+     ]
+    }
    }
   },
   {
@@ -23529,7 +23658,17 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "manoeverwirkung": {
+     "zustand": {
+      "id": "grw:zustand:benommen",
+      "stufe": 1,
+      "dauer_ticks": 30
+     },
+     "belege": [
+      "für 30 Ticks den Zustand Benommen 1"
+     ]
+    }
    }
   },
   {
@@ -24456,7 +24595,15 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "manoeverwirkung": {
+     "zusatzschaden": {
+      "wuerfel": "1W6"
+     },
+     "belege": [
+      "verursacht der Abenteurer 1W6 Schaden mehr"
+     ]
+    }
    }
   },
   {
@@ -24601,7 +24748,15 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "manoeverwirkung": {
+     "hinweis": "Eigene Verteidigung +2 gegen den nächsten Angriff",
+     "je_weiterem_eg": "+1 Verteidigung",
+     "belege": [
+      "ist diese um 2 Punkte erhöht",
+      "um seine Verteidigung je eingesetztem Erfolgsgrad um einen weiteren Punkt zu erhöhen"
+     ]
+    }
    }
   },
   {
@@ -24633,7 +24788,13 @@
      }
     ],
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "manoeverwirkung": {
+     "ziel_verliert_ticks": 3,
+     "belege": [
+      "verliert zusätzlich 3 Ticks"
+     ]
+    }
    }
   },
   {
@@ -24681,7 +24842,16 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "manoeverwirkung": {
+     "zustand": {
+      "id": "grw:zustand:blutend",
+      "stufe": 1
+     },
+     "belege": [
+      "den Zustand Blutend 1"
+     ]
+    }
    }
   },
   {
@@ -24788,7 +24958,13 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "manoeverwirkung": {
+     "hinweis": "Danach halbe WGS vorrücken und sofort ein zweiter Angriff mit −3",
+     "belege": [
+      "einem Malus in Höhe von 3 Punkten"
+     ]
+    }
    }
   },
   {
@@ -24892,7 +25068,15 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "manoeverwirkung": {
+     "hinweis": "Eigene Verteidigung +2 gegen den nächsten Angriff",
+     "je_weiterem_eg": "+1 Verteidigung",
+     "belege": [
+      "ist diese um 2 Punkte erhöht",
+      "um seine Verteidigung pro eingesetztem Erfolgsgrad um einen weiteren Punkt zu erhöhen"
+     ]
+    }
    }
   },
   {
@@ -24936,7 +25120,18 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "manoeverwirkung": {
+     "widerstand": "GW",
+     "schaden": "halb",
+     "hinweis": "Nächster Angriff gegen dasselbe Ziel +2",
+     "je_weiterem_eg": "+1 auf den nächsten Angriff",
+     "belege": [
+      "Dieser Nahkampfangriff geht gegen den Geistigen Widerstand und richtet bei Erfolg nur halben Schaden an",
+      "einen Bonus in Höhe von 2 Punkten",
+      "um diesen Bonus um 1 je Erfolgsgrad zu erhöhen"
+     ]
+    }
    }
   },
   {
@@ -27255,7 +27450,17 @@
      }
     },
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "manoeverwirkung": {
+     "zusatzschaden": {
+      "attribut": "INT"
+     },
+     "voraussetzung": "zielen",
+     "belege": [
+      "muss er mindestens eine Zielen-Aktion ausführen",
+      "zusätzlichen Schaden in Höhe seiner Intuition"
+     ]
+    }
    }
   },
   {
@@ -27393,7 +27598,15 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "manoeverwirkung": {
+     "zustand": {
+      "id": "grw:zustand:lahm"
+     },
+     "belege": [
+      "beim Gegner den Zustand Lahm"
+     ]
+    }
    }
   },
   {
@@ -28584,7 +28797,13 @@
      }
     ],
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "manoeverwirkung": {
+     "ziel_verliert_ticks": 3,
+     "belege": [
+      "verliert zusätzlich 3 Ticks"
+     ]
+    }
    }
   },
   {
@@ -28658,7 +28877,13 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "manoeverwirkung": {
+     "hinweis": "Danach halbe WGS vorrücken und sofort ein zweiter Angriff mit −3",
+     "belege": [
+      "einem Malus in Höhe von 3 Punkten"
+     ]
+    }
    }
   },
   {
@@ -28731,7 +28956,17 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "manoeverwirkung": {
+     "zustand": {
+      "id": "grw:zustand:benommen",
+      "stufe": 1,
+      "dauer_ticks": 30
+     },
+     "belege": [
+      "für 30 Ticks den Zustand Benommen 1"
+     ]
+    }
    }
   },
   {
@@ -31312,7 +31547,18 @@
      }
     ],
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "manoeverwirkung": {
+     "zusaetzliche_ziele": 2,
+     "hinweis": "Bis zu 3 Ziele (höchstens 5 Geschosse, Last 1); Schwierigkeit ist die höchste Verteidigung",
+     "je_weiterem_eg": "2 weitere Ziele",
+     "belege": [
+      "Der Angriffswurf kann gegen bis zu drei Ziele angewendet werden",
+      "um zwei zusätzliche, sich in Reichweite befindliche Feinde",
+      "Maximal können fünf Geschosse gleichzeitig geworfen werden",
+      "mehrere Wurfwaffen mit jeweils höchstens unmodifizierter Last 1"
+     ]
+    }
    }
   },
   {
@@ -31345,7 +31591,18 @@
      }
     },
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "manoeverwirkung": {
+     "zusatzschaden": {
+      "attribut": "STÄ",
+      "faktor": 0.5
+     },
+     "voraussetzung": "zielen",
+     "belege": [
+      "Wenn der Abenteurer mindestens eine Zielen-Aktion ausgeführt hat",
+      "zusätzlichen Schaden in Höhe der halben Stärke"
+     ]
+    }
    }
   },
   {
@@ -31410,7 +31667,14 @@
     "manoever": true,
     "beschreibung": "Trifft das Manöver Mehrfachwurf und hält der Angreifer eine zweite Wurfwaffe in der Hand, muss der Angreifer sofort 2 weitere Ticks aufbringen. Dafür kann er sofort einen zweiten Fernkampfangriff ausführen, ohne die dafür üblichen Ticks aufzuwenden. Dieser Angriff kann gegen ein zweites Ziel gerichtet sein, darf aber in keinem Fall Meisterschafts-Manöver beinhalten. Für einen Mehrfachwurf können nur Wurfwaffen bis unmodifizierter Last 1 verwendet werden.",
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "manoeverwirkung": {
+     "hinweis": "Mit zweiter Wurfwaffe (höchstens Last 1): 2 Ticks mehr, dafür sofort ein zweiter Wurf ohne Meisterschafts-Manöver",
+     "belege": [
+      "muss der Angreifer sofort 2 weitere Ticks aufbringen",
+      "Wurfwaffen bis unmodifizierter Last 1"
+     ]
+    }
    }
   },
   {
@@ -31443,7 +31707,17 @@
      }
     },
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "manoeverwirkung": {
+     "zusatzschaden": {
+      "attribut": "INT"
+     },
+     "voraussetzung": "zielen",
+     "belege": [
+      "muss er mindestens eine Zielen-Aktion ausführen",
+      "zusätzlichen Schaden in Höhe seiner Intuition"
+     ]
+    }
    }
   },
   {
@@ -62762,6 +63036,7 @@
     "original_ueberschrift": "Wuchtig",
     "mit_stufe": false,
     "regeltext": "Bei Waffen mit diesem Merkmal verursacht das freie Manöver Wuchtangriff 2 statt 1 zusätzlichen Punkt Schaden pro eingesetzten Erfolgsgrad.",
+    "wuchtangriff_je_eg": 2,
     "regelgruppe": "grw:merkmal:wuchtig"
    }
   },
@@ -76002,6 +76277,42 @@
       }
      ],
      "quelle": "Tabelle im Abschnitt"
+    },
+    "manoever_regeln": {
+     "eg_je_meisterschaftsmanoever": 1,
+     "streiftreffer": {
+      "schaden_je_manoever": 2,
+      "betaeubung_je_manoever": 2
+     },
+     "freie_manoever": [
+      {
+       "name": "Wuchtangriff",
+       "je_eg": {
+        "schaden": 1
+       }
+      },
+      {
+       "name": "Betäubungsschlag",
+       "eg": 1,
+       "betaeubungsschaden": true,
+       "nur_nahkampf": true
+      },
+      {
+       "name": "Störender Angriff",
+       "je_eg": {
+        "entschlossenheit_erschwert": 3
+       }
+      }
+     ],
+     "belege": [
+      "Der Effekt solcher Manöver tritt nur dann ein, wenn für jedes angesagte Manöver 1 Erfolgsgrad erzielt und verwendet wird",
+      "muss der Kämpfer seinen verursachten Schaden um 2 Punkte für jedes angesagte Manöver senken",
+      "erleidet er stattdessen für jedes angesagte Manöver 2 Punkte Betäubungsschaden",
+      "Für jeden aufgewendeten Erfolgsgrad richtet der Angriff einen zusätzlichen Punkt Schaden an",
+      "Für 1 Erfolgsgrad richtet der Angriff keinen regulären Schaden an. Stattdessen fügt er dem Gegner Betäubungsschaden in derselben Höhe zu",
+      "Dieses freie Manöver ist nur bei Nahkampfangriffen einsetzbar",
+      "um die Entschlossenheit-Probe seines Gegners gegen die Unterbrechung (siehe S. 167) jeweils um zusätzliche 3 Punkte zu erschweren"
+     ]
     }
    },
    "hinweise": [

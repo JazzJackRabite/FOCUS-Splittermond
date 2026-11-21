@@ -7,7 +7,7 @@ Gemini in Google AI Studio – liest diese Datei zuerst und hält sich daran.
 - Die Prüfungen in `src/fundament/__tests__/` setzen diese Datei durch. Schlägt eine fehl, ist der Code zu ändern, nicht die Prüfung.
 - Änderungen an dieser Datei entscheidet der Projektinhaber.
 
-> **Stand 21.11.2026.** Teil 2 (Regelquellen) ist gegen den Code geprüft; eine Prüfung hält Tabelle und Code seitdem
+> **Stand 21.11.2026 (Stand 29).** Teil 2 (Regelquellen) ist gegen den Code geprüft; eine Prüfung hält Tabelle und Code seitdem
 > zusammen (`src/fundament/__tests__`).
 
 ---
@@ -47,6 +47,7 @@ Felder stehen unter `daten` des jeweiligen Eintrags. **Was hier nicht steht, dar
 | Listen des Grundregelwerks: Zauber, Meisterschaften (mit Schwellenwerten), Stärken (wie oft wählbar), Schwächen, Ressourcen (mit Stufenübersicht), Sprachen, Mondzeichen, Fertigkeiten mit Attributen, Rassen, Stärkenpunkte der Erschaffung, Attribute, Gesundheitsstufen | Einträge des GRW-Pakets: `schulen`, `kosten`, `zauberdauer`, `reichweite`, `wirkungsdauer`, `typus`, `wirkung`, `erfolgsgrade`, `schwierigkeit_strukturiert`, `schwelle`, `manoever`, `beschreibung`, `stufe`, `nur_bei_generierung`, `mehrfach_waehlbar`, `tabelle`, `familie`, `untergruppe`, `kategorie`, `attribute`, `attributsmodifikatoren`, `groessenklasse`, `staerken_refs`, `zusaetzliche_staerkepunkte`; Kernregeln: `strukturiert` mit `schwellen`, `staerke_punkte` | `regelwerk/grwListen.ts` |
 | Pausen (Ruhephase, Verschnaufpause), Ruhewirkungen von Stärken und Meisterschaften, Minderung von Wundabzügen, Behinderung und Tick-Zuschlag für Rüstung bzw. Schild | Kernregel „Heilung“: `ruheregeln`; Stärken/Meisterschaften: `ruhewirkung` (`lp_faktor`, `fo_faktor`, `lp_zusatz`, `erschoepft_minuten`, `fo_erschoepft_minuten`, `regeneration_faktor`, `bedingung`, `beleg`); Wirkungen mit `bezug` `wundabzug`, `behinderung`, `tick_zuschlag` und `gilt_fuer` | `regelwerk/spielwirkungen.ts` |
 | Heimatregionen für die kostenlose Kulturkunde | Kultur-Module: `felder.kulturkunde` | `regelwerk/grwListen.ts` |
+| Kampfmanöver: freie Manöver (Wuchtangriff, Betäubungsschlag, Störender Angriff), Kosten in Erfolgsgraden, Streiftreffer, Wirkung der Meisterschafts-Manöver (Widerstand, halber/kein Schaden, Zusatzschaden, Zustand, Tickverlust, Voraussetzung), Merkmal Wuchtig | Kernregel „Nahkampfhandlungen“: `manoever_regeln`; Meisterschaften mit `manoever`: `manoeverwirkung`, sonst `wirkungen_strukturiert` mit `gilt` „beim Manöver“; Merkmale: `wuchtangriff_je_eg` | `utils/combatRules.ts` |
 | Ausrüstung des Grundregelwerks | Ausrüstungseinträge des GRW-Pakets (`schaden`, `wgs`, `modus`, `merkmale_text`, `vtd_bonus`, `sr`, `behinderung`, `preis`, `last`, `haerte`) | `regelwerk/ausruestung.ts` |
 | Pakete laden und im Browser speichern | Paketkopf, Einträge | `regelwerk/laden.ts`, `regelwerk/paketSpeicher.ts` |
 | Einträge finden, Namen und IDs, Umbenennungen | Einträge mit `id`, `typ`, `name`; ID-Register | `regelwerk/katalog.ts`, `regelwerk/bruecke.ts`, `regelwerk/ids.ts` |
@@ -78,7 +79,6 @@ Datenseite wandern. Neue kommen nicht hinzu.
 | Rückfall ohne geladenes Paket: Attribute, Fertigkeiten mit Attributen, Rassen, Mondzeichen, Heldengrade, Gesundheitsstufen | `src/data/rules.ts` | Wie oben; nur noch über `regelwerk/grwListen.ts` und `steigerungsregeln.ts` gelesen |
 | Würfelmechanik (Standard-, Sicherheits-, Risikowurf, Patzer, Triumph, Erfolgsgrade), GRW S. 16–19 | `utils/wuerfeln.ts` | Kernregeln `strukturiert` |
 | Fokuskosten, Erfolgsgrade beim Zaubern, GRW S. 221–222 | `utils/magicRules.ts` | Kernregeln `strukturiert` |
-| Kampfmanöver nach Namen | `utils/combatRules.ts` | Daten der Meisterschaften |
 | Einzelne Stärken und Meisterschaften nach Namen (Rückfall der Voraussetzungsprüfung ohne Paket, einzelne Stellen beim Zaubern, Heilen und bei Begleitern) | `utils/prerequisiteValidator.ts`, `components/play/CastSpellModal.tsx`, `HealModal.tsx`, `PlaySharedVitals.tsx`, `regelwerk/begleiter.ts` | `wirkungen_strukturiert`, formale `voraussetzungen` |
 | Regelwerte für Gefolge, Untote und Golems (Kosten, Grenzen, Preisformel) | `regelwerk/gefolge.ts`, `untote.ts`, `golem.ts` | `strukturiert` an den Regeltexten |
 | Schadens- und Heildialog: Zustandsliste, Verschnaufpause | `components/play/TakeDamageModal.tsx`, `HealModal.tsx` | Zustände und Kernregeln des Pakets |

@@ -7,6 +7,7 @@ import {
   getAvailableCombatManeuvers,
   parseWeaponDamage,
   executeAttackDamageRoll,
+  wuchtangriffJeEg,
 } from '../utils/combatRules';
 import {
   calculateSpellEG,
@@ -15,6 +16,11 @@ import {
 import { getConditionMalus, getActiveRollModifiers } from '../utils/conditionModifiers';
 import { CHARACTER_PRESETS } from '../data/presets';
 import { RACES } from '../data/rules';
+import { Katalog } from '../regelwerk/katalog';
+import { basisAusDateien } from '../regelwerk/__tests__/hilfen';
+
+const KB = basisAusDateien();
+const KAT = new Katalog(KB.manifest, [KB.basis]);
 
 describe('Splittermond GRW – Umfassende Regelprüfung, 5 Testcharaktere & Kampfsimulation', () => {
 
@@ -210,16 +216,13 @@ describe('Splittermond GRW – Umfassende Regelprüfung, 5 Testcharaktere & Kamp
       expect(attackCalc.eg).toBe(2); // Diff 7 entspricht 2 EG (Diff 6..8 = 2 EG)
       expect(attackCalc.outcomeLabel).toContain('Herausragender Treffer');
 
-      // Cederion setzt das Manöver 'Wuchtangriff' ein:
-      // Bei Wuchtangriff bringt jeder eingesetzte EG +2 Schaden (statt normal +1)
-      const maneuvers = getAvailableCombatManeuvers([], 'Klingenwaffen');
-      const wuchtManeuver = maneuvers.find((m) => m.id === 'wuchtangriff');
-      expect(wuchtManeuver).toBeDefined();
-      expect(wuchtManeuver?.egDamageRate).toBe(2);
-
+      // Cederion setzt beide EG für das freie Manöver Wuchtangriff ein: +1 Schaden je EG
+      // (GRW S. 161; Beispiel dort: 1 EG macht aus 1W6+4 dann 1W6+5). Nur Waffen mit dem Merkmal Wuchtig geben +2.
+      const jeEg = wuchtangriffJeEg(undefined, KAT);
+      expect(jeEg).toBe(1);
       const allocatedEG = 2;
-      const bonusDamage = allocatedEG * (wuchtManeuver?.egDamageRate || 1);
-      expect(bonusDamage).toBe(4); // 2 EG * 2 = +4 Schaden!
+      const bonusDamage = allocatedEG * jeEg;
+      expect(bonusDamage).toBe(2);
 
       // Schadenswurf ausführen: Gegner hat Lederrüstung mit RS = 2
       const damageResult = executeAttackDamageRoll({
@@ -231,9 +234,9 @@ describe('Splittermond GRW – Umfassende Regelprüfung, 5 Testcharaktere & Kamp
       // Würfel 1W6 ergibt mindestens 1, maximal 6
       expect(damageResult.baseDice[0]).toBeGreaterThanOrEqual(1);
       expect(damageResult.baseDice[0]).toBeLessThanOrEqual(6);
-      // Brutto-Schaden = Wurf (1..6) + 5 (Waffenbonus) + 4 (Wuchtangriff EG) = 10..15
-      expect(damageResult.grossDamage).toBeGreaterThanOrEqual(10);
-      expect(damageResult.grossDamage).toBeLessThanOrEqual(15);
+      // Brutto-Schaden = Wurf (1..6) + 5 (Waffenbonus) + 2 (Wuchtangriff) = 8..13
+      expect(damageResult.grossDamage).toBeGreaterThanOrEqual(8);
+      expect(damageResult.grossDamage).toBeLessThanOrEqual(13);
       // Netto-Schaden = Brutto - 2 (RS)
       expect(damageResult.netDamage).toBe(damageResult.grossDamage - 2);
     });
@@ -273,12 +276,14 @@ describe('Splittermond GRW – Umfassende Regelprüfung, 5 Testcharaktere & Kamp
       expect(totalMalus).toBe(-1);
     });
 
-    it('Schritt 4: Gegenangriff mit Manöver "Umreißen" (GRW S. 161) & Zustand Liegend', () => {
-      // Gegner schlägt zurück und setzt "Umreißen" ein (kostet 2 EG)
-      const maneuvers = getAvailableCombatManeuvers([], 'Stangenwaffen');
-      const trip = maneuvers.find((m) => m.id === 'umreissen');
-      expect(trip).toBeDefined();
-      expect(trip?.inflictsCondition).toBe('Liegend');
+    it('Schritt 4: Gegenangriff mit der Meisterschaft „Umreißen“ (GRW S. 95) & Zustand Liegend', () => {
+      // Umreißen ist eine allgemeine Nahkampfmeisterschaft (kein freies Manöver): gegen KW, halber Schaden,
+      // das Ziel geht bei misslungener Probe zu Boden; kostet 1 EG
+      const maneuvers = getAvailableCombatManeuvers([{ name: 'Umreißen (S1)', skill: 'Allgemeine Nahkampfmeisterschaften' }], 'Stangenwaffen', 'Nahkampf', {}, KAT);
+      const trip = maneuvers.find((m) => m.name === 'Umreißen');
+      expect(trip).toMatchObject({ targetResistance: 'KW', damageMultiplier: 0.5, egCost: 1 });
+      expect(trip?.hinweis).toContain('liegend');
+      expect(getAvailableCombatManeuvers([], 'Stangenwaffen', 'Nahkampf', {}, KAT).some((m) => m.name === 'Umreißen')).toBe(false);
 
       // Cederion erhält Zustand 'Liegend'
       const { result } = renderHook(() => useCharacterState());

@@ -1,5 +1,7 @@
-import { type MasteryEntry } from '../data/masteries';
-import { grwAllgemeineKampfmeisterschaften, grwMeisterschaften } from '../regelwerk/grwListen';
+import type { Katalog } from '../regelwerk/katalog';
+import type { Eintrag } from '../regelwerk/typen';
+import type { Wirkung } from '../regelwerk/wirkungen';
+import { aktiverKatalog, meisterschaftId, norm } from '../regelwerk/bruecke';
 
 export interface AttackEGCalculation {
   totalRoll: number;
@@ -100,22 +102,42 @@ export function calculateAttackEG(
   };
 }
 
+/**
+ * Ein Angriff mit oder ohne Meisterschafts-Manöver (GRW S. 160–161). Die Wirkung kommt aus dem Paket:
+ * `daten.manoeverwirkung` der Meisterschaft; für Manöver aus Grimoires ohne dieses Feld die Wirkungen „beim Manöver“
+ * (`wirkungen_strukturiert`: Zusatzschaden, Zustand). Keine Manöver nach Namen im Code.
+ */
 export interface CombatManeuver {
   id: string;
   name: string;
+  /** 'free' = Angriff ohne Meisterschafts-Manöver; freie Manöver werden danach mit Erfolgsgraden gewählt */
   type: 'free' | 'mastery';
+  regelId?: string;
   skill?: string;
   source?: string;
   page?: number;
   description: string;
   shortDesc: string;
-  extraDamageFormula?: string; // e.g. "+1W6" for Hammerschlag
-  damageMultiplier?: number;   // e.g. 0.5 for Abdrängen
+  /** Erfolgsgrade, die das Manöver kostet (GRW S. 161: 1 je angesagtem Meisterschafts-Manöver) */
+  egCost: number;
+  extraDamageFormula?: string;
+  /** fester Zusatzschaden aus Werten des Angreifers (Stärke, Intuition, halbe Geschwindigkeit …) */
   fixedExtraDamage?: number;
-  egDamageRate?: number;       // default 1 damage per EG, 2 for Wuchtangriff
-  inflictsCondition?: string;  // e.g. "Liegend" or "Verwundet 1"
-  targetResistance?: 'VTD' | 'KW' | 'GW'; // default VTD
-  requiresZielen?: boolean;
+  fixedExtraDamageText?: string;
+  /** 1 = voller, 0,5 = halber, 0 = kein Schaden */
+  damageMultiplier: number;
+  inflictsCondition?: string;
+  selfCondition?: string;
+  targetResistance: 'VTD' | 'KW' | 'GW';
+  requires?: 'zielen' | 'ringend';
+  zielVerliertTicks?: number;
+  zusaetzlicheZiele?: number;
+  hoechstensGk?: number;
+  hinweis?: string;
+  jeWeiteremEg?: string;
+  belege: string[];
+  /** @deprecated nur noch für alte Aufrufer: Schaden je EG beim Wuchtangriff steht jetzt in wuchtangriffJeEg() */
+  egDamageRate?: number;
 }
 
 export const MELEE_WEAPON_SKILLS = [
@@ -149,432 +171,226 @@ export function isRangedWeapon(weaponSkill?: string, weaponCategory?: string): b
   return !isMeleeWeapon(weaponSkill, weaponCategory);
 }
 
-/**
- * Free maneuvers available to any character according to Splittermond GRW S. 160-161.
- */
-export const FREE_COMBAT_MANEUVERS: CombatManeuver[] = [
-  {
-    id: 'none',
-    name: 'Standardangriff',
-    type: 'free',
-    source: 'GRW',
-    page: 158,
-    description: 'Ein gewöhnlicher Angriff ohne spezielles Manöver. Jeder erzielte Erfolgsgrad kann flexibel für zusätzlichen Schaden (+1 Schaden pro EG), das Umgehen von Rüstung (-1 RS pro EG) oder eigene Abwehr (+1 VTD pro EG) eingesetzt werden.',
-    shortDesc: 'Standardangriff (1 EG = +1 Schaden)',
-    egDamageRate: 1,
-  },
-  {
-    id: 'wuchtangriff',
-    name: 'Wuchtangriff',
-    type: 'free',
-    source: 'GRW',
-    page: 160,
-    description: 'Der Kämpfer legt seine gesamte Kraft in den Hieb. Jeder eingesetzte Erfolgsgrad (EG) erhöht den Schaden um 2 Punkte (statt normal 1 Punkt). Nur für Nahkampfwaffen und Wurfwaffen, nicht jedoch für Schusswaffen (GRW S. 160).',
-    shortDesc: 'Maximale Kraft: Jeder EG bringt +2 Schaden!',
-    egDamageRate: 2,
-  },
-  {
-    id: 'gezielter_schlag',
-    name: 'Gezielter Schlag / Schuss',
-    type: 'free',
-    source: 'GRW',
-    page: 160,
-    description: 'Der Angreifer zielt gezielt auf eine Schwachstelle oder Rüstungslücke. Jeder eingesetzte Erfolgsgrad ignoriert 1 Punkt der gegnerischen Schadensreduktion (RS). Überschüssige EG erhöhen den Schaden um 1.',
-    shortDesc: 'Ignoriert 1 Punkt gegnerische Rüstung (RS) pro EG',
-    egDamageRate: 1,
-  },
-  {
-    id: 'defensiver_angriff',
-    name: 'Defensiver Angriff',
-    type: 'free',
-    source: 'GRW',
-    page: 160,
-    description: 'Der Kämpfer greift mit Bedacht an und achtet vor allem auf die eigene Deckung. Bis zu 3 eingesetzte Erfolgsgrade erhöhen die eigene Verteidigung bis zur nächsten eigenen Aktion um +1 VTD pro EG. Nur im Nahkampf einsetzbar (GRW S. 160).',
-    shortDesc: 'Erhöht eigene VTD bis zur nächsten Aktion (+1 VTD pro EG, max. 3)',
-    egDamageRate: 1,
-  },
-  {
-    id: 'finte',
-    name: 'Finte',
-    type: 'free',
-    source: 'GRW',
-    page: 160,
-    description: 'Ein angetäuschter Schlag bringt die Abwehr des Gegners ins Wanken. Jeder eingesetzte Erfolgsgrad senkt die Verteidigung des Ziels gegen den nächsten folgenden Angriff um 1 Punkt. Nur im Nahkampf einsetzbar (GRW S. 160).',
-    shortDesc: 'Senkt VTD des Ziels für den nächsten Angriff (-1 VTD pro EG)',
-    egDamageRate: 1,
-  },
-  {
-    id: 'umreissen',
-    name: 'Zu Boden werfen / Umreißen',
-    type: 'free',
-    source: 'GRW',
-    page: 161,
-    description: 'Der Angreifer versucht, den Gegner durch Schwung, Schildstoß oder Beinstellen zu Fall zu bringen. Kostet 2 Erfolgsgrade. Bei Erfolg erhält das Ziel den Zustand Liegend. Nur im Nahkampf einsetzbar (GRW S. 161).',
-    shortDesc: 'Kostet 2 EG: Bringt das Ziel zu Boden (Zustand Liegend)',
-    inflictsCondition: 'Liegend',
-    egDamageRate: 1,
-  },
-];
-
-/**
- * Returns allowed free combat maneuvers for a specific weapon skill and category.
- * Rules according to Splittermond GRW S. 160-161:
- * - Melee (Nahkampf): Standardangriff, Wuchtangriff, Gezielter Schlag, Defensiver Angriff, Finte, Zu Boden werfen / Umreißen.
- * - Ranged (Schusswaffen): Standardangriff, Gezielter Schuss. (Kein Wuchtangriff, kein Defensiver Angriff, keine Finte, kein Umreißen).
- * - Thrown (Wurfwaffen): Standardangriff, Wuchtangriff (erlaubt laut GRW S. 160), Gezielter Wurf.
- */
-export function getFreeCombatManeuversForWeapon(
-  weaponSkill: string = 'Klingenwaffen',
-  weaponCategory?: string
-): CombatManeuver[] {
-  const isMelee = isMeleeWeapon(weaponSkill, weaponCategory);
-  const isWurf = weaponSkill.toLowerCase().includes('wurf');
-
-  return FREE_COMBAT_MANEUVERS.filter((m) => {
-    if (m.id === 'none') return true;
-    if (m.id === 'gezielter_schlag') return true;
-    if (m.id === 'wuchtangriff') {
-      return isMelee || isWurf;
-    }
-    if (['defensiver_angriff', 'finte', 'umreissen'].includes(m.id)) {
-      return isMelee;
-    }
-    return true;
-  }).map((m) => {
-    if (m.id === 'gezielter_schlag' && !isMelee) {
-      return {
-        ...m,
-        name: isWurf ? 'Gezielter Wurf' : 'Gezielter Schuss',
-        description: 'Der Angreifer visiert eine Schwachstelle des Ziels an. Jeder eingesetzte Erfolgsgrad ignoriert 1 Punkt gegnerische Rüstung (RS).',
-        shortDesc: 'Ignoriert 1 Punkt gegnerische Rüstung (RS) pro EG',
-      };
-    }
-    return m;
-  });
-}
-
-export interface KnownMasteryManeuverConfig extends Partial<CombatManeuver> {
-  allowedSkills?: string[];
-  isGeneralNahkampf?: boolean;
-}
-
-/**
- * Known Combat Mastery maneuvers mapped to their specific mechanics and weapon restrictions.
- */
-export const KNOWN_MASTERY_MANEUVERS: Record<string, KnownMasteryManeuverConfig> = {
-  // Allgemeine Nahkampfmeisterschaften (valid for ALL melee weapon skills: Klingen-, Stangen-, Hieb-, Kettenwaffen, Handgemenge)
-  'Abdrängen': {
-    isGeneralNahkampf: true,
-    targetResistance: 'KW',
-    damageMultiplier: 0.5,
-    shortDesc: 'Probe vs. Körperlicher Widerstand (KW). Gegner wird 1m (+0,5m pro weiterem EG) zurückgedrängt, halber Schaden.',
-  },
-  'Entwaffnen': {
-    isGeneralNahkampf: true,
-    shortDesc: 'Ziel verliert die geführte Waffe (Mindest-EG oder vergleichende Probe).',
-  },
-  'Rundumschlag': {
-    isGeneralNahkampf: true,
-    shortDesc: 'Greift bis zu 2 weitere Gegner in Nahkampfreichweite gleichzeitig an.',
-  },
-  'Umklammern': {
-    isGeneralNahkampf: true,
-    inflictsCondition: 'Ringend',
-    shortDesc: 'Ziel und Angreifer erhalten Zustand Ringend (VTD -2 und Aktionen erschwert).',
-  },
-  'Vorstürmen': {
-    isGeneralNahkampf: true,
-    shortDesc: 'Stürmt auf den Gegner zu und führt einen mächtigen Nahkampfangriff aus.',
-  },
-
-  // Hiebwaffen & Kettenwaffen & Stangenwaffen
-  'Hammerschlag': {
-    allowedSkills: ['Hiebwaffen', 'Kettenwaffen'],
-    extraDamageFormula: '1W6',
-    shortDesc: '+1W6 Schaden zusätzlich! Weitere EG können für weiteren Schaden genutzt werden.',
-  },
-  'Schmetterschlag': {
-    allowedSkills: ['Hiebwaffen', 'Stangenwaffen'],
-    inflictsCondition: 'Verwundet 1',
-    shortDesc: 'Verursacht zusätzlich zum normalen Schaden den Zustand Verwundet 1.',
-  },
-  'Knochenbrecher': {
-    allowedSkills: ['Hiebwaffen'],
-    shortDesc: 'Fügt dem Ziel schwere Knochenbrüche zu.',
-  },
-  'Schildbrecher': {
-    allowedSkills: ['Hiebwaffen'],
-    shortDesc: 'Zielt auf gegnerischen Schild. Beschädigt oder zerstört Schilde.',
-  },
-
-  // Klingenwaffen & Stangenwaffen
-  'Ausfall': {
-    allowedSkills: ['Klingenwaffen', 'Stangenwaffen'],
-    shortDesc: 'Gegner mit einer schnellen Angriffsserie bedrängen und zurückweichen lassen.',
-  },
-  'Klingenwirbel': {
-    allowedSkills: ['Klingenwaffen', 'Stangenwaffen'],
-    shortDesc: 'Erlaubt einen schnellen zweiten Angriff in Folge.',
-  },
-  'Blutiger Aderlass': {
-    allowedSkills: ['Klingenwaffen'],
-    inflictsCondition: 'Blutend 1',
-    shortDesc: 'Verursacht zusätzlich zum normalen Schaden den Zustand Blutend 1.',
-  },
-  'Verteidigungswirbel': {
-    allowedSkills: ['Klingenwaffen', 'Kettenwaffen'],
-    shortDesc: 'Erhöht die aktive Abwehr mit der geführten Waffe.',
-  },
-  'Verwirrung': {
-    allowedSkills: ['Klingenwaffen', 'Handgemenge'],
-    shortDesc: 'Verwirrt den Gegner durch geschickte Manöver.',
-  },
-
-  // Handgemenge
-  'Schmerzhafter Hieb': {
-    allowedSkills: ['Handgemenge'],
-    shortDesc: 'Fügt schmerzhaften Zusatzschaden oder Zustände im Nahkampf zu.',
-  },
-  'Würgegriff': {
-    allowedSkills: ['Handgemenge'],
-    shortDesc: 'Nimmt den Gegner in den Würgegriff.',
-  },
-
-  // Fernkampf - Schusswaffen
-  'Meisterschuss': {
-    allowedSkills: ['Schusswaffen'],
-    requiresZielen: true,
-    shortDesc: 'Meisterlicher Fernkampfschuss mit mächtigem Durchschlag.',
-  },
-  'Sehnenschneider': {
-    allowedSkills: ['Schusswaffen'],
-    inflictsCondition: 'Lahm (60 Ticks)',
-    shortDesc: 'Verursacht zusätzlich für 60 Ticks den Zustand Lahm.',
-  },
-
-  // Fernkampf - Wurfwaffen
-  'Meisterwurf': {
-    allowedSkills: ['Wurfwaffen'],
-    requiresZielen: true,
-    shortDesc: 'Meisterlicher Wurf mit verheerender Präzision.',
-  },
-  'Harter Wurf': {
-    allowedSkills: ['Wurfwaffen'],
-    shortDesc: 'Kräftiger Wurf mit zusätzlichem Wuchtschaden.',
-  },
-  'Mehrfachwurf': {
-    allowedSkills: ['Wurfwaffen'],
-    shortDesc: 'Schleudert mehrere Wurfwaffen gleichzeitig auf Feinde.',
-  },
-  'Geschosshagel': {
-    allowedSkills: ['Wurfwaffen'],
-    shortDesc: 'Regen aus Wurfwaffen auf bis zu mehrere Feinde.',
-  },
-
-  // Scharfschütze (Fernkampf only - Schusswaffen & Wurfwaffen)
-  'Scharfschütze': {
-    allowedSkills: ['Schusswaffen', 'Wurfwaffen'],
-    requiresZielen: true,
-    shortDesc: 'Präziser Fernkampfschuss nach Zielen (ignoriert Modifikatoren für Getümmel).',
-  },
+const STANDARDANGRIFF: CombatManeuver = {
+  id: 'none',
+  name: 'Angriff ohne Meisterschafts-Manöver',
+  type: 'free',
+  source: 'GRW',
+  page: 160,
+  description: 'Erfolgsgrade können nach dem Wurf für freie Manöver eingesetzt werden (GRW S. 161).',
+  shortDesc: 'Erfolgsgrade für freie Manöver',
+  egCost: 0,
+  damageMultiplier: 1,
+  targetResistance: 'VTD',
+  belege: [],
+  egDamageRate: 1,
 };
 
+/** Angriff ohne Meisterschafts-Manöver; die freien Manöver wählt man danach mit Erfolgsgraden */
+export const FREE_COMBAT_MANEUVERS: CombatManeuver[] = [STANDARDANGRIFF];
+
+// ---------------------------------------------------------------- Regeln aus dem Paket
+
+const NAHKAMPF_ID = 'grw:regel:kampf-regeln:nahkampfhandlungen';
+
+export interface FreiesManoever { name: string; eg?: number; je_eg?: { schaden?: number; entschlossenheit_erschwert?: number }; betaeubungsschaden?: boolean; nur_nahkampf?: boolean }
+
+export interface ManoeverRegeln {
+  egJeManoever: number;
+  streiftrefferSchaden: number;
+  streiftrefferBetaeubung: number;
+  freie: FreiesManoever[];
+  quelle: string;
+}
+
+/** Manöverregeln (GRW S. 160–161): EG je Meisterschafts-Manöver, Streiftreffer, freie Manöver */
+export function manoeverRegeln(k: Katalog | null = aktiverKatalog()): ManoeverRegeln {
+  const e = k?.get(NAHKAMPF_ID); const r = e?.daten.manoever_regeln;
+  return {
+    egJeManoever: r?.eg_je_meisterschaftsmanoever ?? 1,
+    streiftrefferSchaden: r?.streiftreffer?.schaden_je_manoever ?? 2,
+    streiftrefferBetaeubung: r?.streiftreffer?.betaeubung_je_manoever ?? 2,
+    freie: r?.freie_manoever ?? [{ name: 'Wuchtangriff', je_eg: { schaden: 1 } }],
+    quelle: 'GRW S. 161',
+  };
+}
+
+/** Schaden je EG beim freien Manöver Wuchtangriff; Waffen mit einem Merkmal, das ihn erhöht (Wuchtig, GRW S. 186), geben mehr */
+export function wuchtangriffJeEg(waffenMerkmale: string | undefined, k: Katalog | null = aktiverKatalog()): number {
+  const grund = manoeverRegeln(k).freie.find((f) => f.je_eg?.schaden)?.je_eg?.schaden ?? 1;
+  if (!k || !waffenMerkmale) return grund;
+  const text = waffenMerkmale.toLowerCase();
+  for (const e of Object.values(k.eintraege)) {
+    if (e.typ === 'merkmal' && typeof e.daten.wuchtangriff_je_eg === 'number' && new RegExp(`(^|[^\\p{L}])${e.name.toLowerCase()}([^\\p{L}]|$)`, 'u').test(text)) {
+      return Math.max(grund, e.daten.wuchtangriff_je_eg);
+    }
+  }
+  return grund;
+}
+
+export interface AngreiferWerte { INT?: number; STA?: number; GSW?: number }
+
+const ATTRIBUT_KURZ: Record<string, keyof AngreiferWerte> = { 'STÄ': 'STA', STA: 'STA', INT: 'INT', GSW: 'GSW' };
+const ATTRIBUT_TEXT: Record<string, string> = { STA: 'Stärke', INT: 'Intuition', GSW: 'Geschwindigkeit' };
+
+interface Manoeverwirkung {
+  widerstand?: 'VTD' | 'KW' | 'GW';
+  schaden?: 'voll' | 'halb' | 'kein';
+  zusatzschaden?: { wuerfel?: string; attribut?: string; wert?: string; faktor?: number; hoechstens?: number };
+  zustand?: { id: string; stufe?: number; dauer_ticks?: number; auch_selbst?: boolean };
+  ziel_verliert_ticks?: number;
+  zusaetzliche_ziele?: number;
+  hoechstens_gk?: number;
+  voraussetzung?: 'zielen' | 'ringend';
+  hinweis?: string;
+  je_weiterem_eg?: string;
+  belege: string[];
+}
+
+function zustandText(k: Katalog, z: { id: string; stufe?: number | null; dauer_ticks?: number | null }): string {
+  const n = k.get(z.id)?.name ?? z.id;
+  return `${n}${z.stufe ? ` ${z.stufe}` : ''}${z.dauer_ticks ? ` (${z.dauer_ticks} Ticks)` : ''}`;
+}
+
+/** Wirkung eines Manövers aus dem Paket; ohne `manoeverwirkung` aus den Wirkungen „beim Manöver“ */
+function wirkungAusEintrag(e: Eintrag): Manoeverwirkung {
+  if (e.daten.manoeverwirkung) return e.daten.manoeverwirkung as Manoeverwirkung;
+  const w: Manoeverwirkung = { belege: [] };
+  for (const x of (e.daten.wirkungen_strukturiert ?? []) as Wirkung[]) {
+    if (x.gilt !== 'beim Manöver') continue;
+    if (x.art === 'zusatzschaden' && typeof x.wert === 'string' && /^\d*W\d+/i.test(x.wert)) w.zusatzschaden = { wuerfel: x.wert };
+    if (x.art === 'zusatzschaden' && typeof x.wert === 'number') w.zusatzschaden = { wert: 'fest', faktor: x.wert };
+    if (x.art === 'zustand' && x.zustand_ref && x.traeger === 'ziel') w.zustand = { id: x.zustand_ref.id, stufe: (x as { stufe?: number }).stufe, dauer_ticks: (x as { dauer_ticks?: number }).dauer_ticks };
+    if ((x as { beleg?: string }).beleg) w.belege.push((x as { beleg?: string }).beleg!);
+  }
+  return w;
+}
+
+function zusatzschadenFest(z: Manoeverwirkung['zusatzschaden'], werte: AngreiferWerte): { wert?: number; text?: string } {
+  if (!z || z.wuerfel) return {};
+  if (z.wert === 'fest') return { wert: z.faktor ?? 0, text: `+${z.faktor ?? 0}` };
+  const schl = ATTRIBUT_KURZ[z.attribut ?? z.wert ?? ''];
+  if (!schl) return {};
+  const f = z.faktor ?? 1;
+  const roh = (werte[schl] ?? 0) * f;
+  let wert = Math.round(roh);  // kaufmännisch (GRW S. 11)
+  if (z.hoechstens !== undefined) wert = Math.min(wert, z.hoechstens);
+  const name = ATTRIBUT_TEXT[schl];
+  const text = `${f === 0.5 ? 'halbe ' : ''}${name}${z.hoechstens !== undefined ? ` (höchstens ${z.hoechstens})` : ''}`;
+  return { wert, text };
+}
+
+/** Manöver aus einem Paketeintrag (Meisterschaft mit `manoever`) */
+export function manoeverAusEintrag(e: Eintrag, k: Katalog, werte: AngreiferWerte = {}): CombatManeuver {
+  const w = wirkungAusEintrag(e);
+  const fest = zusatzschadenFest(w.zusatzschaden, werte);
+  const fertigkeit = k.get(e.daten.fertigkeit)?.name ?? e.daten.fertigkeit_name;
+  const teile = [
+    w.widerstand && w.widerstand !== 'VTD' ? `gegen ${w.widerstand}` : '',
+    w.schaden === 'halb' ? 'halber Schaden' : w.schaden === 'kein' ? 'kein Schaden' : '',
+    w.zusatzschaden?.wuerfel ? `+${w.zusatzschaden.wuerfel} Schaden` : fest.text ? `+ ${fest.text} Schaden` : '',
+    w.zustand ? `Ziel: ${zustandText(k, w.zustand)}${w.zustand.auch_selbst ? ' (beide)' : ''}` : '',
+    w.ziel_verliert_ticks ? `Ziel verliert ${w.ziel_verliert_ticks} Ticks` : '',
+    w.hinweis ?? '',
+  ].filter(Boolean);
+  return {
+    id: `mastery_${e.id}`,
+    regelId: e.id,
+    name: e.name,
+    type: 'mastery',
+    skill: fertigkeit,
+    source: k.pakete[e.quelle.paket]?.kuerzel ?? e.quelle.paket,
+    page: (e.quelle.buch_seiten ?? [])[0],
+    description: e.daten.beschreibung ?? '',
+    shortDesc: teile.join(' · ') || e.name,
+    egCost: manoeverRegeln(k).egJeManoever,
+    extraDamageFormula: w.zusatzschaden?.wuerfel,
+    fixedExtraDamage: fest.wert,
+    fixedExtraDamageText: fest.text,
+    damageMultiplier: w.schaden === 'halb' ? 0.5 : w.schaden === 'kein' ? 0 : 1,
+    inflictsCondition: w.zustand ? zustandText(k, w.zustand) : undefined,
+    selfCondition: w.zustand?.auch_selbst ? zustandText(k, w.zustand) : undefined,
+    targetResistance: w.widerstand ?? 'VTD',
+    requires: w.voraussetzung,
+    zielVerliertTicks: w.ziel_verliert_ticks,
+    zusaetzlicheZiele: w.zusaetzliche_ziele,
+    hoechstensGk: w.hoechstens_gk,
+    hinweis: w.hinweis,
+    jeWeiteremEg: w.je_weiterem_eg,
+    belege: w.belege,
+    egDamageRate: 1,
+  };
+}
+
+/** Gilt eine Meisterschaft für diese Waffe? Waffenfertigkeit gleich, oder allgemeine Nah- bzw. Kampfmeisterschaft */
+function passtZurWaffe(fertigkeitName: string | undefined, weaponSkill: string, isMelee: boolean): boolean {
+  if (!fertigkeitName) return false;
+  const f = fertigkeitName.toLowerCase();
+  if (f === weaponSkill.trim().toLowerCase()) return true;
+  if (f.startsWith('allgemeine') && f.includes('nahkampf')) return isMelee;
+  if (f.startsWith('allgemeine') && f.includes('kampf')) return true;
+  return false;
+}
+
 /**
- * Checks if a combat maneuver is allowed for a given weapon skill and category.
+ * Ist das Manöver mit dieser Waffe einsetzbar? Entscheidet die Fertigkeit der Meisterschaft im Paket.
  */
 export function isCombatManeuverAllowedForWeapon(
   maneuverNameOrClean: string,
   weaponSkill: string = 'Klingenwaffen',
   weaponCategory?: string,
-  masterySkill?: string
+  masterySkill?: string,
+  k: Katalog | null = aktiverKatalog(),
 ): boolean {
-  const cleanName = maneuverNameOrClean.replace(/\s*\([ST]\d+\)/i, '').trim();
-  const cleanLower = cleanName.toLowerCase();
   const isMelee = isMeleeWeapon(weaponSkill, weaponCategory);
-  const normWeaponSkill = weaponSkill.trim().toLowerCase();
-
-  const known = KNOWN_MASTERY_MANEUVERS[cleanName];
-
-  // If it's a known general melee mastery:
-  if (known?.isGeneralNahkampf) {
-    if (!isMelee) return false;
-    if (known.allowedSkills && known.allowedSkills.length > 0) {
-      return known.allowedSkills.some((s) => s.toLowerCase() === normWeaponSkill);
-    }
-    return true;
-  }
-
-  // If known has specific allowed skills:
-  if (known?.allowedSkills && known.allowedSkills.length > 0) {
-    const matchedSkill = known.allowedSkills.some((s) => s.toLowerCase() === normWeaponSkill);
-    if (!matchedSkill) return false;
-    const isKnownMelee = known.allowedSkills.some((s) =>
-      MELEE_WEAPON_SKILLS.some((m) => m.toLowerCase() === s.toLowerCase())
-    );
-    const isKnownRanged = known.allowedSkills.some((s) =>
-      RANGED_WEAPON_SKILLS.some((r) => r.toLowerCase() === s.toLowerCase())
-    );
-    if (isMelee && !isKnownMelee) return false;
-    if (!isMelee && !isKnownRanged) return false;
-    return true;
-  }
-
-  // If masterySkill is specified:
-  if (masterySkill) {
-    const normMasterySkill = masterySkill.trim().toLowerCase();
-    if (normMasterySkill.includes('allgemeine') || normMasterySkill.includes('nahkampf')) {
-      return isMelee;
-    }
-    if (normMasterySkill === normWeaponSkill) {
-      return true;
-    }
-    return false;
-  }
-
-  // Check in grwMeisterschaften()
-  const dbEntries = grwMeisterschaften()[weaponSkill] || [];
-  const foundInSkill = dbEntries.find(
-    (e) => (e.baseName || e.name).replace(/\s*\([ST]\d+\)/i, '').trim().toLowerCase() === cleanLower
-  );
-  if (foundInSkill) return true;
-
-  if (isMelee) {
-    const foundInGeneral = grwAllgemeineKampfmeisterschaften().find(
-      (e) => (e.baseName || e.name).replace(/\s*\([ST]\d+\)/i, '').trim().toLowerCase() === cleanLower
-    );
-    if (foundInGeneral) return true;
-  }
-
-  return false;
+  if (masterySkill) return passtZurWaffe(masterySkill, weaponSkill, isMelee);
+  if (!k) return false;
+  const name = norm(maneuverNameOrClean.replace(/\s*\([ST]\d+\)/i, ''));
+  return Object.values(k.eintraege).some((e) => e.typ === 'meisterschaft' && e.daten.manoever && norm(e.name) === name
+    && passtZurWaffe(k.get(e.daten.fertigkeit)?.name ?? e.daten.fertigkeit_name, weaponSkill, isMelee));
 }
 
 /**
- * Returns available combat maneuvers for a character and their chosen weapon/skill.
- * Combines category-filtered free maneuvers with valid learned mastery maneuvers.
+ * Manöver, die der Charakter mit dieser Waffe ansagen kann: ein Angriff ohne Meisterschafts-Manöver und jede gelernte
+ * Manöver-Meisterschaft der Waffenfertigkeit bzw. der allgemeinen Meisterschaften (GRW und Grimoires).
  */
 export function getAvailableCombatManeuvers(
-  characterMasteries: any = [],
+  characterMasteries: unknown = [],
   weaponSkill: string = 'Klingenwaffen',
-  weaponCategory?: string
+  weaponCategory?: string,
+  werte: AngreiferWerte = {},
+  k: Katalog | null = aktiverKatalog(),
 ): CombatManeuver[] {
-  // 1. Get filtered free maneuvers for weapon category
-  const maneuvers: CombatManeuver[] = getFreeCombatManeuversForWeapon(weaponSkill, weaponCategory);
+  const out: CombatManeuver[] = [STANDARDANGRIFF];
+  if (!k) return out;
   const isMelee = isMeleeWeapon(weaponSkill, weaponCategory);
-
-  // 2. Parse learned masteries from characterMasteries (handles Array or Object/Record)
-  interface LearnedItem {
-    rawName: string;
-    cleanName: string;
-    cleanLower: string;
-    skill?: string;
+  const gelernt: { name: string; skill?: string; regelId?: string }[] = [];
+  const nimm = (item: unknown, skill?: string) => {
+    const o = item as { name?: string; baseName?: string; skill?: string; regelId?: string } | string;
+    const name = typeof o === 'string' ? o : (o?.name || o?.baseName || '');
+    if (name) gelernt.push({ name: name.replace(/\s*\([ST]\d+\)/i, '').trim(), skill: typeof o === 'object' ? (o?.skill ?? skill) : skill, regelId: typeof o === 'object' ? o?.regelId : undefined });
+  };
+  if (Array.isArray(characterMasteries)) characterMasteries.forEach((m) => nimm(m));
+  else if (characterMasteries && typeof characterMasteries === 'object') {
+    for (const [skill, l] of Object.entries(characterMasteries as Record<string, unknown[]>)) (l ?? []).forEach((m) => nimm(m, skill));
   }
-  const learnedList: LearnedItem[] = [];
-
-  if (Array.isArray(characterMasteries)) {
-    for (const item of characterMasteries) {
-      const rawName = typeof item === 'string' ? item : (item?.name || item?.baseName || '');
-      if (!rawName) continue;
-      const cleanName = rawName.replace(/\s*\([ST]\d+\)/i, '').trim();
-      learnedList.push({
-        rawName,
-        cleanName,
-        cleanLower: cleanName.toLowerCase(),
-        skill: typeof item === 'object' ? item?.skill : undefined,
-      });
-    }
-  } else if (characterMasteries && typeof characterMasteries === 'object') {
-    for (const [skillKey, list] of Object.entries(characterMasteries)) {
-      if (Array.isArray(list)) {
-        for (const item of list) {
-          const rawName = typeof item === 'string' ? item : (item?.name || item?.baseName || '');
-          if (!rawName) continue;
-          const cleanName = rawName.replace(/\s*\([ST]\d+\)/i, '').trim();
-          learnedList.push({
-            rawName,
-            cleanName,
-            cleanLower: cleanName.toLowerCase(),
-            skill: skillKey,
-          });
-        }
-      }
-    }
+  const gesehen = new Set<string>();
+  for (const g of gelernt) {
+    const id = meisterschaftId(k, g.name, g.skill, g.regelId);
+    const e = id ? k.get(id) : undefined;
+    if (!e?.daten.manoever) continue;
+    const fertigkeit = k.get(e.daten.fertigkeit)?.name ?? e.daten.fertigkeit_name;
+    // Eine Meisterschaft gilt nur in ihrer Fertigkeit (GRW S. 94); allgemeine Nahkampfmeisterschaften für jede Nahkampfwaffe
+    if (!passtZurWaffe(fertigkeit, weaponSkill, isMelee) || gesehen.has(e.id)) continue;
+    gesehen.add(e.id);
+    out.push(manoeverAusEintrag(e, k, werte));
   }
+  return out;
+}
 
-  // 3. Search relevant DB masteries (General combat masteries if melee + weapon specific masteries)
-  const skillMasteries = grwMeisterschaften()[weaponSkill] || [];
-  const relevantDbMasteries: MasteryEntry[] = [
-    ...(isMelee ? grwAllgemeineKampfmeisterschaften() : []),
-    ...skillMasteries,
-  ].filter((m) => {
-    return m.manoever || (m.desc && m.desc.includes('[Manöver]'));
-  });
-
-  for (const dbM of relevantDbMasteries) {
-    const cleanName = (dbM.baseName || dbM.name).replace(/\s*\([ST]\d+\)/i, '').trim();
-    const cleanLower = cleanName.toLowerCase();
-
-    // Check if character learned this mastery
-    const learnedMatch = learnedList.find((l) => l.cleanLower === cleanLower);
-    if (!learnedMatch) continue;
-
-    // Verify maneuver is allowed for this weapon
-    if (!isCombatManeuverAllowedForWeapon(cleanName, weaponSkill, weaponCategory, dbM.skill || learnedMatch.skill)) {
-      continue;
-    }
-
-    if (!maneuvers.some((m) => m.name.toLowerCase() === cleanLower)) {
-      const knownData = KNOWN_MASTERY_MANEUVERS[cleanName] || {};
-      maneuvers.push({
-        id: `mastery_${cleanLower.replace(/\s+/g, '_')}`,
-        name: cleanName,
-        type: 'mastery',
-        skill: dbM.skill || learnedMatch.skill || weaponSkill,
-        source: dbM.source || 'GRW',
-        page: dbM.page,
-        description: dbM.desc || '',
-        shortDesc: knownData.shortDesc || (dbM.desc ? dbM.desc.replace(/^\[Manöver\]\s*/i, '').slice(0, 100) + '...' : cleanName),
-        extraDamageFormula: knownData.extraDamageFormula,
-        damageMultiplier: knownData.damageMultiplier ?? 1,
-        fixedExtraDamage: knownData.fixedExtraDamage ?? 0,
-        egDamageRate: knownData.egDamageRate ?? 1,
-        inflictsCondition: knownData.inflictsCondition,
-        targetResistance: knownData.targetResistance ?? 'VTD',
-        requiresZielen: knownData.requiresZielen,
-      });
-    }
-  }
-
-  // 4. Also check directly known mastery maneuvers learned by character
-  for (const learned of learnedList) {
-    if (maneuvers.some((m) => m.name.toLowerCase() === learned.cleanLower)) continue;
-
-    if (KNOWN_MASTERY_MANEUVERS[learned.cleanName]) {
-      // Must be allowed for this weapon!
-      if (!isCombatManeuverAllowedForWeapon(learned.cleanName, weaponSkill, weaponCategory, learned.skill)) {
-        continue;
-      }
-
-      const known = KNOWN_MASTERY_MANEUVERS[learned.cleanName];
-      maneuvers.push({
-        id: `mastery_${learned.cleanLower.replace(/\s+/g, '_')}`,
-        name: learned.cleanName,
-        type: 'mastery',
-        skill: learned.skill || (known.isGeneralNahkampf ? 'Allgemeine Nahkampfmeisterschaften' : weaponSkill),
-        source: 'GRW',
-        description: known.shortDesc || learned.cleanName,
-        shortDesc: known.shortDesc || learned.cleanName,
-        extraDamageFormula: known.extraDamageFormula,
-        damageMultiplier: known.damageMultiplier ?? 1,
-        fixedExtraDamage: known.fixedExtraDamage ?? 0,
-        egDamageRate: known.egDamageRate ?? 1,
-        inflictsCondition: known.inflictsCondition,
-        targetResistance: known.targetResistance ?? 'VTD',
-        requiresZielen: known.requiresZielen,
-      });
-    }
-  }
-
-  return maneuvers;
+/** @deprecated Freie Manöver werden nach dem Wurf mit Erfolgsgraden gewählt (manoeverRegeln().freie) */
+export function getFreeCombatManeuversForWeapon(): CombatManeuver[] {
+  return FREE_COMBAT_MANEUVERS;
 }
 
 export interface ParsedWeaponDamage {
@@ -627,6 +443,12 @@ export function parseWeaponDamage(formulaStr?: string | null, fallbackType: stri
 export interface DamageRollInput {
   baseFormula: string;           // e.g. "1W6+3"
   maneuverExtraFormula?: string; // e.g. "1W6" (from Hammerschlag)
+  /** fester Zusatzschaden des Manövers (z. B. Stärke beim Würgegriff) */
+  maneuverFixedDamage?: number;
+  /** Betäubungsschlag: profaner Schaden wird Betäubungsschaden (GRW S. 161) */
+  stunDamage?: boolean;
+  /** Streiftreffer: Abzug in Punkten (2 je angesagtem Manöver, GRW S. 161); Manöverwirkungen entfallen */
+  streiftrefferAbzug?: number;
   egBonusDamage: number;         // extra damage from allocated EG (e.g. +4)
   damageMultiplier?: number;     // e.g. 0.5 for Abdrängen
   targetArmorReduction?: number; // opponent's RS (e.g. 3)
@@ -675,9 +497,12 @@ export function executeAttackDamageRoll(input: DamageRollInput): DamageRollResul
   const maneuverDiceSum = maneuverDice.reduce((a, b) => a + b, 0);
 
   // Sum before multiplier
-  const rawSum = baseDiceSum + parsed.bonus + maneuverDiceSum + input.egBonusDamage;
+  const fest = input.maneuverFixedDamage ?? 0;
+  const rawSum = baseDiceSum + parsed.bonus + maneuverDiceSum + fest + input.egBonusDamage;
   const multiplier = input.damageMultiplier ?? 1;
-  const grossDamage = Math.max(1, Math.round(rawSum * multiplier));
+  const abzug = Math.max(0, input.streiftrefferAbzug ?? 0);
+  // halber Schaden kaufmännisch gerundet (GRW S. 11); kein Schaden bleibt 0
+  const grossDamage = multiplier === 0 ? 0 : Math.max(0, Math.round(rawSum * multiplier) - abzug);
 
   // Armor calculations
   const rawArmor = Math.max(0, input.targetArmorReduction ?? 0);
@@ -698,13 +523,13 @@ export function executeAttackDamageRoll(input: DamageRollInput): DamageRollResul
   const dicePart = `[${baseDice.join(', ')}]`;
   const bonusPart = parsed.bonus !== 0 ? (parsed.bonus > 0 ? ` + ${parsed.bonus}` : ` - ${Math.abs(parsed.bonus)}`) : '';
   const egPart = input.egBonusDamage > 0 ? ` + ${input.egBonusDamage} EG` : '';
-  const manPart = maneuverDice.length > 0 ? ` + Manöver [${maneuverDice.join(', ')}]` : '';
-  const multPart = multiplier !== 1 ? ` × ${multiplier}` : '';
+  const manPart = (maneuverDice.length > 0 ? ` + Manöver [${maneuverDice.join(', ')}]` : '') + (fest ? ` + ${fest} Manöver` : '');
+  const multPart = (multiplier === 0.5 ? ' halbiert' : multiplier === 0 ? ' kein Schaden' : multiplier !== 1 ? ` × ${multiplier}` : '') + (abzug ? ` − ${abzug} Streiftreffer` : '');
   const armorPart = rawArmor > 0
     ? ` - ${effectiveArmor} RS${armorPen > 0 ? ` (${rawArmor} - ${armorPen} durchdrungen)` : ''}`
     : '';
 
-  const breakdownText = `${dicePart}${bonusPart}${egPart}${manPart}${multPart} = ${grossDamage} Brutto${armorPart} → ${netDamage} Netto`;
+  const breakdownText = `${dicePart}${bonusPart}${egPart}${manPart}${multPart} = ${grossDamage} Brutto${armorPart} → ${netDamage} Netto${input.stunDamage ? ' (Betäubungsschaden)' : ''}`;
 
   return {
     baseDice,
@@ -716,7 +541,7 @@ export function executeAttackDamageRoll(input: DamageRollInput): DamageRollResul
     grossDamage,
     effectiveArmor,
     netDamage,
-    damageType: input.damageType || parsed.damageType,
+    damageType: input.stunDamage ? 'Betäubung' : (input.damageType || parsed.damageType),
     appliedConditions,
     breakdownText,
   };

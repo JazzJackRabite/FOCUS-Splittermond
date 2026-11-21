@@ -706,6 +706,36 @@ die Grimoires), Dateiendung `.grim`. Das Grundregelwerk ist kein Grimoire; es bl
   GRW- und Magie-Paket sowie Grimoire „magie“ neu gebaut. Prüfsuite 0 neue Befunde, Praxistest 109/109.
 - Tests: 422 grün mit allen 12 Grimoires und Volltest, 391 ohne Bücher; Build läuft.
 
+## Stand 29 (21.11.2026): Kampfmanöver aus dem Paket
+
+- **Bestandsaufnahme** der 23 Manöver und 5 freien Manöver in `combatRules.ts` gegen GRW S. 95–100 und 160–161:
+  - **Erfunden (entfernt):** freie Manöver „Gezielter Schlag/Schuss“ (Rüstung umgehen), „Defensiver Angriff“, „Finte“,
+    „Zu Boden werfen/Umreißen“ für 2 EG. Die „Liste der freien Manöver“ (S. 161, geprüft an den Rohzeilen der PDF-Seite 162)
+    kennt nur Wuchtangriff, Betäubungsschlag und Störender Angriff. „Scharfschütze“ ist kein Manöver (S. 99).
+  - **Falsch:** Wuchtangriff +2 statt +1 Schaden je EG (+2 nur mit dem Merkmal Wuchtig, S. 186; Beispiel S. 161:
+    1 EG macht aus 1W6+4 dann 1W6+5), Wuchtangriff war für Schusswaffen gesperrt (S. 162: freie Manöver gelten auch im
+    Fernkampf); Schmetterschlag Verwundet 1 statt Benommen 1 für 30 Ticks; Sehnenschneider Lahm 60 Ticks statt Lahm;
+    Umklammern ohne KW und ohne halben Schaden.
+  - **Fehlte:** Wirkung von Knochenbrecher (Verwundet 1), Schmerzhafter Hieb (Lahm 60 Ticks), Ausfall (Ziel −3 Ticks),
+    Verwirrung (gegen GW, halber Schaden), Vorstürmen (+halbe GSW, höchstens 8), Würgegriff (+STÄ), Meisterschuss und
+    Meisterwurf (+INT), Harter Wurf (+halbe STÄ), Entwaffnen und Schildbrecher (kein Schaden), Rundumschlag (halber
+    Schaden, 2 weitere Ziele), Umreißen als Meisterschaft (KW, halber Schaden); die Kosten von 1 EG je angesagtem Manöver
+    und der Streiftreffer (S. 161).
+- **Datenseite (auf D:):** `Werkzeuge/regelpakete/manoever.py` + `.json`: `manoever_regeln` (freie Manöver, EG-Kosten,
+  Streiftreffer), `manoeverwirkung` an allen 29 Manöver-Meisterschaften, `wuchtangriff_je_eg` am Merkmal Wuchtig; jede Zahl
+  gegen einen Belegsatz geprüft. Prüfsuite 0 neue Befunde, Praxistest 109/109.
+- **Editor:** `combatRules.ts` ohne Namenslisten (`KNOWN_MASTERY_MANEUVERS` entfernt); `getAvailableCombatManeuvers`
+  liest die gelernten Manöver-Meisterschaften aus dem Katalog (auch aus Grimoires; ohne `manoeverwirkung` aus den Wirkungen
+  „beim Manöver“). Eine Meisterschaft gilt nur in ihrer Fertigkeit. Angriffsdialog: Manöverkarten mit EG-Kosten, Fundstelle
+  und Belegsätzen beim Überfahren; Zielwert-Beschriftung nach Widerstand (VTD/KW/GW); Voraussetzungen (Zielen, ringend,
+  Größenklasse); Erfolgsgrade für Wuchtangriff (mit Merkmal der Waffe), Störenden Angriff, Betäubungsschlag (nur Nahkampf)
+  und weitere EG des Manövers; Streiftreffer-Hinweis und Schadensabzug; halber Schaden kaufmännisch gerundet.
+  Zusatzschaden aus STÄ, INT und GSW des Angreifers (`angreiferWerte`).
+- Regelnamen im Code 39 → 16. Tests: 426 grün mit allen 12 Grimoires und Volltest, 395 ohne Bücher; Build läuft.
+- Offen: Situationsknöpfe im Angriffsdialog („Gegner liegt +2“, „Vorteil +1“, „Deckung +2 VTD“) stehen noch als Zahlen im
+  Code und weichen teils von der Tabelle Kampfpositionen (S. 170) ab; nur ein Manöver je Angriff wählbar (das GRW erlaubt
+  mehrere); Würfelmechanik und Erfolgsgrad-Bezeichnungen (`calculateAttackEG`) noch im Code.
+
 ## Google AI Studio
 
 Unverändert eine Vite-/React-App mit `metadata.json` im Wurzelordner; Import über „Import from GitHub“, Hosting über Cloud Run.

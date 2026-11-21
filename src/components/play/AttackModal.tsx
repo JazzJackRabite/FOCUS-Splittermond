@@ -34,6 +34,10 @@ import {
   FREE_COMBAT_MANEUVERS,
   parseWeaponDamage,
   executeAttackDamageRoll,
+  isMeleeWeapon,
+  manoeverRegeln,
+  wuchtangriffJeEg,
+  type AngreiferWerte,
   type CombatManeuver,
   type AttackEGCalculation,
   type DamageRollResult,
@@ -71,9 +75,14 @@ export interface AttackSuccessResult {
   differenz: number;
   eg: number;
   egDamageSpent: number;
-  egArmorPenSpent: number;
-  egDefensiveSpent: number;
-  egTripSpent: boolean;
+  /** Störender Angriff: EG, je +3 auf die Entschlossenheit-Probe des Ziels (GRW S. 161) */
+  egStoerendSpent: number;
+  /** Betäubungsschlag (1 EG): Schaden als Betäubungsschaden */
+  betaeubungsschlag: boolean;
+  /** weitere EG für das angesagte Manöver (z. B. Abdrängen je 0,5 m) */
+  egManoeverExtra: number;
+  /** zu wenige EG für das angesagte Manöver: Streiftreffer (GRW S. 161) */
+  streiftreffer: boolean;
   isCrit: boolean;
   damageRoll?: DamageRollResult;
   notes?: string;
@@ -92,6 +101,8 @@ export interface AttackFailureResult {
 export interface AttackModalProps {
   target: AttackTargetConfig;
   characterMasteries?: any[];
+  /** Werte des Angreifers für Zusatzschaden aus Manövern (Stärke, Intuition, Geschwindigkeit) */
+  angreiferWerte?: AngreiferWerte;
   conditions?: StatusCondition[];
   channeledSpells?: ChanneledSpell[];
   woundPenalty?: number;
@@ -110,10 +121,28 @@ import { SituativeBoni, useSituativeBoni } from './SituativeBoni';
 
 /** Stabile leere Liste: ein `= []` als Vorgabe erzeugt bei jedem Rendern ein neues Array und löst über den Effekt unten eine Endlosschleife aus. */
 const KEINE_ZAUBER: ChanneledSpell[] = [];
+const KEINE_WERTE: AngreiferWerte = {};
+const WIDERSTAND_TEXT: Record<'VTD' | 'KW' | 'GW', string> = { VTD: 'Verteidigung (VTD)', KW: 'Körperlicher Widerstand (KW)', GW: 'Geistiger Widerstand (GW)' };
+
+/** Zähler für Erfolgsgrade (−/+), mindestens 44 Pixel hohe Knöpfe */
+const EgZaehler: React.FC<{ titel: string; text: string; wert: number; setze: (f: (v: number) => number) => void; mehrMoeglich: boolean; testid: string }> = ({ titel, text, wert, setze, mehrMoeglich, testid }) => (
+  <div className="bg-seite p-2.5 rounded-knopf border border-rahmen flex items-center justify-between gap-2" data-testid={testid}>
+    <div>
+      <span className="font-bold text-schrift block">{titel}</span>
+      <span className="text-[11px] text-leise">{text}</span>
+    </div>
+    <div className="flex items-center gap-1.5">
+      <Knopf nurSymbol aria-label={`${titel}: ein EG weniger`} disabled={wert <= 0} onClick={() => setze((v) => Math.max(0, v - 1))}>−</Knopf>
+      <span className="w-6 text-center tabular-nums font-bold text-schrift" data-testid={`${testid}-wert`}>{wert}</span>
+      <Knopf nurSymbol aria-label={`${titel}: ein EG mehr`} disabled={!mehrMoeglich} onClick={() => setze((v) => (mehrMoeglich ? v + 1 : v))}>+</Knopf>
+    </div>
+  </div>
+);
 
 export const AttackModal: React.FC<AttackModalProps> = ({
   target,
   characterMasteries = [],
+  angreiferWerte = KEINE_WERTE,
   conditions = [],
   channeledSpells = KEINE_ZAUBER,
   woundPenalty = 0,
@@ -130,19 +159,16 @@ export const AttackModal: React.FC<AttackModalProps> = ({
 
   // Available Maneuvers (Free + Masteries) filtered strictly by weapon category & skill
   const availableManeuvers = useMemo(() => {
-    return getAvailableCombatManeuvers(characterMasteries, skillName, weapon.category);
-  }, [characterMasteries, skillName, weapon.category]);
+    return getAvailableCombatManeuvers(characterMasteries, skillName, weapon.category, angreiferWerte);
+  }, [characterMasteries, skillName, weapon.category, angreiferWerte]);
+  // Freie Manöver und Streiftreffer aus dem Paket (GRW S. 161)
+  const regeln = useMemo(() => manoeverRegeln(), []);
+  const nahkampf = isMeleeWeapon(skillName, weapon.category);
+  const wuchtJeEg = useMemo(() => wuchtangriffJeEg(weapon.attributes), [weapon.attributes]);
+  const stoerend = regeln.freie.find((f) => f.je_eg?.entschlossenheit_erschwert);
+  const betaeubung = regeln.freie.find((f) => f.betaeubungsschaden && (!f.nur_nahkampf || nahkampf));
 
-  const [selectedManeuver, setSelectedManeuver] = useState<CombatManeuver>(
-    availableManeuvers[0] || {
-      id: 'none',
-      name: 'Standardangriff',
-      type: 'free',
-      description: 'Standardangriff',
-      shortDesc: 'Standardangriff',
-      egDamageRate: 1,
-    }
-  );
+  const [selectedManeuver, setSelectedManeuver] = useState<CombatManeuver>(availableManeuvers[0] || FREE_COMBAT_MANEUVERS[0]);
 
   // Keep selected maneuver valid if available maneuvers change
   useEffect(() => {
@@ -264,14 +290,24 @@ export const AttackModal: React.FC<AttackModalProps> = ({
 
   // Step 3: EG Allocation
   const [egDamageSpent, setEgDamageSpent] = useState<number>(0);
-  const [egArmorPenSpent, setEgArmorPenSpent] = useState<number>(0);
-  const [egDefensiveSpent, setEgDefensiveSpent] = useState<number>(0);
-  const [egTripSpent, setEgTripSpent] = useState<boolean>(false);
+  const [egStoerendSpent, setEgStoerendSpent] = useState<number>(0);
+  const [betaeubungsschlag, setBetaeubungsschlag] = useState<boolean>(false);
+  const [egManoeverExtra, setEgManoeverExtra] = useState<number>(0);
 
   const totalEgAvailable = egCalculation?.eg ?? 0;
-  const tripEgCost = egTripSpent ? 2 : 0;
-  const totalEgAllocated = egDamageSpent + egArmorPenSpent + egDefensiveSpent + tripEgCost;
-  const remainingEG = Math.max(0, totalEgAvailable - totalEgAllocated);
+  // Ein angesagtes Meisterschafts-Manöver kostet EG; reichen sie nicht, ist es ein Streiftreffer und alle EG verfallen
+  const manoeverKosten = selectedManeuver.egCost ?? 0;
+  const streiftreffer = !!egCalculation?.isSuccess && totalEgAvailable < manoeverKosten;
+  const freieEg = streiftreffer ? 0 : Math.max(0, totalEgAvailable - manoeverKosten);
+  const totalEgAllocated = egDamageSpent + egStoerendSpent + (betaeubungsschlag ? (betaeubung?.eg ?? 1) : 0) + egManoeverExtra;
+  const remainingEG = Math.max(0, freieEg - totalEgAllocated);
+  const verteileStandard = (eg: number, erfolg: boolean) => {
+    const frei = erfolg && eg >= manoeverKosten ? eg - manoeverKosten : 0;
+    setEgDamageSpent(frei);
+    setEgStoerendSpent(0);
+    setBetaeubungsschlag(false);
+    setEgManoeverExtra(0);
+  };
 
   // Step 4: Integrated Damage Roll
   const [damageRollResult, setDamageRollResult] = useState<DamageRollResult | null>(null);
@@ -310,14 +346,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
         fumble,
         crit
       );
-      if (calc.isSuccess && calc.eg > 0) {
-        setEgDamageSpent(calc.eg);
-      } else {
-        setEgDamageSpent(0);
-      }
-      setEgArmorPenSpent(0);
-      setEgDefensiveSpent(0);
-      setEgTripSpent(false);
+      verteileStandard(calc.eg, calc.isSuccess);
     }, 180);
   };
 
@@ -344,30 +373,25 @@ export const AttackModal: React.FC<AttackModalProps> = ({
       val === 2,
       val === 20
     );
-    if (calc.isSuccess && calc.eg > 0) {
-      setEgDamageSpent(calc.eg);
-    } else {
-      setEgDamageSpent(0);
-    }
-    setEgArmorPenSpent(0);
-    setEgDefensiveSpent(0);
-    setEgTripSpent(false);
+    verteileStandard(calc.eg, calc.isSuccess);
   };
 
   // Perform the Damage Roll
   const handleRollDamage = () => {
-    const rate = selectedManeuver.egDamageRate ?? 1;
-    const egBonus = egDamageSpent * rate;
+    const egBonus = streiftreffer ? 0 : egDamageSpent * wuchtJeEg;
+    const angesagt = selectedManeuver.type === 'mastery' ? 1 : 0;
 
     const res = executeAttackDamageRoll({
       baseFormula: weapon.damage || '1W6',
-      maneuverExtraFormula: selectedManeuver.extraDamageFormula,
+      // Beim Streiftreffer bleiben die Effekte der Manöver aus; Schadenseinschränkungen (halber Schaden) gelten weiter
+      maneuverExtraFormula: streiftreffer ? undefined : selectedManeuver.extraDamageFormula,
+      maneuverFixedDamage: streiftreffer ? 0 : selectedManeuver.fixedExtraDamage,
       egBonusDamage: egBonus + extraSpellDmg,
       damageMultiplier: selectedManeuver.damageMultiplier ?? 1,
       targetArmorReduction: targetArmor,
-      armorPenetrationEG: egArmorPenSpent,
-      maneuverCondition: selectedManeuver.inflictsCondition,
-      tripCondition: egTripSpent,
+      maneuverCondition: streiftreffer ? undefined : selectedManeuver.inflictsCondition,
+      stunDamage: betaeubungsschlag && !streiftreffer,
+      streiftrefferAbzug: streiftreffer ? angesagt * regeln.streiftrefferSchaden : 0,
     });
 
     setDamageRollResult(res);
@@ -412,9 +436,10 @@ export const AttackModal: React.FC<AttackModalProps> = ({
         differenz: egCalculation.differenz,
         eg: egCalculation.eg,
         egDamageSpent,
-        egArmorPenSpent,
-        egDefensiveSpent,
-        egTripSpent,
+        egStoerendSpent,
+        betaeubungsschlag,
+        egManoeverExtra,
+        streiftreffer,
         isCrit,
         damageRoll: damageRollResult || undefined,
         notes: attackNote,
@@ -543,7 +568,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
             {/* VTD Input & Presets */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="text-xs text-leise block mb-1">Gegnerische Verteidigung (VTD):</label>
+                <label className="text-xs text-leise block mb-1">{WIDERSTAND_TEXT[selectedManeuver.targetResistance ?? 'VTD']} des Ziels:</label>
                 <div className="flex items-center gap-1.5">
                   <div className="flex-1 flex items-center bg-seite border border-rahmen rounded-knopf overflow-hidden">
                     <Knopf
@@ -774,7 +799,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
           <div className="bg-seite border border-rahmen rounded-karte p-3.5 space-y-2.5">
             <div className="flex justify-between items-center">
               <span className="text-xs font-bold uppercase tracking-wider text-gold fantasy-font flex items-center gap-1.5">
-                <Zap size={14} /> 2. Kampfmanöver wählen (max. 1 Manöver)
+                <Zap size={14} /> 2. Meisterschafts-Manöver ansagen
               </span>
               <span className="text-xs text-leise font-medium">
                 {availableManeuvers.filter((m) => m.type === 'mastery').length} erlernte Meisterschaften
@@ -791,6 +816,9 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                     key={m.id}
                     type="button"
                     onClick={() => setSelectedManeuver(m)}
+                    title={[m.page ? `${m.source ?? 'GRW'} S. ${m.page}` : '', ...(m.belege ?? [])].filter(Boolean).join('\n') || undefined}
+                    aria-pressed={isSelected}
+                    data-testid={`manoever-${m.id}`}
                     className={`min-h-11 text-left p-2.5 rounded-knopf border transition-all cursor-pointer relative flex flex-col justify-between ${
                       isSelected
                         ? 'bg-flaeche border-gold ring-1 ring-rahmen'
@@ -808,27 +836,28 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                             : 'bg-seite text-schrift'
                         }`}
                       >
-                        {isMastery ? 'Meisterschaft' : 'Frei'}
+                        {isMastery ? `${m.egCost} EG` : 'Ohne'}
                       </span>
                     </div>
                     <p className="text-[11px] text-schrift leading-snug line-clamp-2">
                       {m.shortDesc}
                     </p>
-                    {isSelected && (
-                      <span className="absolute top-1.5 right-1.5 text-xs text-gold font-bold">
-                        ✓
-                      </span>
-                    )}
                   </button>
                 );
               })}
             </div>
 
-            {/* Detailed description of chosen maneuver */}
+            {/* Beschreibung und Voraussetzungen des gewählten Manövers (aus dem Paket) */}
             {selectedManeuver && selectedManeuver.description && (
-              <div className="bg-seite p-2.5 rounded-knopf border border-rahmen text-xs text-schrift mt-1">
-                <span className="font-bold text-gold">{selectedManeuver.name}:</span>{' '}
-                <span>{selectedManeuver.description}</span>
+              <div className="bg-seite p-2.5 rounded-knopf border border-rahmen text-xs text-schrift mt-1 space-y-1">
+                <div>
+                  <span className="font-bold text-gold-hell">{selectedManeuver.name}</span>
+                  {selectedManeuver.page ? <span className="text-leise"> ({selectedManeuver.source ?? 'GRW'} S. {selectedManeuver.page})</span> : null}:{' '}
+                  <span>{selectedManeuver.description}</span>
+                </div>
+                {selectedManeuver.requires === 'zielen' && <div data-testid="manoever-voraussetzung">Voraussetzung: mindestens eine Zielen-Aktion vor dem Angriff.</div>}
+                {selectedManeuver.requires === 'ringend' && <div data-testid="manoever-voraussetzung">Voraussetzung: Angreifer und Ziel sind ringend.</div>}
+                {selectedManeuver.hoechstensGk && <div>Nur gegen Ziele bis Größenklasse {selectedManeuver.hoechstensGk}.</div>}
               </div>
             )}
           </div>
@@ -889,7 +918,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
               </div>
 
               <span className="text-leise">
-                Ziel-VTD: <strong className="text-schrift">{effectiveTargetVTD}</strong>
+                Ziel-{selectedManeuver.targetResistance ?? 'VTD'}: <strong className="text-schrift">{effectiveTargetVTD}</strong>
               </span>
             </div>
 
@@ -1011,154 +1040,85 @@ export const AttackModal: React.FC<AttackModalProps> = ({
             )}
           </div>
 
-          {/* ── ROW 4: ERFOLGSGRADE ZUWEISEN (WENN TREFFER) ── */}
+          {/* ── ROW 4: ERFOLGSGRADE EINSETZEN (WENN TREFFER) – freie Manöver und Kosten des Manövers aus dem Paket, GRW S. 161 ── */}
           {hasRolled && egCalculation && egCalculation.isSuccess && (
             <div className="bg-seite border border-rahmen rounded-karte p-3.5 space-y-3">
               <div className="flex justify-between items-center">
                 <span className="text-xs font-bold uppercase tracking-wider text-gold fantasy-font flex items-center gap-1.5">
-                  <Award size={14} /> 4. Erfolgsgrade einsetzen ({egCalculation.eg} EG verfügbar)
+                  <Award size={14} /> 4. Erfolgsgrade einsetzen ({egCalculation.eg} EG)
                 </span>
                 <span className="text-xs tabular-nums text-leise">
-                  Eingesetzt: {totalEgAllocated} / {totalEgAvailable} EG
+                  Eingesetzt: {totalEgAllocated + (streiftreffer ? 0 : manoeverKosten)} / {totalEgAvailable} EG
                 </span>
               </div>
 
+              {selectedManeuver.type === 'mastery' && (
+                streiftreffer ? (
+                  <div className="p-2.5 rounded-knopf bg-schaden-grund border border-schaden text-xs text-schrift" data-testid="streiftreffer" title={regeln.quelle}>
+                    <strong>Streiftreffer:</strong> {selectedManeuver.name} braucht {manoeverKosten} EG. Die Wirkung des Manövers bleibt aus,
+                    alle Erfolgsgrade verfallen, und der Schaden sinkt um {regeln.streiftrefferSchaden} (alternativ {regeln.streiftrefferBetaeubung} Punkte
+                    Betäubungsschaden für den Angreifer) – {regeln.quelle}.
+                  </div>
+                ) : (
+                  <div className="p-2.5 rounded-knopf bg-erhoeht border border-rahmen text-xs text-schrift" data-testid="manoever-kosten">
+                    {selectedManeuver.name}: {manoeverKosten} EG für das angesagte Manöver
+                  </div>
+                )
+              )}
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
-                {/* 1. Schaden erhöhen */}
-                <div className="bg-seite p-2.5 rounded-knopf border border-rahmen flex items-center justify-between">
-                  <div>
-                    <span className="font-bold text-schrift block">
-                      Schaden erhöhen
-                    </span>
-                    <span className="text-[11px] text-leise">
-                      {selectedManeuver.egDamageRate === 2
-                        ? 'Wuchtangriff: +2 Schaden / EG!'
-                        : '+1 Schaden / EG'}
-                    </span>
-                  </div>
+                {/* Wuchtangriff */}
+                <EgZaehler
+                  titel="Wuchtangriff"
+                  text={`+${wuchtJeEg} Schaden je EG${wuchtJeEg > 1 ? ' (Merkmal der Waffe)' : ''}`}
+                  wert={egDamageSpent}
+                  setze={setEgDamageSpent}
+                  mehrMoeglich={remainingEG > 0}
+                  testid="eg-wucht"
+                />
 
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => setEgDamageSpent((prev) => Math.max(0, prev - 1))}
-                      disabled={egDamageSpent <= 0}
-                      className="w-6 h-6 rounded-knopf bg-seite hover:bg-erhoeht disabled:opacity-30 text-schrift font-bold flex items-center justify-center cursor-pointer"
+                {/* Störender Angriff */}
+                {stoerend && (
+                  <EgZaehler
+                    titel="Störender Angriff"
+                    text={`Entschlossenheit des Ziels gegen Unterbrechung +${stoerend.je_eg?.entschlossenheit_erschwert} je EG`}
+                    wert={egStoerendSpent}
+                    setze={setEgStoerendSpent}
+                    mehrMoeglich={remainingEG > 0}
+                    testid="eg-stoerend"
+                  />
+                )}
+
+                {/* Betäubungsschlag (nur Nahkampf) */}
+                {betaeubung && (
+                  <div className="bg-seite p-2.5 rounded-knopf border border-rahmen flex items-center justify-between gap-2">
+                    <div>
+                      <span className="font-bold text-schrift block">Betäubungsschlag</span>
+                      <span className="text-[11px] text-leise">{betaeubung.eg ?? 1} EG: Schaden wird Betäubungsschaden</span>
+                    </div>
+                    <Knopf
+                      art={betaeubungsschlag ? 'erholung' : 'neutral'}
+                      aria-pressed={betaeubungsschlag}
+                      disabled={!betaeubungsschlag && remainingEG < (betaeubung.eg ?? 1)}
+                      onClick={() => setBetaeubungsschlag((v) => !v)}
+                      data-testid="eg-betaeubung"
                     >
-                      −
-                    </button>
-                    <span className="w-6 text-center tabular-nums font-bold text-schrift">
-                      {egDamageSpent}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setEgDamageSpent((prev) => (remainingEG > 0 ? prev + 1 : prev))}
-                      disabled={remainingEG <= 0}
-                      className="w-6 h-6 rounded-knopf bg-seite hover:bg-erhoeht disabled:opacity-30 text-schrift font-bold flex items-center justify-center cursor-pointer"
-                    >
-                      +
-                    </button>
+                      {betaeubungsschlag ? 'Gewählt' : `${betaeubung.eg ?? 1} EG`}
+                    </Knopf>
                   </div>
-                </div>
+                )}
 
-                {/* 2. Rüstung durchdringen (Gezielter Schlag) */}
-                <div className="bg-seite p-2.5 rounded-knopf border border-rahmen flex items-center justify-between">
-                  <div>
-                    <span className="font-bold text-schrift block">
-                      Rüstung umgehen
-                    </span>
-                    <span className="text-[11px] text-leise">
-                      -1 gegnerische RS / EG
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => setEgArmorPenSpent((prev) => Math.max(0, prev - 1))}
-                      disabled={egArmorPenSpent <= 0}
-                      className="w-6 h-6 rounded-knopf bg-seite hover:bg-erhoeht disabled:opacity-30 text-schrift font-bold flex items-center justify-center cursor-pointer"
-                    >
-                      −
-                    </button>
-                    <span className="w-6 text-center tabular-nums font-bold text-schrift">
-                      {egArmorPenSpent}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setEgArmorPenSpent((prev) => (remainingEG > 0 ? prev + 1 : prev))}
-                      disabled={remainingEG <= 0}
-                      className="w-6 h-6 rounded-knopf bg-seite hover:bg-erhoeht disabled:opacity-30 text-schrift font-bold flex items-center justify-center cursor-pointer"
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
-
-                {/* 3. Umreißen / Zu Boden werfen (2 EG) */}
-                <div className="bg-seite p-2.5 rounded-knopf border border-rahmen flex items-center justify-between">
-                  <div>
-                    <span className="font-bold text-schrift block">
-                      Zu Boden werfen
-                    </span>
-                    <span className="text-[11px] text-leise">
-                      Kostet 2 EG: Ziel erhält <em>Liegend</em>
-                    </span>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (egTripSpent) {
-                        setEgTripSpent(false);
-                      } else if (remainingEG >= 2) {
-                        setEgTripSpent(true);
-                      } else {
-                        toast('Benötigt mindestens 2 ungenutzte Erfolgsgrade');
-                      }
-                    }}
-                    className={`min-h-11 px-3 py-1 rounded-knopf font-bold text-xs border transition-all cursor-pointer ${
-                      egTripSpent
-                        ? 'bg-unverletzt-grund text-unverletzt border-unverletzt'
-                        : 'bg-seite text-leise border-rahmen hover:bg-erhoeht'
-                    }`}
-                  >
-                    {egTripSpent ? '✓ Aktiv (2 EG)' : '2 EG'}
-                  </button>
-                </div>
-
-                {/* 4. Defensiver Bonus (+1 VTD pro EG, max 3) */}
-                <div className="bg-seite p-2.5 rounded-knopf border border-rahmen flex items-center justify-between">
-                  <div>
-                    <span className="font-bold text-schrift block">
-                      Eigene Abwehr
-                    </span>
-                    <span className="text-[11px] text-leise">
-                      +1 VTD bis nächste Aktion / EG (max 3)
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => setEgDefensiveSpent((prev) => Math.max(0, prev - 1))}
-                      disabled={egDefensiveSpent <= 0}
-                      className="w-6 h-6 rounded-knopf bg-seite hover:bg-erhoeht disabled:opacity-30 text-schrift font-bold flex items-center justify-center cursor-pointer"
-                    >
-                      −
-                    </button>
-                    <span className="w-6 text-center tabular-nums font-bold text-schrift">
-                      {egDefensiveSpent}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setEgDefensiveSpent((prev) => (remainingEG > 0 && prev < 3 ? prev + 1 : prev))}
-                      disabled={remainingEG <= 0 || egDefensiveSpent >= 3}
-                      className="w-6 h-6 rounded-knopf bg-seite hover:bg-erhoeht disabled:opacity-30 text-schrift font-bold flex items-center justify-center cursor-pointer"
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
+                {/* Weitere EG für das angesagte Manöver */}
+                {selectedManeuver.jeWeiteremEg && !streiftreffer && (
+                  <EgZaehler
+                    titel={selectedManeuver.name}
+                    text={`Je weiterem EG: ${selectedManeuver.jeWeiteremEg}`}
+                    wert={egManoeverExtra}
+                    setze={setEgManoeverExtra}
+                    mehrMoeglich={remainingEG > 0}
+                    testid="eg-manoever"
+                  />
+                )}
               </div>
             </div>
           )}
@@ -1174,7 +1134,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                   Formel: <strong className="text-schaden">{weapon.damage || '1W6'}</strong>
                   {selectedManeuver.extraDamageFormula && ` + ${selectedManeuver.extraDamageFormula}`}
                   {extraSpellDmg > 0 && ` + ${extraSpellDmg} Zauber`}
-                  {egDamageSpent > 0 && ` + ${egDamageSpent * (selectedManeuver.egDamageRate ?? 1)} EG`}
+                  {!streiftreffer && egDamageSpent > 0 && ` + ${egDamageSpent * wuchtJeEg} EG`}
                 </span>
               </div>
 
@@ -1190,7 +1150,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                     : `Schaden würfeln (${weapon.damage || '1W6'}${
                         selectedManeuver.extraDamageFormula ? ` + ${selectedManeuver.extraDamageFormula}` : ''
                       }${extraSpellDmg > 0 ? ` + ${extraSpellDmg} Zauber` : ''}${
-                        egDamageSpent > 0 ? ` + ${egDamageSpent * (selectedManeuver.egDamageRate ?? 1)} EG` : ''
+                        !streiftreffer && egDamageSpent > 0 ? ` + ${egDamageSpent * wuchtJeEg} EG` : ''
                       })`}
                 </span>
               </Knopf>
@@ -1217,7 +1177,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                       )}
                       {egDamageSpent > 0 && (
                         <span className="text-xs text-unverletzt tabular-nums">
-                          + {egDamageSpent * (selectedManeuver.egDamageRate ?? 1)} EG
+                          + {egDamageSpent * wuchtJeEg} EG
                         </span>
                       )}
                     </div>
@@ -1294,7 +1254,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
                     <span>
                       Schaden würfeln ({weapon.damage || '1W6'}
                       {selectedManeuver.extraDamageFormula ? ` + ${selectedManeuver.extraDamageFormula}` : ''}
-                      {egDamageSpent > 0 ? ` + ${egDamageSpent * (selectedManeuver.egDamageRate ?? 1)} EG` : ''})
+                      {!streiftreffer && egDamageSpent > 0 ? ` + ${egDamageSpent * wuchtJeEg} EG` : ''})
                     </span>
                   </Knopf>
                 </div>

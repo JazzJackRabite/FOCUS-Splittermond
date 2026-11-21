@@ -168,6 +168,11 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
   const [rollConfig, setRollConfig] = useState<RollModalConfig | null>(null);
   const [castSpellTarget, setCastSpellTarget] = useState<Spell | null>(null);
   const [attackTarget, setAttackTarget] = useState<AttackTargetConfig | null>(null);
+  // Werte für Zusatzschaden aus Manövern (Stärke, Intuition, Geschwindigkeit)
+  const angreiferWerte = useMemo(
+    () => ({ STA: currentAttributes.STA ?? 0, INT: currentAttributes.INT ?? 0, GSW: calc.derived?.GSW ?? 0 }),
+    [currentAttributes.STA, currentAttributes.INT, calc.derived?.GSW]
+  );
   const [restResultModal, setRestResultModal] = useState<RestResultModalState | null>(null);
   const [spOption, setSpOption] = useState(0);
 
@@ -895,6 +900,7 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
               (list || []).map((m: any) => ({ ...m, skill: m.skill || skill }))
             )
           }
+          angreiferWerte={angreiferWerte}
           conditions={wirksameZustaendeListe}
           channeledSpells={playState.channeledSpells}
           woundPenalty={effectiveWoundPenalty}
