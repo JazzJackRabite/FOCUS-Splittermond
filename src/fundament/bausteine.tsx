@@ -47,6 +47,49 @@ export const Knopf = React.forwardRef<HTMLButtonElement, KnopfProps>(({ art = 'n
 ));
 Knopf.displayName = 'Knopf';
 
+// ---------------------------------------------------------------- Leistenknopf, Feldknopf
+/**
+ * Knopf innerhalb einer farbigen Leiste (Plus/Minus, mittige Beschriftung). Die Leiste ist mindestens 44 px hoch,
+ * der Knopf füllt ihre Höhe; Farben gibt die Leiste über className mit (Werte aus fundament.css).
+ */
+export const Leistenknopf = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAttributes<HTMLButtonElement>>(({ className, type = 'button', ...rest }, ref) => (
+  <button
+    ref={ref}
+    type={type}
+    className={zusammen(
+      'self-stretch min-w-7 flex items-center justify-center rounded-knopf cursor-pointer transition-colors active:scale-95',
+      'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gold-hell disabled:cursor-not-allowed disabled:opacity-50',
+      className,
+    )}
+    {...rest}
+  />
+));
+Leistenknopf.displayName = 'Leistenknopf';
+
+/**
+ * Kästchen einer Punkteleiste (Lebenspunkte, Fokus, temporäre LP), das sich per Klick zurücknehmen lässt.
+ * Bewusst klein, damit eine ganze Leiste in eine Zeile passt; braucht eine Beschriftung (title und aria-label).
+ * Leere Kästchen sind deaktiviert.
+ */
+export const Feldknopf = React.forwardRef<HTMLButtonElement, Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'title'> & { beschriftung: string }>(
+  ({ beschriftung, className, type = 'button', disabled, ...rest }, ref) => (
+    <button
+      ref={ref}
+      type={type}
+      title={beschriftung}
+      aria-label={beschriftung}
+      disabled={disabled}
+      className={zusammen(
+        'w-5.5 h-5.5 sm:w-6 sm:h-6 rounded-knopf transition-all select-none',
+        'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gold-hell',
+        disabled ? 'cursor-default' : 'cursor-pointer hover:scale-105 active:scale-95',
+        className,
+      )}
+      {...rest}
+    />
+  ));
+Feldknopf.displayName = 'Feldknopf';
+
 const WAHL_TON: Record<'gold' | 'erholung' | 'gefahr', string> = {
   gold: 'bg-erhoeht border-gold text-schrift',
   erholung: 'bg-unverletzt-grund border-unverletzt text-schrift',

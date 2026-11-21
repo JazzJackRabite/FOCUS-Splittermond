@@ -1,6 +1,6 @@
 import { fokusDurchZustaende, mitZustaenden, zustandsErklaerung, zustandswerte } from '../../regelwerk/zustandswerte';
 import { alleZustaende, zustandHatStufe, zustandQuelle } from '../../regelwerk/zustaende';
-import { Rauten, Knopf, Wahlknopf } from '../../fundament';
+import { Rauten, Knopf, Wahlknopf, Leistenknopf, Feldknopf } from '../../fundament';
 import React, { useState, useMemo } from 'react';
 import {
   AlertTriangle,
@@ -88,24 +88,23 @@ const CompoundStepper: React.FC<CompoundStepperProps> = ({
       className={`flex items-center justify-between rounded-knopf border ${styles.border} ${styles.bg} px-1.5 min-h-11 select-none transition-all`}
     >
       {/* Minus Button */}
-      <button
-        type="button"
+      <Leistenknopf
         onClick={onMinus}
         title={minusTitle}
-        className={`text-base font-bold ${styles.accent} ${styles.hoverBtn} w-7 h-9 shrink-0 flex items-center justify-center rounded-knopf cursor-pointer transition-colors active:scale-90`}
+        aria-label={minusTitle}
+        className={`text-base font-bold ${styles.accent} ${styles.hoverBtn} shrink-0`}
       >
         −
-      </button>
+      </Leistenknopf>
 
       {/* Center Label (Clickable) */}
-      <button
-        type="button"
+      <Leistenknopf
         onClick={onLabelClick || onPlus}
-        className={`flex-1 text-center font-bold text-xs tracking-wide ${styles.text} hover:opacity-90 active:scale-98 transition-all px-0.5 min-w-0 truncate flex items-center justify-center gap-1 cursor-pointer`}
+        className={`flex-1 text-center font-bold text-xs tracking-wide ${styles.text} hover:opacity-90 px-0.5 min-w-0 truncate gap-1`}
       >
         <span className="truncate">{label}</span>
         {symbol && <span className="tabular-nums text-[11px] opacity-90 shrink-0">{symbol}</span>}
-      </button>
+      </Leistenknopf>
 
       {/* Right Stepper: Value + Plus */}
       <div className="flex items-center gap-0.5 shrink-0">
@@ -118,14 +117,14 @@ const CompoundStepper: React.FC<CompoundStepperProps> = ({
           onChange={(e) => onAmountChange(Math.max(1, Math.min(20, parseInt(e.target.value, 10) || 1)))}
           className={`w-6 sm:w-7 text-center bg-transparent border-0 tabular-nums font-bold text-xs ${styles.text} focus:outline-none p-0`}
         />
-        <button
-          type="button"
+        <Leistenknopf
           onClick={onPlus}
           title={plusTitle}
-          className={`text-base font-bold ${styles.accent} ${styles.hoverBtn} w-7 h-9 shrink-0 flex items-center justify-center rounded-knopf cursor-pointer transition-colors active:scale-90`}
+          aria-label={plusTitle}
+          className={`text-base font-bold ${styles.accent} ${styles.hoverBtn} shrink-0`}
         >
           +
-        </button>
+        </Leistenknopf>
       </div>
     </div>
   );
@@ -324,17 +323,12 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
     const isClickable = slot.type !== 'empty';
 
     return (
-      <button
+      <Feldknopf
         key={index}
-        type="button"
         disabled={!isClickable}
         onClick={isClickable ? () => handleRemoveSlotDamage(slot, index) : undefined}
-        title={title}
-        className={`w-5.5 h-5.5 sm:w-6 sm:h-6 rounded-knopf transition-all select-none ${styleClass} ${
-          isClickable
-            ? 'cursor-pointer hover:scale-105 active:scale-95 '
-            : 'cursor-default'
-        }`}
+        beschriftung={title}
+        className={styleClass}
       />
     );
   };
@@ -368,17 +362,12 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
     const isClickable = type !== 'empty';
 
     return (
-      <button
+      <Feldknopf
         key={index}
-        type="button"
         disabled={!isClickable}
         onClick={isClickable ? () => handleRemoveFocusSlot(type) : undefined}
-        title={title}
-        className={`w-5.5 h-5.5 sm:w-6 sm:h-6 rounded-knopf transition-all select-none ${styleClass} ${
-          isClickable
-            ? 'cursor-pointer hover:scale-105 active:scale-95 '
-            : 'cursor-default'
-        }`}
+        beschriftung={title}
+        className={styleClass}
       />
     );
   };
@@ -695,15 +684,14 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
 
                   <div className="flex items-center flex-wrap gap-1">
                     {Array.from({ length: activeTempHP }).map((_, i) => (
-                      <button
+                      <Feldknopf
                         key={`temp-active-${i}`}
-                        type="button"
                         onClick={() => {
                           dispatch({ type: 'PLAY_REMOVE_TEMP_HP', payload: { amount: 1 } });
                           toast.success('1 temporären LP entfernt');
                         }}
-                        title={`Temporärer LP #${i + 1} (Aktiv) – Klick zum Entfernen`}
-                        className="w-5.5 h-5.5 sm:w-6 sm:h-6 rounded-knopf bg-temporaer border border-temporaer hover:scale-105 active:scale-95 transition-all cursor-pointer select-none"
+                        beschriftung={`Temporärer LP #${i + 1} (Aktiv) – Klick zum Entfernen`}
+                        className="bg-temporaer border border-temporaer"
                       />
                     ))}
                     {tempHPUsed > 0 &&

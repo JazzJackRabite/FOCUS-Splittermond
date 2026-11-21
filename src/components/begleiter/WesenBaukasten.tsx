@@ -8,7 +8,7 @@ import type { Katalog } from '../../regelwerk/katalog';
 import type { Begleiter } from '../../types';
 import { Abschnittstitel, Auswahl, Knopf, Marke } from '../../fundament';
 import { Feinschliff } from './Feinschliff';
-import { Hinweise } from './Wertekasten';
+import { Hinweise, MarkeMitEntfernen } from './Wertekasten';
 
 const Titel3: React.FC<{ children: React.ReactNode }> = ({ children }) => <Abschnittstitel als="h3" className="text-[15px]">{children}</Abschnittstitel>;
 
@@ -35,9 +35,7 @@ const VerbesserteAngriffe: React.FC<{ k: Katalog; b: Begleiter; va: NonNullable<
       {va.kaeufe.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {va.kaeufe.map((x, i) => (
-            <Marke key={`${x.schluessel}-${i}`}>{x.text} <span className="text-leise">({x.punkte} P.)</span>
-              <Knopf nurSymbol aria-label={`${x.text} entfernen`} onClick={() => aendern({ verbesserteAngriffe: liste.filter((_, j) => j !== i) })} className="ml-1"><X size={12} aria-hidden /></Knopf>
-            </Marke>
+            <MarkeMitEntfernen key={`${x.schluessel}-${i}`} label={`${x.text} entfernen`} onEntfernen={() => aendern({ verbesserteAngriffe: liste.filter((_, j) => j !== i) })}>{x.text} <span className="text-leise">({x.punkte} P.)</span></MarkeMitEntfernen>
           ))}
         </div>
       )}

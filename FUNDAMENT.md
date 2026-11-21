@@ -161,6 +161,8 @@ Fehlt einer, wird er dort ergänzt – nicht in der Ansicht nachgebaut.
 |---|---|---|
 | `Knopf` | jede Schaltfläche | `primaer` (Gold, eine je Ansicht), `sekundaer` (goldener Rahmen), `neutral`, `gefahr`, `erholung`; `nurSymbol` |
 | `Wahlknopf` | auswählbare Karte oder Filter (eine Wahl aus mehreren, Umschalter), `aria-pressed` | Ton im gewählten Zustand: `gold`, `erholung`, `gefahr`; `mittig` |
+| `Leistenknopf` | Knopf in einer farbigen Leiste (Plus/Minus, mittige Beschriftung); füllt die Höhe der mindestens 44 px hohen Leiste | Farben über `className` aus fundament.css |
+| `Feldknopf` | Kästchen einer Punkteleiste (LP, Fokus, temporäre LP), per Klick zurücknehmbar; bewusst klein, damit die Leiste in eine Zeile passt | `beschriftung` (Pflicht, wird title und aria-label), leere Kästchen `disabled` |
 | `Reiter` | Reiter einer Leiste (Hauptnavigation, Reiter in Dialogen), `role="tab"`, goldene Unterstreichung | – |
 | `Karte` | Fläche für einen zusammengehörigen Bereich | – |
 | `Abschnittstitel` | Titel eines Bereichs | `h2`, `h3` |
@@ -178,7 +180,7 @@ Alle Ansichten verwenden die benannten Werte; fest eingetragene Farbwerte gibt e
 Würfelbanner, Druck), stehen in `src/fundament/klassen.css` – ebenfalls ohne eigene Farbwerte.
 
 Alle Dialoge haben die Titelzeile aus den Bausteinen (`Dialog` oder `Dialogkopf`, eine Prüfung hält das fest), schließen mit
-Escape und haben einen Schließen-Knopf mit Beschriftung für Vorleseprogramme. Schaltflächen kommen aus den Bausteinen (`Knopf`, `Wahlknopf`, `Reiter`); eine Prüfung zählt selbst gebaute `<button>` je
+Escape und haben einen Schließen-Knopf mit Beschriftung für Vorleseprogramme. Schaltflächen kommen aus den Bausteinen (`Knopf`, `Wahlknopf`, `Reiter`, `Leistenknopf`, `Feldknopf`); eine Prüfung zählt selbst gebaute `<button>` je
 Datei (`knoepfe` in `src/fundament/altlasten.json`) und lässt sie nur weniger werden.
 
 ## 4. Arbeitsweise
