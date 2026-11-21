@@ -1,6 +1,5 @@
-import { Dialogfenster, Dialoghintergrund, Dialogkopf } from '../../fundament';
+import { Dialog, Dialogfenster, Dialoghintergrund, Dialogkopf, Knopf } from '../../fundament';
 import React, { useEffect, useId } from 'react';
-import { Knopf, Dialog } from '../../fundament';
 import { X, Sun, Moon, Heart, Sparkles, Zap, ShieldCheck, CheckCircle2 } from 'lucide-react';
 
 export interface RestDetailItem {
@@ -44,9 +43,10 @@ export const RestResultModal: React.FC<RestResultModalProps> = ({ data, onClose 
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <Dialogfenster
-        id="rest-result-modal-card" breite="md" role="dialog" aria-modal="true" aria-labelledby={titelId}
+      <Dialogfenster role="dialog" aria-modal="true" aria-labelledby={titelId}
+        id="rest-result-modal-card" breite="md"
       >
+        {/* Header Banner */}
         <Dialogkopf
           titelId={titelId}
           symbol={isVp ? <Sun size={22} /> : <Moon size={22} />}

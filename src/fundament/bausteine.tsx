@@ -47,6 +47,60 @@ export const Knopf = React.forwardRef<HTMLButtonElement, KnopfProps>(({ art = 'n
 ));
 Knopf.displayName = 'Knopf';
 
+const WAHL_TON: Record<'gold' | 'erholung' | 'gefahr', string> = {
+  gold: 'bg-erhoeht border-gold text-schrift',
+  erholung: 'bg-unverletzt-grund border-unverletzt text-schrift',
+  gefahr: 'bg-schaden-grund border-schaden text-schrift',
+};
+
+export interface WahlknopfProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  /** ausgewählt (aria-pressed) */
+  gewaehlt: boolean;
+  /** Farbe im ausgewählten Zustand */
+  ton?: keyof typeof WAHL_TON;
+  /** Inhalt mittig statt linksbündig (z. B. Reiter, kurze Filter) */
+  mittig?: boolean;
+}
+
+/** Auswählbare Karte mit Titel und Erläuterung (z. B. Heilmethode, Schadensart). Mindestens 44 px hoch. */
+export const Wahlknopf = React.forwardRef<HTMLButtonElement, WahlknopfProps>(({ gewaehlt, ton = 'gold', mittig, className, type = 'button', ...rest }, ref) => (
+  <button
+    ref={ref}
+    type={type}
+    aria-pressed={gewaehlt}
+    className={zusammen(
+      'flex min-h-11 p-2 rounded-knopf border font-text cursor-pointer transition-colors',
+      mittig ? 'flex-row flex-wrap items-center justify-center text-center gap-2' : 'flex-col text-left',
+      'disabled:cursor-not-allowed disabled:opacity-50',
+      'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-hell',
+      gewaehlt ? WAHL_TON[ton] : 'bg-seite border-rahmen text-schrift hover:border-leise',
+      className,
+    )}
+    {...rest}
+  />
+));
+Wahlknopf.displayName = 'Wahlknopf';
+
+/** Reiter einer Leiste (Hauptnavigation, Reiter in Dialogen): goldene Unterstreichung, wenn gewählt. Mindestens 44 px hoch. */
+export const Reiter = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAttributes<HTMLButtonElement> & { gewaehlt: boolean }>(
+  ({ gewaehlt, className, type = 'button', ...rest }, ref) => (
+    <button
+      ref={ref}
+      type={type}
+      role="tab"
+      aria-selected={gewaehlt}
+      className={zusammen(
+        'inline-flex items-center justify-center gap-1.5 min-h-11 border-b-2 font-bold text-center cursor-pointer transition-colors select-none',
+        'disabled:cursor-not-allowed disabled:opacity-50',
+        'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-hell',
+        gewaehlt ? 'text-gold border-gold' : 'text-leise border-transparent hover:text-schrift',
+        className,
+      )}
+      {...rest}
+    />
+  ));
+Reiter.displayName = 'Reiter';
+
 // ---------------------------------------------------------------- Karte und Titel
 /** Fläche für einen zusammengehörigen Bereich */
 export const Karte: React.FC<React.HTMLAttributes<HTMLElement> & { als?: 'section' | 'div' }> = ({ als: Tag = 'section', className, ...rest }) => (

@@ -74,37 +74,26 @@ describe('HealModal (GRW S. 165-167)', () => {
     expect(onClose).toHaveBeenCalled();
   });
 
-  it('Erste Hilfe hebt keinen Zustand von selbst auf; Blutend wird von Hand behandelt (GRW: Stufe sinkt je EG)', () => {
+  it('Heilkunde wählt keine Zustände vor; gewählte Zustände werden beendet', () => {
     const onApplyHeal = vi.fn();
-    const onClose = vi.fn();
-
     render(
-      <HealModal
-        onClose={onClose}
-        maxLP={8}
-        currentHealthSlots={sampleSlots}
-        activeConditions={sampleConditions}
-        onApplyHeal={onApplyHeal}
-      />
+      <HealModal onClose={vi.fn()} maxLP={8} currentHealthSlots={sampleSlots} activeConditions={sampleConditions} onApplyHeal={onApplyHeal} />
     );
+    fireEvent.click(screen.getByRole('button', { name: /Heilkunde/i }));
+    const blutend = screen.getByLabelText(/Blutend/i) as HTMLInputElement;
+    expect(blutend.checked).toBe(false);
+    fireEvent.click(blutend);
+    fireEvent.click(screen.getByRole('button', { name: /heilen/i }));
+    expect(onApplyHeal).toHaveBeenCalledWith(expect.objectContaining({ conditionsToRemove: ['cond-1'], healMethod: 'Heilkunde' }));
+  });
 
-    // Click Erste Hilfe
-    const ersteHilfeBtn = screen.getByRole('button', { name: /Erste Hilfe/i });
-    fireEvent.click(ersteHilfeBtn);
-
-    const blutendCheckbox = screen.getByLabelText(/Blutend/i) as HTMLInputElement;
-    expect(blutendCheckbox.checked).toBe(false);
-    fireEvent.click(blutendCheckbox);
-
-    // Submit
-    const applyButton = screen.getByRole('button', { name: /heilen/i });
-    fireEvent.click(applyButton);
-
-    expect(onApplyHeal).toHaveBeenCalledWith(
-      expect.objectContaining({
-        conditionsToRemove: ['cond-1'],
-        healMethod: expect.stringContaining('Erste Hilfe'),
-      })
+  it('Verschnaufpause heilt allen Betäubungsschaden (Dauer aus den Kernregeln)', () => {
+    const onApplyHeal = vi.fn();
+    render(
+      <HealModal onClose={vi.fn()} maxLP={8} currentHealthSlots={sampleSlots} activeConditions={sampleConditions} onApplyHeal={onApplyHeal} />
     );
+    fireEvent.click(screen.getByRole('button', { name: /Verschnaufpause/i }));
+    fireEvent.click(screen.getByRole('button', { name: /2 LP heilen/i }));
+    expect(onApplyHeal).toHaveBeenCalledWith(expect.objectContaining({ consumedHealed: 0, exhaustedHealed: 2, healMethod: 'Verschnaufpause (30 Minuten)' }));
   });
 });

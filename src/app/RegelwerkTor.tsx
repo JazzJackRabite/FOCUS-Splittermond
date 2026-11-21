@@ -4,6 +4,7 @@
  */
 import React from 'react';
 import { useRegelwerk } from '../regelwerk/RegelwerkContext';
+import { Knopf } from '../fundament';
 
 export const RegelwerkTor: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { status, fehler } = useRegelwerk();
@@ -16,8 +17,7 @@ export const RegelwerkTor: React.FC<{ children: React.ReactNode }> = ({ children
           <>
             <p>Das Grundregelwerk konnte nicht geladen werden.</p>
             {fehler && <p className="text-xs text-leise break-words">{fehler}</p>}
-            <button type="button" onClick={() => window.location.reload()}
-              className="min-h-11 px-4 rounded-knopf bg-gold text-seite font-bold">Neu laden</button>
+            <Knopf art="primaer" onClick={() => window.location.reload()}>Neu laden</Knopf>
           </>
         ) : (
           <p className="text-leise">Regelwerk wird geladen …</p>

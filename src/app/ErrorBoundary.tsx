@@ -1,3 +1,4 @@
+import { Knopf } from '../fundament';
 import React from 'react';
 
 interface ErrorBoundaryState {
@@ -31,12 +32,9 @@ export class ErrorBoundary extends React.Component<React.PropsWithChildren, Erro
                 {this.state.error.message}
               </p>
             )}
-            <button
-              onClick={() => window.location.reload()}
-              className="min-h-11 bg-gold text-seite font-bold px-6 py-2 rounded-knopf hover:bg-gold-hell transition-colors"
-            >
+            <Knopf art="primaer" onClick={() => window.location.reload()} className="font-bold">
               Neu laden
-            </button>
+            </Knopf>
           </div>
         </div>
       );

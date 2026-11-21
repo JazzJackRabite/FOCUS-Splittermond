@@ -8,7 +8,7 @@ import React, { useState } from 'react';
 import { Check, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCharacter } from '../../../context/CharacterContext';
 import { aenderungGesperrt, regelverstoss } from '../../../fundament/hausregeln';
-import { Dialog, Knopf } from '../../../fundament';
+import { Dialog, Knopf, Wahlknopf } from '../../../fundament';
 import { alleTiere, beschwoerbareWesen } from '../../../regelwerk/begleiter';
 import { basen } from '../../../regelwerk/wesenBaukasten';
 import { gefolgeWerte, kulturen } from '../../../regelwerk/gefolge';
@@ -78,15 +78,13 @@ const Schrittleiste: React.FC<{ titel: string[]; aktuell: number; erreichbar: nu
       const fertig = i < aktuell;
       return (
         <li key={i}>
-          <button type="button" disabled={i > erreichbar} onClick={() => gehe(i)} aria-current={i === aktuell ? 'step' : undefined}
-            className={`min-h-11 flex items-center gap-2 rounded-knopf border px-2.5 text-xs font-text transition-colors ${
-              i === aktuell ? 'border-gold bg-erhoeht text-schrift font-bold' : fertig ? 'border-rahmen text-schrift hover:border-gold' : 'border-rahmen text-leise hover:border-gold'
-            } disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-rahmen`}>
+          <Wahlknopf gewaehlt={i === aktuell} mittig disabled={i > erreichbar} onClick={() => gehe(i)} aria-current={i === aktuell ? 'step' : undefined}
+            className={`px-2.5 text-xs ${i === aktuell ? 'font-bold' : fertig ? '' : 'text-leise'}`}>
             <span className={`w-5 h-5 rounded-full border flex items-center justify-center text-[11px] shrink-0 ${i === aktuell || fertig ? 'border-gold text-gold' : 'border-rahmen'}`} aria-hidden>
               {fertig ? <Check size={12} /> : i + 1}
             </span>
             {t}
-          </button>
+          </Wahlknopf>
         </li>
       );
     })}

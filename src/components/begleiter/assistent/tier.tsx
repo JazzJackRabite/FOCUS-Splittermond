@@ -145,7 +145,7 @@ const WahlFeld: React.FC<{ k: Katalog; o: OffeneWahl; wert: string | string[] | 
     <div className="space-y-2">
       <div className="text-sm">{label} <span className="text-leise">({(w.varianten ?? []).map(x => `${x.anzahl === 1 ? 'eine' : x.anzahl} der Schwelle ${x.schwelle}`).join(' oder ')})</span></div>
       <div className="flex flex-wrap gap-2">
-        {liste.map((id, i) => <Marke key={`${id}-${i}`}>{k.get(id)?.name ?? id} <button type="button" className="ml-1 min-h-6" aria-label={`${k.get(id)?.name ?? id} entfernen`} onClick={() => setze(liste.filter((_, j) => j !== i))}><X size={12} aria-hidden /></button></Marke>)}
+        {liste.map((id, i) => <Marke key={`${id}-${i}`}>{k.get(id)?.name ?? id} <Knopf nurSymbol aria-label={`${k.get(id)?.name ?? id} entfernen`} onClick={() => setze(liste.filter((_, j) => j !== i))} className="ml-1"><X size={12} aria-hidden /></Knopf></Marke>)}
       </div>
       <div className="flex flex-wrap gap-2 items-end">
         <Auswahl beschriftung={`${o.abrichtung}: Meisterschaft hinzufügen`} value={neu} onChange={e => setNeu(e.target.value)}>

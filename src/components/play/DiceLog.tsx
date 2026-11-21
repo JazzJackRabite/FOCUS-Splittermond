@@ -103,23 +103,13 @@ export const DiceLog: React.FC<DiceLogProps> = ({
         </div>
         <div className="flex items-center gap-2">
           {onUndo && (
-            <button
-              id="undo-protocol-btn"
-              onClick={onUndo}
-              disabled={!canUndo}
-              className={`min-h-11 flex items-center gap-1 px-2.5 py-1 rounded-knopf text-xs font-bold transition border ${
-                canUndo
-                  ? 'bg-erhoeht text-schrift hover:bg-rahmen border-gold cursor-pointer active:scale-95'
-                  : 'bg-erhoeht text-leise border-rahmen cursor-not-allowed opacity-60'
-              }`}
+            <Knopf art="sekundaer" id="undo-protocol-btn" onClick={onUndo} disabled={!canUndo} className="text-xs font-bold"
               title={
                 canUndo
                   ? 'Letztes Ereignis rückgängig machen (setzt Berechnungen/Zustände zurück und löscht den Protokolleintrag)'
                   : 'Kein Ereignis zum Rückgängigmachen vorhanden'
-              }
-            >
-              <RotateCcw size={13} /> Rückgängig
-            </button>
+              }><RotateCcw size={13} /> Rückgängig
+            </Knopf>
           )}
           {allEntries.length > 0 && (
             <Knopf nurSymbol

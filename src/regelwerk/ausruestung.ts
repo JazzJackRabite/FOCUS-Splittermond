@@ -37,6 +37,8 @@ type D = Record<string, any>;
 const txt = (v: unknown): string => (v === null || v === undefined ? '' : String(v).trim());
 const zahl = (v: unknown, d = 0) => { const n = Number(v); return Number.isFinite(n) ? n : d; };
 const leer = (s: string) => !s || s === '–' || s === '-';
+/** Härte als Zahl, wenn das Paket eine nennt */
+const haerte = (d: D): { hardness?: number } => (txt(d.haerte) !== '' && Number.isFinite(Number(d.haerte)) ? { hardness: Number(d.haerte) } : {});
 
 function preis(d: D): string {
   if (d.preis && typeof d.preis === 'object' && txt(d.preis.text)) return txt(d.preis.text);
@@ -91,13 +93,13 @@ export function alsAusruestung(e: Eintrag, quelle: string): AusruestungsItem | n
     const zeile = werteZeile([['Fertigkeit', skill], ['Schaden', d.schaden], ['WGS', d.wgs], ['Reichweite', d.reichweite], ['Attribute', (d.attribute ?? []).join(', ')],
       ['Mindestattribute', d.mindestattribute_text], ['Last', last], ['Härte', d.haerte], ['Preis', preis(d)], ['Verfügbarkeit', d.verfuegbarkeit], ['Merkmale', merkmale]]);
     return { id: e.id, name: e.name, type: 'weapon', category: txt(d.modus) || 'Nahkampf', skill, damage: txt(d.schaden), wgs: d.wgs ?? '',
-      range: txt(d.reichweite), price: preis(d), load: last, attributes: merkmale, source: quelle, page, desc: beschreibung(zeile, d) };
+      range: txt(d.reichweite), price: preis(d), load: last, attributes: merkmale, source: quelle, page, desc: beschreibung(zeile, d), ...haerte(d) };
   }
   if (t.art === 'armor' || t.art === 'shield') {
     const zeile = werteZeile([['VTD+', d.vtd_bonus], ['SR', d.sr], ['Behinderung', d.behinderung], ['Tick-Zuschlag', d.tick_zuschlag],
       ['Mindest-STÄ', d.mindest_staerke], ['Last', last], ['Härte', d.haerte], ['Preis', preis(d)], ['Verfügbarkeit', d.verfuegbarkeit], ['Merkmale', merkmale]]);
     const gemeinsam = { id: e.id, name: e.name, vtdBonus: zahl(d.vtd_bonus), handicap: zahl(d.behinderung), tickModifier: zahl(d.tick_zuschlag),
-      price: preis(d), load: last, attributes: merkmale, source: quelle, page, desc: beschreibung(zeile, d) };
+      price: preis(d), load: last, attributes: merkmale, source: quelle, page, desc: beschreibung(zeile, d), ...haerte(d) };
     return t.art === 'armor'
       ? { ...gemeinsam, type: 'armor', category: 'Rüstung', sr: zahl(d.sr), minStrength: zahl(d.mindest_staerke) }
       : { ...gemeinsam, type: 'shield', category: 'Schild' };
@@ -112,7 +114,7 @@ export function alsAusruestung(e: Eintrag, quelle: string): AusruestungsItem | n
     ['Last', last], ['Härte', d.haerte], ['Preis', preis(d)], ['Verfügbarkeit', d.verfuegbarkeit]]);
   const item: GearItem = { id: e.id, name: e.name, type: t.art as GearItem['type'], category, price: preis(d), source: quelle, page, desc: beschreibung(zeile, d) };
   if (last !== '') item.load = last;
-  if (d.haerte !== undefined && d.haerte !== null && d.haerte !== '') item.hardness = zahl(d.haerte);
+  Object.assign(item, haerte(d));
   return item;
 }
 

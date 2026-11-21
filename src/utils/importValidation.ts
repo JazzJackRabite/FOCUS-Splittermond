@@ -357,6 +357,7 @@ function validateInventoryItem(v: unknown): InventoryItem | null {
   const handicap = parseNumField(v.handicap ?? v.behinderung ?? v.be);
   const tickModifier = parseNumField(v.tickModifier ?? v.tickMalus ?? v.tick);
   const minStrength = parseNumField(v.minStrength ?? v.mindeststaerke ?? v.minSTA);
+  const hardness = parseNumField(v.hardness ?? v.haerte);
 
   return {
     id: isString(v.id) && v.id.trim() ? v.id : generateId(),
@@ -380,6 +381,7 @@ function validateInventoryItem(v: unknown): InventoryItem | null {
     handicap,
     tickModifier,
     minStrength,
+    hardness,
   };
 }
 

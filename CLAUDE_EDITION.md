@@ -144,11 +144,6 @@ Repository `JazzJackRabite/FOKUS-1.0-claudeedition` (Branch `main`; entstanden a
 
 ## Nächste Schritte
 
-> **In Arbeit (21.11.2026, Sitzung „Altlasten“, Zweig `altlasten-paketlesen`):** Textauslese aus `regelwerk/` (Golem, Gefolge,
-> Untote, Wesen-Baukasten, Relikte, Modifikationen, `components/begleiter/besitzer.ts`) wandert auf die Datenseite;
-> Schadens- und Heildialog, `ErschaffungRegelwerk.tsx`; Umstellung der Dialoge auf die Bausteine; Rückfall `src/data`.
-> Bitte diese Dateien bis zum Zusammenführen nicht ändern oder vorher hier eintragen, was ansteht.
-
 Die geplanten Schritte sind erledigt. Offen bleiben Ideen wie Spielhilfen für bedingte Wirkungen (z. B. Bonus gegen Typus per Klick
 anwenden) oder Werte der Begleiter im Kampf.
 
@@ -332,8 +327,8 @@ aus echtem Schaden; Würfelformeln zusammenfassen. Die Funktionen aus Stand 9–
 **Technik:** Die Zauberwerte standen in Stand 16 als geprüfte Tabelle im Code; seit Stand 17 kommen sie aus den Regelpaketen. 314 Tests grün, Build läuft.
 
 **Offen:** Die Tabellen gelten nur für GRW-Zauber (Namen fest im Code); Zauber aus Grimoires wirken nicht automatisch.
-Wiederherstellung entfernt eine feste Liste von Zuständen statt „Zustände, die Folge von Angriffen sind“. Unbenutzte
-Dateien aus AI Studio im Repository: `public/assets/aistudio/*.png`, `.aistudio/`, leere `src/data/splittermond_grw.sqlite`.
+Wiederherstellung entfernt eine feste Liste von Zuständen statt „Zustände, die Folge von Angriffen sind“. (Erledigt: Die
+unbenutzten Dateien aus AI Studio sind entfernt, siehe Stand 33.)
 
 ## Tab „Begleiter“, Teil 4: würfeln, Lebenspunkte und Fokus
 
@@ -812,6 +807,68 @@ die Grimoires), Dateiendung `.grim`. Das Grundregelwerk ist kein Grimoire; es bl
 - **Begleiter-Leiste**: jeder Chip zeigt LP, Fokus, kampfunfähig und Zustände, verletzte Begleiter mit rotem Rand.
 - `write.py`: Ohne PDF beim Bau bleibt die volle Prüfsumme aus dem bisherigen Paket erhalten.
 - Tests: 439 grün mit allen Grimoires (5 übersprungen), 408 ohne Bücher; Prüfsuite regelpakete 0 Befunde; Build läuft.
+
+## Stand 33 (21.11.2026): Schaden und Heilung aus dem Paket, Härte, Bakebakeku, Schaltflächen aus den Bausteinen
+
+- **Schadensdialog** (`regelwerk/schadenUndHeilung.ts`): Gesundheitsstufen aus den Kernregeln, Schadensminderung durch
+  einen Splitterpunkt aus den Splittergaben (−5, GRW S. 81). Die feste Schnellauswahl „Blutend 1–2, Brennend 1–3,
+  Benommen 1–2, Vergiftet“ ist entfernt: Die Höchststufen standen in keinem Regeltext, „Vergiftet“ ist kein Zustand.
+  Zustände kommen aus der Liste der Pakete, eine Höchststufe nur, wo das Paket sie nennt (Geblendet 4).
+- **Heildialog:** „Erste Hilfe“ und „Wundversorgung“ (wählten Blutend automatisch ab, ohne Regelgrundlage im Paket)
+  sind durch „Heilkunde“ ersetzt (Auswirkungen aus der Fertigkeit als Hinweis); welche Zustände enden, wählt der
+  Spieltisch. „Erholung“ heißt jetzt Verschnaufpause, Dauer und Wirkung aus der Kernregel Heilung.
+- **Gefolge, Untote, Golems:** Die Altlasten-Zeile war überholt; alle Regelwerte kommen schon aus `strukturiert`.
+  Beide Zeilen sind aus der Altlasten-Tabelle gestrichen, die Regelquellen ergänzt.
+- **Härte** als Feld am Gegenstand (`hardness`): aus den Paketen für Waffen, Rüstungen, Schilde und Gegenstände,
+  im Inventar angezeigt und bearbeitbar, beim Relikt mit „Härte +1“ hochgerechnet (vorher nur Text). Der Rückfall
+  `src/data/equipment.ts` trägt die Härte der 79 GRW-Waffen und -Rüstungen mit.
+- **Bestiarium** (Datenseite `Werkzeuge/regelpakete/kreatur_varianten.py` + `.json`): Bakebakeku (Bestienmeister S. 48)
+  hatte nur Zuschläge zu Wareishi und keine Waffe; jetzt `werte_berechnet` (Zuschläge, Körper 20 / 2W6+5 / WGS 9 aus der
+  Zeilenfolge der PDF-Seite, Merkmale ersetzt, Zauber und Meisterschaften ergänzt). Weitere Lücken gibt es nur bei
+  Tieren aus Preislisten, deren Band keinen Wertekasten hat (GRW: Esel, Wach- oder Jagdhund; Mondstahlklingen u. a.
+  Pony, Äffchen, Sperberdrache); dafür steht nichts in den Büchern.
+- **Schaltflächen aus den Bausteinen:** neu `Wahlknopf` (auswählbare Karte, `aria-pressed`) und `Reiter` (Reiterleiste,
+  `role="tab"`). Rund 120 selbst gebaute `<button>` in Hauptnavigation, Spiel-, Kampf-, Inventar-, Erschaffungs- und
+  Begleiteransicht sowie allen Dialogen sind umgestellt (mindestens 44 Pixel hoch). Neue Prüfung: selbst gebaute
+  `<button>` je Datei stehen als Altlast (`knoepfe`) und dürfen nur weniger werden; übrig sind 6 in `PlaySharedVitals.tsx`
+  (LP-, Fokus- und Temp-LP-Kästchen, Zähler).
+- **Reste aus AI Studio:** `.aistudio/`, `public/assets/aistudio/` und die leere `src/data/splittermond_grw.sqlite` waren
+  schon entfernt (Commit 6954724, `.gitignore` hält sie draußen). Dazu jetzt: `metadata.json` ohne die ungenutzte
+  Gemini-Berechtigung (die App ruft keine KI auf), Name und Beschreibung aktuell; README verweist auf `FOKUS-1.2` statt
+  `FOCUS_GoogleAIStudio`; die Kopfzeilen in `src/data/*.ts` nennen sie als Rückfall statt einer gelöschten Datenbank.
+- Tests: 448 grün mit allen Grimoires (5 übersprungen); Prüfsuite regelpakete 0 Befunde; Build läuft; im Browser geprüft
+  (Hauptnavigation, Schaden, Heilung, Einstellungen, Profile, Inventar, Angriff, Begleiter-Assistent).
+
+## Stand 34 (21.11.2026): Textauslese auf der Datenseite, keine eingebauten Regeln mehr, Dialogköpfe
+
+Zusammengeführt mit Stand 33 (Zweig `stand33`): Dort umgestellte Schaltflächen, Schaden/Heilung aus dem Paket, Härte und
+Bakebakeku bleiben; die eingebauten Listen in `src/data`, die Stand 33 noch ergänzt hatte, entfallen hier ganz.
+
+- **Textauslese auf der Datenseite** (`Werkzeuge/regelpakete/textauslese.py`, als letzter Inhaltsschritt in `export.py`):
+  Modifikationen-Texte der Baukästen und Abrichtungen (`modifikationen_strukturiert` mit Wahlen), Golem-Bausteine
+  (`voraussetzung_name`/`_ref`, `mehrfach_aus_text`), Sonderausstattung (`sonderausstattung`), Mehrfachgrenze der
+  Abrichtungen (`mehrfach_grenze`), eigene Gesundheitsstufen und Betäubungsimmunität der Merkmale, Golemstufe der
+  Animierungszauber, Ressource Kreatur und Stufenmerkmal, „in der gleichen Magieschule“ (`gleiche_fertigkeit`),
+  mehrfach wählbare Meisterschaften (`mehrfach_waehlbar`). Selbsttest mit den früheren Editor-Beispielen beim Bau.
+  Im Editor entfallen `leseModifikationen`, `leseWahlen`, `mehrfachAusText` und alle Suchmuster mit Wortlaut aus den
+  Büchern; neue Fundament-Prüfung „keine Suchmuster, die Regeltext lesen“. `besitzer.ts` erkennt Kreatur, Gefolge,
+  Golem, Tiervertrauter und Konstrukteur an der ID.
+- **Keine eingebauten Regeln mehr:** Der Editor startet erst mit geladenem Grundregelwerk-Paket (`app/RegelwerkTor.tsx`,
+  Ladeanzeige, Fehler mit „Neu laden“). `src/data` enthält nur noch die Beispielcharaktere; die Typen stehen in
+  `src/types/regeldaten.ts`. Ohne Paket liefern alle Module leere Listen bzw. neutrale Werte. Die Voraussetzungsprüfung
+  arbeitet nur formal über den Katalog (Schwelle 1 aus `schwellenwert`). Tests laufen mit dem GRW-Paket (`src/testSetup.ts`).
+- **Korrekturen:** Traglast nach der Optionalregel GRW S. 165 (Stärke × 2 Last, je weiterem Punkt Behinderung +1, neu
+  `strukturiert.traglast`; vorher KON + STÄ). Keira (Gnom mit Flink) hat GSW 8, nicht 7. Wunderwirker verlangt Zauberfinger
+  in derselben Magieschule.
+- **Erschaffung:** `ErschaffungRegelwerk.tsx` liest das Paket über `erschaffungEditor.ts`; der Text der freien Erschaffung
+  kommt aus den Kernregeln (`kultur_frei`, `abstammung_frei`).
+- **Dialoge:** neuer Baustein `Dialogkopf` (Symbol, Titel, Untertitel, Aktionen, Schließen-Knopf) und `useEscape`; alle
+  Dialoge mit eigenem Aufbau nutzen ihn, schließen mit Escape und tragen `role="dialog"`. Prüfung „jeder Dialog hat die
+  Titelzeile aus den Bausteinen“. Im Angriffsdialog nur eine goldene Hauptaktion.
+- **Altlasten:** Regelnamen, Paketzugriffe, Suchmuster, Farbwerte 0; die Altlasten-Tabelle im FUNDAMENT ist leer.
+  Übrig: 6 eigene `<button>` in `PlaySharedVitals.tsx` (aus Stand 33).
+- Tests: 456 grün mit allen Grimoires und Volltest, 420 ohne Bücher; Prüfsuite 0 neue Befunde, Praxistest 109/109; Build;
+  im Browser geprüft (Ladeanzeige, Angriff, Schaden; Desktop und Handy).
 
 ## Google AI Studio
 

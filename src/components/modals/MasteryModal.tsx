@@ -1,7 +1,6 @@
 import { calculateItemCost } from '../../utils/costCalculations';
-import { Dialogfenster, Dialoghintergrund, Dialogkopf, useEscape } from '../../fundament';
+import { Dialog, Dialogfenster, Dialoghintergrund, Dialogkopf, Knopf, useEscape } from '../../fundament';
 import { useHausregeln } from '../../fundament/hausregeln';
-import { Knopf, Dialog } from '../../fundament';
 import React, { useEffect, useId, useMemo, useState } from 'react';
 import type { MasteryEntry as DbMasteryEntry } from '../../types/regeldaten';
 
@@ -315,14 +314,9 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
                 className="w-full p-2 pr-8 border border-rahmen rounded-knopf bg-seite text-schrift text-xs focus:ring-1 focus:ring-gold focus:border-gold outline-none"
               />
               {search && (
-                <button
-                  type="button"
-                  onClick={() => setSearch('')}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-leise hover:text-schrift text-xs font-bold w-5 h-5 flex items-center justify-center rounded-knopf hover:bg-rahmen cursor-pointer"
-                  title="Suche leeren"
-                >
+                <Knopf nurSymbol onClick={() => setSearch('')} title="Suche leeren" className="absolute right-2 top-1/2 -translate-y-1/2" aria-label="Suche leeren">
                   ✕
-                </button>
+                </Knopf>
               )}
             </div>
 

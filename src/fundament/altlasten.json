@@ -3,5 +3,8 @@
   "farbwerte": {},
   "regelnamen": [],
   "paketzugriffe": [],
-  "suchmuster": []
+  "suchmuster": [],
+  "knoepfe": {
+    "src/components/play/PlaySharedVitals.tsx": 6
+  }
 }

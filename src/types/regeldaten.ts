@@ -98,6 +98,7 @@ export interface WeaponItem {
     range: string;
     price: string;
     load: number | string;
+    hardness?: number;
     attributes: string;
     source: string;
     page: number;
@@ -116,6 +117,7 @@ export interface ArmorItem {
     minStrength: number;
     price: string;
     load: number | string;
+    hardness?: number;
     attributes: string;
     source: string;
     page: number;
@@ -132,6 +134,7 @@ export interface ShieldItem {
     tickModifier: number;
     price: string;
     load: number | string;
+    hardness?: number;
     attributes: string;
     source: string;
     page: number;

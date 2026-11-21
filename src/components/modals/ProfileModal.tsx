@@ -1,6 +1,5 @@
-import { Dialogfenster, Dialoghintergrund, Dialogkopf, useEscape } from '../../fundament';
+import { Dialog, Dialogfenster, Dialoghintergrund, Dialogkopf, Knopf, Reiter, useEscape } from '../../fundament';
 import React, { useId, useState } from 'react';
-import { Knopf, Dialog } from '../../fundament';
 import { User, Plus, Copy, Trash2, Check, Sparkles, X, Upload, Download, BookOpenText } from 'lucide-react';
 import {
   getProfilesList,
@@ -178,23 +177,13 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ onClose, onSelectPro
         <Dialogkopf titelId={titelId} symbol={<User size={22} />} titel="Charakter-Profile & Vorlagen" onSchliessen={onClose} />
 
         {/* Navigation Tabs */}
-        <div className="flex border-b border-rahmen bg-seite">
-          <button
-            onClick={() => setTab('profiles')}
-            className={`min-h-11 flex-1 py-3 text-center font-bold text-sm uppercase tracking-wider transition-all ${
-              tab === 'profiles' ? 'bg-erhoeht text-schrift border-b-2 border-gold' : 'text-leise hover:bg-rahmen hover:text-schrift'
-            }`}
-          >
+        <div role="tablist" className="flex border-b border-rahmen bg-seite">
+          <Reiter gewaehlt={tab === 'profiles'} className="flex-1 py-3 text-sm uppercase tracking-wider" onClick={() => setTab('profiles')}>
             Meine Charaktere ({profiles.length})
-          </button>
-          <button
-            onClick={() => setTab('presets')}
-            className={`min-h-11 flex-1 py-3 text-center font-bold text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-1 ${
-              tab === 'presets' ? 'bg-erhoeht text-schrift border-b-2 border-gold' : 'text-leise hover:bg-rahmen hover:text-schrift'
-            }`}
-          >
-            <Sparkles size={16} className="text-gold" /> Archetypen & Vorlagen
-          </button>
+          </Reiter>
+          <Reiter gewaehlt={tab === 'presets'} className="flex-1 py-3 text-sm uppercase tracking-wider" onClick={() => setTab('presets')}>
+            <Sparkles size={16} /> Archetypen & Vorlagen
+          </Reiter>
         </div>
 
         {/* Content */}
@@ -268,37 +257,19 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ onClose, onSelectPro
                             <Check size={14} /> Laden
                           </Knopf>
                         )}
-                        <button
-                          onClick={() => handleGenerateProfilePDF(p.id)}
-                          className={`min-h-11 p-2 rounded-knopf hover:bg-rahmen transition-colors cursor-pointer ${isActive ? 'hover:text-gold-hell text-schrift' : 'text-schrift'}`}
-                          title="PDF-Charakterbogen generieren"
-                        >
+                        <Knopf nurSymbol onClick={() => handleGenerateProfilePDF(p.id)} title="PDF-Charakterbogen generieren" aria-label="PDF-Charakterbogen generieren">
                           <BookOpenText size={16} />
-                        </button>
-                        <button
-                          onClick={() => handleExportProfile(p.id, p.name)}
-                          className={`min-h-11 p-2 rounded-knopf hover:bg-rahmen transition-colors cursor-pointer ${isActive ? 'hover:text-gold-hell text-schrift' : 'text-schrift'}`}
-                          title="Charakter (JSON) exportieren"
-                        >
+                        </Knopf>
+                        <Knopf nurSymbol onClick={() => handleExportProfile(p.id, p.name)} title="Charakter (JSON) exportieren" aria-label="Charakter (JSON) exportieren">
                           <Download size={16} />
-                        </button>
-                        <button
-                          onClick={() => handleDuplicateProfile(p.id)}
-                          className={`min-h-11 p-2 rounded-knopf hover:bg-rahmen transition-colors cursor-pointer ${isActive ? 'hover:text-gold-hell text-schrift' : 'text-schrift'}`}
-                          title="Duplizieren"
-                        >
+                        </Knopf>
+                        <Knopf nurSymbol onClick={() => handleDuplicateProfile(p.id)} title="Duplizieren" aria-label="Duplizieren">
                           <Copy size={16} />
-                        </button>
+                        </Knopf>
                         {profiles.length > 1 && (
-                          <button
-                            onClick={() => handleDeleteProfile(p.id)}
-                            className={`min-h-11 p-2 rounded-knopf hover:bg-schaden-grund hover:text-schrift transition-colors cursor-pointer ${
-                              isActive ? 'text-schaden' : 'text-schaden'
-                            }`}
-                            title="Löschen"
-                          >
+                          <Knopf art="gefahr" nurSymbol onClick={() => handleDeleteProfile(p.id)} title="Löschen" aria-label="Löschen">
                             <Trash2 size={16} />
-                          </button>
+                          </Knopf>
                         )}
                       </div>
                     </div>

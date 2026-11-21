@@ -1,7 +1,6 @@
 import { mitZustaenden, zustandsErklaerung, zustandswerte } from '../../regelwerk/zustandswerte';
-import { Dialogfenster, Dialoghintergrund, Dialogkopf } from '../../fundament';
+import { Dialog, Dialogfenster, Dialoghintergrund, Dialogkopf, Knopf, Wahlknopf } from '../../fundament';
 import React, { useState, useMemo, useRef, useLayoutEffect } from 'react';
-import { Knopf, Dialog } from '../../fundament';
 import {
   Swords,
   Shield,
@@ -303,6 +302,7 @@ export const CombatMagicTab: React.FC = () => {
       wgs: w.wgs,
       range: w.range || undefined,
       attributes: w.attributes,
+      hardness: w.hardness,
     };
     dispatch({ type: 'ADD_INVENTORY_ITEM', payload: newItem });
     toast.success(`Waffe '${w.name}' hinzugefügt!`);
@@ -358,6 +358,7 @@ export const CombatMagicTab: React.FC = () => {
       handicap: a.handicap,
       tickModifier: a.tickModifier,
       minStrength: isArmor ? armorItem.minStrength : undefined,
+      hardness: a.hardness,
       attributes: a.attributes,
     };
     dispatch({ type: 'ADD_INVENTORY_ITEM', payload: newItem });
@@ -563,18 +564,9 @@ export const CombatMagicTab: React.FC = () => {
 
                       {/* Secondary Management Controls (Ziehen/Ablegen & Löschen) */}
                       <div className="flex items-center gap-1.5 shrink-0">
-                        <button
-                          type="button"
-                          onClick={() => dispatch({ type: 'TOGGLE_EQUIP_ITEM', payload: { id: w.id } })}
-                          className={`min-h-11 px-2.5 py-1 rounded-knopf border text-xs cursor-pointer transition-all whitespace-nowrap font-medium ${
-                            w.equipped
-                              ? 'bg-erschoepft-grund text-erschoepft border-erschoepft hover:bg-erschoepft hover:text-seite'
-                              : 'bg-erhoeht text-schrift border-rahmen hover:bg-rahmen'
-                          }`}
-                          title={w.equipped ? 'Waffe wegstecken (in Rucksack)' : 'Waffe ziehen / ausrüsten'}
-                        >
+                        <Wahlknopf gewaehlt={!!w.equipped} mittig onClick={() => dispatch({ type: 'TOGGLE_EQUIP_ITEM', payload: { id: w.id } })} title={w.equipped ? 'Waffe wegstecken (in Rucksack)' : 'Waffe ziehen / ausrüsten'} className="text-xs whitespace-nowrap font-medium">
                           {w.equipped ? 'Wegstecken' : 'Ziehen'}
-                        </button>
+                        </Wahlknopf>
                         <Knopf nurSymbol
                           onClick={() => {
                             dispatch({ type: 'REMOVE_INVENTORY_ITEM', payload: { id: w.id } });
@@ -838,17 +830,9 @@ export const CombatMagicTab: React.FC = () => {
                       </div>
 
                       <div className="flex items-center gap-1.5 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-rahmen justify-start sm:justify-end">
-                        <button
-                          type="button"
-                          onClick={() => dispatch({ type: 'TOGGLE_EQUIP_ITEM', payload: { id: a.id } })}
-                          className={`min-h-11 px-3 py-1 rounded-knopf border text-xs font-bold cursor-pointer transition-all whitespace-nowrap ${
-                            a.equipped
-                              ? 'bg-erschoepft-grund text-erschoepft border-erschoepft hover:bg-erschoepft hover:text-seite'
-                              : 'bg-erhoeht text-schrift border-gold hover:bg-rahmen'
-                          }`}
-                        >
+                        <Wahlknopf gewaehlt={!!a.equipped} mittig onClick={() => dispatch({ type: 'TOGGLE_EQUIP_ITEM', payload: { id: a.id } })} className="text-xs font-bold whitespace-nowrap">
                           {a.equipped ? 'Ablegen' : 'Anlegen'}
-                        </button>
+                        </Wahlknopf>
                         <Knopf nurSymbol
                           onClick={() => {
                             dispatch({ type: 'REMOVE_INVENTORY_ITEM', payload: { id: a.id } });
@@ -1067,7 +1051,7 @@ export const CombatMagicTab: React.FC = () => {
       {/* ── MODAL: Waffe hinzufügen ── */}
       {showAddWeaponModal && (
         <Dialoghintergrund>
-          <Dialogfenster breite="2xl" className="[&>*:not(:first-child)]:mx-5 [&>*:last-child]:mb-5 space-y-4">
+          <Dialogfenster breite="2xl" className="p-5 space-y-4">
             <Dialogkopf symbol={<Swords size={20} />} titel="Waffe auswählen oder erstellen" onSchliessen={() => setShowAddWeaponModal(false)} />
 
             {/* Search & Filter */}
@@ -1221,7 +1205,7 @@ export const CombatMagicTab: React.FC = () => {
       {/* ── MODAL: Rüstung oder Schild hinzufügen ── */}
       {showAddArmorModal && (
         <Dialoghintergrund>
-          <Dialogfenster breite="2xl" className="[&>*:not(:first-child)]:mx-5 [&>*:last-child]:mb-5 space-y-4">
+          <Dialogfenster breite="2xl" className="p-5 space-y-4">
             <Dialogkopf symbol={<Shield size={20} />} titel="Rüstung oder Schild auswählen" onSchliessen={() => setShowAddArmorModal(false)} />
 
             {/* Filter buttons */}
@@ -1237,39 +1221,15 @@ export const CombatMagicTab: React.FC = () => {
                 />
               </div>
               <div className="flex rounded-knopf border border-rahmen overflow-hidden text-xs">
-                <button
-                  type="button"
-                  onClick={() => setArmorTypeFilter('all')}
-                  className={`min-h-11 px-3 py-1 font-bold transition-all ${
-                    armorTypeFilter === 'all'
-                      ? 'bg-erhoeht text-schrift'
-                      : 'bg-erhoeht text-schrift hover:bg-rahmen'
-                  }`}
-                >
+                <Wahlknopf gewaehlt={armorTypeFilter === 'all'} mittig onClick={() => setArmorTypeFilter('all')}>
                   Alle
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setArmorTypeFilter('armor')}
-                  className={`min-h-11 px-3 py-1 font-bold transition-all ${
-                    armorTypeFilter === 'armor'
-                      ? 'bg-erhoeht text-schrift'
-                      : 'bg-erhoeht text-schrift hover:bg-rahmen'
-                  }`}
-                >
+                </Wahlknopf>
+                <Wahlknopf gewaehlt={armorTypeFilter === 'armor'} mittig onClick={() => setArmorTypeFilter('armor')}>
                   Rüstungen
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setArmorTypeFilter('shield')}
-                  className={`min-h-11 px-3 py-1 font-bold transition-all ${
-                    armorTypeFilter === 'shield'
-                      ? 'bg-erhoeht text-schrift'
-                      : 'bg-erhoeht text-schrift hover:bg-rahmen'
-                  }`}
-                >
+                </Wahlknopf>
+                <Wahlknopf gewaehlt={armorTypeFilter === 'shield'} mittig onClick={() => setArmorTypeFilter('shield')}>
                   Schilde
-                </button>
+                </Wahlknopf>
               </div>
             </div>
 

@@ -85,6 +85,15 @@ describe('Relikt-Baukasten aus dem GRW', () => {
     expect(it.desc).toContain('Werte: Schaden 1W6+4 → 1W6+6.');
     expect(it.desc).toContain('Waffenschaden +1 ×2 – 2 P., GRW S. 142');
   });
+
+  it('Härte des Grundgegenstands als Feld, Verbesserung Härte +1 rechnet sie hoch', () => {
+    const basis = alleAusruestung(K).find(i => i.name === 'Langschwert' && i.type === 'weapon')!;
+    expect(typeof basis.hardness).toBe('number');
+    const r = relikt({ basisId: basis.id, bausteine: [{ id: 'grw:verbesserung:haerte-1', anzahl: 2 }] });
+    const it = reliktAlsInventar(r, bs, basis);
+    expect(it.hardness).toBe(basis.hardness! + 2);
+    expect(it.desc).toContain(`Härte ${basis.hardness} → ${basis.hardness! + 2}`);
+  });
 });
 
 describe('Relikte im Zustand und in der Werkstatt', () => {

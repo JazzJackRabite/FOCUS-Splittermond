@@ -1,6 +1,5 @@
-import { Dialogfenster, Dialoghintergrund, Dialogkopf } from '../../fundament';
+import { Dialog, Dialogfenster, Dialoghintergrund, Dialogkopf, Knopf } from '../../fundament';
 import React, { useState, useEffect } from 'react';
-import { Knopf, Dialog } from '../../fundament';
 import { Sun, Moon, RotateCcw, Settings, Heart, Sparkles, X, Check, Clock } from 'lucide-react';
 import type { ItemEntry, Mastery } from '../../types';
 import { ruheregeln, ruhephasenRegeneration, ruhewirkungen, type Ruhewirkung } from '../../regelwerk/spielwirkungen';

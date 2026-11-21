@@ -65,11 +65,12 @@ Felder stehen unter `daten` des jeweiligen Eintrags. **Was hier nicht steht, dar
 | Ausrüstung aus Grimoires | Ausrüstungseinträge; `modus` (ersetzt, ergänzt) | `regelwerk/ausruestung.ts` |
 | Relikte | `relikt_baukasten`, `baustein` | `regelwerk/relikte.ts` |
 | Begleiter: Tiere, beschworene Wesen, Dienste | `werte_berechnet`, `tabellenzeile`, `beschwoerbares_wesen_stufe`, `immer_verfuegbar`; Abrichtungen: `mehrfach_grenze` | `regelwerk/begleiter.ts`, `regelwerk/dienste.ts` |
-| Begleiter: Gefolge, erhobene Untote, Golems | `attribute`, `modulwerte`, `modifikationen_strukturiert`, `kosten_ep`, `baustein`, `felder`, `tabellen`; Golem-Bausteine: `voraussetzung_name`, `mehrfach_aus_text`; Feinschliff: `sonderausstattung`; Animierungszauber: `golem_stufe_bis` | `regelwerk/gefolge.ts`, `regelwerk/untote.ts`, `regelwerk/golem.ts`, `regelwerk/modifikationen.ts` |
+| Begleiter: Gefolge, erhobene Untote, Golems | `strukturiert` (`gefolge`, `untote`, Golem-Regeln), `wertesaetze`, `attribute`, `modulwerte`, `modifikationen_strukturiert`, `kosten_ep`, `baustein`, `felder`, `tabellen`; Golem-Bausteine: `voraussetzung_name`, `mehrfach_aus_text`; Feinschliff: `sonderausstattung`; Animierungszauber: `golem_stufe_bis` | `regelwerk/gefolge.ts`, `regelwerk/untote.ts`, `regelwerk/golem.ts`, `regelwerk/modifikationen.ts` |
 | Begleiter: Wesen-Baukasten (beschwörbare Wesen, Kreaturen) | Einträge `wesen_baukasten_basis`, `wesen_baukasten_modul`, `wesen_baukasten_rolle`; `beschwoerbares_wesen_stufe`, `ressource_kreatur`, `stufe_bonus`, `kosten_punkte`, `mehrfach`, `gruppe`, `voraussetzungen`, `moegliche_dienste`, `modifikationen_strukturiert`; Schritt 5: `strukturiert` | `regelwerk/wesenBaukasten.ts`, `regelwerk/modifikationen.ts` |
 | Begleiter: Abrichtungen mit Zahlen, Vertraute | Abrichtungen: `modifikationen_strukturiert`, `wahlen`, `werte_hinweis`; Vertrautenmagie: `vertrautenmagie` (Meisterschaften), `typus` (Zauber) | `regelwerk/abrichtungsWerte.ts`, `regelwerk/vertraute.ts` |
 | Baukästen: doppelte Merkmale, Verbesserte Angriffe | Feinschliff-Regeln: `strukturiert` (`merkmale_zusammenfuehren`, `verbesserte_angriffe`); Rolle: `verbesserter_angriff`; Waffen: `schaden`, `wgs`, `modus`, `merkmale_text` | `regelwerk/modifikationen.ts`, `regelwerk/wesenBaukasten.ts`, `regelwerk/golem.ts` |
 | Lebenspunkte und Stufen der Begleiter | Kernregeln: `strukturiert`; Merkmale: `gesundheitsstufen_namen`, `betaeubungsimmun` | `regelwerk/vitals.ts` |
+| Schadens- und Heildialog | Splittergaben: `strukturiert.gaben`; Heilung: `strukturiert.pausen`, `ruheregeln`; Zustände: `hat_stufe`, `zustandswirkung`; Heilkunde: `auswirkungen` | `regelwerk/schadenUndHeilung.ts` |
 
 Ansichten (`components/`) greifen nicht selbst in die Paketdaten, sondern fragen die Module aus `regelwerk/`. Wo eine
 Ansicht das heute noch tut, steht sie in `src/fundament/altlasten.json` (`paketzugriffe`).
@@ -159,6 +160,8 @@ Fehlt einer, wird er dort ergänzt – nicht in der Ansicht nachgebaut.
 | Baustein | Zweck | Varianten |
 |---|---|---|
 | `Knopf` | jede Schaltfläche | `primaer` (Gold, eine je Ansicht), `sekundaer` (goldener Rahmen), `neutral`, `gefahr`, `erholung`; `nurSymbol` |
+| `Wahlknopf` | auswählbare Karte oder Filter (eine Wahl aus mehreren, Umschalter), `aria-pressed` | Ton im gewählten Zustand: `gold`, `erholung`, `gefahr`; `mittig` |
+| `Reiter` | Reiter einer Leiste (Hauptnavigation, Reiter in Dialogen), `role="tab"`, goldene Unterstreichung | – |
 | `Karte` | Fläche für einen zusammengehörigen Bereich | – |
 | `Abschnittstitel` | Titel eines Bereichs | `h2`, `h3` |
 | `Marke` | kleine Kennzeichnung: Zustand, Bonus, Kosten | Ton: `neutral`, `gold`, `unverletzt`, `erschoepft`, `schaden`, `kanalisiert`, `magie`, `temporaer`; `klein` |
@@ -175,9 +178,8 @@ Alle Ansichten verwenden die benannten Werte; fest eingetragene Farbwerte gibt e
 Würfelbanner, Druck), stehen in `src/fundament/klassen.css` – ebenfalls ohne eigene Farbwerte.
 
 Alle Dialoge haben die Titelzeile aus den Bausteinen (`Dialog` oder `Dialogkopf`, eine Prüfung hält das fest), schließen mit
-Escape und haben einen Schließen-Knopf mit Beschriftung für Vorleseprogramme. Auswahlkacheln (Methoden, Manöver, Mengen)
-bleiben eigene `<button>`-Elemente mit mindestens 44 Pixel Höhe; einfache Aktionen sind `Knopf`. Wer eine Ansicht anfasst,
-stellt verbliebene eigene Knöpfe dabei auf `Knopf` um (eine goldene Hauptaktion je Ansicht).
+Escape und haben einen Schließen-Knopf mit Beschriftung für Vorleseprogramme. Schaltflächen kommen aus den Bausteinen (`Knopf`, `Wahlknopf`, `Reiter`); eine Prüfung zählt selbst gebaute `<button>` je
+Datei (`knoepfe` in `src/fundament/altlasten.json`) und lässt sie nur weniger werden.
 
 ## 4. Arbeitsweise
 

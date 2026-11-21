@@ -157,6 +157,8 @@ export interface InventoryItem {
   handicap?: number;    // Behinderung, e.g. 1
   tickModifier?: number;// e.g. 1
   minStrength?: number; // e.g. 3
+  /** Härte (GRW: Bruchfestigkeit von Gegenständen; bei Relikten mit den Änderungen der Bausteine) */
+  hardness?: number;
 }
 
 export interface Money {
