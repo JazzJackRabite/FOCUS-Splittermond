@@ -61,6 +61,39 @@ export function regelnamenImCode(): string[] {
   return [...out].sort();
 }
 
+/**
+ * Suchmuster, die Regeltext lesen (Grundsatz 3): Regex-Literale und Textvergleiche (includes, startsWith, endsWith,
+ * indexOf, new RegExp) mit einer Wortfolge aus drei oder mehr Wörtern, sowie Suchmuster mit dem Namen einer Regel
+ * (Zauber, Meisterschaft, Stärke, Ressource des GRW). Regeltext liest die Datenseite und schreibt Felder.
+ */
+export function suchmuster(): string[] {
+  const paket = JSON.parse(fs.readFileSync(path.join(WURZEL, 'public/regelpakete/grw.srp.json'), 'utf8'));
+  const namen = new Set<string>();
+  for (const e of paket.eintraege) if ((REGELTYPEN.has(e.typ) || e.typ === 'ressource') && e.name.length >= 6 && !/\s/.test(e.name)) namen.add(e.name.toLowerCase());
+  const wortfolge = /[A-Za-zÄÖÜäöüß]{2,}(?: [A-Za-zÄÖÜäöüß]{2,}){2,}/;
+  const ohneSyntax = (r: string) => r.replace(/\\s[+*?]?/g, ' ').replace(/\(\?:|\)\??|\[[^\]]*\][+*?]?|\\[bdwB]|[\^$]/g, '').replace(/\|/g, '  ');
+  const out = new Set<string>();
+  for (const ordner of CODE) {
+    const o = path.join(SRC, ordner);
+    if (!fs.existsSync(o)) continue;
+    for (const p of dateien(o)) {
+      if (p.endsWith('.css')) continue;
+      const text = fs.readFileSync(p, 'utf8').replace(/\/\*[\s\S]*?\*\/|(^|[^:])\/\/[^\n]*/g, '$1');
+      const muster: string[] = [];
+      for (const m of text.matchAll(/(?<=[(=,:?!&|]\s*|return\s+)\/((?:\\\/|\[[^\]\n]*\]|[^/\n[])+)\/[gimsuy]*/g)) muster.push(m[1]);
+      for (const m of text.matchAll(/(?:new RegExp|\.includes|\.startsWith|\.endsWith|\.indexOf)\(\s*'([^'\n]+)'/g)) muster.push(m[1]);
+      for (const r of muster) {
+        const klar = ohneSyntax(r);
+        const w = klar.match(wortfolge);
+        if (w) { out.add(`${rel(p)}: ${w[0]}`); continue; }
+        const n = [...namen].find((x) => new RegExp(`(^|[^a-zäöüß:])${x}([^a-zäöüß]|$)`).test(klar.toLowerCase()));
+        if (n) out.add(`${rel(p)}: ${n}`);
+      }
+    }
+  }
+  return [...out].sort();
+}
+
 /** Zeilen der Tabelle „Regelquellen“ aus FUNDAMENT.md: Felder (Spalte 2) und Dateien (Spalte 3) */
 export function regelquellen(): { bereich: string; felder: string[]; dateien: string[] }[] {
   const md = fs.readFileSync(path.join(WURZEL, 'FUNDAMENT.md'), 'utf8');

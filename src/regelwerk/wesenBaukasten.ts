@@ -13,8 +13,8 @@ import type { Eintrag } from './typen';
 import type { Begleiter } from '../types';
 import type { Traeger } from './bedingungen';
 import { erfuellt } from './bedingungen';
-import { anwenden, leseModifikationen, merkmalRegel, summe, werteblock, type Werteblock } from './modifikationen';
-import { leseWahlen, wahlenAnwenden, type GolemWahl } from './golem';
+import { anwenden, ausStruktur, merkmalRegel, summe, werteblock, type Werteblock } from './modifikationen';
+import { wahlenAus, wahlenAnwenden, type GolemWahl } from './golem';
 import type { Ergebnis } from './typen';
 
 export type BaukastenArt = 'beschwoerbar' | 'kreatur';
@@ -189,9 +189,9 @@ export function wesenBaukastenWerte(k: Katalog, b: Begleiter): WesenBaukastenWer
   const wahlen: GolemWahl[] = []; const feinschliff: string[] = []; const feste: string[] = [];
   const zaehler = new Map<string, number>();
   const mods = gewaehlt.map(e => {
-    const m = leseModifikationen(k, e.daten.modifikationen);
+    const m = ausStruktur(e.daten.modifikationen_strukturiert);
     const nr = zaehler.get(e.id) ?? 0; zaehler.set(e.id, nr + 1);
-    const w = leseWahlen(m.rest, e.name, `${e.id}:${nr}`, schritt5?.schwelle ?? 1);
+    const w = wahlenAus(e.daten.modifikationen_strukturiert, e.name, `${e.id}:${nr}`, schritt5?.schwelle ?? 1);
     wahlen.push(...w.wahlen); feinschliff.push(...w.text.map(t => `${e.name}: ${t}`)); feste.push(...w.feste);
     return { ...m, rest: [] };
   });
@@ -221,8 +221,9 @@ export function wesenBaukastenWerte(k: Katalog, b: Begleiter): WesenBaukastenWer
     va = { punkte, verbraucht, kaeufe };
   }
   let werte = anwenden(k, grundwerte, summeMods, merkmalRegel(k, MERKMAL_REGEL[art]));
-  const merkmalName = art === 'beschwoerbar' ? /^Beschwörbares Wesen \d+$/ : /^Kreatur \d+$/;
-  werte = { ...werte, merkmale: werte.merkmale.map(x => (merkmalName.test(x) ? x.replace(/\d+$/, String(stufe)) : x)) };
+  // Stufenmerkmal der Grundlage (Datenseite: `stufenmerkmal`, z. B. „Kreatur 2“) auf die erreichte Stufe setzen
+  const sm: string | undefined = basis?.daten.stufenmerkmal;
+  werte = { ...werte, merkmale: werte.merkmale.map(x => (sm && x.startsWith(`${sm} `) && /^\d+$/.test(x.slice(sm.length + 1)) ? `${sm} ${stufe}` : x)) };
   wahlenAnwenden(k, werte, wahlen, feste, b.feinschliff ?? {}, (text, schluessel, mass = 1) => hinweise.push({ text, schluessel, mass }), 'das Wesen');
 
   // Voraussetzungen (Träger „wesen“): jeweils mit allen übrigen Bausteinen

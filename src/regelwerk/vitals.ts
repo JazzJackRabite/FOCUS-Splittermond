@@ -33,11 +33,9 @@ function monstermerkmal(k: Katalog, merkmal: string) {
 export function gesundheitsstufen(k: Katalog | null, merkmale: string[] = []): { stufen: Gesundheitsstufe[]; quelle: string | null } {
   const alle: Gesundheitsstufe[] = k?.get(ABGELEITET_ID)?.daten.strukturiert?.gesundheitsstufen?.map((s: { name: string; wundabzug: number }) => ({ name: s.name, wundabzug: s.wundabzug })) ?? STANDARD;
   if (k) for (const m of merkmale) {
-    const text = String(monstermerkmal(k, m)?.daten.beschreibung ?? '');
-    const i = text.search(/Regeln für die Stufen? /);
-    if (!/Gesundheitsstufe/.test(text) || i < 0) continue;
-    const rest = text.slice(i);
-    const namen = alle.filter(s => new RegExp(`\\b${s.name}\\b`).test(rest));
+    // eigene Gesundheitsstufen des Merkmals (Datenseite: gesundheitsstufen_namen)
+    const eigene: string[] = monstermerkmal(k, m)?.daten.gesundheitsstufen_namen ?? [];
+    const namen = alle.filter(s => eigene.includes(s.name));
     if (namen.length) return { stufen: namen, quelle: m.replace(/\s*[(\d].*$/, '') };
   }
   return { stufen: alle, quelle: null };
@@ -46,7 +44,7 @@ export function gesundheitsstufen(k: Katalog | null, merkmale: string[] = []): {
 /** Immun gegen Betäubungsschaden (z. B. Konstrukt)? */
 export function betaeubungsimmun(k: Katalog | null, merkmale: string[] = []): boolean {
   if (!k) return false;
-  return merkmale.some(m => /^Betäubungsimmunität/.test(m) || /immun gegen (?:[^.]*?)?Betäubungsschaden/.test(String(monstermerkmal(k, m)?.daten.beschreibung ?? '')));
+  return merkmale.some(m => !!monstermerkmal(k, m)?.daten.betaeubungsimmun);
 }
 
 export interface Lebenslage {

@@ -14,7 +14,7 @@ import { validateCharacterImport } from '../../utils/importValidation';
 import { Katalog } from '../katalog';
 import { abschliessen, basisAusDateien, begleiterErstellen, grimoireDatei, weiter } from './hilfen';
 import { erstelleKatalog, grimoireLesen } from '../laden';
-import { anwenden, iniPlus, leseModifikationen, mehrfachAusText, schadenPlus, werteblock } from '../modifikationen';
+import { anwenden, ausStruktur, iniPlus, schadenPlus, werteblock } from '../modifikationen';
 import { attributKosten, erhebungen, fertigkeitKosten, freieSchwelle, grenzHeldengrad, untotWerte, ANGRIFF } from '../untote';
 import { golemWerte, korpusse } from '../golem';
 import type { Begleiter, CharacterState } from '../../types';
@@ -24,32 +24,30 @@ const kat = { aktuell: K as Katalog };
 vi.mock('../RegelwerkContext', () => ({ useRegelwerk: () => ({ katalog: kat.aktuell }) }));
 
 describe('Modifikationen-Texte', () => {
-  it('liest feste Werte, Fertigkeiten, Merkmale; Wahlen bleiben Text', () => {
-    const m = leseModifikationen(K, 'Der Golem ist groß. Modifikationen: KON +1, STÄ +1; LP +1, VTD +2, SR +2; Angriff +1, INI −1; Athletik +2, Zähigkeit +2; '
-      + 'zusätzliches Merkmal: Dämmersicht; Merkmal Pazifist entfällt; ein beliebiges Attribut +1; GK +1 (maximal 7), Schaden +2, WGS +2, zusätzliches Waffenmerkmal Wuchtig');
+  // Das Auslesen der Texte macht die Datenseite (Werkzeuge/regelpakete/textauslese.py, mit Selbsttest beim Bau)
+  it('übernimmt das Feld modifikationen_strukturiert', () => {
+    const m = ausStruktur({ attribute: { KON: 1, 'STÄ': 1 }, abgeleitet: { LP: 1, VTD: 2, SR: 2, INI: -1, GK: 1 }, hoechstens: { GK: 7 }, angriff: 1, schaden: 2, wgs: 2,
+      fertigkeiten: { 'grw:fertigkeit:athletik': 2 }, merkmale_dazu: ['Dämmersicht'], merkmale_weg: ['Pazifist'], waffenmerkmale: ['Wuchtig'],
+      wahlen: [{ art: 'attribut', optionen: ['AUS'], bonus: 1, text: 'ein beliebiges Attribut +1' }], text: ['Sonderregel'] });
     expect(m.attribute).toEqual({ KON: 1, 'STÄ': 1 });
-    expect(m.abgeleitet).toEqual({ LP: 1, VTD: 2, SR: 2, INI: -1, GK: 1 });
     expect(m.hoechstens).toEqual({ GK: 7 });
     expect([m.angriff, m.schaden, m.wgs]).toEqual([1, 2, 2]);
-    expect(m.fertigkeiten).toEqual({ 'grw:fertigkeit:athletik': 2, 'grw:fertigkeit:zaehigkeit': 2 });
     expect(m.merkmaleDazu).toEqual(['Dämmersicht']);
-    expect(m.merkmaleWeg).toEqual(['Pazifist']);
-    expect(m.waffenmerkmale).toEqual(['Wuchtig']);
-    expect(m.rest).toEqual(['ein beliebiges Attribut +1']);
+    expect(m.rest).toEqual(['ein beliebiges Attribut +1', 'Sonderregel']);
+    expect(ausStruktur(undefined).rest).toEqual([]);
   });
   it('wendet an: Waffen, Initiative, Zerbrechlich → Schwächlich, Obergrenze', () => {
     const w = werteblock(K, {
       attribute: { KON: '2' }, abgeleitete_werte: { GK: '7', LP: '5', SR: '0' }, merkmale: 'Pazifist, Zerbrechlich',
       waffen: [{ name: 'Körper', wert: '4', schaden: '1W10', wgs: '8', ini: '9−1W6', merkmale: '–' }],
     });
-    const m = leseModifikationen(K, 'GK +1 (maximal 7), Angriff +2, Schaden +1, INI −2; Merkmal Pazifist entfällt; etwaiges Merkmal Zerbrechlich wird zu Schwächlich oder etwaiges Merkmal Schwächlich entfällt');
+    const m = ausStruktur({ abgeleitet: { GK: 1, INI: -2 }, hoechstens: { GK: 7 }, angriff: 2, schaden: 1, merkmale_weg: ['Pazifist'], robuster: 1 });
     const r = anwenden(K, w, m);
     expect(r.abgeleitet.GK).toBe(7);
     expect(r.waffen[0]).toMatchObject({ wert: 6, schaden: '1W10+1', ini: '7−1W6' });
     expect(r.merkmale).toEqual(['Schwächlich']);
     expect(schadenPlus('2W6+3', -4)).toBe('2W6−1');
     expect(iniPlus('8−1W6', -1)).toBe('7−1W6');
-    expect([mehrfachAusText('bis zu zweimal gewählt'), mehrfachAusText('beliebig oft'), mehrfachAusText('Der Golem ...')]).toEqual([2, Infinity, 1]);
   });
 });
 

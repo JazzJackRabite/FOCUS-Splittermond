@@ -173,7 +173,7 @@ const Abrichtungen: React.FC<SchrittProps> = ({ k, b, aendern, besitzer }) => {
   });
   const angebot = liste.map(a => {
     const n = gewaehlt.filter(x => x === a.id).length;
-    const grenze = a.mehrfachText && /pro (hg|heldengrad) des besitzers/i.test(a.mehrfachText) ? besitzer.heldengrad : a.hoechstens;
+    const grenze = a.jeHeldengrad ? besitzer.heldengrad : a.hoechstens;
     return { a, voll: n >= grenze, ergebnis: pruefeAbrichtung(k, a, besitzer.char, tierTraeger(k, b), n) };
   });
   const gruppen = [...new Set(liste.map(a => a.gruppe))];

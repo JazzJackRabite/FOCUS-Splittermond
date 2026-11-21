@@ -8,7 +8,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { basisAusDateien, grimoireDatei } from './hilfen';
 import { erstelleKatalog, grimoireLesen } from '../laden';
 import { Katalog } from '../katalog';
-import { merkmaleZusammenfuehren, leseModifikationen, anwenden, type MerkmalRegel } from '../modifikationen';
+import { merkmaleZusammenfuehren, ausStruktur, anwenden, type MerkmalRegel } from '../modifikationen';
 import { tierGrundwerte, tierWerte } from '../abrichtungsWerte';
 import { wesenBaukastenWerte } from '../wesenBaukasten';
 import { vertrautenMeisterschaften, alleVertrautenMeisterschaften, alleVertrautenZauber } from '../vertraute';
@@ -30,7 +30,8 @@ describe('Merkmale zusammenführen (ohne Grimoires)', () => {
     expect(merkmaleZusammenfuehren(['Flugwesen', 'Flugwesen'], { ...regel, stufen_addieren: false })).toEqual(['Flugwesen']);
   });
   it('„Merkmal X N oder +M“ und „Waffenmerkmal X N oder +M“', () => {
-    const m = leseModifikationen(GRW, 'Angriff +2, Merkmal Furchterregend 15 oder +5, Waffenmerkmal Kritisch 1 oder +1');
+    // Datenseite (textauslese.py) liest „Angriff +2, Merkmal Furchterregend 15 oder +5, Waffenmerkmal Kritisch 1 oder +1“
+    const m = ausStruktur({ angriff: 2, merkmale_stufe: [{ name: 'Furchterregend', neu: 15, plus: 5 }], waffenmerkmale_stufe: [{ name: 'Kritisch', neu: 1, plus: 1 }] });
     expect(m.merkmaleStufe).toEqual([{ name: 'Furchterregend', neu: 15, plus: 5 }]);
     expect(m.waffenmerkmaleStufe).toEqual([{ name: 'Kritisch', neu: 1, plus: 1 }]);
     const w = { attribute: {}, abgeleitet: { LP: 10 }, fertigkeiten: [], merkmale: ['Furchterregend 15'], waffen: [{ name: 'Biss', wert: 10, schaden: '1W6', wgs: '6', ini: '5', merkmale: 'Kritisch 1, Scharf 2' }] };

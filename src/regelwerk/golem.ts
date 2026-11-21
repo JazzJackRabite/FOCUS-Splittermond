@@ -10,7 +10,7 @@ import { ABGELEITET_ID } from './abgeleitet';
 import type { Eintrag } from './typen';
 import type { Begleiter } from '../types';
 import {
-  anwenden, leer, leseModifikationen, mehrfachAusText, merkmalRegel, summe, werteblock, type Modifikationen, type Werteblock,
+  anwenden, ausStruktur, leer, merkmalRegel, summe, werteblock, type Modifikationen, type ModifikationenStruktur, type Werteblock,
 } from './modifikationen';
 
 export const BAUSTEIN_ARTEN = ['Zusätzliche Fähigkeit', 'Rolle', 'Applikation', 'Schwachpunkt', 'Instruktion', 'Verfügung'] as const;
@@ -54,12 +54,13 @@ export function korpusStufe(e: Eintrag): number {
 /** Wie oft darf ein Baustein gewählt werden? Laut Paket (beliebig oft je Bausteinart, Höchstzahl), sonst nach Beschreibung */
 export function hoechstens(k: Katalog, e: Eintrag): number {
   if ((golemRegeln(k)?.mehrfach_beliebig ?? []).includes(e.daten.baustein)) return Infinity;
-  return Number(e.daten.baustein_werte?.hoechstens) || mehrfachAusText(e.daten.beschreibung);
+  const t = e.daten.mehrfach_aus_text;
+  return Number(e.daten.baustein_werte?.hoechstens) || (t === 'beliebig' ? Infinity : Number(t) || 1);
 }
 
-/** Voraussetzung „Voraussetzung: Zusätzliche Fähigkeit Aggressiv“ → Name */
+/** Voraussetzung eines Bausteins (Name eines anderen Bausteins; Datenseite: `voraussetzung_name`) */
 export function voraussetzung(e: Eintrag): string | null {
-  return String(e.daten.beschreibung ?? '').match(/Voraussetzung: (?:Zusätzliche Fähigkeit )?([^;,.]+)/)?.[1]?.trim() ?? null;
+  return e.daten.voraussetzung_name ?? null;
 }
 
 /** Zahlen der Schwachpunkte, die die Beschreibung nur als Prosa nennt (`baustein_werte` im Paket) */
@@ -69,11 +70,13 @@ function schwachpunktModifikation(e: Eintrag): Modifikationen {
   return m;
 }
 
-/** Sonderausstattung (Tabelle Schritt 5): Zeilen mit zwei Möglichkeiten („SR +2“ oder „Applikation Gefügig (x2)“) */
+/** Sonderausstattung (Tabelle Schritt 5): Zeilen mit zwei Möglichkeiten („SR +2“ oder „Applikation Gefügig (x2)“), Datenseite: `sonderausstattung` */
 export function sonderausstattungen(k: Katalog): { optionen: string[]; material: string }[] {
-  const r = Object.values(k.eintraege).find(e => e.typ === 'regel' && /baukasten-schritt-5-feinschliff$/.test(e.id));
-  const t = (r?.daten.tabellen ?? []).find((x: { kopf: string[] }) => x.kopf?.[0] === 'Wirkung');
-  return (t?.zeilen ?? []).map((z: string[]) => ({ optionen: z[0].split(/ oder /).map(s => s.trim()), material: z[1] }));
+  return sonderausstattungDaten(k).map(z => ({ optionen: z.optionen.map(o => o.text), material: z.material }));
+}
+function sonderausstattungDaten(k: Katalog): { optionen: { text: string; modifikationen_strukturiert: ModifikationenStruktur }[]; material: string }[] {
+  const r = Object.values(k.eintraege).find(e => e.typ === 'regel' && e.id.endsWith('baukasten-schritt-5-feinschliff'));
+  return r?.daten.sonderausstattung ?? [];
 }
 
 /** Höchste Meisterschaftsschwelle nach Stufe des Merkmals Golem (Tabelle Schritt 5) */
@@ -93,7 +96,7 @@ export function golemSchwelle(k: Katalog, stufe: number): number {
 /** Animierungszauber, der einen Golem dieser Stufe animieren kann („Merkmal Golem 3 oder niedriger“) */
 export function animierung(k: Katalog, stufe: number): Eintrag | null {
   const z = Object.values(k.eintraege).filter(e => e.typ === 'zauber' && (e.daten.typus ?? []).includes('Animierung'))
-    .map(e => ({ e, bis: Number(String(e.daten.wirkung ?? '').match(/Merkmal Golem (\d+)/)?.[1] ?? 0) }))
+    .map(e => ({ e, bis: Number(e.daten.golem_stufe_bis ?? 0) }))
     .filter(x => x.bis >= stufe).sort((a, b) => a.bis - b.bis);
   return z[0]?.e ?? null;
 }
@@ -108,28 +111,10 @@ export type GolemWahl = { schluessel: string; quelle: string; text: string } & (
 
 const ALLE_ATTRIBUTE = ['AUS', 'BEW', 'INT', 'KON', 'MYS', 'STÄ', 'VER', 'WIL'];
 
-/** Wahl-Texte eines Bausteins → Wahlen; übrige Texte bleiben Text. feste: „zusätzliche Meisterschaften: …“ ohne Wahl */
-export function leseWahlen(rest: string[], quelle: string, quellId: string, schwelleSchritt5: number): { wahlen: GolemWahl[]; text: string[]; feste: string[] } {
-  const wahlen: GolemWahl[] = []; const text: string[] = []; const feste: string[] = [];
-  let n = 0;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const neu = (w: Record<string, any>) => wahlen.push({ ...w, schluessel: `${quellId}#${n++}`, quelle } as GolemWahl);
-  for (const r0 of rest) {
-    const r = r0.trim();
-    let m: RegExpMatchArray | null;
-    if ((m = r.match(/^ein beliebiges Attribut \+(\d+)$/))) { neu({ art: 'attribut', optionen: ALLE_ATTRIBUTE, bonus: Number(m[1]), text: r }); continue; }
-    if ((m = r.match(/^((?:[A-ZÄ]{3} oder )+[A-ZÄ]{3}) \+(\d+)$/))) { neu({ art: 'attribut', optionen: m[1].split(' oder '), bonus: Number(m[2]), text: r }); continue; }
-    if ((m = r.match(/^eine noch nicht freigeschaltete Fertigkeit auf (\d+) oder eine bestehende \+(\d+)$/))) { neu({ art: 'fertigkeit', neu: Number(m[1]), plus: Number(m[2]), text: r }); continue; }
-    if ((m = r.match(/^(\d+) freie Fertigkeitspunkte[^(]*\(max\. \+(\d+) pro Fertigkeit\)$/))) { neu({ art: 'punkte', anzahl: Number(m[1]), max: Number(m[2]), text: r }); continue; }
-    const frei = [...r.matchAll(/eine freie Meisterschaft \[Schwelle (\d+|siehe Schritt 5)\]/g)];
-    if (frei.length) {
-      for (const f of frei) neu({ art: 'meisterschaft', schwelle: /^\d+$/.test(f[1]) ? Number(f[1]) : schwelleSchritt5, text: f[0] });
-      continue;
-    }
-    if ((m = r.match(/^zusätzliche Meisterschaften?: (.+)$/))) { feste.push(m[1]); continue; }
-    text.push(r);
-  }
-  return { wahlen, text, feste };
+/** Wahlen einer strukturierten Modifikation mit Schlüsseln; „schritt5“ = Schwelle aus der Feinschliff-Tabelle */
+export function wahlenAus(st: ModifikationenStruktur | null | undefined, quelle: string, quellId: string, schwelleSchritt5: number): { wahlen: GolemWahl[]; text: string[]; feste: string[] } {
+  const wahlen = (st?.wahlen ?? []).map((w, n) => ({ ...w, ...(w.art === 'meisterschaft' ? { schwelle: w.schwelle === 'schritt5' ? schwelleSchritt5 : w.schwelle } : {}), schluessel: `${quellId}#${n}`, quelle }) as GolemWahl);
+  return { wahlen, text: [...(st?.text ?? [])], feste: [...(st?.feste_meisterschaften ?? [])] };
 }
 
 /**
@@ -258,21 +243,22 @@ export function golemWerte(k: Katalog, b: Begleiter): GolemWerte {
     const grund = werteblock(k, { ...korpus.daten.werte, fertigkeiten_refs: korpus.daten.fertigkeiten_refs });
     const mods: Modifikationen[] = [];
     const feste: string[] = [];
-    const mitWahl = (m: Modifikationen, quelle: string, id: string) => {
-      const w = leseWahlen(m.rest.filter(r => !/^Applikation /.test(r)), quelle, id, schwelle5);
-      wahlen.push(...w.wahlen); feinschliff.push(...w.text); feste.push(...w.feste);
-      return { ...m, rest: [] };
+    const mitWahl = (st: ModifikationenStruktur | undefined, quelle: string, id: string) => {
+      const w = wahlenAus(st, quelle, id, schwelle5);
+      wahlen.push(...w.wahlen); feinschliff.push(...w.text.filter(r => !r.startsWith('Applikation '))); feste.push(...w.feste);
+      return { ...ausStruktur(st), rest: [] };
     };
-    if (material) mods.push(leseModifikationen(k, material.daten.felder?.modifikationen));
+    if (material) mods.push(ausStruktur(material.daten.felder?.modifikationen_strukturiert));
     const matSp = materialSchwachpunkt ? bausteine(k, 'Schwachpunkt').find(e => e.name === materialSchwachpunkt) : undefined;
     if (matSp) mods.push(schwachpunktModifikation(matSp));
     const zaehler = new Map<string, number>();
     for (const e of [...gewaehlt['Zusätzliche Fähigkeit'], ...gewaehlt.Rolle]) {
       const nr = zaehler.get(e.id) ?? 0; zaehler.set(e.id, nr + 1);
-      mods.push(mitWahl(leseModifikationen(k, String(e.daten.beschreibung).replace(/^Voraussetzung:[^;]*;\s*/, '')), e.name, `${e.id}:${nr}`));
+      mods.push(mitWahl(e.daten.modifikationen_strukturiert, e.name, `${e.id}:${nr}`));
     }
     for (const e of gewaehlt.Schwachpunkt) mods.push(schwachpunktModifikation(e));
-    sa.forEach((s2, i) => mods.push(mitWahl(leseModifikationen(k, s2), 'Sonderausstattung', `sa:${i}`)));
+    const saDaten = sonderausstattungDaten(k).flatMap(z => z.optionen);
+    sa.forEach((s2, i) => mods.push(mitWahl(saDaten.find(o => o.text === s2)?.modifikationen_strukturiert, 'Sonderausstattung', `sa:${i}`)));
     const m = summe(...mods);
     // doppelte Merkmale nach Schritt 5 zusammenführen (Die Magie S. 207)
     werte = anwenden(k, grund, m, merkmalRegel(k, 'magie:regel:regeln:baukasten-schritt-5-feinschliff'));

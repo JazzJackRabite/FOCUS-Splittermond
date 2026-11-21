@@ -11,22 +11,23 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { FARBEN_ERLAUBT, WURZEL, farbtabelle, farbwerte, kontrast, kontrastBefunde, paketzugriffe, regelnamenImCode, regelquellen, regelquellenBefunde } from './pruefen';
+import { FARBEN_ERLAUBT, WURZEL, farbtabelle, farbwerte, kontrast, kontrastBefunde, paketzugriffe, regelnamenImCode, regelquellen, regelquellenBefunde, suchmuster } from './pruefen';
 import { Abschnittstitel, Auswahl, Dialog, Eingabe, Karte, Knopf, Marke, Rauten, Rollbereich } from '..';
 
 const ALTLASTEN = path.join(WURZEL, 'src/fundament/altlasten.json');
 
 describe('Fundament: Altlasten dürfen nur weniger werden', () => {
-  const ist = { farbwerte: farbwerte(), regelnamen: regelnamenImCode(), paketzugriffe: paketzugriffe() };
+  const ist = { farbwerte: farbwerte(), regelnamen: regelnamenImCode(), paketzugriffe: paketzugriffe(), suchmuster: suchmuster() };
   if (process.env.FUNDAMENT_ALTLASTEN === 'schreiben') {
     fs.writeFileSync(ALTLASTEN, JSON.stringify({
       _hinweis: 'Bekannte Verstöße gegen FUNDAMENT.md. Wird nur kleiner: nach einer Umstellung mit FUNDAMENT_ALTLASTEN=schreiben npx vitest run src/fundament neu schreiben. Nie von Hand erweitern.',
       farbwerte: ist.farbwerte,
       regelnamen: ist.regelnamen,
       paketzugriffe: ist.paketzugriffe,
+      suchmuster: ist.suchmuster,
     }, null, 2) + '\n');
   }
-  const soll = JSON.parse(fs.readFileSync(ALTLASTEN, 'utf8')) as { farbwerte: Record<string, number>; regelnamen: string[]; paketzugriffe: string[] };
+  const soll = JSON.parse(fs.readFileSync(ALTLASTEN, 'utf8')) as { farbwerte: Record<string, number>; regelnamen: string[]; paketzugriffe: string[]; suchmuster?: string[] };
 
   it(`Farbwerte stehen nur in ${FARBEN_ERLAUBT}`, () => {
     const zuviel = Object.entries(ist.farbwerte)
@@ -38,6 +39,11 @@ describe('Fundament: Altlasten dürfen nur weniger werden', () => {
   it('keine neuen Regelnamen im Programmcode', () => {
     const neu = ist.regelnamen.filter((x) => !soll.regelnamen.includes(x));
     expect(neu, 'Ein Zauber-, Meisterschafts- oder Stärkenname steht als Text im Code. Regeln kommen aus den Regelpaketen (FUNDAMENT.md, Regelquellen): den Wert ins Paket legen und über die ID oder das Datenfeld lesen.').toEqual([]);
+  });
+
+  it('keine Suchmuster, die Regeltext lesen (Grundsatz 3)', () => {
+    const neu = ist.suchmuster.filter((x) => !(soll.suchmuster ?? []).includes(x));
+    expect(neu, 'Ein Suchmuster liest Regeltext (Wortfolge aus drei oder mehr Wörtern) oder sucht nach dem Namen einer Regel. Das Auslesen gehört auf die Datenseite (Werkzeuge/regelpakete, z. B. textauslese.py), der Editor liest das Feld bzw. die ID.').toEqual([]);
   });
 
   it('die Tabelle „Regelquellen“ in FUNDAMENT.md passt zum Code', () => {

@@ -64,12 +64,12 @@ Felder stehen unter `daten` des jeweiligen Eintrags. **Was hier nicht steht, dar
 | Zauber, Meisterschaften, Stärken, Ressourcen aus Grimoires in den Auswahllisten | `schulen`, `kosten`, `zauberdauer`, `reichweite`, `wirkungsdauer`, `wirkung`, `erfolgsgrade`, `schwelle`, `stufe`, `fertigkeit`, `manoever` | `regelwerk/bruecke.ts` |
 | Ausrüstung aus Grimoires | Ausrüstungseinträge; `modus` (ersetzt, ergänzt) | `regelwerk/ausruestung.ts` |
 | Relikte | `relikt_baukasten`, `baustein` | `regelwerk/relikte.ts` |
-| Begleiter: Tiere, beschworene Wesen, Dienste | `werte_berechnet`, `tabellenzeile`, `beschwoerbares_wesen_stufe`, `immer_verfuegbar` | `regelwerk/begleiter.ts`, `regelwerk/dienste.ts` |
-| Begleiter: Gefolge, erhobene Untote, Golems | `attribute`, `modulwerte`, `modifikationen`, `kosten_ep`, `baustein`, `felder`, `tabellen` | `regelwerk/gefolge.ts`, `regelwerk/untote.ts`, `regelwerk/golem.ts`, `regelwerk/modifikationen.ts` |
-| Begleiter: Wesen-Baukasten (beschwörbare Wesen, Kreaturen) | Einträge `wesen_baukasten_basis`, `wesen_baukasten_modul`, `wesen_baukasten_rolle`; `beschwoerbares_wesen_stufe`, `ressource_kreatur`, `stufe_bonus`, `kosten_punkte`, `mehrfach`, `gruppe`, `voraussetzungen`, `moegliche_dienste`, `modifikationen`; Schritt 5: `strukturiert` | `regelwerk/wesenBaukasten.ts`, `regelwerk/modifikationen.ts` |
-| Begleiter: Abrichtungen mit Zahlen, Vertraute | Abrichtungen: `modifikationen`, `wahlen`, `werte_hinweis`; Vertrautenmagie: `vertrautenmagie` (Meisterschaften), `typus` (Zauber) | `regelwerk/abrichtungsWerte.ts`, `regelwerk/vertraute.ts` |
+| Begleiter: Tiere, beschworene Wesen, Dienste | `werte_berechnet`, `tabellenzeile`, `beschwoerbares_wesen_stufe`, `immer_verfuegbar`; Abrichtungen: `mehrfach_grenze` | `regelwerk/begleiter.ts`, `regelwerk/dienste.ts` |
+| Begleiter: Gefolge, erhobene Untote, Golems | `attribute`, `modulwerte`, `modifikationen_strukturiert`, `kosten_ep`, `baustein`, `felder`, `tabellen`; Golem-Bausteine: `voraussetzung_name`, `mehrfach_aus_text`; Feinschliff: `sonderausstattung`; Animierungszauber: `golem_stufe_bis` | `regelwerk/gefolge.ts`, `regelwerk/untote.ts`, `regelwerk/golem.ts`, `regelwerk/modifikationen.ts` |
+| Begleiter: Wesen-Baukasten (beschwörbare Wesen, Kreaturen) | Einträge `wesen_baukasten_basis`, `wesen_baukasten_modul`, `wesen_baukasten_rolle`; `beschwoerbares_wesen_stufe`, `ressource_kreatur`, `stufe_bonus`, `kosten_punkte`, `mehrfach`, `gruppe`, `voraussetzungen`, `moegliche_dienste`, `modifikationen_strukturiert`; Schritt 5: `strukturiert` | `regelwerk/wesenBaukasten.ts`, `regelwerk/modifikationen.ts` |
+| Begleiter: Abrichtungen mit Zahlen, Vertraute | Abrichtungen: `modifikationen_strukturiert`, `wahlen`, `werte_hinweis`; Vertrautenmagie: `vertrautenmagie` (Meisterschaften), `typus` (Zauber) | `regelwerk/abrichtungsWerte.ts`, `regelwerk/vertraute.ts` |
 | Baukästen: doppelte Merkmale, Verbesserte Angriffe | Feinschliff-Regeln: `strukturiert` (`merkmale_zusammenfuehren`, `verbesserte_angriffe`); Rolle: `verbesserter_angriff`; Waffen: `schaden`, `wgs`, `modus`, `merkmale_text` | `regelwerk/modifikationen.ts`, `regelwerk/wesenBaukasten.ts`, `regelwerk/golem.ts` |
-| Lebenspunkte und Stufen der Begleiter | Kernregeln: `strukturiert`; Merkmale: `beschreibung` | `regelwerk/vitals.ts` |
+| Lebenspunkte und Stufen der Begleiter | Kernregeln: `strukturiert`; Merkmale: `gesundheitsstufen_namen`, `betaeubungsimmun` | `regelwerk/vitals.ts` |
 
 Ansichten (`components/`) greifen nicht selbst in die Paketdaten, sondern fragen die Module aus `regelwerk/`. Wo eine
 Ansicht das heute noch tut, steht sie in `src/fundament/altlasten.json` (`paketzugriffe`).
@@ -84,9 +84,10 @@ Datenseite wandern. Neue kommen nicht hinzu.
 | Rückfall ohne geladenes Paket: Listen des Grundregelwerks (Zauber, Meisterschaften, Stärken, Schwächen, Ressourcen, Ausrüstung, Sprachen) | `src/data/*.ts` | Werden nur noch gelesen, solange kein Paket geladen ist (Start der App, einzelne Tests); Tests halten sie gleich mit dem Paket (`grwListen.test.ts`, `ausruestung.test.ts`). Entfällt, sobald der Editor ohne Rückfall startet |
 | Rückfall ohne geladenes Paket: Attribute, Fertigkeiten mit Attributen, Rassen, Mondzeichen, Heldengrade, Gesundheitsstufen | `src/data/rules.ts` | Wie oben; nur noch über `regelwerk/grwListen.ts` und `steigerungsregeln.ts` gelesen |
 | Rückfall ohne geladenes Paket: Werte des Grundregelwerks für Proben (Würfel, Patzer, Triumph, EG-Stufen) und Zauber-EG (Optionen, Auslösezeit) | `regelwerk/proben.ts`, `regelwerk/zauberEg.ts` | Wie oben; mit Paket gelten nur dessen Werte |
-| Regelwerte für Gefolge, Untote und Golems (Kosten, Grenzen, Preisformel) | `regelwerk/gefolge.ts`, `untote.ts`, `golem.ts` | `strukturiert` an den Regeltexten |
 
-Die genaue Liste der geduldeten Regelnamen steht in `src/fundament/altlasten.json` (`regelnamen`).
+Die genaue Liste der geduldeten Regelnamen und Suchmuster steht in `src/fundament/altlasten.json` (`regelnamen`, `suchmuster`).
+Suchmuster, die Regeltext lesen (eine Wortfolge aus drei oder mehr Wörtern oder der Name einer Regel), sind im Editor nicht
+erlaubt: Was aus Fließtext gelesen werden muss, liest die Datenseite (`Werkzeuge/regelpakete/textauslese.py`) und schreibt ein Feld.
 Ohne geladenes Regelpaket rechnet der Editor mit diesen eingebauten Werten weiter (Rückfall). Die Beispielcharaktere
 (`src/data/presets.ts`) nennen Einträge beim Namen; beim Laden einer Vorlage schreibt der Editor die IDs aus dem Paket mit,
 und ein Test prüft, dass jeder Name eine ID im GRW-Paket hat (`vorlagen.test.ts`). Für die Zustände des Grundregelwerks liegt der Rückfall in

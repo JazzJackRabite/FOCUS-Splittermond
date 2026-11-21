@@ -50,10 +50,11 @@ describe('Tiergefährten aus dem GRW', () => {
 describe('Regeln ohne Buch', () => {
   it('Mehrfachwahl', () => {
     expect(mehrfachGrenze(null, 2)).toBe(1);
-    expect(mehrfachGrenze('beliebig oft', 2)).toBe(Infinity);
-    expect(mehrfachGrenze('maximal viermal', 2)).toBe(4);
-    expect(mehrfachGrenze('maximal dreimal', 2)).toBe(3);
-    expect(mehrfachGrenze('einmal pro HG des Besitzers', 3)).toBe(3);
+    expect(mehrfachGrenze({ beliebig: true }, 2)).toBe(Infinity);
+    expect(mehrfachGrenze({ anzahl: 4 }, 2)).toBe(4);
+    expect(mehrfachGrenze({ anzahl: 3 }, 2)).toBe(3);
+    expect(mehrfachGrenze({ je_heldengrad: true }, 3)).toBe(3);
+    expect(mehrfachGrenze({ spielleitung: true }, 3)).toBe(Infinity);
   });
   it('Zuordnung der Ressourcen Kreatur', () => {
     expect(kreaturZuordnung([3, 2], [2, 3])).toBe(true);

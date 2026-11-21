@@ -1,11 +1,10 @@
 /**
- * „Modifikationen“-Texte aus den Baukästen (Golem-Bausteine, Golem-Material, Abnormitäten, Wesen-Baukasten), z. B.
- * „KON +1, STÄ +1; LP +1, VTD +2, SR +2; Angriff +1; Athletik +2; zusätzliches Merkmal: Dämmersicht; Merkmal Pazifist entfällt“.
- * Feste Zahlenwerte werden ausgelesen und auf einen Wertekasten angewendet; alles andere (Wahlen wie „ein beliebiges Attribut
- * +1“, freie Fertigkeitspunkte, freie Meisterschaften, Sonderregeln) bleibt als Text für die Spielleitung bzw. den Feinschliff.
+ * Modifikationen aus den Baukästen (Golem-Bausteine, Golem-Material, Abnormitäten, Wesen-Baukasten, Abrichtungen).
+ * Die Datenseite liest die Texte aus und schreibt `modifikationen_strukturiert` (Werkzeuge/regelpakete/textauslese.py);
+ * der Editor liest nur dieses Feld und wendet die festen Zahlen auf einen Wertekasten an. Wahlen (ein beliebiges Attribut,
+ * freie Fertigkeitspunkte, freie Meisterschaften) und übrige Texte stehen ebenfalls im Feld.
  */
 import type { Katalog } from './katalog';
-import { norm } from './bruecke';
 
 export const ATTRIBUT_KURZ = ['AUS', 'BEW', 'INT', 'KON', 'MYS', 'STÄ', 'VER', 'WIL'];
 export const ABGELEITET_KURZ = ['GK', 'GSW', 'INI', 'LP', 'FO', 'VTD', 'SR', 'KW', 'GW'];
@@ -51,7 +50,7 @@ export const leer = (): Modifikationen => ({
 const zahl = (s: string) => Number(s.replace(/[−–]/g, '-').replace('+', ''));
 const plus = (r: Record<string, number>, k: string, v: number) => { r[k] = (r[k] ?? 0) + v; };
 
-/** Kommas außerhalb von Klammern trennen */
+/** Kommas außerhalb von Klammern trennen (Listen in Wertekästen) */
 function teile(s: string, zeichen: string): string[] {
   const out: string[] = []; let tiefe = 0; let akt = '';
   for (const c of s) {
@@ -63,53 +62,35 @@ function teile(s: string, zeichen: string): string[] {
   return out.map(x => x.trim()).filter(Boolean);
 }
 
-/** Fertigkeit nach Namen (ohne Gruppenfertigkeiten) */
-function fertigkeitNachName(k: Katalog, name: string): string | undefined {
-  const n = norm(name);
-  return Object.values(k.eintraege).find(e => e.typ === 'fertigkeit' && norm(e.name) === n)?.id;
+/** Wahl aus einem Modifikationen-Text, wie die Datenseite sie schreibt (Schwelle „schritt5“: nach Feinschliff-Tabelle) */
+export type WahlRoh =
+  | { art: 'attribut'; optionen: string[]; bonus: number; text: string }
+  | { art: 'meisterschaft'; schwelle: number | 'schritt5'; text: string }
+  | { art: 'fertigkeit'; neu: number; plus: number; text: string }
+  | { art: 'punkte'; anzahl: number; max: number; text: string };
+
+/** Feld `modifikationen_strukturiert` im Paket */
+export interface ModifikationenStruktur {
+  attribute?: Record<string, number>; abgeleitet?: Record<string, number>; hoechstens?: Record<string, number>; fertigkeiten?: Record<string, number>;
+  angriff?: number; schaden?: number; wgs?: number; robuster?: number;
+  merkmale_dazu?: string[]; merkmale_weg?: string[]; waffenmerkmale?: string[]; waffenmerkmale_weg?: string[];
+  merkmale_stufe?: { name: string; neu: number; plus: number }[]; waffenmerkmale_stufe?: { name: string; neu: number; plus: number }[];
+  wahlen?: WahlRoh[]; feste_meisterschaften?: string[]; text?: string[];
 }
 
-/** Liest einen Modifikationen-Text. Ein vorangestelltes „…Modifikationen:“ (Prosa davor) wird übersprungen. */
-export function leseModifikationen(k: Katalog, text: string | null | undefined, m: Modifikationen = leer()): Modifikationen {
-  if (!text) return m;
-  let t = text;
-  const i = t.search(/Modifikationen:/);
-  if (i >= 0) t = t.slice(i + 'Modifikationen:'.length);
-  t = t.trim().replace(/\.$/, '');
-  for (const abschnitt of teile(t, ';')) {
-    // Listen nach Doppelpunkt: „zusätzliches Merkmal: X“, „zusätzliche Merkmale: A, B“
-    const merkmal = abschnitt.match(/^zusätzliche[sn]? (?:Monster)?[Mm]erkmale?:\s*(.+)$/);
-    if (merkmal) { m.merkmaleDazu.push(...teile(merkmal[1], ',').filter(x => !/^aus der folgenden|^zwei/.test(x))); if (/aus der folgenden|zwei zusätzliche/.test(abschnitt)) m.rest.push(abschnitt); continue; }
-    const stuecke = teile(abschnitt, ',');
-    const doppel = stuecke.findIndex(x => /:/.test(x));
-    if (doppel >= 0) m.rest.push(stuecke.splice(doppel).join(', '));
-    for (const teil of stuecke) {
-      if (/^etwaiges Merkmal Zerbrechlich wird zu Schwächlich/.test(teil)) { m.robuster++; continue; }
-      const stufe = teil.match(/^(Waffenmerkmal|Merkmal) (.+?) (\d+) oder \+(\d+)$/);
-      if (stufe) { (stufe[1] === 'Merkmal' ? m.merkmaleStufe : m.waffenmerkmaleStufe).push({ name: stufe[2], neu: Number(stufe[3]), plus: Number(stufe[4]) }); continue; }
-      const wmWeg = teil.match(/^(?:etwaiges )?Waffenmerkmal (.+?) entfällt$/);
-      if (wmWeg) { m.waffenmerkmaleWeg.push(wmWeg[1]); continue; }
-      const wm = teil.match(/^(?:zusätzliches |Angriffe erhalten )?Waffenmerkmal (.+)$/);
-      if (wm) { m.waffenmerkmale.push(wm[1]); continue; }
-      const weg = teil.match(/^(?:etwaiges )?Merkmal (.+?) entfällt$/);
-      if (weg) { m.merkmaleWeg.push(weg[1]); continue; }
-      const dazu = teil.match(/^zusätzliche[sn]? (?:Monster)?[Mm]erkmal (.+)$/);
-      if (dazu) { m.merkmaleDazu.push(dazu[1]); continue; }
-      const w = teil.match(/^([A-Za-zÄÖÜäöüß][A-Za-zÄÖÜäöüß \-]*?) ([+\-−–]\s?\d+)(?: \(maximal (\d+)\))?$/);
-      if (!w) { m.rest.push(teil); continue; }
-      const [, roh, wertText, max] = w; const v = zahl(wertText.replace(/\s/g, ''));
-      const name = roh === 'Initiative' ? 'INI' : roh;
-      if (ATTRIBUT_KURZ.includes(name)) plus(m.attribute, name, v);
-      else if (ABGELEITET_KURZ.includes(name)) { plus(m.abgeleitet, name, v); if (max) m.hoechstens[name] = Number(max); }
-      else if (name === 'Angriff') m.angriff += v;
-      else if (name === 'Schaden') m.schaden += v;
-      else if (name === 'WGS') m.wgs += v;
-      else {
-        const f = fertigkeitNachName(k, name);
-        if (f) plus(m.fertigkeiten, f, v); else m.rest.push(teil);
-      }
-    }
-  }
+/** Feste Zahlen einer strukturierten Modifikation; `rest` bekommt die Texte (Wahlen und Übriges) */
+export function ausStruktur(s: ModifikationenStruktur | null | undefined): Modifikationen {
+  const m = leer();
+  if (!s) return m;
+  for (const [a, v] of Object.entries(s.attribute ?? {})) plus(m.attribute, a, v);
+  for (const [a, v] of Object.entries(s.abgeleitet ?? {})) plus(m.abgeleitet, a, v);
+  for (const [a, v] of Object.entries(s.fertigkeiten ?? {})) plus(m.fertigkeiten, a, v);
+  Object.assign(m.hoechstens, s.hoechstens ?? {});
+  m.angriff = s.angriff ?? 0; m.schaden = s.schaden ?? 0; m.wgs = s.wgs ?? 0; m.robuster = s.robuster ?? 0;
+  m.merkmaleDazu = [...(s.merkmale_dazu ?? [])]; m.merkmaleWeg = [...(s.merkmale_weg ?? [])];
+  m.waffenmerkmale = [...(s.waffenmerkmale ?? [])]; m.waffenmerkmaleWeg = [...(s.waffenmerkmale_weg ?? [])];
+  m.merkmaleStufe = [...(s.merkmale_stufe ?? [])]; m.waffenmerkmaleStufe = [...(s.waffenmerkmale_stufe ?? [])];
+  m.rest = [...(s.wahlen ?? []).map(w => w.text), ...(s.text ?? [])];
   return m;
 }
 
@@ -275,11 +256,3 @@ export function alsWertekasten(w: Werteblock): import('./begleiter').Wertekasten
   };
 }
 
-/** „bis zu zweimal“, „bis zu dreimal“, „beliebig oft“, „mehrfach“ in Beschreibungen → Höchstzahl (sonst 1) */
-export function mehrfachAusText(text: string | null | undefined): number {
-  const t = String(text ?? '').toLowerCase();
-  if (/beliebig oft|mehrfach gewählt|mehrfach wählbar|kann mehrfach/.test(t)) return Infinity;
-  const m = t.match(/(?:bis zu |maximal )?(zwei|drei|vier|fünf)\s?(?:mal|-mal)/);
-  if (m) return { zwei: 2, drei: 3, vier: 4, 'fünf': 5 }[m[1]] ?? 1;
-  return 1;
-}

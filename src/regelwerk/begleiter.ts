@@ -26,12 +26,10 @@ export function wertekasten(e: Eintrag): Wertekasten | null {
   return { attribute: d.attribute, abgeleitete_werte: d.abgeleitete_werte, waffen: d.waffen, felder: d.felder, berechnet: !!e.daten.werte_berechnet };
 }
 
-/** nötige Stufe der Ressource Kreatur (Merkmal „Kreatur N“); null = kein Tiergefährte */
+/** nötige Stufe der Ressource Kreatur (Datenseite: `ressource_kreatur`); null = kein Tiergefährte */
 export function kreaturStufe(e: Eintrag): number | null {
   const d = e.daten.werte_berechnet ?? e.daten;
-  if (typeof d.ressource_kreatur === 'number') return d.ressource_kreatur;
-  const m = String(d.felder?.merkmale ?? '').match(/Kreatur (\d+)/);
-  return m ? Number(m[1]) : null;
+  return typeof d.ressource_kreatur === 'number' ? d.ressource_kreatur : null;
 }
 
 export interface Tiergefaehrte { id: string; name: string; stufe: number; typus: string; quelle: string; eintrag: Eintrag }
@@ -111,23 +109,20 @@ export interface AbrichtungsInfo {
   id: string; name: string; gruppe: string; kosten: number; beschreibung: string;
   /** höchstens so oft wählbar (Infinity = beliebig oft) */
   hoechstens: number; mehrfachText: string | null;
+  /** einmal je Heldengrad des Besitzers */
+  jeHeldengrad: boolean;
   /** Grundausbildung: wird über die Abrichtung „Grundausbildung“ erlernt (kostet 1, braucht deren Voraussetzung) */
   grundausbildung: boolean;
   voraussetzung: { text: string; bedingung: unknown } | null;
   quelle: string; seite?: number;
 }
 
-const ZAHLWORT: Record<string, number> = { einmal: 1, zweimal: 2, dreimal: 3, viermal: 4, fuenfmal: 5, 'fünfmal': 5 };
-
-/** „maximal viermal“ → 4, „beliebig oft …“ → Infinity, „einmal pro HG des Besitzers“ → Heldengrad, null → 1 */
-export function mehrfachGrenze(text: string | null | undefined, heldengrad: number): number {
-  if (!text) return 1;
-  const t = text.toLowerCase();
-  if (t.includes('beliebig')) return Infinity;
-  if (/pro (hg|heldengrad)/.test(t) && !/magieschule/.test(t)) return heldengrad;
-  const m = t.match(/(einmal|zweimal|dreimal|viermal|fünfmal|fuenfmal)/);
-  if (m && t.includes('maximal')) return ZAHLWORT[m[1]];
-  return Infinity; // z. B. „einmal pro Magieschule und Heldengrad“: Grenze hängt von der Wahl ab → Spielleitung
+/** Grenze der Mehrfachwahl (Datenseite: `mehrfach_grenze`): Anzahl, beliebig, je Heldengrad; ohne Angabe 1 */
+export function mehrfachGrenze(g: { anzahl?: number; beliebig?: boolean; je_heldengrad?: boolean; spielleitung?: boolean } | null | undefined, heldengrad: number): number {
+  if (!g) return 1;
+  if (g.anzahl) return g.anzahl;
+  if (g.je_heldengrad) return heldengrad;
+  return Infinity; // beliebig, oder die Grenze hängt von der Wahl ab (Spielleitung)
 }
 
 /** Alle Abrichtungen im Katalog (leer ohne Grimoire „Bestienmeister“) */
@@ -143,7 +138,7 @@ export function abrichtungen(k: Katalog): AbrichtungsInfo[] {
     return {
       id: e.id, name: e.name, gruppe: String(d.gruppe ?? ''), beschreibung: String(d.beschreibung ?? ''),
       kosten: typeof d.potenzial_kosten === 'number' ? d.potenzial_kosten : 1,
-      hoechstens: ga ? 1 : mehrfachGrenze(d.mehrfach, 4), mehrfachText: d.mehrfach ?? null,
+      hoechstens: ga ? 1 : mehrfachGrenze(d.mehrfach_grenze, 4), mehrfachText: d.mehrfach ?? null, jeHeldengrad: !ga && !!d.mehrfach_grenze?.je_heldengrad,
       grundausbildung: ga, voraussetzung: v ?? null,
       quelle: k.pakete[e.quelle.paket]?.kuerzel ?? e.quelle.paket, seite: e.quelle.buch_seiten?.[0],
     };

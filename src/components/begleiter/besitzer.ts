@@ -4,9 +4,10 @@
  */
 import { useMemo } from 'react';
 import { useCharacter } from '../../context/CharacterContext';
-import { bedingungsCharakter, meisterschaftId } from '../../regelwerk/bruecke';
+import { bedingungsCharakter, idNachName, meisterschaftId } from '../../regelwerk/bruecke';
 import type { BedingungsCharakter } from '../../regelwerk/bedingungen';
 import { nekromantenMeisterschaften } from '../../regelwerk/untote';
+import { heldengrade } from '../../regelwerk/steigerungsregeln';
 import { gefolgeWerte } from '../../regelwerk/gefolge';
 import type { Katalog } from '../../regelwerk/katalog';
 import type { Begleiter } from '../../types';
@@ -35,18 +36,21 @@ export function useBesitzer(k: Katalog): Besitzer {
     });
     const msIds = ms.map(m => meisterschaftId(k, m.name, m.skill, (m as { regelId?: string }).regelId)).filter((x): x is string => !!x);
     const hg = calc?.heldengrad?.nr ?? 1;
-    const ressource = (name: RegExp) => state.resourcesList.filter(r => name.test(r.name)).map(r => Number(r.level) || 0);
+    // Ressourcen und Stärken nach Katalog-ID (Endung der ID, gleich in welchem Band), nicht nach Namen
+    const ressourcenIds = state.resourcesList.map(r => ({ id: idNachName(k, 'ressource', r.name) ?? '', stufe: Number(r.level) || 0 }));
+    const ressource = (endung: string) => ressourcenIds.filter(r => r.id.endsWith(`:ressource:${endung}`)).map(r => r.stufe);
+    const staerkenIds = state.strengthsList.map(s => idNachName(k, 'staerke', s.name) ?? '');
     const nekro = nekromantenMeisterschaften(k, state.masteries);
     return {
       char, msIds, heldengrad: Math.max(1, hg),
-      kreatur: ressource(/^Kreatur\b/).sort((a, b) => b - a),
-      tiervertrauter: state.strengthsList.some(s => /^Tiervertrauter\b/.test(s.name)),
-      gefolgePunkte: ressource(/^Gefolge\b/).reduce((s, n) => s + n, 0),
-      maxFertigkeit: Number((calc as { heldengrad?: { maxSkill?: number } } | undefined)?.heldengrad?.maxSkill) || 6,
+      kreatur: ressource('kreatur').sort((a, b) => b - a),
+      tiervertrauter: staerkenIds.some(i => i.endsWith(':staerke:tiervertrauter')),
+      gefolgePunkte: ressource('gefolge').reduce((s, n) => s + n, 0),
+      maxFertigkeit: Number((calc as { heldengrad?: { maxSkill?: number } } | undefined)?.heldengrad?.maxSkill) || (heldengrade(k)?.[0]?.maxSkill ?? 0),
       ...nekro,
       zauber: (state.spellsList ?? []).map(s => s.name),
-      golemPunkte: ressource(/^Golem\b/),
-      konstrukteur: Object.values(state.masteries ?? {}).flat().some(m => /^Konstrukteur\b/.test(m.name)),
+      golemPunkte: ressource('golem'),
+      konstrukteur: msIds.some(i => i.endsWith(':konstrukteur')),
     };
   }, [k, state.masteries, state.skillsBase, state.resourcesList, state.spellsList, state.strengthsList, state.race, calc]);
 }

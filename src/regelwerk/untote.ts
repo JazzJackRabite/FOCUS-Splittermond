@@ -10,7 +10,7 @@ import type { Katalog } from './katalog';
 import type { Eintrag } from './typen';
 import type { Begleiter, Mastery } from '../types';
 import { ABGELEITET_ID, attributSteigerungKosten, fertigkeitspunkteKosten, hoechstePunkteHeldengrad, schwelleNachPunkten } from './abgeleitet';
-import { anwenden, leseModifikationen, werteblock, ATTRIBUT_KURZ, type Werteblock } from './modifikationen';
+import { anwenden, ausStruktur, werteblock, ATTRIBUT_KURZ, type Werteblock } from './modifikationen';
 import { wertekasten } from './begleiter';
 import { meisterschaftId } from './bruecke';
 import { quelleText } from './relikte';
@@ -182,7 +182,7 @@ export function untotWerte(k: Katalog, b: Begleiter, opt: { nekromant: boolean; 
     const gewaehlt = meisterschaften.filter(m => m.ok).map(m => `${m.fertigkeit} (${m.name})`);
     werte = { ...w, attribute, abgeleitet, fertigkeiten, waffen, meisterschaften: [w.meisterschaften, ...gewaehlt].filter(Boolean).join(', ') || undefined };
     if (abnormitaet) {
-      const m = leseModifikationen(k, abnormitaet.daten.modifikationen);
+      const m = ausStruktur(abnormitaet.daten.modifikationen_strukturiert);
       werte = anwenden(k, werte, m);
     }
   } else if (wertesatz) {

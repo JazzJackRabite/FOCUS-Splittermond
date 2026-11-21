@@ -6,7 +6,7 @@
  */
 import type { Katalog } from './katalog';
 import type { Begleiter } from '../types';
-import { anwenden, leseModifikationen, summe, werteblock, type Modifikationen, type Werteblock } from './modifikationen';
+import { anwenden, ausStruktur, summe, werteblock, type Modifikationen, type ModifikationenStruktur, type Werteblock } from './modifikationen';
 import type { Eintrag } from './typen';
 import { wahlenAnwenden, type GolemWahl } from './golem';
 
@@ -14,7 +14,7 @@ export interface AbrichtungsWahl {
   art: 'option' | 'meisterschaft' | 'meisterschaften' | 'fertigkeit';
   text: string;
   /** option: wählbare Änderungen */
-  optionen?: { text: string; modifikationen: string }[];
+  optionen?: { text: string; modifikationen: string; modifikationen_strukturiert?: ModifikationenStruktur }[];
   /** meisterschaft: nur in dieser Fertigkeit; feste Schwelle oder höchste der genannten Meisterschaften des Tierführers */
   fertigkeit?: string; schwelle?: number; schwelle_nach?: string[];
   /** meisterschaften: zulässige Zusammenstellungen (z. B. zwei der Schwelle 1 oder eine der Schwelle 2) */
@@ -63,14 +63,14 @@ export function tierWerte(k: Katalog, b: Begleiter, basis: Werteblock | null, ms
   const fs = b.abrichtungWahlen ?? {};
   const mods: Modifikationen[] = []; const wahlen: OffeneWahl[] = []; const texte: string[] = []; const hinweise: string[] = [];
   for (const { stelle, e } of gewaehlt) {
-    if (e!.daten.modifikationen) mods.push(leseModifikationen(k, e!.daten.modifikationen));
+    if (e!.daten.modifikationen_strukturiert) mods.push(ausStruktur(e!.daten.modifikationen_strukturiert));
     if (e!.daten.werte_hinweis) texte.push(`${e!.name}: ${e!.daten.werte_hinweis}`);
     ((e!.daten.wahlen ?? []) as AbrichtungsWahl[]).forEach((w, nr) => {
       const schwelle = w.schwelle ?? (w.schwelle_nach ? schwelleNach(w.schwelle_nach, msIds) : null);
       const schluessel = `${stelle}:${nr}`;
       wahlen.push({ schluessel, abrichtung: e!.name, stelle, w, schwelle });
       const v = fs[schluessel];
-      if (w.art === 'option' && typeof v === 'string' && w.optionen?.[Number(v)]) mods.push(leseModifikationen(k, w.optionen[Number(v)].modifikationen));
+      if (w.art === 'option' && typeof v === 'string' && w.optionen?.[Number(v)]) mods.push(ausStruktur(w.optionen[Number(v)].modifikationen_strukturiert));
     });
   }
   const werte = anwenden(k, basis, summe(...mods));

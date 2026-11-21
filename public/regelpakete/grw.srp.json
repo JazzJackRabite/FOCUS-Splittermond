@@ -63118,6 +63118,7 @@
     "hinweise": [
      "Ergänzt am 02.11.2026 (Monstermerkmale des Grundregelwerks als Verweisziel)."
     ],
+    "betaeubungsimmun": true,
     "regelgruppe": "grw:monstermerkmal:betaeubungsimmunitaet"
    },
    "hinweise": [
@@ -63662,6 +63663,11 @@
     "hinweise": [
      "Ergänzt am 02.11.2026 (Monstermerkmale des Grundregelwerks als Verweisziel)."
     ],
+    "gesundheitsstufen_namen": [
+     "Unverletzt",
+     "Verletzt",
+     "Todgeweiht"
+    ],
     "regelgruppe": "grw:monstermerkmal:schwaechlich"
    },
    "hinweise": [
@@ -63795,6 +63801,9 @@
     "beschreibung": "Das Wesen ist sehr leicht zu töten. Es besitzt nur eine einzige Gesundheitsstufe. Auf dieser Gesundheitsstufe gelten die Regeln für die Stufe Unverletzt.",
     "hinweise": [
      "Ergänzt am 02.11.2026 (Monstermerkmale des Grundregelwerks als Verweisziel)."
+    ],
+    "gesundheitsstufen_namen": [
+     "Unverletzt"
     ]
    },
    "hinweise": [
