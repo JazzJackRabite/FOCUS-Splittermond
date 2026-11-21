@@ -1,4 +1,4 @@
-import { Wahlknopf } from '../../fundament';
+import { Auswahl, Wahlknopf } from '../../fundament';
 import React, { useContext, useMemo, useState } from 'react';
 import { Sparkles } from 'lucide-react';
 import { CharacterContext } from '../../context/CharacterContext';
@@ -21,14 +21,25 @@ export function useSituativeBoni(art: WurfArtKontext, fertigkeit: string) {
     const aus = k && liste ? situativeBoni(k, liste, art, fertigkeit, attribute) : [];
     // Schwerpunkt-Boni aus Relikten (Verbesserung der Gegenstandsqualität) für Proben und Angriffe
     const rel = k && relikte?.length && art !== 'zauber' ? reliktSchwerpunktBoni(relikte, inventar ?? [], bausteineAktiv(k), fertigkeit) : [];
-    return [...aus, ...rel];
+    return [...aus, ...rel] as SituativerBonus[];
   }, [liste, art, fertigkeit, attribute, relikte, inventar]);
   const [gewaehlt, setGewaehlt] = useState<Set<string>>(new Set());
   const umschalten = (id: string) => setGewaehlt(g => { const n = new Set(g); if (n.has(id)) n.delete(id); else n.add(id); return n; });
+  // Typus des Ziels: wählt die Boni gegen diesen Typus aus und nimmt die gegen andere Typen zurück
+  const typen = useMemo(() => [...new Set(boni.map(b => b.typus).filter((t): t is string => !!t))].sort(), [boni]);
+  const [zielTypus, setZielTypusRoh] = useState('');
+  const setZielTypus = (t: string) => {
+    setZielTypusRoh(t);
+    setGewaehlt(g => {
+      const n = new Set([...g].filter(id => !boni.find(b => b.id === id)?.typus));
+      if (t) for (const b of boni) if (b.typus === t && b.wert !== null) n.add(b.id);
+      return n;
+    });
+  };
   const aktiv = boni.filter(b => gewaehlt.has(b.id) && b.wert !== null);
   const summe = aktiv.reduce((s, b) => s + (b.wert ?? 0), 0);
   const labels = aktiv.map(b => `${b.quelle} (${b.wert! >= 0 ? '+' : ''}${b.wert})`);
-  return { boni, gewaehlt, umschalten, summe, labels };
+  return { boni, gewaehlt, umschalten, summe, labels, typen, zielTypus, setZielTypus };
 }
 
 const vorzeichen = (n: number) => (n >= 0 ? `+${n}` : `${n}`);
@@ -38,10 +49,15 @@ export const SituativeBoni: React.FC<{
   gewaehlt: Set<string>;
   onToggle: (id: string) => void;
   dunkel?: boolean;
-}> = ({ boni, gewaehlt, onToggle, dunkel = false }) => {
+  /** Typen, gegen die einzelne Boni gelten, mit der Wahl des Ziels (aus useSituativeBoni) */
+  typen?: string[];
+  zielTypus?: string;
+  onZielTypus?: (t: string) => void;
+}> = ({ boni, gewaehlt, onToggle, dunkel = false, typen = [], zielTypus = '', onZielTypus }) => {
   if (!boni.length) return null;
-  const verrechenbar = boni.filter(b => b.wert !== null);
-  const hinweise = boni.filter(b => b.wert === null);
+  const passend = boni.filter(b => !zielTypus || !b.typus || b.typus === zielTypus);
+  const verrechenbar = passend.filter(b => b.wert !== null);
+  const hinweise = passend.filter(b => b.wert === null);
   const rahmen = dunkel ? 'bg-seite border-rahmen text-schrift' : 'bg-seite border-rahmen text-schrift';
   const titel = dunkel ? 'text-gold' : 'text-schrift';
   return (
@@ -49,6 +65,14 @@ export const SituativeBoni: React.FC<{
       <div className={`text-xs font-bold uppercase tracking-wider fantasy-font flex items-center gap-1.5 mb-1 ${titel}`}>
         <Sparkles size={14} className="text-gold" /> Stärken & Meisterschaften
       </div>
+      {typen.length > 0 && onZielTypus && (
+        <div className="mb-2 max-w-xs">
+          <Auswahl beschriftung="Typus des Ziels" value={zielTypus} onChange={e => onZielTypus(e.target.value)}>
+            <option value="">nicht festgelegt</option>
+            {typen.map(t => <option key={t} value={t}>{t}</option>)}
+          </Auswahl>
+        </div>
+      )}
       {verrechenbar.length > 0 && (
         <>
           <p className={`text-xs mb-2 ${dunkel ? 'text-leise' : 'text-leise'}`}>Gilt nur in bestimmten Lagen – anklicken, wenn sie zutrifft:</p>
@@ -61,6 +85,7 @@ export const SituativeBoni: React.FC<{
                   <span className="font-semibold">{b.quelle}</span>
                   {b.bedingung && <span className={an ? 'text-schrift' : 'opacity-75'}> – {b.bedingung}</span>}
                   {!b.bedingung && <span className={an ? 'text-schrift' : 'opacity-75'}> – {b.text}</span>}
+                  {b.typus && <span className="sr-only"> (Typus {b.typus})</span>}
                 </Wahlknopf>
               );
             })}

@@ -395,7 +395,7 @@ export const RollModal: React.FC<RollModalProps> = ({
         )}
 
         {/* Zustands- & Wundabzüge (D&D Beyond Style: automatisch eingerechnet und einzeln abwählbar) */}
-        <SituativeBoni boni={situativ.boni} gewaehlt={situativ.gewaehlt} onToggle={situativ.umschalten} />
+        <SituativeBoni boni={situativ.boni} gewaehlt={situativ.gewaehlt} onToggle={situativ.umschalten} typen={situativ.typen} zielTypus={situativ.zielTypus} onZielTypus={situativ.setZielTypus} />
 
         {modifiersList.length > 0 && (
           <div className="bg-seite rounded-karte p-3 mb-3 border border-rahmen">

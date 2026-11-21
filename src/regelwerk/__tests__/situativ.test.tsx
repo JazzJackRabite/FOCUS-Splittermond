@@ -53,6 +53,25 @@ describe('Probendialog', () => {
     expect(screen.getByText('Gesamt-Modifikator:').nextSibling?.textContent).toBe('+5');
   });
 
+  it('Typus des Ziels wählt die Boni gegen diesen Typus aus (Untotenjäger, GRW S. 216)', () => {
+    const l = [...liste, ...wirkungenDesCharakters(K, ['grw:meisterschaft:todesmagie:untotenjaeger'])];
+    expect(situativeBoni(K, l, 'probe', 'Wahrnehmung').filter(x => x.typus).map(x => [x.quelle, x.typus])).toEqual([['Untotenjäger', 'Untoter']]);
+    const calc = { wirkungen: { liste: l, fertigkeitsBoni: {} } } as never;
+    render(
+      <CharacterContext.Provider value={{ state: DEFAULT_STATE, dispatch: () => {}, calc }}>
+        <RollModal skillName="Wahrnehmung" baseValue={10} onClose={() => {}} />
+      </CharacterContext.Provider>,
+    );
+    const knopf = () => screen.queryByRole('button', { name: /Untotenjäger/ });
+    expect(knopf()?.getAttribute('aria-pressed')).toBe('false');
+    fireEvent.change(screen.getByLabelText('Typus des Ziels'), { target: { value: 'Untoter' } });
+    expect(knopf()?.getAttribute('aria-pressed')).toBe('true');
+    expect(screen.getByText('Gesamt-Modifikator:').nextSibling?.textContent).toBe('+3');
+    fireEvent.change(screen.getByLabelText('Typus des Ziels'), { target: { value: '' } });
+    expect(knopf()?.getAttribute('aria-pressed')).toBe('false');
+    expect(screen.queryByText('Gesamt-Modifikator:')).toBeNull();
+  });
+
   it('ohne Charakterkontext kein Abschnitt', () => {
     render(<RollModal skillName="Wahrnehmung" baseValue={10} onClose={() => {}} />);
     expect(screen.queryByTestId('situative-boni')).toBeNull();

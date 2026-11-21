@@ -172,6 +172,8 @@ export interface SituativerBonus {
   text: string;
   bedingung?: string | null;
   beleg: string;
+  /** gilt nur gegen Wesen dieses Typus (Regelpaket: gegen_typus, z. B. Untoter) */
+  typus?: string;
 }
 
 const FERNKAMPF = new Set(['Schusswaffen', 'Wurfwaffen']);
@@ -219,7 +221,7 @@ export function situativeBoni(k: Katalog, liste: CharakterWirkung[], art: WurfAr
     }
     if (!passt) return;
     const text = typeof w.wert === 'string' && roh !== null ? `${wirkungKurz(w)} (= ${roh})` : wirkungKurz(w);
-    out.push({ id: `${cw.quelle}#${i}`, quelle: cw.quelleName, wert: nurHinweis ? null : zahl, text, bedingung: w.bedingung, beleg: w.beleg });
+    out.push({ id: `${cw.quelle}#${i}`, quelle: cw.quelleName, wert: nurHinweis ? null : zahl, text, bedingung: w.bedingung, beleg: w.beleg, ...(w.gegen_typus ? { typus: w.gegen_typus } : {}) });
   });
   return out;
 }

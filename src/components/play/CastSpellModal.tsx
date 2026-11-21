@@ -959,7 +959,7 @@ export const CastSpellModal: React.FC<CastSpellModalProps> = ({
               </div>
             </div>
 
-            <SituativeBoni boni={situativ.boni} gewaehlt={situativ.gewaehlt} onToggle={situativ.umschalten} />
+            <SituativeBoni boni={situativ.boni} gewaehlt={situativ.gewaehlt} onToggle={situativ.umschalten} typen={situativ.typen} zielTypus={situativ.zielTypus} onZielTypus={situativ.setZielTypus} />
 
             {/* Roll Buttons or Roll Result */}
             {!hasRolled ? (

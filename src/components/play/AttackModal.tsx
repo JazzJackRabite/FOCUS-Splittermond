@@ -634,7 +634,7 @@ export const AttackModal: React.FC<AttackModalProps> = ({
               </div>
             </div>
 
-            <SituativeBoni boni={situativ.boni} gewaehlt={situativ.gewaehlt} onToggle={situativ.umschalten} dunkel />
+            <SituativeBoni boni={situativ.boni} gewaehlt={situativ.gewaehlt} onToggle={situativ.umschalten} dunkel typen={situativ.typen} zielTypus={situativ.zielTypus} onZielTypus={situativ.setZielTypus} />
 
             {/* Splittermond GRW: Aktive Zauber-Wirkungen (Aura des Anführers, Beflügelte Waffe, Flammende Waffe, etc.) */}
             {(spellAttackBonuses.length > 0 || spellWeaponDamage.totalDamage > 0) && (
