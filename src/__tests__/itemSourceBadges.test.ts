@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { ALL_EQUIPMENT, WEAPONS_DATA, ARMORS_DATA, SHIELDS_DATA, GEAR_DATA } from '../data/equipment';
+import { grwAusruestung } from '../regelwerk/ausruestung';
+const ALL_EQUIPMENT = grwAusruestung();
 import { useCharacterState } from '../hooks/useCharacterState';
 import { renderHook, act } from '@testing-library/react';
 import type { InventoryItem } from '../types';
@@ -17,13 +18,8 @@ describe('Quellenvermerk (Item Sources) Verification', () => {
       expect(item.page).toBeGreaterThan(0);
     }
 
-    // Weapons from GRW
-    expect(WEAPONS_DATA.every((w) => w.source === 'GRW' && w.page >= 180)).toBe(true);
-    // Armors and shields from GRW
-    expect(ARMORS_DATA.every((a) => a.source === 'GRW' && a.page >= 180)).toBe(true);
-    expect(SHIELDS_DATA.every((s) => s.source === 'GRW' && s.page >= 180)).toBe(true);
-    // Gear from GRW
-    expect(GEAR_DATA.every((g) => g.source === 'GRW' && g.page >= 180)).toBe(true);
+    // Ausrüstung des Grundregelwerks aus dem Paket (Ausrüstung, Materialien und Verbesserungen ab S. 142)
+    expect(ALL_EQUIPMENT.every((w) => w.source === 'GRW' && (w.page ?? 0) >= 140)).toBe(true);
   });
 
   it('preserves authentic sources and pages when adding items to inventory', () => {

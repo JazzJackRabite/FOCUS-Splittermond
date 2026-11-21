@@ -4,12 +4,12 @@
  * Stufe, Abzüge und Quelle stehen im Eintrag vom Typ `zustand` (`hat_stufe`/`parameter`, `zustandswirkung`, `quelle`).
  * „Liegend“ ist kein Zustand, sondern eine Kampfposition (GRW S. 170); der Editor führt sie in derselben Auswahl,
  * weil sie am Spieltisch genauso an- und abgelegt wird.
- * Ohne geladenes Paket gilt der Rückfall für das Grundregelwerk aus data/zustaende.ts.
+ * Ohne geladenes Paket gibt es keine Zustände (der Editor startet erst mit Paket).
  */
 import { aktiverKatalog } from './bruecke';
 import type { Katalog } from './katalog';
 import type { Eintrag } from './typen';
-import { GRW_ZUSTAENDE, type Zustandswirkung } from '../data/zustaende';
+import type { Zustandswirkung } from '../types/regeldaten';
 import { quelleText } from './relikte';
 
 export const KAMPFPOSITION_LIEGEND = 'Liegend';
@@ -24,15 +24,12 @@ function ausEintrag(k: Katalog, e: Eintrag): Zustandsangabe {
   return { name: e.name, mitStufe: d.hat_stufe ?? /\bStufe\b/.test(p), quelle: quelleText(k, e), id: e.id, wirkung: d.zustandswirkung, beschreibung: d.beschreibung };
 }
 
-/** Alle wählbaren Zustände, alphabetisch: aus den geladenen Paketen (ohne Paket: Grundregelwerk-Rückfall) */
+/** Alle wählbaren Zustände, alphabetisch: aus den geladenen Paketen */
 export function zustandsliste(k: Katalog | null = aktiverKatalog()): Zustandsangabe[] {
   if (cache && cache.k === k) return cache.liste;
   const nachName = new Map<string, Zustandsangabe>();
   if (k) for (const e of k.nachTyp('zustand')) if (!nachName.has(e.name)) nachName.set(e.name, ausEintrag(k, e));
-  if (!nachName.size) {
-    for (const [name, z] of Object.entries(GRW_ZUSTAENDE)) nachName.set(name, { name, mitStufe: z.stufe, quelle: `GRW S. ${z.seite}`, wirkung: z.wirkung });
-  }
-  nachName.set(KAMPFPOSITION_LIEGEND, { name: KAMPFPOSITION_LIEGEND, mitStufe: false, quelle: 'GRW S. 170 (Kampfposition)' });
+  if (k) nachName.set(KAMPFPOSITION_LIEGEND, { name: KAMPFPOSITION_LIEGEND, mitStufe: false, quelle: 'GRW S. 170 (Kampfposition)' });
   const liste = [...nachName.values()].sort((a, b) => a.name.localeCompare(b.name, 'de'));
   cache = { k, liste };
   return liste;

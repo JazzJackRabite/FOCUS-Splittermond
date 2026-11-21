@@ -1,19 +1,16 @@
 /**
  * Listen des Grundregelwerks aus dem GRW-Paket (FUNDAMENT.md, Regelquellen): Zauber, Meisterschaften, Stärken,
  * Schwächen, Ressourcen, Sprachen, Mondzeichen, Fertigkeiten mit ihren Attributen und die Meisterschaftsschwellen.
- * Die Ansichten fragen diese Funktionen statt der Listen in `src/data`. Ohne geladenes Paket (Start der App, einzelne
- * Tests) liefern sie den eingebauten Rückfall aus `src/data`; ein Test hält Rückfall und Paket gleich.
+ * Der Editor startet erst mit geladenem Paket (app/RegelwerkTor.tsx); ohne Paket liefern die Funktionen leere Listen.
  */
 import { aktiverKatalog, norm } from './bruecke';
 import type { Katalog } from './katalog';
 import type { Eintrag } from './typen';
-import { SPELLS_DB, type Spell } from '../data/spells';
-import { MASTERIES_DB, GENERAL_COMBAT_MASTERIES, GENERAL_MAGIC_MASTERIES, type MasteryEntry } from '../data/masteries';
-import { STRENGTHS_DATA, type StrengthData } from '../data/strengths';
-import { WEAKNESSES_DATA, WEAKNESS_DESCRIPTIONS, WEAKNESS_PAGES } from '../data/weaknesses';
-import { PREDEFINED_RESOURCES, type ResourceData } from '../data/resources';
-import { LANGUAGES_DATA, type LanguageData } from '../data/languages';
-import { ATTRIBUTES, BASE_STRENGTH_POINTS, GRATIS_STAERKE_DER_KULTUR, MOON_SIGNS, RACES, REGIONS, SKILL_CATEGORIES, SKILL_DATA, WOUND_PENALTIES } from '../data/rules';
+import type { Spell } from '../types/regeldaten';
+import type { MasteryEntry } from '../types/regeldaten';
+import type { StrengthData } from '../types/regeldaten';
+import type { ResourceData } from '../types/regeldaten';
+import type { LanguageData } from '../types/regeldaten';
 import type { RaceData } from '../types';
 import { RASSE_ID } from './bruecke';
 import { gesundheitsstufen } from './vitals';
@@ -87,7 +84,7 @@ function ausPaket(k: Katalog): Listen | null {
       const m: MasteryEntry & { regelId: string } = { name: `${e.name} (S${schwelle})`, baseName: e.name, page: seite(e), source: kurz,
         desc: `${d.manoever ? '[Manöver] ' : ''}${d.beschreibung ?? ''}`, tier: schwelle, minSkillValue: schwellen[schwelle] ?? undefined,
         skill: fertigkeit, manoever: d.manoever === true, prerequisiteText: d.voraussetzungen?.text ?? null, prerequisite: null, prerequisiteStatus: null,
-        id: e.id, regelId: e.id };
+        id: e.id, regelId: e.id, ...(d.mehrfach_waehlbar ? { mehrfach: true } : {}) };
       if (ALLG_KAMPF.has(fertigkeit)) L.allgemeinKampf.push(m);
       else if (fertigkeit === ALLG_MAGIE) L.allgemeinMagie.push(m);
       else (L.meisterschaften[fertigkeit] ??= []).push(m);
@@ -140,33 +137,33 @@ function mitAliasen(r: Record<string, MasteryEntry[]>): Record<string, MasteryEn
 }
 const MEISTER_CACHE = new WeakMap<Listen, Record<string, MasteryEntry[]>>();
 
-export const grwZauber = (k: Katalog | null = aktiverKatalog()): Spell[] => listen(k)?.zauber ?? SPELLS_DB;
+export const grwZauber = (k: Katalog | null = aktiverKatalog()): Spell[] => listen(k)?.zauber ?? [];
 export function grwMeisterschaften(k: Katalog | null = aktiverKatalog()): Record<string, MasteryEntry[]> {
-  const l = listen(k); if (!l) return MASTERIES_DB;
+  const l = listen(k); if (!l) return {};
   if (!MEISTER_CACHE.has(l)) MEISTER_CACHE.set(l, mitAliasen(l.meisterschaften));
   return MEISTER_CACHE.get(l)!;
 }
-export const grwAllgemeineKampfmeisterschaften = (k: Katalog | null = aktiverKatalog()): MasteryEntry[] => listen(k)?.allgemeinKampf ?? GENERAL_COMBAT_MASTERIES;
-export const grwAllgemeineMagiemeisterschaften = (k: Katalog | null = aktiverKatalog()): MasteryEntry[] => listen(k)?.allgemeinMagie ?? GENERAL_MAGIC_MASTERIES;
-export const grwStaerken = (k: Katalog | null = aktiverKatalog()): StrengthData[] => listen(k)?.staerken ?? STRENGTHS_DATA;
+export const grwAllgemeineKampfmeisterschaften = (k: Katalog | null = aktiverKatalog()): MasteryEntry[] => listen(k)?.allgemeinKampf ?? [];
+export const grwAllgemeineMagiemeisterschaften = (k: Katalog | null = aktiverKatalog()): MasteryEntry[] => listen(k)?.allgemeinMagie ?? [];
+export const grwStaerken = (k: Katalog | null = aktiverKatalog()): StrengthData[] => listen(k)?.staerken ?? [];
 export const grwSchwaechen = (k: Katalog | null = aktiverKatalog()): Schwaeche[] =>
-  listen(k)?.schwaechen ?? WEAKNESSES_DATA.map((n) => ({ name: n, desc: WEAKNESS_DESCRIPTIONS[n] ?? '', page: WEAKNESS_PAGES[n], source: 'GRW' }));
-export const grwRessourcen = (k: Katalog | null = aktiverKatalog()): ResourceData[] => listen(k)?.ressourcen ?? PREDEFINED_RESOURCES;
-export const grwSprachen = (k: Katalog | null = aktiverKatalog()): LanguageData[] => listen(k)?.sprachen ?? LANGUAGES_DATA;
-export const grwMondzeichen = (k: Katalog | null = aktiverKatalog()): string[] => listen(k)?.mondzeichen ?? MOON_SIGNS;
+  listen(k)?.schwaechen ?? [];
+export const grwRessourcen = (k: Katalog | null = aktiverKatalog()): ResourceData[] => listen(k)?.ressourcen ?? [];
+export const grwSprachen = (k: Katalog | null = aktiverKatalog()): LanguageData[] => listen(k)?.sprachen ?? [];
+export const grwMondzeichen = (k: Katalog | null = aktiverKatalog()): string[] => listen(k)?.mondzeichen ?? [];
 /** Fertigkeiten nach Art (allgemein, Kampf, Magie) in der Schreibweise des Editors */
 export function grwFertigkeiten(k: Katalog | null = aktiverKatalog()): { allgemein: string[]; kampf: string[]; magie: string[] } {
-  const l = listen(k); return l ? l.fertigkeiten : { allgemein: SKILL_CATEGORIES.GENERAL, kampf: SKILL_CATEGORIES.COMBAT, magie: SKILL_CATEGORIES.MAGIC };
+  const l = listen(k); return l ? l.fertigkeiten : { allgemein: [], kampf: [], magie: [] };
 }
 /** Attribute einer Fertigkeit (Abkürzungen); null bei Kampffertigkeiten (Attribute kommen von der Waffe) */
 export function grwFertigkeitsattribute(k: Katalog | null = aktiverKatalog()): Record<string, string[] | null> {
-  return listen(k)?.fertigkeiten.attribute ?? SKILL_DATA;
+  return listen(k)?.fertigkeiten.attribute ?? {};
 }
 /** Fertigkeitswert, ab dem Meisterschaften einer Schwelle gewählt werden können (GRW: Meisterschaften erhalten) */
 export function schwellenwert(schwelle: number, k: Katalog | null = aktiverKatalog()): number {
   const w = listen(k)?.schwellen[schwelle];
   if (typeof w === 'number') return w;
-  return ({ 1: 6, 2: 9, 3: 12, 4: 15 } as Record<number, number>)[schwelle] ?? 6;  // Rückfall ohne Paket
+  return 0; // ohne Paket keine Schwelle
 }
 /** Eintrag einer Stärke mit `mehrfach_waehlbar` (Beleg und ggf. Auslegung für die Anzeige) */
 export function staerkeMehrfach(name: string, k: Katalog | null = aktiverKatalog()): MehrfachWaehlbar | undefined {
@@ -205,7 +202,7 @@ const RASSEN_CACHE = new WeakMap<Katalog, Record<string, RaceData> | null>();
 
 /** Rassen im Format des Editors (Mensch, Alb, Zwerg, Gnom, Varg): Größenklasse, Attributsmodifikatoren, Rassenstärken */
 export function grwRassen(k: Katalog | null = aktiverKatalog()): Record<string, RaceData> {
-  if (!k) return RACES;
+  if (!k) return {};
   if (!RASSEN_CACHE.has(k)) {
     const out: Record<string, RaceData> = {};
     for (const [editorName, id] of Object.entries(RASSE_ID)) {
@@ -222,14 +219,14 @@ export function grwRassen(k: Katalog | null = aktiverKatalog()): Record<string, 
     }
     RASSEN_CACHE.set(k, Object.keys(out).length ? out : null);
   }
-  return RASSEN_CACHE.get(k) ?? RACES;
+  return RASSEN_CACHE.get(k) ?? {};
 }
 
 /** Punkte für Stärken bei der Erschaffung: Kultur + Ausbildung + Schritt 7 (GRW S. 23–27), dazu Punkte der Rasse */
 export function staerkenBudget(rasse: string, k: Katalog | null = aktiverKatalog()): number {
   const s = k?.get(ERSCHAFFUNG_ID)?.daten.strukturiert as Record<string, { staerke_punkte?: number }> | undefined;
   const teile = s ? [s.kultur_frei?.staerke_punkte, s.ausbildung_frei?.staerke_punkte, s.schritt_7?.staerke_punkte] : [];
-  const grund = teile.length && teile.every((x) => typeof x === 'number') ? teile.reduce((a, b) => a! + b!, 0)! : BASE_STRENGTH_POINTS;
+  const grund = teile.length && teile.every((x) => typeof x === 'number') ? teile.reduce((a, b) => a! + b!, 0)! : 0;
   const r = grwRassen(k)[rasse];
   return grund + (r?.traits ?? []).reduce((n, t) => n + (t.modifiers.strengthPoints ?? 0), 0);
 }
@@ -237,7 +234,7 @@ export function staerkenBudget(rasse: string, k: Katalog | null = aktiverKatalog
 /** Attribute (Kürzel des Editors → Name) */
 export function grwAttribute(k: Katalog | null = aktiverKatalog()): Record<string, string> {
   const l: { name: string; kuerzel: string }[] | undefined = k?.get(ATTRIBUTE_ID)?.daten.strukturiert?.attribute;
-  return l?.length ? Object.fromEntries(l.map((a) => [ATTR_KURZ[a.name] ?? a.kuerzel, a.name])) : ATTRIBUTES;
+  return l?.length ? Object.fromEntries(l.map((a) => [ATTR_KURZ[a.name] ?? a.kuerzel, a.name])) : {};
 }
 
 /** Alle Fertigkeiten (allgemein, Kampf, Magie), alphabetisch */
@@ -248,8 +245,7 @@ export function grwAlleFertigkeiten(k: Katalog | null = aktiverKatalog()): strin
 
 /** Gesundheitsstufen des Abenteurers: Name und Wundabzug (GRW S. 172) */
 export function grwGesundheitsstufen(k: Katalog | null = aktiverKatalog()): { name: string; wundabzug: number }[] {
-  const s = gesundheitsstufen(k).stufen;
-  return s.length ? s : WOUND_PENALTIES.map((w, i) => ({ name: ['Unverletzt', 'Angeschlagen', 'Verletzt', 'Schwer verletzt', 'Todgeweiht'][i], wundabzug: w }));
+  return gesundheitsstufen(k).stufen;
 }
 
 /** Fertigkeiten nach Art in den Schlüsseln der früheren Liste (GENERAL, COMBAT, MAGIC) */
@@ -258,23 +254,23 @@ export function grwFertigkeitsKategorien(k: Katalog | null = aktiverKatalog()): 
   return { GENERAL: f.allgemein, COMBAT: f.kampf, MAGIC: f.magie };
 }
 
-/** Stärke, die die Kultur kostenlos für die Heimatregion gibt (GRW S. 23: Kulturkunde); ohne Paket „Kulturkunde“ */
+/** Stärke, die die Kultur kostenlos für die Heimatregion gibt (GRW S. 23: Kulturkunde) */
 export function gratisStaerkeDerKultur(k: Katalog | null = aktiverKatalog()): string {
   const ref = (k?.get(ERSCHAFFUNG_ID)?.daten.strukturiert as { kultur_frei?: { gratis_staerke_ref?: { id: string } } } | undefined)?.kultur_frei?.gratis_staerke_ref;
-  return (ref && k?.get(ref.id)?.name) || GRATIS_STAERKE_DER_KULTUR;
+  return (ref && k?.get(ref.id)?.name) || '';
 }
 
 /**
  * Heimatregionen für die kostenlose Kulturkunde: das Feld „Kulturkunde“ der Kultur-Module (GRW S. 39–50 und Grimoires),
- * ohne Paket die Kulturen des Grundregelwerks.
+ * Ohne Paket keine.
  */
 export function grwHeimatregionen(k: Katalog | null = aktiverKatalog()): string[] {
-  if (!k) return REGIONS;
+  if (!k) return [];
   const r = new Set<string>();
   for (const e of Object.values(k.eintraege)) {
     if (e.typ !== 'kultur') continue;
     const kk = String(e.daten.felder?.kulturkunde ?? '').trim();
     r.add(kk && kk.length <= 40 ? kk : e.name);
   }
-  return r.size ? [...r].sort((a, b) => a.localeCompare(b, 'de')) : REGIONS;
+  return [...r].sort((a, b) => a.localeCompare(b, 'de'));
 }

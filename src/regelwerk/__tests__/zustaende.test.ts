@@ -6,7 +6,6 @@ import { erstelleKatalog, grimoireLesen } from '../laden';
 import { basisAusDateien, grimoireDatei } from './hilfen';
 import { alleZustaende, zustandHatStufe, zustandQuelle, zustandsliste } from '../zustaende';
 import { getConditionDescription, getConditionMalus, probenbereich, zustandTooltip } from '../../utils/conditionModifiers';
-import { GRW_ZUSTAENDE } from '../../data/zustaende';
 import { setzeAktivenKatalog } from '../bruecke';
 
 const basis = basisAusDateien();
@@ -17,21 +16,17 @@ describe('Zustände aus den Paketen', () => {
   it('Grundregelwerk-Paket: die 17 Zustände des Grundregelwerks, dazu die Kampfposition Liegend – keine Zustände aus anderen Bänden', () => {
     const erwartet = [...GRW, 'Liegend'].sort((a, b) => a.localeCompare(b, 'de'));
     expect(alleZustaende(K)).toEqual(erwartet);
-    expect(alleZustaende(null)).toEqual(erwartet);
+    expect(alleZustaende(null)).toEqual([]);
     for (const n of ['Schwermut', 'Verstoßen', 'Verorkt', 'Erschaudert']) expect(alleZustaende(K)).not.toContain(n);
   });
 
-  it('Stufen laut Paket; der Rückfall ohne Paket stimmt damit überein', () => {
+  it('Stufen laut Paket', () => {
     const mitStufe = zustandsliste(K).filter((z) => z.mitStufe).map((z) => z.name);
     expect(mitStufe).toEqual(['Benommen', 'Blutend', 'Brennend', 'Erschöpft', 'Geblendet', 'Glaubenskrise', 'Siechtum', 'Sterbend', 'Verwundet']);
-    expect(zustandsliste(null).filter((z) => z.mitStufe).map((z) => z.name)).toEqual(mitStufe);
   });
 
-  it('Rückfall und Paket haben dieselben Abzüge und Seiten', () => {
-    for (const z of zustandsliste(K).filter((x) => x.id)) {
-      expect(GRW_ZUSTAENDE[z.name]?.wirkung, z.name).toEqual(z.wirkung);
-      expect(`GRW S. ${GRW_ZUSTAENDE[z.name]?.seite}`, z.name).toBe(z.quelle);
-    }
+  it('jeder Zustand des Grundregelwerks hat eine Seite im Paket', () => {
+    for (const z of zustandsliste(K).filter((x) => x.id)) expect(z.quelle, z.name).toMatch(/^GRW S\. 1[67]\d/);
   });
 
   it('Quelle mit Seite für die Anzeige beim Überfahren mit der Maus', () => {

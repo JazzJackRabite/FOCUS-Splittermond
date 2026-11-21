@@ -20,7 +20,7 @@ import { usePlaySession } from '../../context/PlaySessionContext';
 import { PlaySharedVitals } from '../play/PlaySharedVitals';
 import { SourceBadge } from '../ui/SourceBadge';
 
-import { type WeaponItem, type ArmorItem, type ShieldItem } from '../../data/equipment';
+import type { WeaponItem, ArmorItem, ShieldItem } from '../../types/regeldaten';
 import { alleAusruestung } from '../../regelwerk/ausruestung';
 import { useRegelwerk } from '../../regelwerk/RegelwerkContext';
 import { bausteineAktiv, reliktZauber } from '../../regelwerk/relikte';

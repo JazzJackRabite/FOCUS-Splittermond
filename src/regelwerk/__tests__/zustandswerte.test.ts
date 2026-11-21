@@ -43,9 +43,8 @@ describe('Zustände und abgeleitete Werte (GRW S. 168–169)', () => {
     }
   });
 
-  it('ohne Paket rechnet der Rückfall genauso', () => {
-    expect(mitZustaenden('GSW', 8, zustandswerte([z('Erschöpft', 2)], null))).toBe(6);
-    expect(mitZustaenden('VTD', 20, zustandswerte([z('Ringend')], null))).toBe(17);
+  it('ohne Paket keine Abzüge', () => {
+    expect(mitZustaenden('GSW', 8, zustandswerte([z('Erschöpft', 2)], null))).toBe(8);
   });
 
   it('Geblendet: bei Angriffen und Zaubern gesetzt, bei Fertigkeitsproben nicht vorausgewählt', () => {

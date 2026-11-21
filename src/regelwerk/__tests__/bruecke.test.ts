@@ -7,10 +7,7 @@ import { Katalog } from '../katalog';
 import { grimoireLesen, erstelleKatalog } from '../laden';
 import { setzeAktivenKatalog, meisterschaftId, fertigkeitId, idNachName, RASSE_ID, grimoireModule } from '../bruecke';
 import { basisAusDateien } from './hilfen';
-import { ALL_SKILLS, RACES } from '../../data/rules';
-import { MASTERIES_DB, GENERAL_COMBAT_MASTERIES, GENERAL_MAGIC_MASTERIES } from '../../data/masteries';
-import { STRENGTHS_DATA } from '../../data/strengths';
-import { PREDEFINED_RESOURCES } from '../../data/resources';
+import { grwAlleFertigkeiten, grwAllgemeineKampfmeisterschaften, grwAllgemeineMagiemeisterschaften, grwMeisterschaften, grwRassen, grwRessourcen, grwStaerken } from '../grwListen';
 import { calculateCharacter } from '../../utils/characterCalculations';
 import { getResolvedMasteries, getResolvedSpells } from '../../utils/gameResourceManager';
 import { checkMasteryPrerequisites } from '../../utils/prerequisiteValidator';
@@ -31,6 +28,8 @@ function charakter(teil: Partial<CharacterState>): CharacterState {
 }
 
 describe('Zuordnung der Editor-Namen zu Katalog-IDs', () => {
+  const RACES = grwRassen(K), ALL_SKILLS = grwAlleFertigkeiten(K), STRENGTHS_DATA = grwStaerken(K), PREDEFINED_RESOURCES = grwRessourcen(K);
+  const MASTERIES_DB = grwMeisterschaften(K), GENERAL_COMBAT_MASTERIES = grwAllgemeineKampfmeisterschaften(K), GENERAL_MAGIC_MASTERIES = grwAllgemeineMagiemeisterschaften(K);
   it('alle Rassen, Fertigkeiten, Stärken und Ressourcen des Editors', () => {
     expect(Object.keys(RACES).filter(r => !K.get(RASSE_ID[r]))).toEqual([]);
     expect(ALL_SKILLS.filter(s => !fertigkeitId(K, s))).toEqual([]);

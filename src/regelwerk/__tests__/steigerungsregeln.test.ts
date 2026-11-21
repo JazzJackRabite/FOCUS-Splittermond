@@ -5,16 +5,16 @@ import { setzeAktivenKatalog } from '../bruecke';
 import { basisAusDateien } from './hilfen';
 import { heldengrade, kostenAttribut, kostenFertigkeitspunkt, kostenMeisterschaft, kostenRessourcenpunkt, kostenSprache, kostenStaerke, kostenZauber, mindestpunkteZauber } from '../steigerungsregeln';
 import { calculateItemCost, getAttrXpCost, getSkillXpCost } from '../../utils/costCalculations';
-import { HELDENGRADE } from '../../data/rules';
 
 const basis = basisAusDateien();
 const K = new Katalog(basis.manifest, [basis.basis]);
 afterEach(() => setzeAktivenKatalog(null, false));
 
 describe('Steigerungsregeln aus dem Paket', () => {
-  it('ohne Paket liefern die Funktionen null; der eingebaute Rückfall rechnet weiter', () => {
-    expect(kostenFertigkeitspunkt(7)).toBeNull();
-    expect(heldengrade()).toBeNull();
+  it('ohne Paket liefern die Funktionen null; mit Paket rechnet der Editor', () => {
+    expect(kostenFertigkeitspunkt(7, null)).toBeNull();
+    expect(heldengrade(null)).toBeNull();
+    setzeAktivenKatalog(K, false);
     expect(getSkillXpCost(7)).toBe(5);
   });
 
@@ -27,8 +27,8 @@ describe('Steigerungsregeln aus dem Paket', () => {
     expect([1, 2, 3, 4].map((s) => kostenMeisterschaft(s, K))).toEqual([5, 10, 15, 20]);
   });
 
-  it('Heldengrade nach GRW S. 88; der eingebaute Rückfall stimmt mit dem Paket überein', () => {
-    expect(heldengrade(K)).toEqual(HELDENGRADE);
+  it('Heldengrade nach GRW S. 88', () => {
+    expect(heldengrade(K)?.map((h) => [h.minXP, h.maxAttrMod, h.maxSkill, h.resistBonus])).toEqual([[0, 1, 6, 0], [100, 2, 9, 2], [300, 3, 12, 4], [600, 4, 15, 6]]);
   });
 
   it('die Kostenfunktionen des Editors fragen das Paket', () => {

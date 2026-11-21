@@ -27,6 +27,10 @@ export interface BedingungsCharakter {
   gottheit?: string;
   gewaehlte_magieschule?: string;
   auswahl_geprueft?: boolean;
+  /** gelernte Meisterschaften mit der Fertigkeit, unter der sie geführt werden: [Meisterschafts-ID, Fertigkeits-ID] */
+  gelerntIn?: Array<[string, string | undefined]>;
+  /** Fertigkeit der zu prüfenden Meisterschaft (für Bedingungen mit `gleiche_fertigkeit`) */
+  fertigkeit?: string;
 }
 
 export interface KatalogSicht {
@@ -106,6 +110,9 @@ export function erfuellt(char: BedingungsCharakter, b: Bedingung, kat: KatalogSi
   if ('hat' in b) {
     if (b.bezug) {
       const name = b.meisterschaft_name;
+      // „in der gleichen Magieschule“ / „in derselben Fertigkeit“ (Datenseite: gleiche_fertigkeit)
+      if (b.gleiche_fertigkeit && char.fertigkeit && char.gelerntIn)
+        return char.gelerntIn.some(([h, f]) => f === char.fertigkeit && get(h)?.name === name);
       for (const h of char.hat) { const e = get(h); if (e && e.name === name) return true; }
       return false;
     }

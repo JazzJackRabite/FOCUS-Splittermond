@@ -8,7 +8,6 @@ import { describe, expect, it } from 'vitest';
 import { Katalog } from '../katalog';
 import { grimoireLesen, erstelleKatalog } from '../laden';
 import { AUSRUESTUNGS_TYPEN, alleAusruestung, findeAusruestung, grwAusruestung, grimoireAusruestung } from '../ausruestung';
-import { ALL_EQUIPMENT } from '../../data/equipment';
 import { basisAusDateien, GRIMOIRE_ORDNER, istGrimoireDatei } from './hilfen';
 import type { LadePaket, RegelPaket } from '../typen';
 
@@ -46,22 +45,13 @@ function testbuch(): LadePaket {
 }
 
 describe('Ausrüstung aus Grimoires', () => {
-  it('ohne Bücher: GRW-Ausrüstung aus dem Paket; der eingebaute Rückfall stimmt in allen Werten damit überein', () => {
-    expect(alleAusruestung(null)).toBe(ALL_EQUIPMENT);
+  it('ohne Bücher: GRW-Ausrüstung aus dem Paket; ohne Paket keine', () => {
+    expect(alleAusruestung(null)).toEqual([]);
     const grw = grwAusruestung(K0);
     expect(alleAusruestung(K0)).toEqual(grw);
     expect(grimoireAusruestung(K0)).toEqual([]);
     expect(grw.every(i => i.id?.startsWith('grw:'))).toBe(true);
-    // jeder Eintrag des Rückfalls steht im Paket, mit denselben Spielwerten (das Paket hat zusätzlich Kleidung, Gifte, Material, Verbesserungen)
-    const werte = (i: Record<string, unknown>) => Object.fromEntries(Object.entries(i).filter(([f]) => !['id', 'desc'].includes(f)).sort(([a], [b]) => a.localeCompare(b)).map(([f, v]) => [f, typeof v === 'string' ? v.toUpperCase() : v === 0 ? '0' : v]));
-    const abw: string[] = [];
-    for (const r of ALL_EQUIPMENT as unknown as Record<string, unknown>[]) {
-      const p = findeAusruestung(grw, r.id as string) as unknown as Record<string, unknown> | null;
-      if (!p) { abw.push(`fehlt: ${r.id}`); continue; }
-      if (JSON.stringify(werte(p)) !== JSON.stringify(werte(r))) abw.push(String(r.id));
-    }
-    expect(abw).toEqual([]);
-    expect(grw.length).toBeGreaterThan(ALL_EQUIPMENT.length);
+    expect(grw.length).toBeGreaterThan(140);
   });
 
   const { katalog: K } = erstelleKatalog(basis, [testbuch()]);

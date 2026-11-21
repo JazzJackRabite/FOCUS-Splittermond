@@ -1,7 +1,7 @@
-import { type Spell } from '../data/spells';
-import { type MasteryEntry } from '../data/masteries';
-import type { StrengthData } from '../data/strengths';
-import type { ResourceData } from '../data/resources';
+import type { Spell } from '../types/regeldaten';
+import type { MasteryEntry } from '../types/regeldaten';
+import type { StrengthData } from '../types/regeldaten';
+import type { ResourceData } from '../types/regeldaten';
 import type { CharacterState, Mastery, AdvancementLogEntry } from '../types';
 import { generateId } from './id';
 import type { RulebookModulePackage, RulebookMastery } from '../types/rulebookSchema';

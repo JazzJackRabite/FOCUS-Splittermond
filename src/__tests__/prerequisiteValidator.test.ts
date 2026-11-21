@@ -8,11 +8,10 @@ import {
   getMasteryTier,
   getRequiredSkillValue,
 } from '../utils/prerequisiteValidator';
-import {
-  MASTERIES_DB,
-  GENERAL_COMBAT_MASTERIES,
-  GENERAL_MAGIC_MASTERIES,
-} from '../data/masteries';
+import { grwAllgemeineKampfmeisterschaften, grwAllgemeineMagiemeisterschaften, grwMeisterschaften } from '../regelwerk/grwListen';
+const MASTERIES_DB = grwMeisterschaften();
+const GENERAL_COMBAT_MASTERIES = grwAllgemeineKampfmeisterschaften();
+const GENERAL_MAGIC_MASTERIES = grwAllgemeineMagiemeisterschaften();
 
 describe('prerequisiteValidator - Thresholds & Prerequisites', () => {
   it('normalizes mastery names by stripping (S1), (S2), etc.', () => {
@@ -112,7 +111,7 @@ describe('prerequisiteValidator - Thresholds & Prerequisites', () => {
     expect(resMissing1.thresholdMet).toBe(true);
     expect(resMissing1.prerequisitesMet).toBe(false);
     expect(resMissing1.canLearn).toBe(false);
-    expect(resMissing1.missingPrerequisites).toContain('Meisterschaft "Ausweichen I"');
+    expect(resMissing1.missingPrerequisites).toContain('Meisterschaft Ausweichen I');
 
     // Player has Ausweichen I, now Ausweichen II passes
     const resHave1 = checkMasteryPrerequisites(s2Mastery, 'Akrobatik', 12, {
@@ -129,7 +128,7 @@ describe('prerequisiteValidator - Thresholds & Prerequisites', () => {
       mode: 'xp',
     });
     expect(resS3Without2.canLearn).toBe(false);
-    expect(resS3Without2.missingPrerequisites).toContain('Meisterschaft "Ausweichen II"');
+    expect(resS3Without2.missingPrerequisites).toContain('Meisterschaft Ausweichen II');
 
     // Once Ausweichen II is added, Ausweichen III passes
     const resS3With2 = checkMasteryPrerequisites(s3Mastery, 'Akrobatik', 12, {
@@ -164,7 +163,7 @@ describe('prerequisiteValidator - Thresholds & Prerequisites', () => {
       mode: 'xp',
     });
     expect(resHaveMasteriesOnly.canLearn).toBe(false);
-    expect(resHaveMasteriesOnly.missingPrerequisites[0]).toContain('Fertigkeitspunkte in Zähigkeit 6');
+    expect(resHaveMasteriesOnly.missingPrerequisites[0]).toContain('Fertigkeitspunkte Zähigkeit 6');
 
     const resPass = checkMasteryPrerequisites(apnoe, 'Schwimmen', 12, {
       allCharacterMasteries: [
@@ -190,7 +189,7 @@ describe('prerequisiteValidator - Thresholds & Prerequisites', () => {
       mode: 'xp',
     });
     expect(resNoKontakte.canLearn).toBe(false);
-    expect(resNoKontakte.missingPrerequisites[0]).toContain('Kontakte Stufe 3');
+    expect(resNoKontakte.missingPrerequisites[0]).toContain('Ressource Kontakte 3');
 
     const resHaveKontakte = checkMasteryPrerequisites(investor, investor.skill || 'Diplomatie', 12, {
       allCharacterMasteries: [],
@@ -269,7 +268,7 @@ describe('prerequisiteValidator - Thresholds & Prerequisites', () => {
 
     // With focus in userNote or mastery name
     const resFocusPass = checkMasteryPrerequisites(abhaertung, 'Alchemie', 12, {
-      allCharacterMasteries: [{ name: 'Schwerpunkt', userNote: 'Gifte' } as any],
+      allCharacterMasteries: [{ name: 'Schwerpunkt', skill: 'Alchemie', userNote: 'Gifte' } as any],
       skills: { Alchemie: 12 },
       mode: 'xp',
     });

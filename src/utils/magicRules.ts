@@ -1,4 +1,4 @@
-import { type Spell as DbSpell } from '../data/spells';
+import type { Spell as DbSpell } from '../types/regeldaten';
 import { getSpellDescription } from './gameResourceManager';
 import type { Spell } from '../types';
 

@@ -1,6 +1,6 @@
 /**
  * Zauber durch Erfolgsgrade verbessern (GRW S. 221–222) und Auslösezeit (GRW S. 194–195) aus dem GRW-Paket:
- * EG je Option, Höchstzahl, Mindestwerte. Ohne Paket die Werte des Grundregelwerks als Rückfall.
+ * EG je Option, Höchstzahl, Mindestwerte. Ohne Paket ist keine Option wählbar.
  */
 import type { Katalog } from './katalog';
 import { aktiverKatalog } from './bruecke';
@@ -24,19 +24,18 @@ const OPTION: Record<string, keyof Omit<ZauberEgRegeln, 'grundAusloesezeit' | 'q
   Schaden: 'schaden', Reichweite: 'reichweite', Wirkungsdauer: 'wirkungsdauer', Wirkungsbereich: 'wirkungsbereich', 'Auslösezeit': 'ausloesezeit',
 };
 
-const RUECKFALL: ZauberEgRegeln = {
-  erschoepft: { eg: 1, hoechstens: null, minimum: 1 }, kanalisiert: { eg: 2, hoechstens: null, minimum: 1 }, verzehrt: { eg: 3, hoechstens: null, minimum: 1 },
-  schaden: { eg: 1, hoechstens: null, minimum: null }, reichweite: { eg: 1, hoechstens: null, minimum: null },
-  wirkungsdauer: { eg: 2, hoechstens: null, minimum: null }, wirkungsbereich: { eg: 3, hoechstens: null, minimum: null },
-  ausloesezeit: { eg: 3, hoechstens: 2, minimum: 1 }, grundAusloesezeit: 3, quelle: 'GRW S. 221–222',
+const NICHT: ZauberEgOption = { eg: Infinity, hoechstens: 0, minimum: null };
+const OHNE_PAKET: ZauberEgRegeln = {
+  erschoepft: NICHT, kanalisiert: NICHT, verzehrt: NICHT, schaden: NICHT, reichweite: NICHT, wirkungsdauer: NICHT, wirkungsbereich: NICHT,
+  ausloesezeit: NICHT, grundAusloesezeit: 0, quelle: '',
 };
 
 const CACHE = new WeakMap<Katalog, ZauberEgRegeln>();
 
 export function zauberEgRegeln(k: Katalog | null = aktiverKatalog()): ZauberEgRegeln {
-  if (!k) return RUECKFALL;
+  if (!k) return OHNE_PAKET;
   if (CACHE.has(k)) return CACHE.get(k)!;
-  const r: ZauberEgRegeln = { ...RUECKFALL };
+  const r: ZauberEgRegeln = { ...OHNE_PAKET, quelle: 'GRW S. 221–222' };
   const opt = k.get(EG_ID)?.daten.strukturiert?.optionen as { name: string; eg: number | string; hoechstens?: number | null; minimum?: string }[] | undefined;
   for (const o of opt ?? []) {
     const key = OPTION[o.name];

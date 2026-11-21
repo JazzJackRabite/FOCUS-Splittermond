@@ -16,7 +16,7 @@ const m = (name: string): Mastery => ({ id: name, name, tier: 1, cost: 0, isFree
 describe('Pausen und Wirkungen aus dem GRW-Paket', () => {
   it('Ruheregeln: Konstitution ×2, Willenskraft ×2, mindestens 1, 6 Stunden, Verschnaufpause 30 Minuten', () => {
     expect(ruheregeln(K)).toEqual({ lpFaktor: 2, lpMindestens: 1, foFaktor: 2, foMindestens: 1, ruheStunden: 6, verschnaufMinuten: 30, quelle: 'GRW S. 173–174' });
-    expect(ruheregeln(null)).toEqual(ruheregeln(K));
+    expect(ruheregeln(null).lpFaktor).toBe(0);
   });
 
   it('Ruhewirkungen mit Beleg; bedingte Wirkungen werden nicht eingerechnet', () => {

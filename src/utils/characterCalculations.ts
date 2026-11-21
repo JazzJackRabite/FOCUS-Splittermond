@@ -5,20 +5,20 @@ import type {
   Mastery,
   Spell,
 } from '../types';
-import { HELDENGRADE } from '../data/rules';  // Rückfall ohne Paket
+import type { Heldengrad } from '../regelwerk/steigerungsregeln';
 import { getSkillXpCost, getAttrXpCost, calculateItemCost } from './costCalculations';
 import { heldengrade } from '../regelwerk/steigerungsregeln';
 import { abgeleiteteFuerCharakter, wirkungenFuerCharakter, type CharakterWirkungen, type KatalogWerte } from '../regelwerk/bruecke';
 import { reliktWiderstandFuerCharakter } from '../regelwerk/relikte';
 import { grwAlleFertigkeiten, grwAttribute, grwFertigkeitsKategorien, grwFertigkeitsattribute, grwGesundheitsstufen, grwRassen, staerkenBudget } from '../regelwerk/grwListen';
-import { ausruestungsMinderung, wundabzugMinderung } from '../regelwerk/spielwirkungen';
+import { ausruestungsMinderung, traglast, wundabzugMinderung } from '../regelwerk/spielwirkungen';
 
 export interface CharacterCalculationResult {
   getAttrValue: (key: string) => number;
   currentAttributes: Record<string, number>;
   xpSpent: number;
   xpAvailable: number;
-  heldengrad: (typeof HELDENGRADE)[number];
+  heldengrad: Heldengrad;
   derived: DerivedStats;
   robustBonus: number;
   maxLP: number;
@@ -143,24 +143,13 @@ export function calculateCharacter(state: CharacterState): CharacterCalculationR
   if (isNaN(xpSpent)) xpSpent = 0;
 
   // 3. Heldengrad
-  // Schwellen und Grenzen aus den Kernregeln des Pakets; die eingebaute Liste ist nur der Rückfall
-  const grade: (typeof HELDENGRADE)[number][] = heldengrade() ?? HELDENGRADE;
-  let heldengrad = grade[0];
+  // Schwellen und Grenzen aus den Kernregeln des Pakets
+  const grade: Heldengrad[] = heldengrade() ?? [];
+  let heldengrad: Heldengrad = grade[0] ?? { nr: 1, name: '', minXP: 0, maxAttrMod: 0, maxSkill: 0, resistBonus: 0 };
   for (const g of grade) if (xpSpent >= g.minXP) heldengrad = g;
 
   // 4. Derived stats
-  const raceData = grwRassen()[race as keyof ReturnType<typeof grwRassen>] as { gk: number } | undefined;
-  const gk = Number(raceData?.gk) || 5;
-  const sizeMod = gk === 3 ? 4 : gk === 4 ? 2 : gk === 6 ? -2 : 0;
-  const bew = Number(currentAttributes.BEW) || 0;
-  const sta = Number(currentAttributes.STA) || 0;
-  const intVal = Number(currentAttributes.INT) || 0;
-  const kon = Number(currentAttributes.KON) || 0;
-  const mys = Number(currentAttributes.MYS) || 0;
-  const wil = Number(currentAttributes.WIL) || 0;
-  const ver = Number(currentAttributes.VER) || 0;
-  const vtd = 12 + bew + sta + sizeMod;
-  const resistBonus = Number(heldengrad.resistBonus) || 0;
+  // Formeln der abgeleiteten Werte stehen im Paket (abgeleiteteFuerCharakter, unten); hier nur die Ausrüstung
 
   // Equipment bonuses (armor, shields, load)
   const equippedItems = state.inventory?.filter((it) => it.equipped) ?? [];
@@ -172,7 +161,10 @@ export function calculateCharacter(state: CharacterState): CharacterCalculationR
   const gearHandicap = equippedItems
     .reduce((sum, it) => sum + (Number(it.handicap) || 0), 0);
 
-  const loadCapacity = kon + sta;
+  // Traglast (Optionalregel GRW S. 165): Last je Punkt des Attributs aus dem Paket, Behinderung je weiterem Lastpunkt
+  const tl = traglast();
+  const tlAttr = Object.entries(grwAttribute()).find(([, n]) => n === tl?.attribut)?.[0];
+  const loadCapacity = tl && tlAttr ? (Number(currentAttributes[tlAttr as keyof typeof currentAttributes]) || 0) * tl.lastJePunkt : Infinity;
   const totalLoad = (state.inventory ?? []).reduce(
     (sum, it) => sum + (Number(it.weight) || 0) * (Number(it.quantity) || 1),
     0
@@ -195,23 +187,11 @@ export function calculateCharacter(state: CharacterState): CharacterCalculationR
   const tickVon = (schild: boolean) => equippedItems.filter((it) => (it.type === 'shield') === schild).reduce((sum, it) => sum + (Number(it.tickModifier) || 0), 0);
   const gearTickModifier = Math.max(0, tickVon(false) - minderung.ruestung.tick_zuschlag) + Math.max(0, tickVon(true) - minderung.schild.tick_zuschlag);
 
-  const overweightHandicap = state.ignoreEncumbrance ? 0 : Math.max(0, totalLoad - loadCapacity);
+  const overweightHandicap = state.ignoreEncumbrance || !tl ? 0 : Math.max(0, totalLoad - loadCapacity) * tl.behinderungJeLastpunkt;
   const totalHandicap = armorHandicap + shieldHandicap + overweightHandicap;
 
-  // Splittermond GRW S. 187: "Die halbe Gesamt-Behinderung wird außerdem als Malus auf die Geschwindigkeit angerechnet."
-  // halbe Gesamt-Behinderung, kaufmännisch gerundet (GRW S. 11 und 165); mit Paket rechnet abgeleiteteFuerCharakter
-  const speedHandicapReduction = Math.round(totalHandicap / 2);
-
-  const derived: DerivedStats = {
-    GSW: Math.max(0, bew + gk - speedHandicapReduction),
-    INI: 10 - intVal,
-    LP: gk + kon,
-    FO: 2 * (mys + wil),
-    VTD: vtd + gearVtdBonus,
-    SR: armorSR,
-    GW: 12 + ver + wil + resistBonus,
-    KW: 12 + kon + wil + resistBonus,
-  };
+  // Geschwindigkeit abzüglich halber Behinderung rechnet abgeleiteteFuerCharakter aus dem Paket (GRW S. 165, 187)
+  const derived: DerivedStats = { GSW: 0, INI: 0, LP: 0, FO: 0, VTD: 0, SR: armorSR, GW: 0, KW: 0 };
 
   // 5. Max LP & FO
   // LP und FO aus Stärken stehen im Paket (abgeleitete_werte_modifikatoren); ohne Paket keine

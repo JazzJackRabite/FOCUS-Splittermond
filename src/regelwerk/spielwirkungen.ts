@@ -25,9 +25,9 @@ export function ruheregeln(k: Katalog | null = aktiverKatalog()): Ruheregeln {
   const s = e?.quelle.buch_seiten ?? [173, 174];
   return {
     quelle: `GRW S. ${s.length > 1 ? `${s[0]}–${s[s.length - 1]}` : s[0]}`,
-    lpFaktor: r?.ruhephase?.lp?.faktor ?? 2, lpMindestens: r?.ruhephase?.lp?.mindestens ?? 1,
-    foFaktor: r?.ruhephase?.fo_verzehrt?.faktor ?? 2, foMindestens: r?.ruhephase?.fo_verzehrt?.mindestens ?? 1,
-    ruheStunden: r?.ruhephase?.dauer_stunden ?? 6, verschnaufMinuten: r?.verschnaufpause?.dauer_minuten ?? 30,
+    lpFaktor: r?.ruhephase?.lp?.faktor ?? 0, lpMindestens: r?.ruhephase?.lp?.mindestens ?? 0,
+    foFaktor: r?.ruhephase?.fo_verzehrt?.faktor ?? 0, foMindestens: r?.ruhephase?.fo_verzehrt?.mindestens ?? 0,
+    ruheStunden: r?.ruhephase?.dauer_stunden ?? 0, verschnaufMinuten: r?.verschnaufpause?.dauer_minuten ?? 0,
   };
 }
 
@@ -90,4 +90,10 @@ export function ausruestungsMinderung(c: MitListen, k: Katalog | null = aktiverK
     if (g && (b === 'behinderung' || b === 'tick_zuschlag')) out[g][b] += cw.wirkung.wert as number;
   }
   return out;
+}
+
+/** Traglast (Optionalregel GRW S. 165, Kernregel `strukturiert.traglast`): Last je Punkt Stärke, Behinderung je weiterem Lastpunkt */
+export function traglast(k: Katalog | null = aktiverKatalog()): { attribut: string; lastJePunkt: number; behinderungJeLastpunkt: number } | null {
+  const t = k?.get('grw:regel:ausruestungsregeln:traglast-optionalregel')?.daten.strukturiert?.traglast;
+  return t ? { attribut: t.attribut, lastJePunkt: t.last_je_punkt, behinderungJeLastpunkt: t.behinderung_je_lastpunkt } : null;
 }

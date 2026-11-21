@@ -1,57 +1,28 @@
 /*
- * Kosten in Erfahrungspunkten. Maßgeblich sind die Kernregeln des Grundregelwerk-Pakets (regelwerk/steigerungsregeln.ts);
- * die Zahlen in dieser Datei sind nur der Rückfall, solange kein Paket geladen ist (FUNDAMENT.md, Altlasten).
+ * Kosten in Erfahrungspunkten aus den Kernregeln des Grundregelwerk-Pakets (regelwerk/steigerungsregeln.ts, GRW S. 87).
+ * Ohne Paket kosten Steigerungen nichts (der Editor startet erst mit geladenem Paket).
  */
 import { kostenAttribut, kostenFertigkeitspunkt, kostenMeisterschaft, kostenRessourcenpunkt, kostenSprache, kostenStaerke, kostenZauber } from '../regelwerk/steigerungsregeln';
 
-/**
- * Returns XP cost for a skill point increment.
- * totalVal is the value AFTER the increment (next value).
- */
-export const getSkillXpCost = (nextVal: number): number => {
-  const ausPaket = kostenFertigkeitspunkt(nextVal);
-  if (ausPaket !== null) return ausPaket;
-  if (nextVal > 12) return 9;
-  if (nextVal > 9) return 7;
-  if (nextVal > 6) return 5;
-  return 3;
-};
+/** Kosten eines Fertigkeitspunkts; nextVal ist der Wert nach der Steigerung */
+export const getSkillXpCost = (nextVal: number): number => kostenFertigkeitspunkt(nextVal) ?? 0;
 
-/**
- * Returns XP cost for an attribute increment.
- * currentInc is the current number of increments BEFORE this one.
- */
-export const getAttrXpCost = (currentInc: number): number => {
-  return kostenAttribut(currentInc + 1) ?? 10 + currentInc * 5;
-};
+/** Kosten einer Attributsteigerung; currentInc ist die Zahl der bisherigen Steigerungen */
+export const getAttrXpCost = (currentInc: number): number => kostenAttribut(currentInc + 1) ?? 0;
 
-/**
- * Returns XP cost according to official rules (PDF S. 25 & S. 87)
- */
+/** Kosten nach Art und Stufe (Attribut, Fertigkeit, Stärke, Ressource, Sprache, Meisterschaft, Zauber) */
 export const calculateItemCost = (
   type: 'attribute' | 'skill' | 'strength' | 'resource' | 'language' | 'mastery' | 'spell',
   levelOrRank: number
 ): number => {
   switch (type) {
-    case 'attribute':
-      // 1. = 10 EP, 2. = 15 EP, 3. = 20 EP, 4. = 25 EP
-      return kostenAttribut(levelOrRank) ?? 10 + (levelOrRank - 1) * 5;
-    case 'skill':
-      return getSkillXpCost(levelOrRank);
-    case 'strength':
-      // Stufe 1 = 7 EP, Stufe 2 = 14 EP
-      return kostenStaerke(levelOrRank) ?? levelOrRank * 7;
-    case 'resource':
-      return kostenRessourcenpunkt() ?? 7;
-    case 'language':
-      return kostenSprache() ?? 5;
-    case 'mastery':
-      // Schwelle 1 = 5 EP, Schwelle 2 = 10 EP, Schwelle 3 = 15 EP, Schwelle 4 = 20 EP
-      return kostenMeisterschaft(levelOrRank) ?? levelOrRank * 5;
-    case 'spell':
-      // Grad 0 = 1 EP, Grad 1 = 3 EP, Grad 2 = 6 EP, Grad 3 = 9 EP, Grad 4 = 12 EP, Grad 5 = 15 EP
-      return kostenZauber(levelOrRank) ?? (levelOrRank === 0 ? 1 : levelOrRank * 3);
-    default:
-      return 0;
+    case 'attribute': return kostenAttribut(levelOrRank) ?? 0;
+    case 'skill': return getSkillXpCost(levelOrRank);
+    case 'strength': return kostenStaerke(levelOrRank) ?? 0;
+    case 'resource': return kostenRessourcenpunkt() ?? 0;
+    case 'language': return kostenSprache() ?? 0;
+    case 'mastery': return kostenMeisterschaft(levelOrRank) ?? 0;
+    case 'spell': return kostenZauber(levelOrRank) ?? 0;
+    default: return 0;
   }
 };

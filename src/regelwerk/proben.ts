@@ -1,6 +1,6 @@
 /**
  * Probenregeln aus dem GRW-Paket (GRW S. 16–20): Würfelarten, Patzer, Triumph, Erfolgsgrade und ihre Einstufung.
- * Gemeinsam für Fertigkeitsproben, Angriffe und Zauber. Ohne Paket: die Werte des Grundregelwerks als Rückfall.
+ * Gemeinsam für Fertigkeitsproben, Angriffe und Zauber. Ohne Paket gibt es weder Erfolgsgrade noch Patzer oder Triumph.
  */
 import type { Katalog } from './katalog';
 import { aktiverKatalog } from './bruecke';
@@ -24,16 +24,6 @@ export interface Probenregeln {
   quelle: string;
 }
 
-const RUECKFALL_STUFEN: Probenregeln['stufen'] = [
-  { egMin: 5, egMax: Infinity, einstufung: 'Herausragend gelungen' },
-  { egMin: 3, egMax: 4, einstufung: '(Gut) gelungen' },
-  { egMin: 1, egMax: 2, einstufung: 'Gelungen' },
-  { egMin: 0, egMax: 0, nurBeiDifferenz: 'positiv', einstufung: '(Knapp) gelungen' },
-  { egMin: 0, egMax: 0, nurBeiDifferenz: 'negativ', einstufung: 'Knapp misslungen' },
-  { egMin: -2, egMax: -1, einstufung: 'Misslungen' },
-  { egMin: -4, egMax: -3, einstufung: '(Schwer) misslungen' },
-  { egMin: -Infinity, egMax: -5, einstufung: 'Verheerend misslungen' },
-];
 
 /** „5 und mehr“, „3 bis 4“, „0“, „-1 bis -2“, „-5 und mehr“ in Grenzen übersetzen */
 function egBereich(text: string): [number, number] | null {
@@ -55,7 +45,7 @@ export function probenregeln(k: Katalog | null = aktiverKatalog()): Probenregeln
   const eg = k?.get(EG_ID)?.daten.strukturiert;
   const pa = k?.get(PATZER_ID)?.daten.strukturiert;
   const tr = k?.get(TRIUMPH_ID)?.daten.strukturiert;
-  let stufen = RUECKFALL_STUFEN;
+  let stufen: Probenregeln['stufen'] = [];
   if (Array.isArray(eg?.stufen)) {
     const s = (eg.stufen as { differenz: string; eg: string; einstufung: string }[]).map((x) => {
       const b = egBereich(x.eg); if (!b) return null;
@@ -65,16 +55,16 @@ export function probenregeln(k: Katalog | null = aktiverKatalog()): Probenregeln
     if (s.every(Boolean)) stufen = s as Probenregeln['stufen'];
   }
   const r: Probenregeln = {
-    punkteJeEg: eg?.punkte_je_eg ?? 3,
-    patzerSummeHoechstens: pa?.summe_hoechstens ?? 3,
-    patzerEg: pa?.eg_aenderung ?? -3,
-    patzerEgHoechstens: pa?.eg_hoechstens ?? -1,
-    triumphSummeMindestens: tr?.summe_mindestens ?? 19,
-    triumphEg: tr?.eg_aenderung ?? 3,
+    punkteJeEg: eg?.punkte_je_eg ?? Infinity,
+    patzerSummeHoechstens: pa?.summe_hoechstens ?? -Infinity,
+    patzerEg: pa?.eg_aenderung ?? 0,
+    patzerEgHoechstens: pa?.eg_hoechstens ?? 0,
+    triumphSummeMindestens: tr?.summe_mindestens ?? Infinity,
+    triumphEg: tr?.eg_aenderung ?? 0,
     wuerfel: {
-      standard: anzahlW10(k?.get(WURF_IDS.standard)?.daten.strukturiert?.wuerfel) ?? 2,
-      safe: anzahlW10(k?.get(WURF_IDS.safe)?.daten.strukturiert?.wuerfel) ?? 2,
-      risk: anzahlW10(k?.get(WURF_IDS.risk)?.daten.strukturiert?.wuerfel) ?? 4,
+      standard: anzahlW10(k?.get(WURF_IDS.standard)?.daten.strukturiert?.wuerfel) ?? 0,
+      safe: anzahlW10(k?.get(WURF_IDS.safe)?.daten.strukturiert?.wuerfel) ?? 0,
+      risk: anzahlW10(k?.get(WURF_IDS.risk)?.daten.strukturiert?.wuerfel) ?? 0,
     },
     stufen,
     quelle: 'GRW S. 17–18',

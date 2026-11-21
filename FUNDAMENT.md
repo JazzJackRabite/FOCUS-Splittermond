@@ -44,8 +44,8 @@ Felder stehen unter `daten` des jeweiligen Eintrags. **Was hier nicht steht, dar
 |---|---|---|
 | Kosten in Erfahrungspunkten, Heldengrade (Schwellen, Grenzen, Widerstandsbonus), Fertigkeitspunkte je Zaubergrad | Kernregeln: `strukturiert` mit `steigerungskosten`, `heldengrade` | `regelwerk/steigerungsregeln.ts` |
 | Zustände: welche es gibt, Stufe, Abzüge auf Proben und Werte, Beschreibung, Quelle (Anzeige beim Überfahren mit der Maus) | Einträge vom Typ `zustand`: `hat_stufe`/`parameter`, `zustandswirkung`, `beschreibung`, `quelle` – Grundregelwerk aus dem GRW-Paket, alle anderen aus den Grimoires | `regelwerk/zustaende.ts`, `regelwerk/zustandswerte.ts`, `utils/conditionModifiers.ts` |
-| Listen des Grundregelwerks: Zauber, Meisterschaften (mit Schwellenwerten), Stärken (wie oft wählbar), Schwächen, Ressourcen (mit Stufenübersicht), Sprachen, Mondzeichen, Fertigkeiten mit Attributen, Rassen, Stärkenpunkte der Erschaffung, Attribute, Gesundheitsstufen | Einträge des GRW-Pakets: `schulen`, `kosten`, `zauberdauer`, `reichweite`, `wirkungsdauer`, `typus`, `wirkung`, `erfolgsgrade`, `schwierigkeit_strukturiert`, `schwelle`, `manoever`, `beschreibung`, `stufe`, `nur_bei_generierung`, `mehrfach_waehlbar`, `tabelle`, `familie`, `untergruppe`, `kategorie`, `attribute`, `attributsmodifikatoren`, `groessenklasse`, `staerken_refs`, `zusaetzliche_staerkepunkte`; Kernregeln: `strukturiert` mit `schwellen`, `staerke_punkte` | `regelwerk/grwListen.ts` |
-| Pausen (Ruhephase, Verschnaufpause), Ruhewirkungen von Stärken und Meisterschaften, Minderung von Wundabzügen, Behinderung und Tick-Zuschlag für Rüstung bzw. Schild | Kernregel „Heilung“: `ruheregeln`; Stärken/Meisterschaften: `ruhewirkung` (`lp_faktor`, `fo_faktor`, `lp_zusatz`, `erschoepft_minuten`, `fo_erschoepft_minuten`, `regeneration_faktor`, `bedingung`, `beleg`); Wirkungen mit `bezug` `wundabzug`, `behinderung`, `tick_zuschlag` und `gilt_fuer` | `regelwerk/spielwirkungen.ts` |
+| Listen des Grundregelwerks: Zauber, Meisterschaften (mit Schwellenwerten), Stärken (wie oft wählbar), Schwächen, Ressourcen (mit Stufenübersicht), Sprachen, Mondzeichen, Fertigkeiten mit Attributen, Rassen, Stärkenpunkte der Erschaffung, Attribute, Gesundheitsstufen | Einträge des GRW-Pakets: `schulen`, `kosten`, `zauberdauer`, `reichweite`, `wirkungsdauer`, `typus`, `wirkung`, `erfolgsgrade`, `schwierigkeit_strukturiert`, `schwelle`, `manoever`, `beschreibung`, `stufe`, `nur_bei_generierung`, `mehrfach_waehlbar`, `tabelle`, `familie`, `untergruppe`, `kategorie`, `attribute`, `attributsmodifikatoren`, `groessenklasse`, `staerken_refs`, `zusaetzliche_staerkepunkte`, `mehrfach_waehlbar`; Kernregeln: `strukturiert` mit `schwellen`, `staerke_punkte` | `regelwerk/grwListen.ts` |
+| Pausen (Ruhephase, Verschnaufpause), Ruhewirkungen von Stärken und Meisterschaften, Minderung von Wundabzügen, Behinderung und Tick-Zuschlag für Rüstung bzw. Schild | Kernregel „Heilung“: `ruheregeln`; Stärken/Meisterschaften: `ruhewirkung` (`lp_faktor`, `fo_faktor`, `lp_zusatz`, `erschoepft_minuten`, `fo_erschoepft_minuten`, `regeneration_faktor`, `bedingung`, `beleg`); Wirkungen mit `bezug` `wundabzug`, `behinderung`, `tick_zuschlag` und `gilt_fuer`; Traglast (Optionalregel): `strukturiert.traglast` | `regelwerk/spielwirkungen.ts` |
 | Heimatregionen für die kostenlose Kulturkunde | Kultur-Module: `felder.kulturkunde` | `regelwerk/grwListen.ts` |
 | Kampfmanöver: freie Manöver (Wuchtangriff, Betäubungsschlag, Störender Angriff), Kosten in Erfolgsgraden, Streiftreffer, Kombination mehrerer Manöver (`kombination`), Wirkung der Meisterschafts-Manöver (Widerstand, halber/kein Schaden, Zusatzschaden, Zustand, Tickverlust, Voraussetzung), Merkmal Wuchtig | Kernregel „Nahkampfhandlungen“: `manoever_regeln`; Meisterschaften mit `manoever`: `manoeverwirkung`, sonst `wirkungen_strukturiert` mit `gilt` „beim Manöver“; Merkmale: `wuchtangriff_je_eg` | `utils/combatRules.ts` |
 | Proben: Patzer und Triumph beim Würfeln, Erfolgsgrade je Punkte über/unter der Schwierigkeit, Einstufung (knapp, gut, herausragend …) – für Fertigkeitsproben, Angriffe und Zauber | Kernregeln „Erfolgsgrade (EG)“: `strukturiert` mit `punkte_je_eg`, `stufen`; „Patzer“: `summe_hoechstens`, `eg_aenderung`, `eg_hoechstens`; „Triumph“: `summe_mindestens`, `eg_aenderung` | `regelwerk/proben.ts` |
@@ -56,7 +56,7 @@ Felder stehen unter `daten` des jeweiligen Eintrags. **Was hier nicht steht, dar
 | Pakete laden und im Browser speichern | Paketkopf, Einträge | `regelwerk/laden.ts`, `regelwerk/paketSpeicher.ts` |
 | Einträge finden, Namen und IDs, Umbenennungen | Einträge mit `id`, `typ`, `name`; ID-Register | `regelwerk/katalog.ts`, `regelwerk/bruecke.ts`, `regelwerk/ids.ts` |
 | Abgeleitete Werte, Heldengrade, Höchstbonus | Kernregeln: `strukturiert`; an Stärken: `abgeleitete_werte_modifikatoren`; `groessenklasse`; an Ausrüstung: `behinderung`, `vtd_bonus`, `mindest_staerke` | `regelwerk/abgeleitet.ts` |
-| Voraussetzungen | `voraussetzungen` (formal, mit IDs) | `regelwerk/bedingungen.ts` |
+| Voraussetzungen | `voraussetzungen` (formal, mit IDs; `gleiche_fertigkeit` für „in der gleichen Magieschule“) | `regelwerk/bedingungen.ts` |
 | Erschaffung: Rassen, Kulturen, Abstammungen, Module, Grenzen je Schritt | `modulwerte`, `attributsmodifikatoren`, `staerken_refs`, `strukturiert`, `tabelle` | `regelwerk/erschaffung.ts`, `regelwerk/erschaffungEditor.ts` |
 | Wirkungen von Stärken und Meisterschaften (feste Boni, Boni beim Würfeln) | `wirkungen_strukturiert` mit `fertigkeit_refs`, `alle_proben`, `gilt`, `traeger` | `regelwerk/wirkungen.ts` |
 | Kosten und Zauberdauer aus Meisterschaften | `wirkungen_strukturiert`, Gruppe B | `regelwerk/wirkungen.ts` |
@@ -76,24 +76,18 @@ Ansicht das heute noch tut, steht sie in `src/fundament/altlasten.json` (`paketz
 
 ### Regeln, die noch im Code stehen (Altlasten)
 
-Diese Stellen verstoßen gegen Grundsatz 2. Sie sind bekannt, werden von den Prüfungen vorerst geduldet und sollen auf die
-Datenseite wandern. Neue kommen nicht hinzu.
+Keine. Der Editor startet erst, wenn das Grundregelwerk-Paket geladen ist (`app/RegelwerkTor.tsx`); eingebaute
+Rückfall-Listen gibt es nicht mehr. Ohne Paket liefern die Module unter `regelwerk/` leere Listen und neutrale Werte
+(keine Erfolgsgrade, keine Kosten, keine Zustände). Neue Altlasten kommen nicht hinzu: Die Prüfungen in
+`src/fundament/__tests__` schlagen bei Regelnamen im Code, Paketzugriffen aus Ansichten und Suchmustern auf Regeltext
+fehl; die Liste der geduldeten Stellen (`src/fundament/altlasten.json`) ist leer und wird nie von Hand erweitert.
 
-| Was | Wo | Ziel |
-|---|---|---|
-| Rückfall ohne geladenes Paket: Listen des Grundregelwerks (Zauber, Meisterschaften, Stärken, Schwächen, Ressourcen, Ausrüstung, Sprachen) | `src/data/*.ts` | Werden nur noch gelesen, solange kein Paket geladen ist (Start der App, einzelne Tests); Tests halten sie gleich mit dem Paket (`grwListen.test.ts`, `ausruestung.test.ts`). Entfällt, sobald der Editor ohne Rückfall startet |
-| Rückfall ohne geladenes Paket: Attribute, Fertigkeiten mit Attributen, Rassen, Mondzeichen, Heldengrade, Gesundheitsstufen | `src/data/rules.ts` | Wie oben; nur noch über `regelwerk/grwListen.ts` und `steigerungsregeln.ts` gelesen |
-| Rückfall ohne geladenes Paket: Werte des Grundregelwerks für Proben (Würfel, Patzer, Triumph, EG-Stufen) und Zauber-EG (Optionen, Auslösezeit) | `regelwerk/proben.ts`, `regelwerk/zauberEg.ts` | Wie oben; mit Paket gelten nur dessen Werte |
-
-Die genaue Liste der geduldeten Regelnamen und Suchmuster steht in `src/fundament/altlasten.json` (`regelnamen`, `suchmuster`).
 Suchmuster, die Regeltext lesen (eine Wortfolge aus drei oder mehr Wörtern oder der Name einer Regel), sind im Editor nicht
 erlaubt: Was aus Fließtext gelesen werden muss, liest die Datenseite (`Werkzeuge/regelpakete/textauslese.py`) und schreibt ein Feld.
-Ohne geladenes Regelpaket rechnet der Editor mit diesen eingebauten Werten weiter (Rückfall). Die Beispielcharaktere
-(`src/data/presets.ts`) nennen Einträge beim Namen; beim Laden einer Vorlage schreibt der Editor die IDs aus dem Paket mit,
-und ein Test prüft, dass jeder Name eine ID im GRW-Paket hat (`vorlagen.test.ts`). Für die Zustände des Grundregelwerks liegt der Rückfall in
-`src/data/zustaende.ts`; Zustände aus anderen Bänden stehen nicht im Code. Das gilt auch für die Kosten in
-Erfahrungspunkten und die Heldengrade: Maßgeblich ist das Paket; `utils/costCalculations.ts` und die Liste in
-`src/data/rules.ts` enthalten dieselben Zahlen nur noch als Rückfall, und ein Test hält beide gleich.
+
+Die Beispielcharaktere (`src/data/presets.ts`) nennen Einträge beim Namen; beim Laden einer Vorlage schreibt der Editor die
+IDs aus dem Paket mit, und ein Test prüft, dass jeder Name eine ID im GRW-Paket hat (`vorlagen.test.ts`). Die Tests laufen wie
+der Editor mit geladenem Grundregelwerk-Paket (`src/testSetup.ts`).
 
 ## 3. Gestaltung
 

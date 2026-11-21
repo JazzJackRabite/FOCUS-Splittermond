@@ -15,7 +15,8 @@ import {
 } from '../utils/magicRules';
 import { getConditionMalus, getActiveRollModifiers } from '../utils/conditionModifiers';
 import { CHARACTER_PRESETS } from '../data/presets';
-import { RACES } from '../data/rules';
+import { grwRassen } from '../regelwerk/grwListen';
+const RACES = grwRassen();
 import { Katalog } from '../regelwerk/katalog';
 import { basisAusDateien } from '../regelwerk/__tests__/hilfen';
 
@@ -146,8 +147,8 @@ describe('Splittermond GRW – Umfassende Regelprüfung, 5 Testcharaktere & Kamp
       // GK 3 gibt +4 VTD-Modifikator!
       // BEW = 4, STA = 1 => 12 + 4 + 1 + 4 = 21 VTD!
       expect(result.current.derived.VTD).toBeGreaterThanOrEqual(20);
-      // GSW = GK 3 + BEW 4 = 7
-      expect(result.current.derived.GSW).toBe(7);
+      // GSW = GK 3 + BEW 4 + 1 (Stärke Flink, Rassenmerkmal) = 8
+      expect(result.current.derived.GSW).toBe(8);
     });
 
     it('Charakter 5: Telkin Feuerfaust (Zwerg - Hammerpriester & Krieger)', () => {

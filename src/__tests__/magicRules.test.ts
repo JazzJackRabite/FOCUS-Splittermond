@@ -93,7 +93,7 @@ describe('magicRules - enhancements & info', () => {
     expect([r.erschoepft.eg, r.kanalisiert.eg, r.verzehrt.eg, r.schaden.eg, r.reichweite.eg, r.wirkungsdauer.eg, r.wirkungsbereich.eg, r.ausloesezeit.eg]).toEqual([1, 2, 3, 1, 1, 2, 3, 3]);
     expect(r.ausloesezeit).toMatchObject({ hoechstens: 2, minimum: 1 });
     expect(r.grundAusloesezeit).toBe(3);
-    expect(zauberEgRegeln(null)).toEqual({ ...r, quelle: r.quelle });
+    expect(zauberEgRegeln(null).schaden.eg).toBe(Infinity);
   });
 
   it('retrieves spell info from database', () => {

@@ -146,10 +146,10 @@ export interface ManoeverRegeln {
 export function manoeverRegeln(k: Katalog | null = aktiverKatalog()): ManoeverRegeln {
   const e = k?.get(NAHKAMPF_ID); const r = e?.daten.manoever_regeln;
   return {
-    egJeManoever: r?.eg_je_meisterschaftsmanoever ?? 1,
-    streiftrefferSchaden: r?.streiftreffer?.schaden_je_manoever ?? 2,
-    streiftrefferBetaeubung: r?.streiftreffer?.betaeubung_je_manoever ?? 2,
-    freie: r?.freie_manoever ?? [{ name: 'Wuchtangriff', je_eg: { schaden: 1 } }],
+    egJeManoever: r?.eg_je_meisterschaftsmanoever ?? 0,
+    streiftrefferSchaden: r?.streiftreffer?.schaden_je_manoever ?? 0,
+    streiftrefferBetaeubung: r?.streiftreffer?.betaeubung_je_manoever ?? 0,
+    freie: r?.freie_manoever ?? [],
     kombination: {
       mehrere: !!r?.kombination?.mehrere,
       gleicherWiderstand: r?.kombination?.gleicher_widerstand ?? true,
@@ -162,7 +162,7 @@ export function manoeverRegeln(k: Katalog | null = aktiverKatalog()): ManoeverRe
 
 /** Schaden je EG beim freien Manöver Wuchtangriff; Waffen mit einem Merkmal, das ihn erhöht (Wuchtig, GRW S. 186), geben mehr */
 export function wuchtangriffJeEg(waffenMerkmale: string | undefined, k: Katalog | null = aktiverKatalog()): number {
-  const grund = manoeverRegeln(k).freie.find((f) => f.je_eg?.schaden)?.je_eg?.schaden ?? 1;
+  const grund = manoeverRegeln(k).freie.find((f) => f.je_eg?.schaden)?.je_eg?.schaden ?? 0;
   if (!k || !waffenMerkmale) return grund;
   const text = waffenMerkmale.toLowerCase();
   for (const e of Object.values(k.eintraege)) {

@@ -3,9 +3,5 @@
   "farbwerte": {},
   "regelnamen": [],
   "paketzugriffe": [],
-  "suchmuster": [
-    "src/utils/prerequisiteValidator.ts: Schwerpunkt für eine Stadt",
-    "src/utils/prerequisiteValidator.ts: in der Fertigkeit",
-    "src/utils/prerequisiteValidator.ts: in der gleichen Magieschule"
-  ]
+  "suchmuster": []
 }

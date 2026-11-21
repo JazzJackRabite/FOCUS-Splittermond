@@ -15997,7 +15997,8 @@
       "hat": "grw:meisterschaft:allgemeine-magiemeisterschaften:hand-des-zauberers",
       "text": "Hand des Zauberers in der gleichen Magieschule",
       "bezug": "der gleichen Magieschule",
-      "meisterschaft_name": "Hand des Zauberers"
+      "meisterschaft_name": "Hand des Zauberers",
+      "gleiche_fertigkeit": true
      }
     },
     "wirkungen_strukturiert": [
@@ -16134,7 +16135,8 @@
       "hat": "grw:meisterschaft:allgemeine-magiemeisterschaften:fokuskontrolle",
       "text": "Fokuskontrolle in der gleichen Magieschule",
       "bezug": "der gleichen Magieschule",
-      "meisterschaft_name": "Fokuskontrolle"
+      "meisterschaft_name": "Fokuskontrolle",
+      "gleiche_fertigkeit": true
      }
     },
     "wirkungen_strukturiert": [],
@@ -16212,7 +16214,8 @@
       "hat": "grw:meisterschaft:allgemeine-magiemeisterschaften:zauberfinger",
       "text": "Zauberfinger in der gleichen Magieschule",
       "bezug": "der gleichen Magieschule",
-      "meisterschaft_name": "Zauberfinger"
+      "meisterschaft_name": "Zauberfinger",
+      "gleiche_fertigkeit": true
      }
     },
     "wirkungen_strukturiert": [],
@@ -17347,7 +17350,11 @@
      }
     ],
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "mehrfach_waehlbar": {
+     "anzahl": null,
+     "beleg": "Bestienjäger kann genau wie Jäger des Übernatürlichen mehrfach gewählt werden."
+    }
    }
   },
   {
@@ -17416,7 +17423,11 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "mehrfach_waehlbar": {
+     "anzahl": null,
+     "beleg": "Die Meisterschaft kann mehrfach gewählt werden."
+    }
    }
   },
   {
@@ -18597,7 +18608,11 @@
      }
     },
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "mehrfach_waehlbar": {
+     "anzahl": null,
+     "beleg": "Die Meisterschaft ist mehrfach wählbar."
+    }
    }
   },
   {
@@ -18668,7 +18683,11 @@
     "manoever": false,
     "beschreibung": "Der Künstler kann bis zu 2 EG bei passenden Proben ansammeln. Die Meisterschaft muss für einen bestimmten Schwerpunkt gewählt werden und gilt nur im Zusammenhang damit. Der Besitz des Schwerpunktes ist keine Voraussetzung für die Wahl dieser Meisterschaft. Die Meisterschaft ist mehrfach wählbar.",
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "mehrfach_waehlbar": {
+     "anzahl": null,
+     "beleg": "Die Meisterschaft ist mehrfach wählbar."
+    }
    }
   },
   {
@@ -18819,7 +18838,11 @@
      }
     },
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "mehrfach_waehlbar": {
+     "anzahl": null,
+     "beleg": "Die Meisterschaft ist mehrfach wählbar."
+    }
    }
   },
   {
@@ -19350,7 +19373,11 @@
      }
     },
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "mehrfach_waehlbar": {
+     "anzahl": null,
+     "beleg": "Die Meisterschaft ist mehrfach wählbar."
+    }
    }
   },
   {
@@ -19417,7 +19444,11 @@
     "manoever": false,
     "beschreibung": "Der Edelhandwerker kann bis zu 2 EG bei passenden Proben ansammeln und Gegenstände der Gegenstandsqualität 1 und 2 herstellen und reparieren. Die Meisterschaft muss für einen bestimmten Schwerpunkt gewählt werden und gilt nur im Zusammenhang mit diesem. Der Besitz des Schwerpunktes ist keine Voraussetzung für die Wahl dieser Meisterschaft. Die Meisterschaft ist mehrfach wählbar.",
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "mehrfach_waehlbar": {
+     "anzahl": null,
+     "beleg": "Die Meisterschaft ist mehrfach wählbar."
+    }
    }
   },
   {
@@ -19452,7 +19483,11 @@
      }
     },
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "mehrfach_waehlbar": {
+     "anzahl": null,
+     "beleg": "Die Meisterschaft ist mehrfach wählbar."
+    }
    }
   },
   {
@@ -19487,7 +19522,11 @@
      }
     },
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "mehrfach_waehlbar": {
+     "anzahl": null,
+     "beleg": "Die Meisterschaft kann mehrfach gewählt werden und gilt dann immer für einen anderen Schwerpunkt."
+    }
    }
   },
   {
@@ -21801,7 +21840,11 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "mehrfach_waehlbar": {
+     "anzahl": null,
+     "beleg": "Diese Meisterschaft kann mehrfach gewählt werden."
+    }
    }
   },
   {
@@ -21840,7 +21883,11 @@
      }
     ],
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "mehrfach_waehlbar": {
+     "anzahl": null,
+     "beleg": "Legendenjäger kann genau wie Jäger des Sagenhaften mehrfach gewählt werden."
+    }
    }
   },
   {
@@ -22338,7 +22385,11 @@
      }
     },
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "mehrfach_waehlbar": {
+     "anzahl": null,
+     "beleg": "Die Meisterschaft ist mehrfach wählbar."
+    }
    }
   },
   {
@@ -22405,7 +22456,11 @@
     "manoever": false,
     "beschreibung": "Der Handwerker kann bis zu 2 EG bei passenden Proben ansammeln und Gegenstände der Gegenstandsqualität 1 und 2 herstellen und reparieren. Die Meisterschaft muss für einen bestimmten Schwerpunkt gewählt werden und gilt nur im Zusammenhang mit diesem. Der Besitz des Schwerpunktes ist keine Voraussetzung für die Wahl dieser Meisterschaft. Die Meisterschaft ist mehrfach wählbar.",
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "mehrfach_waehlbar": {
+     "anzahl": null,
+     "beleg": "Die Meisterschaft ist mehrfach wählbar."
+    }
    }
   },
   {
@@ -22440,7 +22495,11 @@
      }
     },
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "mehrfach_waehlbar": {
+     "anzahl": null,
+     "beleg": "Die Meisterschaft ist mehrfach wählbar."
+    }
    }
   },
   {
@@ -22475,7 +22534,11 @@
      }
     },
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "mehrfach_waehlbar": {
+     "anzahl": null,
+     "beleg": "Die Meisterschaft kann mehrfach gewählt werden und gilt dann immer für einen anderen Schwerpunkt."
+    }
    }
   },
   {
@@ -24098,7 +24161,11 @@
      }
     ],
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "mehrfach_waehlbar": {
+     "anzahl": null,
+     "beleg": "Tierexperte kann unter den Bedingungen wie Tierkenner mehrfach gewählt werden."
+    }
    }
   },
   {
@@ -24137,7 +24204,11 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "mehrfach_waehlbar": {
+     "anzahl": null,
+     "beleg": "Diese Meisterschaft kann mehrfach gewählt werden."
+    }
    }
   },
   {
@@ -25749,7 +25820,11 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "mehrfach_waehlbar": {
+     "anzahl": null,
+     "beleg": "Diese Meisterschaft kann mehrfach gewählt werden."
+    }
    }
   },
   {
@@ -25805,7 +25880,11 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "mehrfach_waehlbar": {
+     "anzahl": null,
+     "beleg": "Diese Meisterschaft kann mehrfach gewählt werden."
+    }
    }
   },
   {
@@ -25909,7 +25988,11 @@
      }
     ],
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "mehrfach_waehlbar": {
+     "anzahl": null,
+     "beleg": "Meisterjäger kann genau wie Jäger mehrfach gewählt werden."
+    }
    }
   },
   {
@@ -29965,7 +30048,11 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "mehrfach_waehlbar": {
+     "anzahl": null,
+     "beleg": "Die Meisterschaft kann mehrfach gewählt werden (jedes Mal für ein neues Gelände)."
+    }
    }
   },
   {
@@ -30314,7 +30401,11 @@
       "gruppe": "B"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "mehrfach_waehlbar": {
+     "anzahl": null,
+     "beleg": "Diese Meisterschaft kann mehrfach gewählt werden, immer mit einer neuen Gestalt."
+    }
    }
   },
   {
@@ -30447,7 +30538,11 @@
      }
     ],
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "mehrfach_waehlbar": {
+     "anzahl": null,
+     "beleg": "Diese Meisterschaft kann mehrfach gewählt werden, immer mit einer neuen Gestalt (für die jeweils die Bevorzugte Gestalt besessen werden muss)."
+    }
    }
   },
   {
@@ -30842,7 +30937,11 @@
       "gruppe": "A"
      }
     ],
-    "wirkung_erkannt": true
+    "wirkung_erkannt": true,
+    "mehrfach_waehlbar": {
+     "anzahl": null,
+     "beleg": "Diese Meisterschaft kann mehrfach gewählt werden, je einmal für jede Umgebung."
+    }
    }
   },
   {
@@ -70410,7 +70509,24 @@
       "inhalt_importiert": false
      }
     ],
-    "regelbereich": "ausruestungsregeln"
+    "regelbereich": "ausruestungsregeln",
+    "strukturiert": {
+     "traglast": {
+      "attribut": "Stärke",
+      "last_je_punkt": 2,
+      "behinderung_je_lastpunkt": 1
+     },
+     "belege": [
+      {
+       "id": "grw:regel:ausruestungsregeln:traglast-optionalregel",
+       "text": "pro Punkt Stärke Gegenstände im Wert von Last 2 mit sich führen"
+      },
+      {
+       "id": "grw:regel:ausruestungsregeln:traglast-optionalregel",
+       "text": "für jeden weiteren Punkt erhöht sich seine Behinderung (siehe S. 165) um 1 Punkt"
+      }
+     ]
+    }
    }
   },
   {

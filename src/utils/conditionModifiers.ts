@@ -2,7 +2,7 @@ import type { StatusCondition } from '../types';
 import { aktiverKatalog } from '../regelwerk/bruecke';
 import { gesundheitsstufen } from '../regelwerk/vitals';
 
-import type { Probenbereich } from '../data/zustaende';
+import type { Probenbereich } from '../types/regeldaten';
 import { zustand, zustandQuelle } from '../regelwerk/zustaende';
 import { grwFertigkeitsKategorien, grwFertigkeitsattribute } from '../regelwerk/grwListen';
 
@@ -41,7 +41,7 @@ export function probenbereich(fertigkeit: string): Probenbereich {
   return 'allgemein';
 }
 
-export type { Probenbereich } from '../data/zustaende';
+export type { Probenbereich } from '../types/regeldaten';
 
 export interface Zustandskontext {
   /** Fertigkeitsgruppe der Probe; ohne Angabe gilt „allgemein“ */

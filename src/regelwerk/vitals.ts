@@ -19,10 +19,6 @@ export interface BegleiterZustand {
   zustaende?: { id: string; key: string; level?: number; note?: string }[];
 }
 
-const STANDARD: Gesundheitsstufe[] = [
-  { name: 'Unverletzt', wundabzug: 0 }, { name: 'Angeschlagen', wundabzug: -1 }, { name: 'Verletzt', wundabzug: -2 },
-  { name: 'Schwer verletzt', wundabzug: -4 }, { name: 'Todgeweiht', wundabzug: -8 },
-];
 
 function monstermerkmal(k: Katalog, merkmal: string) {
   const n = norm(merkmal.replace(/\s*[(\d].*$/, ''));
@@ -31,7 +27,7 @@ function monstermerkmal(k: Katalog, merkmal: string) {
 
 /** Gesundheitsstufen eines Wesens mit diesen Merkmalen */
 export function gesundheitsstufen(k: Katalog | null, merkmale: string[] = []): { stufen: Gesundheitsstufe[]; quelle: string | null } {
-  const alle: Gesundheitsstufe[] = k?.get(ABGELEITET_ID)?.daten.strukturiert?.gesundheitsstufen?.map((s: { name: string; wundabzug: number }) => ({ name: s.name, wundabzug: s.wundabzug })) ?? STANDARD;
+  const alle: Gesundheitsstufe[] = k?.get(ABGELEITET_ID)?.daten.strukturiert?.gesundheitsstufen?.map((s: { name: string; wundabzug: number }) => ({ name: s.name, wundabzug: s.wundabzug })) ?? [];
   if (k) for (const m of merkmale) {
     // eigene Gesundheitsstufen des Merkmals (Datenseite: gesundheitsstufen_namen)
     const eigene: string[] = monstermerkmal(k, m)?.daten.gesundheitsstufen_namen ?? [];

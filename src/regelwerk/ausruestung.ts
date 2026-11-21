@@ -4,11 +4,11 @@
  *   Projektile, Ausrüstungssätze, Alchemika, Kräuter, Gifte, Material, Verbesserungen, magische Gegenstände).
  * - grwMitGrimoireAenderungen(k, liste): GRW-Liste mit den Änderungen der Grimoires (aktion „ersetzt“ überschreibt Werte,
  *   „ergaenzt“ mit Beschreibung hängt den Text an).
- * - grwAusruestung(k): Ausrüstung des Grundregelwerks aus dem GRW-Paket (ohne Paket: eingebauter Rückfall src/data/equipment.ts).
- * - alleAusruestung(): GRW-Ausrüstung plus Grimoires des aktiven Katalogs; ohne Katalog nur der Rückfall.
+ * - grwAusruestung(k): Ausrüstung des Grundregelwerks aus dem GRW-Paket (ohne Paket leer).
+ * - alleAusruestung(): GRW-Ausrüstung plus Grimoires des aktiven Katalogs; ohne Katalog leer.
  * - findeAusruestung(liste, id): Eintrag nach ID; versteht auch die IDs der früheren eingebauten Liste („waffen|Nahkampf|…|Name“).
  */
-import { ALL_EQUIPMENT, type ArmorItem, type GearItem, type ShieldItem, type WeaponItem } from '../data/equipment';
+import type { ArmorItem, GearItem, ShieldItem, WeaponItem } from '../types/regeldaten';
 import type { Katalog } from './katalog';
 import type { Eintrag } from './typen';
 import { aktiverKatalog } from './bruecke';
@@ -143,15 +143,15 @@ function grwEintrag(k: Katalog, item: AusruestungsItem, nachName: Map<string, Ei
 const REIHENFOLGE = Object.keys(AUSRUESTUNGS_TYPEN);
 const GRW_CACHE = new WeakMap<Katalog, AusruestungsItem[]>();
 
-/** Ausrüstung des Grundregelwerks aus dem GRW-Paket, nach Art und Name; ohne GRW-Ausrüstung im Paket der eingebaute Rückfall */
+/** Ausrüstung des Grundregelwerks aus dem GRW-Paket, nach Art und Name */
 export function grwAusruestung(k: Katalog | null = aktiverKatalog()): AusruestungsItem[] {
-  if (!k) return ALL_EQUIPMENT as AusruestungsItem[];
+  if (!k) return [];
   if (!GRW_CACHE.has(k)) {
     const basis = k.manifest.basis_paket;
     const E = Object.values(k.eintraege).filter(e => e.quelle.paket === basis && e.aktion === 'neu' && e.typ in NACH_TYP)
       .sort((a, b) => REIHENFOLGE.indexOf(a.typ) - REIHENFOLGE.indexOf(b.typ) || a.name.localeCompare(b.name, 'de'));
     const liste = E.map(e => alsAusruestung(e, kuerzel(k, basis))).filter((x): x is AusruestungsItem => !!x);
-    GRW_CACHE.set(k, liste.length ? liste : ALL_EQUIPMENT as AusruestungsItem[]);
+    GRW_CACHE.set(k, liste);
   }
   return GRW_CACHE.get(k)!;
 }

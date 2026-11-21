@@ -3,8 +3,7 @@ import { Dialogfenster, Dialoghintergrund } from '../../fundament';
 import { useHausregeln } from '../../fundament/hausregeln';
 import { Knopf, Dialog } from '../../fundament';
 import React, { useState, useEffect, useMemo } from 'react';
-import { isMasteryRepeatable } from '../../data/masteries';
-import type { MasteryEntry as DbMasteryEntry } from '../../data/masteries';
+import type { MasteryEntry as DbMasteryEntry } from '../../types/regeldaten';
 
 import { validateFreeMasteryAssignment } from '../../utils/validation';
 import { getMasteryDescription, getResolvedMasteries } from '../../utils/gameResourceManager';
@@ -138,7 +137,7 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
     for (const m of filteredMasteries) {
       const c = masteryCheckMap.get(m.name);
       if (!c || !c.thresholdMet) continue;
-      const taken = existingMasteries.some((em) => em.name === m.name) && !isMasteryRepeatable(m.name);
+      const taken = existingMasteries.some((em) => em.name === m.name) && !m.mehrfach;
       if (taken) continue;
       const t = c.tier;
       proSchwelle.set(t, (proSchwelle.get(t) ?? true) && !c.prerequisitesMet);
@@ -155,7 +154,7 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
     return filteredMasteries.filter((m) => {
       const check = masteryCheckMap.get(m.name);
       const isTaken = existingMasteries.some((em) => em.name === m.name);
-      const isRepeatable = isMasteryRepeatable(m.name);
+      const isRepeatable = !!m.mehrfach;
 
       if (onlyAvailable) {
         if (isTaken && !isRepeatable) return false;
@@ -229,7 +228,7 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
     if (!exists) {
       const available = searchedMasteries.find((m) => {
         const isTaken = existingMasteries.some((em) => em.name === m.name);
-        const isRepeatable = isMasteryRepeatable(m.name);
+        const isRepeatable = !!m.mehrfach;
         const check = masteryCheckMap.get(m.name);
         return (!isTaken || isRepeatable) && check?.canLearn;
       });
@@ -254,7 +253,7 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
   const isSelectionInvalid = isCustom
     ? !customName.trim() || (!(currentValidation?.canLearn ?? true) && !hausregeln)
     : !selectedName ||
-      (existingMasteries.some((m) => m.name === selectedName) && !isMasteryRepeatable(selectedName)) ||
+      (existingMasteries.some((m) => m.name === selectedName) && !selectedEntry?.mehrfach) ||
       (currentValidation ? !currentValidation.canLearn && !hausregeln && !(isFree && freiTrotzVoraussetzung(selectedName)) : false);
 
   const handleAdd = () => {
@@ -366,7 +365,7 @@ export const MasteryModal: React.FC<MasteryModalProps> = ({
             >
               {searchedMasteries.map((m) => {
                 const isTaken = existingMasteries.some((em) => em.name === m.name);
-                const isRepeatable = isMasteryRepeatable(m.name);
+                const isRepeatable = !!m.mehrfach;
                 const check = masteryCheckMap.get(m.name);
                 const isTierTooHigh = check ? !check.thresholdMet : false;
                 const isMissingPrereqs = check ? !check.prerequisitesMet : false;

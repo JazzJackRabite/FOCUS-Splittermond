@@ -1,8 +1,7 @@
 /**
  * Steigerungsregeln aus dem Grundregelwerk-Paket (FUNDAMENT.md, Regelquellen):
  * Kosten in Erfahrungspunkten und Heldengrade stehen in den Kernregeln (`strukturiert`), nicht im Programmcode.
- * Jede Funktion liefert null, wenn kein Paket geladen ist oder der Wert fehlt – dann greift der eingebaute Rückfall
- * in utils/costCalculations.ts bzw. data/rules.ts.
+ * Jede Funktion liefert null, wenn kein Paket geladen ist oder der Wert fehlt.
  */
 import { aktiverKatalog } from './bruecke';
 import type { Katalog } from './katalog';

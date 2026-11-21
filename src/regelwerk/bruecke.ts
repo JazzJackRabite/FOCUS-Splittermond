@@ -127,7 +127,7 @@ export function grimoireModule(): RulebookModulePackage[] {
         const schwelle = zahl(d.schwelle, 1);
         const fName = ix.fertigkeitName.get(d.fertigkeit) ?? d.fertigkeit_name ?? 'Allgemein';
         masteries.push({ id: e.id, name: `${e.name} (S${schwelle})`, skill: fName, level: schwelle, desc: d.beschreibung ?? '', page: seite(e), source: kurz,
-          baseName: e.name, tier: schwelle, manoever: d.manoever === true, prerequisiteText: d.voraussetzungen?.text ?? null, regelId: e.id });
+          baseName: e.name, tier: schwelle, manoever: d.manoever === true, prerequisiteText: d.voraussetzungen?.text ?? null, regelId: e.id, ...(d.mehrfach_waehlbar ? { mehrfach: true } : {}) });
       } else if (e.typ === 'staerke') {
         strengths.push({ id: e.id, name: e.name, cost: zahl(d.stufe, 1), max: 1, multi: false, onlyCreation: d.nur_bei_generierung === true,
           desc: d.beschreibung ?? '', page: seite(e), source: kurz });
@@ -153,15 +153,18 @@ export function grimoireModule(): RulebookModulePackage[] {
 export function bedingungsCharakter(k: Katalog, opt: {
   meisterschaften: Array<Mastery | string>; fertigkeiten: Record<string, number>; ressourcen?: Array<{ name: string; level?: number }>;
   zauber?: Array<{ name: string; school?: string }>; staerken?: Array<{ name: string; level?: number }>; rasse?: string; meisterschaftsFertigkeit?: Record<string, string>;
+  /** Fertigkeit der zu prüfenden Meisterschaft */
+  fertigkeit?: string;
 }): BedingungsCharakter {
   const hat = new Set<string>(); const werte: Record<string, number> = {}; const schwerpunkte: Array<[string, string]> = []; const zauber: string[] = [];
+  const gelerntIn: Array<[string, string | undefined]> = [];
   for (const [n, w] of Object.entries(opt.fertigkeiten)) { const i = fertigkeitId(k, n); if (i) werte[i] = w; }
   for (const m of opt.meisterschaften) {
     const name = typeof m === 'string' ? m : m.name;
     const skill = typeof m === 'string' ? opt.meisterschaftsFertigkeit?.[m] : m.skill;
     const regelId = typeof m === 'string' ? undefined : (m as Mastery & { regelId?: string }).regelId;
     const i = meisterschaftId(k, name, skill, regelId);
-    if (i) hat.add(i);
+    if (i) { hat.add(i); gelerntIn.push([i, skill ? fertigkeitId(k, skill) : undefined]); }
     if (typeof m !== 'string' && /schwerpunkt/i.test(name) && m.userNote) {
       const f = skill ? fertigkeitId(k, skill) : undefined;
       if (f) schwerpunkte.push([f, m.userNote.trim()]);
@@ -171,7 +174,7 @@ export function bedingungsCharakter(k: Katalog, opt: {
   for (const s of opt.staerken ?? []) { const i = idNachName(k, 'staerke', s.name); if (i) hat.add(i); }
   for (const z of opt.zauber ?? []) { const i = idNachName(k, 'zauber', z.name); if (i) { zauber.push(i); hat.add(i); } }
   if (opt.rasse && RASSE_ID[opt.rasse]) hat.add(RASSE_ID[opt.rasse]);
-  return { hat, werte, schwerpunkte, zauber };
+  return { hat, werte, schwerpunkte, zauber, gelerntIn, ...(opt.fertigkeit ? { fertigkeit: fertigkeitId(k, opt.fertigkeit) } : {}) };
 }
 
 export interface VoraussetzungsErgebnis { id: string; ergebnis: Ergebnis; text: string }
