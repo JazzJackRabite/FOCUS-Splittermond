@@ -7,7 +7,7 @@ Gemini in Google AI Studio – liest diese Datei zuerst und hält sich daran.
 - Die Prüfungen in `src/fundament/__tests__/` setzen diese Datei durch. Schlägt eine fehl, ist der Code zu ändern, nicht die Prüfung.
 - Änderungen an dieser Datei entscheidet der Projektinhaber.
 
-> **Stand 11.11.2026.** Teil 2 (Regelquellen) ist gegen den Code geprüft; eine Prüfung hält Tabelle und Code seitdem
+> **Stand 21.11.2026.** Teil 2 (Regelquellen) ist gegen den Code geprüft; eine Prüfung hält Tabelle und Code seitdem
 > zusammen (`src/fundament/__tests__`).
 
 ---
@@ -79,7 +79,7 @@ Datenseite wandern. Neue kommen nicht hinzu.
 | Würfelmechanik (Standard-, Sicherheits-, Risikowurf, Patzer, Triumph, Erfolgsgrade), GRW S. 16–19 | `utils/wuerfeln.ts` | Kernregeln `strukturiert` |
 | Fokuskosten, Erfolgsgrade beim Zaubern, GRW S. 221–222 | `utils/magicRules.ts` | Kernregeln `strukturiert` |
 | Kampfmanöver nach Namen | `utils/combatRules.ts` | Daten der Meisterschaften |
-| Einzelne Stärken und Meisterschaften nach Namen (z. B. bei Rast und abgeleiteten Werten) | `utils/characterCalculations.ts`, `components/play/RestSection.tsx`, `utils/prerequisiteValidator.ts` | `wirkungen_strukturiert` |
+| Einzelne Stärken und Meisterschaften nach Namen (Rückfall der Voraussetzungsprüfung ohne Paket, einzelne Stellen beim Zaubern, Heilen und bei Begleitern) | `utils/prerequisiteValidator.ts`, `components/play/CastSpellModal.tsx`, `HealModal.tsx`, `PlaySharedVitals.tsx`, `regelwerk/begleiter.ts` | `wirkungen_strukturiert`, formale `voraussetzungen` |
 | Regelwerte für Gefolge, Untote und Golems (Kosten, Grenzen, Preisformel) | `regelwerk/gefolge.ts`, `untote.ts`, `golem.ts` | `strukturiert` an den Regeltexten |
 | Schadens- und Heildialog: Zustandsliste, Verschnaufpause | `components/play/TakeDamageModal.tsx`, `HealModal.tsx` | Zustände und Kernregeln des Pakets |
 
