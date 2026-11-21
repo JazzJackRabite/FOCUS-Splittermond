@@ -1,7 +1,15 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest';
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { RestSection } from '../components/play/RestSection';
+import { setzeAktivenKatalog } from '../regelwerk/bruecke';
+import { basisAusDateien } from '../regelwerk/__tests__/hilfen';
+import { Katalog } from '../regelwerk/katalog';
+
+// Regeln aus dem GRW-Paket (Wirkungen, Ruhewirkungen, Minderungen); ohne Paket gibt es keine Boni nach Namen mehr
+beforeAll(() => { const b = basisAusDateien(); setzeAktivenKatalog(new Katalog(b.manifest, [b.basis]), false); });
+afterAll(() => setzeAktivenKatalog(null, false));
+
 
 describe('RestSection Component (Streamlined Regeneration & Pausen)', () => {
   const defaultProps = {
@@ -76,7 +84,7 @@ describe('RestSection Component (Streamlined Regeneration & Pausen)', () => {
 
     // Modal is now visible
     expect(screen.getByText('Optionen: Verschnaufpause')).toBeDefined();
-    expect(screen.getByText(/Splittermond GRW S. 160/)).toBeDefined();
+    expect(screen.getByText(/GRW S\. 173–174/)).toBeDefined();  // Fundstelle der Heilungsregeln aus dem Paket
 
     // Close button
     const closeBtn = screen.getByRole('button', { name: /Übernehmen & Schließen/i });
@@ -121,14 +129,14 @@ describe('RestSection Component (Streamlined Regeneration & Pausen)', () => {
         moonSign="Segen der Mondkraft"
         strengthsList={[{ name: 'Erhöhte Lebensregeneration', level: 1, source: 'GRW' }]}
         masteries={{
-          Athletik: [{ id: 'm1', name: 'Schnell wieder auf den Beinen', tier: 1, cost: 0, isFree: true, isCreationBonus: false, source: 'GRW' }],
+          Zähigkeit: [{ id: 'm1', name: 'Schnell wieder auf den Beinen', tier: 1, cost: 0, isFree: true, isCreationBonus: false, source: 'GRW' }],
         }}
       />
     );
 
-    // Duration reflects Segen der Mondkraft
-    expect(screen.getByText('15 Minuten')).toBeDefined();
-    expect(screen.getByText('3 Stunden')).toBeDefined();
+    // Dauer aus den Pausenregeln des Pakets; Segen der Mondkraft halbiert nur beim Einsatz der Gabe für einen Splitterpunkt (GRW S. 81, 83)
+    expect(screen.getByText('30 Minuten')).toBeDefined();
+    expect(screen.getByText('6 Stunden')).toBeDefined();
 
     // LP Calculation: KON (2) * 3 (Erhöhte Lebensregeneration) + 1 (Schnell wieder auf den Beinen) = 7 LP
     // FO Calculation: WIL (3) * 2 = 6 FO

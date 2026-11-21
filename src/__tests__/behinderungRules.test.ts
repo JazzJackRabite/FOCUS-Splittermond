@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import {
   GENERAL_BEW_SKILLS,
   isSkillAffectedByBehinderung,
@@ -7,6 +7,14 @@ import {
 import { calculateCharacter } from '../utils/characterCalculations';
 import { DEFAULT_STATE } from '../hooks/useCharacterState';
 import type { CharacterState, InventoryItem } from '../types';
+import { setzeAktivenKatalog } from '../regelwerk/bruecke';
+import { basisAusDateien } from '../regelwerk/__tests__/hilfen';
+import { Katalog } from '../regelwerk/katalog';
+
+// Regeln aus dem GRW-Paket (Wirkungen, Ruhewirkungen, Minderungen); ohne Paket gibt es keine Boni nach Namen mehr
+beforeAll(() => { const b = basisAusDateien(); setzeAktivenKatalog(new Katalog(b.manifest, [b.basis]), false); });
+afterAll(() => setzeAktivenKatalog(null, false));
+
 
 describe('Splittermond Behinderung (Handicap) Rules (GRW S. 187)', () => {
   describe('Skill Identification (Allgemeine Fertigkeiten mit Beweglichkeit)', () => {
@@ -115,7 +123,7 @@ describe('Splittermond Behinderung (Handicap) Rules (GRW S. 187)', () => {
   });
 
   describe('Character Calculations (characterCalculations.ts)', () => {
-    it('calculates armor and shield handicap and reduces GSW by half total handicap (Math.floor(BEH / 2))', () => {
+    it('calculates armor and shield handicap and reduces GSW by half total handicap (kaufmännisch gerundet, GRW S. 11)', () => {
       const chainmail: InventoryItem = {
         id: 'arm1',
         name: 'Kettenhemd',
@@ -155,7 +163,7 @@ describe('Splittermond Behinderung (Handicap) Rules (GRW S. 187)', () => {
       expect(calc.totalHandicap).toBe(4);
 
       // Base GSW = BEW (3) + GK (5) = 8
-      // Speed reduction = Math.floor(4 / 2) = 2
+      // Speed reduction = 4 / 2 = 2
       // Effective GSW = 8 - 2 = 6
       expect(calc.derived.GSW).toBe(6);
     });
@@ -198,7 +206,7 @@ describe('Splittermond Behinderung (Handicap) Rules (GRW S. 187)', () => {
       // Raw handicap is 3, but Rüstungsträger I reduces armor handicap by 1 => 2
       expect(calc.armorHandicap).toBe(2);
       expect(calc.totalHandicap).toBe(2);
-      // GSW: 3 + 5 - Math.floor(2 / 2) = 8 - 1 = 7
+      // GSW: 3 + 5 - 2 / 2 = 8 - 1 = 7
       expect(calc.derived.GSW).toBe(7);
     });
 
@@ -240,8 +248,8 @@ describe('Splittermond Behinderung (Handicap) Rules (GRW S. 187)', () => {
       // Raw handicap is 2, reduced by 1 => 1
       expect(calc.shieldHandicap).toBe(1);
       expect(calc.totalHandicap).toBe(1);
-      // GSW: Math.floor(1 / 2) = 0 => GSW remains 8
-      expect(calc.derived.GSW).toBe(8);
+      // GSW: halbe Behinderung 0,5 kaufmännisch gerundet = 1 (GRW S. 11) => 8 - 1 = 7
+      expect(calc.derived.GSW).toBe(7);
     });
 
     it('adds overweight to total Behinderung when inventory exceeds load capacity (KON + STA)', () => {
@@ -269,8 +277,8 @@ describe('Splittermond Behinderung (Handicap) Rules (GRW S. 187)', () => {
       expect(calc.overweightHandicap).toBe(3);
       expect(calc.totalHandicap).toBe(3);
 
-      // GSW reduction = Math.floor(3 / 2) = 1
-      expect(calc.derived.GSW).toBe(7);
+      // GSW-Abzug = halbe Behinderung 1,5 kaufmännisch gerundet = 2 (GRW S. 11) => 8 - 2 = 6
+      expect(calc.derived.GSW).toBe(6);
     });
 
     it('ignores overweight handicap when ignoreEncumbrance is true', () => {

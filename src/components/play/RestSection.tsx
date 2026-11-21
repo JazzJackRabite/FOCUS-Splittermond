@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Knopf, Dialog } from '../../fundament';
 import { Sun, Moon, RotateCcw, Settings, Heart, Sparkles, X, Check, Clock } from 'lucide-react';
 import type { ItemEntry, Mastery } from '../../types';
+import { ruheregeln, ruhephasenRegeneration, ruhewirkungen, type Ruhewirkung } from '../../regelwerk/spielwirkungen';
 
 export interface VerschnaufpauseOptions {
   healAllStun: boolean;
@@ -28,45 +29,26 @@ export const RestSection: React.FC<RestSectionProps> = ({
   kon,
   wil,
   strengthsList,
-  weaknessesList,
   masteries,
   moonSign,
   onVerschnaufpause,
   onRuhephase,
 }) => {
-  // Masteries, Strengths, Weaknesses detection helper
-  const allMasteriesFlat = Object.values(masteries).flat();
-  const hasMastery = (name: string) =>
-    allMasteriesFlat.some((m) => m.name.toLowerCase().trim().includes(name.toLowerCase().trim()));
-  const hasStrength = (name: string) =>
-    strengthsList.some((s) => s.name.toLowerCase().trim().includes(name.toLowerCase().trim()));
-  const hasWeakness = (name: string) =>
-    weaknessesList.some((w) => w.name.toLowerCase().trim().includes(name.toLowerCase().trim()));
-
-  // Active modifiers detection
-  const hasErhoehteLPRegen = hasStrength('Erhöhte Lebensregeneration');
-  const hasErhoehteFORegen = hasStrength('Erhöhte Fokusregeneration');
-  const hasSchnellAufBeinen = hasMastery('Schnell wieder auf den Beinen');
-  const hasGesunderGeist = hasMastery('Gesunder Geist in gesundem Körper');
-  const hasDahinsiechen = hasWeakness('Dahinsiechen');
-  const hasMeditation = hasMastery('Meditation');
-  const hasDickschaedel = hasMastery('Dickschädel');
+  // Pausenregeln und Ruhewirkungen aus dem Paket (regelwerk/spielwirkungen.ts): keine Namen von Stärken oder Meisterschaften im Code
+  const regeln = ruheregeln();
+  const wirkungen = ruhewirkungen({ strengthsList, masteries });
+  const fest = wirkungen.filter((w) => !w.bedingung);
+  const bedingt = wirkungen.filter((w) => w.bedingung);
+  const { lp: calculatedLPDefault, fo: calculatedFODefault } = ruhephasenRegeneration(kon, wil, wirkungen, regeln);
+  const lpMultiplier = Math.max(regeln.lpFaktor, ...fest.map((w) => w.lp_faktor ?? 0));
+  const foMultiplier = Math.max(regeln.foFaktor, ...fest.map((w) => w.fo_faktor ?? 0));
+  const kurzpausen = fest.filter((w) => w.erschoepft_minuten || w.fo_erschoepft_minuten);
+  const ruheText = (w: Ruhewirkung) => [
+    w.lp_faktor ? `Konstitution ×${w.lp_faktor}` : '', w.fo_faktor ? `Willenskraft ×${w.fo_faktor}` : '',
+    w.lp_zusatz ? `+${w.lp_zusatz} LP` : '', w.regeneration_faktor ? `Regeneration ×${w.regeneration_faktor}` : '',
+    w.erschoepft_minuten ? `Erschöpft in ${w.erschoepft_minuten} Min` : '', w.fo_erschoepft_minuten ? `erschöpfter Fokus in ${w.fo_erschoepft_minuten} Min` : '',
+  ].filter(Boolean).join(', ');
   const hasSegenMondkraft = moonSign === 'Segen der Mondkraft';
-
-  // -------------------------------------------------------------
-  // Ruhephase Default calculation
-  // -------------------------------------------------------------
-  const lpMultiplier = hasErhoehteLPRegen ? 3 : 2;
-  const foMultiplier = hasErhoehteFORegen ? 3 : 2;
-
-  let calculatedLPDefault = hasDahinsiechen ? 0 : kon * lpMultiplier;
-  if (!hasDahinsiechen) {
-    if (hasSchnellAufBeinen) calculatedLPDefault += 1;
-    if (hasGesunderGeist) calculatedLPDefault += 1;
-    calculatedLPDefault = Math.max(0, calculatedLPDefault);
-  }
-
-  const calculatedFODefault = Math.max(0, wil * foMultiplier);
 
   // User configured Ruhephase amounts
   const [customLP, setCustomLP] = useState<number>(calculatedLPDefault);
@@ -76,9 +58,9 @@ export const RestSection: React.FC<RestSectionProps> = ({
   // Verschnaufpause configured options
   // -------------------------------------------------------------
   const [vpHealAllStun, setVpHealAllStun] = useState<boolean>(true);
-  const [vpStunAmount, setVpStunAmount] = useState<number>(kon * 2);
+  const [vpStunAmount, setVpStunAmount] = useState<number>(kon * regeln.lpFaktor);
   const [vpHealAllFocus, setVpHealAllFocus] = useState<boolean>(true);
-  const [vpFocusAmount, setVpFocusAmount] = useState<number>(wil * 2);
+  const [vpFocusAmount, setVpFocusAmount] = useState<number>(wil * regeln.foFaktor);
   const [vpExhaustReduction, setVpExhaustReduction] = useState<number>(1);
   const [vpRemoveConditions, setVpRemoveConditions] = useState<boolean>(true);
 
@@ -113,9 +95,9 @@ export const RestSection: React.FC<RestSectionProps> = ({
 
   const resetVpToDefault = () => {
     setVpHealAllStun(true);
-    setVpStunAmount(kon * 2);
+    setVpStunAmount(kon * regeln.lpFaktor);
     setVpHealAllFocus(true);
-    setVpFocusAmount(wil * 2);
+    setVpFocusAmount(wil * regeln.foFaktor);
     setVpExhaustReduction(1);
     setVpRemoveConditions(true);
   };
@@ -149,8 +131,8 @@ export const RestSection: React.FC<RestSectionProps> = ({
     }
   };
 
-  const vpDuration = hasSegenMondkraft ? '15 Minuten' : '30 Minuten';
-  const ruhephaseDuration = hasSegenMondkraft ? '3 Stunden' : '6 Stunden';
+  const vpDuration = `${regeln.verschnaufMinuten} Minuten`;
+  const ruhephaseDuration = `${regeln.ruheStunden} Stunden`;
 
   return (
     <div id="rest-section-container" className="bg-flaeche rounded-karte border border-rahmen p-5 space-y-3.5">
@@ -382,31 +364,26 @@ export const RestSection: React.FC<RestSectionProps> = ({
                   <div className="bg-erhoeht border border-rahmen rounded-knopf p-3 space-y-1.5 text-xs text-schrift">
                     <div className="flex items-center justify-between font-bold text-schrift">
                       <span>Regel-Grundlage:</span>
-                      <span className="font-normal text-[11px] text-leise">Splittermond GRW S. 160</span>
+                      <span className="font-normal text-[11px] text-leise">{regeln.quelle}</span>
                     </div>
                     <p className="leading-relaxed">
                       Dauer: <strong>{vpDuration}</strong> ununterbrochene Rast. Heilt allen Betäubungsschaden, stellt erschöpften Fokus wieder her und baut 1 Stufe <em>Erschöpft</em> ab.
                     </p>
 
-                    {(hasSegenMondkraft || hasMeditation || hasDickschaedel) && (
+                    {(hasSegenMondkraft || kurzpausen.length > 0) && (
                       <div className="pt-2 border-t border-rahmen space-y-1">
                         <span className="font-semibold text-schrift block text-[11px]">Aktive Besonderheiten:</span>
                         <div className="flex flex-wrap gap-1.5">
                           {hasSegenMondkraft && (
                             <span className="px-2 py-0.5 rounded-knopf bg-rahmen text-schrift font-bold border border-rahmen text-[11px]">
-                              Mondsegen: 15 Min statt 30 Min
+                              Mondzeichen (Gabe, Splitterpunkt): Dauer halbieren
                             </span>
                           )}
-                          {hasMeditation && (
-                            <span className="px-2 py-0.5 rounded-knopf bg-kanalisiert-grund text-schrift border border-kanalisiert text-[11px] font-semibold">
-                              Meditation (T1): Fokus in 10 Min
+                          {kurzpausen.map((w) => (
+                            <span key={w.quelle} title={w.beleg} className="px-2 py-0.5 rounded-knopf bg-kanalisiert-grund text-schrift border border-kanalisiert text-[11px] font-semibold">
+                              {w.quelle}: {ruheText(w)}
                             </span>
-                          )}
-                          {hasDickschaedel && (
-                            <span className="px-2 py-0.5 rounded-knopf bg-unverletzt-grund text-unverletzt border border-unverletzt text-[11px] font-semibold">
-                              Dickschädel (T1): Erschöpfung in 15 Min
-                            </span>
-                          )}
+                          ))}
                         </div>
                       </div>
                     )}
@@ -569,16 +546,14 @@ export const RestSection: React.FC<RestSectionProps> = ({
                   <div className="bg-erhoeht border border-rahmen rounded-knopf p-3 space-y-2 text-xs text-schrift">
                     <div className="flex items-center justify-between font-bold text-schrift">
                       <span>Berechnungsgrundlage (Regel-Standard):</span>
-                      <span className="font-normal text-[11px] text-leise">Splittermond GRW S. 160</span>
+                      <span className="font-normal text-[11px] text-leise">{regeln.quelle}</span>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-1">
                       <div className="p-2 rounded-knopf bg-flaeche border border-rahmen">
                         <div className="font-bold text-schaden">Lebenspunkte (LP):</div>
                         <div className="tabular-nums text-[11px] mt-0.5 text-schrift">
-                          {hasDahinsiechen
-                            ? '0 LP (Dahinsiechen)'
-                            : `KON (${kon}) × ${lpMultiplier}${hasSchnellAufBeinen ? ' + 1' : ''}${hasGesunderGeist ? ' + 1' : ''} = ${calculatedLPDefault} LP`}
+                          {`KON (${kon}) × ${lpMultiplier}${fest.map((w) => (w.lp_zusatz ? ` + ${w.lp_zusatz}` : '')).join('')} = ${calculatedLPDefault} LP`}
                         </div>
                       </div>
 
@@ -591,35 +566,20 @@ export const RestSection: React.FC<RestSectionProps> = ({
                     </div>
 
                     {/* Active Modifiers info */}
-                    {(hasErhoehteLPRegen || hasErhoehteFORegen || hasSchnellAufBeinen || hasGesunderGeist || hasDahinsiechen) && (
+                    {wirkungen.length > 0 && (
                       <div className="pt-2 border-t border-rahmen space-y-1">
                         <span className="font-semibold text-schrift block text-[11px]">Berücksichtigte Modifikatoren:</span>
                         <div className="flex flex-wrap gap-1.5 text-[11px]">
-                          {hasErhoehteLPRegen && (
-                            <span className="px-2 py-0.5 rounded-knopf bg-unverletzt-grund text-unverletzt font-semibold border border-unverletzt">
-                              Stärke: Erhöhte Lebensregeneration (×3)
+                          {fest.filter((w) => w.lp_faktor || w.fo_faktor || w.lp_zusatz).map((w) => (
+                            <span key={w.quelle} title={w.beleg} className="px-2 py-0.5 rounded-knopf bg-kanalisiert-grund text-schrift font-semibold border border-kanalisiert">
+                              {w.quelleTyp}: {w.quelle} ({ruheText(w)})
                             </span>
-                          )}
-                          {hasErhoehteFORegen && (
-                            <span className="px-2 py-0.5 rounded-knopf bg-unverletzt-grund text-unverletzt font-semibold border border-unverletzt">
-                              Stärke: Erhöhte Fokusregeneration (×3)
+                          ))}
+                          {bedingt.map((w) => (
+                            <span key={w.quelle} title={w.beleg} className="px-2 py-0.5 rounded-knopf bg-rahmen text-schrift border border-rahmen">
+                              Nicht eingerechnet – {w.quelle} ({ruheText(w)}) {w.bedingung}
                             </span>
-                          )}
-                          {hasSchnellAufBeinen && (
-                            <span className="px-2 py-0.5 rounded-knopf bg-kanalisiert-grund text-schrift font-semibold border border-kanalisiert">
-                              Meisterschaft: Schnell wieder auf den Beinen (+1 LP)
-                            </span>
-                          )}
-                          {hasGesunderGeist && (
-                            <span className="px-2 py-0.5 rounded-knopf bg-kanalisiert-grund text-schrift font-semibold border border-kanalisiert">
-                              Meisterschaft: Gesunder Geist in gesundem Körper (+1 LP)
-                            </span>
-                          )}
-                          {hasDahinsiechen && (
-                            <span className="px-2 py-0.5 rounded-knopf bg-schaden-grund text-schrift font-semibold border border-schaden">
-                              Schwäche: Dahinsiechen (keine LP-Regeneration)
-                            </span>
-                          )}
+                          ))}
                         </div>
                       </div>
                     )}

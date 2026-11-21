@@ -28,6 +28,8 @@ export interface Wirkung {
   /** bezug „proben“: gilt für jede Probe (sonst nur für fertigkeit_refs) */
   alle_proben?: boolean;
   zustand_ref?: { id: string; text: string };
+  /** Behinderung/Tick-Zuschlag: gilt nur für Rüstung bzw. Schild */
+  gilt_fuer?: 'ruestung' | 'schild';
   schadensart?: string;
   gegen_typus?: string;
   beleg: string;

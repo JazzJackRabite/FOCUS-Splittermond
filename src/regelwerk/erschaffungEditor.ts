@@ -16,7 +16,7 @@ import type { CharacterState } from '../types';
 export type { ModulWahl };
 
 import type { ErschaffungsModulAngewendet as ModulAngewendet, ErschaffungsModulZustand as ErschaffungsModul, ErschaffungsWahl } from '../types';
-import { grwAlleFertigkeiten } from '../regelwerk/grwListen';
+import { gratisStaerkeDerKultur, grwAlleFertigkeiten } from './grwListen';
 export type { ModulAngewendet, ErschaffungsModul, ErschaffungsWahl };
 
 /** Katalog-Fertigkeits-ID → Fertigkeitsname im Editor (z. B. „Geschichte & Mythen“) */
@@ -176,10 +176,11 @@ export function bauAusEditor(k: Katalog, state: CharacterState): { bau: Bau; hin
   const ausbRes = nimm(K5.ressourcenpunkte);
   const s7Res = Object.fromEntries(Object.entries(res).filter(([, v]) => v !== 0));
 
-  // ---- Stärken (ohne Rassenstärken und Kulturkunde)
+  // ---- Stärken (ohne Rassenstärken und die kostenlose Stärke der Kultur)
   const staerken: string[] = [];
+  const gratis = gratisStaerkeDerKultur(k);
   for (const s of state.strengthsList) {
-    if (s.isRacial || /^Kulturkunde/.test(s.name) || s.source === 'xp') continue;
+    if (s.isRacial || s.name.startsWith(gratis) || s.source === 'xp') continue;
     const i = idNachName(k, 'staerke', s.name.replace(/\s*\(.*\)$/, ''));
     if (!i) { hinweise.push(`Stärke „${s.name}“ steht nicht im Regelwerk`); continue; }
     for (let j = 0; j < Math.max(1, Number(s.level) || 1); j++) staerken.push(i);

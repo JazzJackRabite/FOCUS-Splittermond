@@ -190,6 +190,8 @@ export function voraussetzungAusKatalog(name: string, fertigkeit: string, regelI
 // ---------------------------------------------------------------- Abgeleitete Werte
 export interface KatalogWerte {
   GSW: number; INI: number; LP: number; FO: number; VTD: number; GW: number; KW: number; SP: number;
+  /** Schadensreduktion aus Stärken (z. B. Natürlicher Rüstungsschutz) */
+  SR: number;
   /** LP- bzw. FO-Bonus aus Stärken (z. B. Robust, Erhöhter Fokuspool) */
   lpAusStaerken: number; foAusStaerken: number;
   hoechstbonus: number; hinweise: string[];
@@ -223,7 +225,7 @@ export function abgeleiteteFuerCharakter(state: Pick<CharacterState, 'race' | 's
   const gswAbzug = beh ? Math.trunc(beh / 2 + 0.5) : 0;
   const w = mit.werte;
   return {
-    GSW: Math.max(0, w.GSW - gswAbzug), INI: w.INI, LP: w.LP, FO: w.FO, VTD: w.VTD + vtdAus, GW: w.GW, KW: w.KW, SP: w.SP,
+    GSW: Math.max(0, w.GSW - gswAbzug), INI: w.INI, LP: w.LP, FO: w.FO, VTD: w.VTD + vtdAus, GW: w.GW, KW: w.KW, SP: w.SP, SR: w.SR ?? 0,
     lpAusStaerken: w.LP - ohne.werte.LP, foAusStaerken: w.FO - ohne.werte.FO, hoechstbonus: mit.hoechstbonus, hinweise, bedingt: mit.bedingt,
   };
 }

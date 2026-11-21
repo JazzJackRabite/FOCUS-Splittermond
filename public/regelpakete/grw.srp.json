@@ -5388,7 +5388,11 @@
     "nur_bei_generierung": false,
     "beschreibung": "Der Abenteurer gewinnt magische Kraft deutlich schneller zurück. Bei der Regeneration von Verzehrtem Fokus in einer Ruhephase wird die Willenskraft verdreifacht statt verdoppelt.",
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "ruhewirkung": {
+     "fo_faktor": 3,
+     "beleg": "wird die Willenskraft verdreifacht statt verdoppelt"
+    }
    }
   },
   {
@@ -5412,7 +5416,11 @@
     "nur_bei_generierung": false,
     "beschreibung": "Die Verwundungen des Abenteurers heilen deutlich schneller. Bei der Regeneration von verlorenen Lebenspunkten in einer Ruhephase wird die Konstitution verdreifacht statt verdoppelt.",
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "ruhewirkung": {
+     "lp_faktor": 3,
+     "beleg": "wird die Konstitution verdreifacht statt verdoppelt"
+    }
    }
   },
   {
@@ -6293,6 +6301,13 @@
     "stufe": 2,
     "nur_bei_generierung": true,
     "beschreibung": "Die Haut des Abenteurers ist von einem dichten Fell bedeckt oder auf andere Weise besonders widerstandsfähig, was ihm eine Schadensreduktion von 1 einbringt.",
+    "abgeleitete_werte_modifikatoren": [
+     {
+      "abgeleiteter_wert": "SR",
+      "bonus": 1,
+      "beleg": "was ihm eine Schadensreduktion von 1 einbringt."
+     }
+    ],
     "wirkungen_strukturiert": [],
     "wirkung_erkannt": false
    }
@@ -22846,7 +22861,11 @@
      }
     },
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "ruhewirkung": {
+     "lp_zusatz": 1,
+     "beleg": "Er heilt bei einer Ruhephase 1 zusätzlichen Lebenspunkt"
+    }
    }
   },
   {
@@ -25776,7 +25795,12 @@
      }
     },
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "ruhewirkung": {
+     "lp_zusatz": 2,
+     "bedingung": "in der unberührten Natur",
+     "beleg": "Er heilt bei einer Ruhephase 2 zusätzliche Lebenspunkte, wenn er sich in der unberührten Natur aufhält"
+    }
    }
   },
   {
@@ -31530,7 +31554,11 @@
      }
     },
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "ruhewirkung": {
+     "erschoepft_minuten": 15,
+     "beleg": "benötigt er nur 15 Minuten (statt die 30 Minuten der Verschnaufpause), um eine Stufe des Zustands Erschöpft abzubauen"
+    }
    }
   },
   {
@@ -31565,7 +31593,8 @@
       "quelle_wirkung": "erfassung",
       "bezug": "behinderung",
       "gilt": "immer",
-      "gruppe": "A"
+      "gruppe": "A",
+      "gilt_fuer": "ruestung"
      }
     ],
     "wirkung_erkannt": true
@@ -31611,7 +31640,8 @@
       "bezug": "tick_zuschlag",
       "einheit": "ticks",
       "gilt": "immer",
-      "gruppe": "A"
+      "gruppe": "A",
+      "gilt_fuer": "ruestung"
      }
     ],
     "wirkung_erkannt": true
@@ -31723,7 +31753,11 @@
     "manoever": false,
     "beschreibung": "Der Abenteurer regeneriert Schadenspunkte schneller. Immer wenn er durch eine Ruhephase Lebenspunkte zurück erhält, bekommt ein Abenteurer mit dieser Meisterschaft 1 zusätzlichen Punkt.",
     "wirkungen_strukturiert": [],
-    "wirkung_erkannt": false
+    "wirkung_erkannt": false,
+    "ruhewirkung": {
+     "lp_zusatz": 1,
+     "beleg": "bekommt ein Abenteurer mit dieser Meisterschaft 1 zusätzlichen Punkt"
+    }
    }
   },
   {
@@ -31797,7 +31831,8 @@
       "quelle_wirkung": "erfassung",
       "bezug": "behinderung",
       "gilt": "immer",
-      "gruppe": "A"
+      "gruppe": "A",
+      "gilt_fuer": "schild"
      }
     ],
     "wirkung_erkannt": true
@@ -31843,7 +31878,8 @@
       "bezug": "tick_zuschlag",
       "einheit": "ticks",
       "gilt": "immer",
-      "gruppe": "A"
+      "gruppe": "A",
+      "gilt_fuer": "schild"
      }
     ],
     "wirkung_erkannt": true
@@ -75406,6 +75442,43 @@
       {
        "id": "grw:regel:kampf-regeln:heilung",
        "text": "Dies ist bis zu zweimal pro Tag möglich und heilt Lebenspunkte in Höhe der doppelten Konstitution (mindestens 1 Punkt)."
+      }
+     ]
+    },
+    "ruheregeln": {
+     "ruhephase": {
+      "lp": {
+       "attribut": "Konstitution",
+       "faktor": 2,
+       "mindestens": 1
+      },
+      "fo_verzehrt": {
+       "attribut": "Willenskraft",
+       "faktor": 2,
+       "mindestens": 1
+      },
+      "dauer_stunden": 6,
+      "je_tag": 2
+     },
+     "verschnaufpause": {
+      "dauer_minuten": 30
+     },
+     "belege": [
+      {
+       "id": "grw:regel:kampf-regeln:heilung",
+       "text": "heilt Lebenspunkte in Höhe der doppelten Konstitution (mindestens 1 Punkt)"
+      },
+      {
+       "id": "grw:regel:kampf-regeln:heilung",
+       "text": "Dies ist bis zu zweimal pro Tag möglich"
+      },
+      {
+       "id": "grw:regel:kampf-regeln:heilung",
+       "text": "Verschnaufpause von 30 Minuten Dauer"
+      },
+      {
+       "id": "grw:regel:magie-regeln:fokus-zurueckgewinnen",
+       "text": "wie sein Willenskraft-Attribut mal 2 beträgt (mindestens 1 Punkt)"
       }
      ]
     }

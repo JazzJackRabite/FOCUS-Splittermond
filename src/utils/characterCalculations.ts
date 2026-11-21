@@ -11,6 +11,7 @@ import { heldengrade } from '../regelwerk/steigerungsregeln';
 import { abgeleiteteFuerCharakter, wirkungenFuerCharakter, type CharakterWirkungen, type KatalogWerte } from '../regelwerk/bruecke';
 import { reliktWiderstandFuerCharakter } from '../regelwerk/relikte';
 import { grwAlleFertigkeiten, grwAttribute, grwFertigkeitsKategorien, grwFertigkeitsattribute, grwGesundheitsstufen, grwRassen, staerkenBudget } from '../regelwerk/grwListen';
+import { ausruestungsMinderung, wundabzugMinderung } from '../regelwerk/spielwirkungen';
 
 export interface CharacterCalculationResult {
   getAttrValue: (key: string) => number;
@@ -159,7 +160,6 @@ export function calculateCharacter(state: CharacterState): CharacterCalculationR
   const wil = Number(currentAttributes.WIL) || 0;
   const ver = Number(currentAttributes.VER) || 0;
   const vtd = 12 + bew + sta + sizeMod;
-  const racialSR = strengthsList.some((s) => s.name === 'Natürlicher Rüstungsschutz') ? 1 : 0;
   const resistBonus = Number(heldengrad.resistBonus) || 0;
 
   // Equipment bonuses (armor, shields, load)
@@ -171,8 +171,6 @@ export function calculateCharacter(state: CharacterState): CharacterCalculationR
     .reduce((sum, it) => sum + (Number(it.vtdBonus) || 0), 0);
   const gearHandicap = equippedItems
     .reduce((sum, it) => sum + (Number(it.handicap) || 0), 0);
-  const gearTickModifier = equippedItems
-    .reduce((sum, it) => sum + (Number(it.tickModifier) || 0), 0);
 
   const loadCapacity = kon + sta;
   const totalLoad = (state.inventory ?? []).reduce(
@@ -180,30 +178,29 @@ export function calculateCharacter(state: CharacterState): CharacterCalculationR
     0
   );
 
-  // Masteries reducing armor / shield handicap (Splittermond GRW)
-  const zaehigkeitMasteries = masteries['Zähigkeit'] ?? [];
-  const hasArmorTraining = zaehigkeitMasteries.some((m) =>
-    m.name.startsWith('Rüstungsträger I')
-  );
-  const hasShieldTraining = zaehigkeitMasteries.some((m) =>
-    m.name.startsWith('Starker Schildarm I')
-  );
+  // Meisterschaften, die Behinderung und Tick-Zuschlag von Rüstung bzw. Schild senken (Wirkungen mit gilt_fuer aus dem Paket, GRW S. 123)
+  const minderung = ausruestungsMinderung(state);
 
   const armorHandicapRaw = equippedItems
     .filter((it) => it.type === 'armor' || (it.handicap !== undefined && it.type !== 'shield'))
     .reduce((sum, it) => sum + (Number(it.handicap) || 0), 0);
-  const armorHandicap = Math.max(0, armorHandicapRaw - (hasArmorTraining ? 1 : 0));
+  const armorHandicap = Math.max(0, armorHandicapRaw - minderung.ruestung.behinderung);
 
   const shieldHandicapRaw = equippedItems
     .filter((it) => it.type === 'shield')
     .reduce((sum, it) => sum + (Number(it.handicap) || 0), 0);
-  const shieldHandicap = Math.max(0, shieldHandicapRaw - (hasShieldTraining ? 1 : 0));
+  const shieldHandicap = Math.max(0, shieldHandicapRaw - minderung.schild.behinderung);
+
+  // Tick-Zuschlag von Rüstung und Schild, gesenkt durch Rüstungsträger II bzw. Starker Schildarm II (nie unter 0)
+  const tickVon = (schild: boolean) => equippedItems.filter((it) => (it.type === 'shield') === schild).reduce((sum, it) => sum + (Number(it.tickModifier) || 0), 0);
+  const gearTickModifier = Math.max(0, tickVon(false) - minderung.ruestung.tick_zuschlag) + Math.max(0, tickVon(true) - minderung.schild.tick_zuschlag);
 
   const overweightHandicap = state.ignoreEncumbrance ? 0 : Math.max(0, totalLoad - loadCapacity);
   const totalHandicap = armorHandicap + shieldHandicap + overweightHandicap;
 
   // Splittermond GRW S. 187: "Die halbe Gesamt-Behinderung wird außerdem als Malus auf die Geschwindigkeit angerechnet."
-  const speedHandicapReduction = Math.floor(totalHandicap / 2);
+  // halbe Gesamt-Behinderung, kaufmännisch gerundet (GRW S. 11 und 165); mit Paket rechnet abgeleiteteFuerCharakter
+  const speedHandicapReduction = Math.round(totalHandicap / 2);
 
   const derived: DerivedStats = {
     GSW: Math.max(0, bew + gk - speedHandicapReduction),
@@ -211,19 +208,15 @@ export function calculateCharacter(state: CharacterState): CharacterCalculationR
     LP: gk + kon,
     FO: 2 * (mys + wil),
     VTD: vtd + gearVtdBonus,
-    SR: racialSR + armorSR,
+    SR: armorSR,
     GW: 12 + ver + wil + resistBonus,
     KW: 12 + kon + wil + resistBonus,
   };
 
   // 5. Max LP & FO
-  let robustBonus = strengthsList
-    .filter((s) => s.name === 'Robust')
-    .reduce((sum, s) => sum + (Number(s.level) || 1), 0);
-
-  let foBonusFromStrengths = strengthsList
-    .filter((s) => s.name === 'Erhöhter Fokuspool')
-    .reduce((sum, s) => sum + (Number(s.level) || 1) * 5, 0);
+  // LP und FO aus Stärken stehen im Paket (abgeleitete_werte_modifikatoren); ohne Paket keine
+  let robustBonus = 0;
+  let foBonusFromStrengths = 0;
 
   // 5a. Regelpakete geladen: Formeln, Heldengrad-Boni (VTD/GW/KW, Splitterpunkte), Stärken, Höchstbonus der Ausrüstung
   //     und kaufmännische Rundung der Behinderung aus den Regeldaten (GRW S. 11–18, 88–89)
@@ -237,6 +230,7 @@ export function calculateCharacter(state: CharacterState): CharacterCalculationR
     derived.VTD = regelwerk.VTD;
     derived.GW = regelwerk.GW;
     derived.KW = regelwerk.KW;
+    derived.SR += regelwerk.SR;
     robustBonus = regelwerk.lpAusStaerken;
     foBonusFromStrengths = regelwerk.foAusStaerken;
   }
@@ -285,11 +279,8 @@ export function calculateCharacter(state: CharacterState): CharacterCalculationR
 
     let penalty = WOUND_PENALTIES[levelIndex] ?? 0;
     if (penalty < 0) {
-      const hasSchmerzresistenz = strengthsList.some((s) => s.name === 'Schmerzresistenz');
-      const zähigkeitMasteries = masteries['Zähigkeit'] ?? [];
-      const hasSchmerzwiderstand1 = zähigkeitMasteries.some((m) => m.name.startsWith('Schmerzwiderstand I'));
-      const hasSchmerzwiderstand2 = zähigkeitMasteries.some((m) => m.name.startsWith('Schmerzwiderstand II'));
-      const reduction = (hasSchmerzresistenz ? 1 : 0) + (hasSchmerzwiderstand1 ? 1 : 0) + (hasSchmerzwiderstand2 ? 1 : 0);
+      // Wundabzüge verringert (Schmerzresistenz, Schmerzwiderstand; Wirkungen aus dem Paket, GRW S. 172)
+      const reduction = wundabzugMinderung(state).summe;
       penalty = Math.min(0, penalty + reduction);
     }
 
@@ -298,7 +289,7 @@ export function calculateCharacter(state: CharacterState): CharacterCalculationR
   }
 
   // 7. Splitter points
-  const splinterPoints = regelwerk ? regelwerk.SP : 3 + (strengthsList.some((s) => s.name === 'Zusätzliche Splitterpunkte') ? 2 : 0);
+  const splinterPoints = regelwerk ? regelwerk.SP : 3;
 
   // 8. Creation Usage
   const attrPoints = Object.values(attrBase).reduce((a, b) => a + (Number(b) || 0), 0);

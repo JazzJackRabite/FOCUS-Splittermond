@@ -681,6 +681,31 @@ die Grimoires), Dateiendung `.grim`. Das Grundregelwerk ist kein Grimoire; es bl
 - Offen: Würfelmechanik, Fokuskosten, Kampfmanöver nach Namen, einzelne Stärken nach Namen (characterCalculations,
   RestSection), Heimatregionen (stehen nicht im GRW-Paket) – siehe FUNDAMENT.md, Altlasten.
 
+## Stand 28 (21.11.2026): Pausen, Ruhewirkungen, Wundabzüge, Rüstung/Schild und Heimatregionen aus dem Paket
+
+- **Keine Stärken und Meisterschaften mehr nach Namen** in `characterCalculations.ts` und `RestSection.tsx`
+  (Regelnamen im Code 53 → 39). Neues Modul `regelwerk/spielwirkungen.ts`:
+  - `ruheregeln`: Ruhephase (Konstitution × 2 LP, Willenskraft × 2 Fokus, mindestens 1, 6 Stunden) und Verschnaufpause
+    (30 Minuten) aus `daten.ruheregeln` der Kernregel „Heilung“; Fundstelle „GRW S. 173–174“ statt fest eingetragener S. 160.
+  - `ruhewirkungen`: `daten.ruhewirkung` (z. B. Erhöhte Lebensregeneration ×3, Schnell wieder auf den Beinen +1,
+    Dickschädel 15 Minuten); bedingte Wirkungen (Eins mit der Natur) erscheinen als „nicht eingerechnet“; Beleg beim Überfahren.
+  - `wundabzugMinderung`: Wirkungen „Wundabzug gesenkt“ (Schmerzresistenz, Schmerzwiderstand I/II).
+  - `ausruestungsMinderung`: Behinderung und Tick-Zuschlag getrennt für Rüstung und Schild (`gilt_fuer`); Rüstungsträger II
+    und Starker Schildarm II senken jetzt auch den Tick-Zuschlag (vorher gar nicht berücksichtigt).
+- **Schadensreduktion aus Stärken** über `abgeleitete_werte_modifikatoren` (Natürlicher Rüstungsschutz +1); `KatalogWerte.SR`.
+- **LP/FO/SP aus Stärken** nur noch aus dem Paket; ohne Paket gibt es keine Boni nach Namen mehr.
+- **Heimatregionen** = Kulturkunde der Kultur-Module (`grwHeimatregionen`, GRW: die zwölf Kulturen); ein früher gewählter
+  Name bleibt in der Auswahl stehen. Die kostenlose Stärke der Kultur heißt überall wie im Paket (`gratisStaerkeDerKultur`).
+- **Regelkorrekturen:**
+  - GSW-Abzug durch Behinderung kaufmännisch gerundet (GRW S. 11: „wird stets kaufmännisch gerundet“), auch im Rückfall;
+    Behinderung 1 kostet also 1 GSW, Behinderung 3 kostet 2. Tests entsprechend korrigiert.
+  - „Segen der Mondkraft“ halbiert die Pausendauer nicht mehr automatisch, sondern nur beim Einsatz der Gabe für einen
+    Splitterpunkt (GRW S. 81, 83); der Rast-Dialog zeigt das als Hinweis.
+  - Die Schwäche „Dahinsiechen“ gibt es nicht (Dahinsiechen ist ein Zauber in „Die Magie“); die Sonderbehandlung ist entfallen.
+- **Datenseite (auf D:):** `spielwirkungen.py` + `.json`, `abgeleitet.py` (SR), Schema in `write.py`, `lader.py` der Prüfsuite;
+  GRW- und Magie-Paket sowie Grimoire „magie“ neu gebaut. Prüfsuite 0 neue Befunde, Praxistest 109/109.
+- Tests: 422 grün mit allen 12 Grimoires und Volltest, 391 ohne Bücher; Build läuft.
+
 ## Google AI Studio
 
 Unverändert eine Vite-/React-App mit `metadata.json` im Wurzelordner; Import über „Import from GitHub“, Hosting über Cloud Run.

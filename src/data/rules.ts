@@ -33,11 +33,10 @@ export const MOON_SIGNS = [
     "Segen der Mondkraft"
 ];
 
+// Heimatregionen = Kulturkunde der Kultur-Module des Grundregelwerks (GRW S. 39–50); Rückfall ohne Paket, maßgeblich ist grwHeimatregionen()
 export const REGIONS = [
-    "Albische Inseln", "Dakardsmyr", "Farukan", "Immersommerwald", 
-    "Ioria", "Kintai", "Lorakis (Allgemein)", "Midstad", 
-    "Nördliche Wälder", "Patalis", "Selenia", "Surmakar", 
-    "Tarr", "Termark", "Windküste", "Zwingard"
+    "Albischer Seebund", "Ashurmazaan", "Dämmeralben", "Furgand", "Ioria", "Keshabid",
+    "Mertalischer Städtebund", "Pashtar", "Selenia", "Tarr", "Wächterbund", "Zwingard"
 ];
 
 export const SKILL_CATEGORIES = {

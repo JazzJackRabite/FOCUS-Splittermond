@@ -54,7 +54,7 @@ export function abgeleiteteWerte(kat: Katalog, attribute: Attribute, rasse: stri
       if (m.hoechstbonus && Math.abs(neu) > m.hoechstbonus) { hinweise.push(`${sid}: Höchstbonus ${m.hoechstbonus} erreicht`); continue; }
       if (typeof m.mehrfach === 'number' && anzahl(sid) > m.mehrfach) hinweise.push(`${sid}: höchstens ${m.mehrfach}× wählbar`);
       if (m.mehrfach === 'einmal pro Heldengrad' && anzahl(sid) > heldengrad) hinweise.push(`${sid}: nur einmal pro Heldengrad wählbar`);
-      summeSt.set(key, neu); w[k] += m.bonus;
+      summeSt.set(key, neu); w[k] = (w[k] ?? 0) + m.bonus;
     }
   }
   // Ausrüstung: VTD-Bonus zählt zur Quelle Ausrüstung (Höchstbonus), Behinderung halbiert auf GSW

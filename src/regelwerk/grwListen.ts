@@ -13,7 +13,7 @@ import { STRENGTHS_DATA, type StrengthData } from '../data/strengths';
 import { WEAKNESSES_DATA, WEAKNESS_DESCRIPTIONS, WEAKNESS_PAGES } from '../data/weaknesses';
 import { PREDEFINED_RESOURCES, type ResourceData } from '../data/resources';
 import { LANGUAGES_DATA, type LanguageData } from '../data/languages';
-import { ATTRIBUTES, BASE_STRENGTH_POINTS, MOON_SIGNS, RACES, SKILL_CATEGORIES, SKILL_DATA, WOUND_PENALTIES } from '../data/rules';
+import { ATTRIBUTES, BASE_STRENGTH_POINTS, MOON_SIGNS, RACES, REGIONS, SKILL_CATEGORIES, SKILL_DATA, WOUND_PENALTIES } from '../data/rules';
 import type { RaceData } from '../types';
 import { RASSE_ID } from './bruecke';
 import { gesundheitsstufen } from './vitals';
@@ -262,4 +262,19 @@ export function grwFertigkeitsKategorien(k: Katalog | null = aktiverKatalog()): 
 export function gratisStaerkeDerKultur(k: Katalog | null = aktiverKatalog()): string {
   const ref = (k?.get(ERSCHAFFUNG_ID)?.daten.strukturiert as { kultur_frei?: { gratis_staerke_ref?: { id: string } } } | undefined)?.kultur_frei?.gratis_staerke_ref;
   return (ref && k?.get(ref.id)?.name) || 'Kulturkunde';
+}
+
+/**
+ * Heimatregionen für die kostenlose Kulturkunde: das Feld „Kulturkunde“ der Kultur-Module (GRW S. 39–50 und Grimoires),
+ * ohne Paket die Kulturen des Grundregelwerks.
+ */
+export function grwHeimatregionen(k: Katalog | null = aktiverKatalog()): string[] {
+  if (!k) return REGIONS;
+  const r = new Set<string>();
+  for (const e of Object.values(k.eintraege)) {
+    if (e.typ !== 'kultur') continue;
+    const kk = String(e.daten.felder?.kulturkunde ?? '').trim();
+    r.add(kk && kk.length <= 40 ? kk : e.name);
+  }
+  return r.size ? [...r].sort((a, b) => a.localeCompare(b, 'de')) : REGIONS;
 }

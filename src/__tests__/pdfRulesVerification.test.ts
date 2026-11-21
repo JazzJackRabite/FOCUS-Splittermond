@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useCalculations } from '../hooks/useCalculations';
 import { useCharacterState, DEFAULT_STATE } from '../hooks/useCharacterState';
@@ -12,6 +12,14 @@ import {
 import { getConditionMalus, getActiveRollModifiers } from '../utils/conditionModifiers';
 import { calculateItemCost, getSkillXpCost, getAttrXpCost } from '../utils/costCalculations';
 import type { CharacterState, StatusCondition } from '../types';
+import { setzeAktivenKatalog } from '../regelwerk/bruecke';
+import { basisAusDateien } from '../regelwerk/__tests__/hilfen';
+import { Katalog } from '../regelwerk/katalog';
+
+// Regeln aus dem GRW-Paket (Wirkungen, Ruhewirkungen, Minderungen); ohne Paket gibt es keine Boni nach Namen mehr
+beforeAll(() => { const b = basisAusDateien(); setzeAktivenKatalog(new Katalog(b.manifest, [b.basis]), false); });
+afterAll(() => setzeAktivenKatalog(null, false));
+
 
 describe('Splittermond GRW (2. erratierte Neuauflage) - Regelverifikation anhand PDF', () => {
   // =========================================================================

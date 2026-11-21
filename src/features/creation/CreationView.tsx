@@ -2,7 +2,6 @@ import { regelverstoss, useHausregeln } from '../../fundament/hausregeln';
 import React, { useState, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
 import { ChevronsDownUp } from 'lucide-react';
-import { REGIONS } from '../../data/rules';
 import { getStrengthDescription, matchSchool, getResolvedStrengths, getResolvedResources, getResolvedWeaknesses } from '../../utils/gameResourceManager';
 import { getSkillXpCost, getAttrXpCost } from '../../utils/costCalculations';
 import { useCharacter } from '../../context/CharacterContext';
@@ -26,7 +25,7 @@ import { AdvancementLog } from '../../components/advancement/AdvancementLog';
 import { ErschaffungRegelwerk } from '../../components/creation/ErschaffungRegelwerk';
 import type { ConfirmDialogState } from '../../hooks/useModals';
 import type { RaceData } from '../../types';
-import { grwAttribute, grwFertigkeitsKategorien, grwFertigkeitsattribute, grwMondzeichen, grwRassen, grwSprachen, grwStaerken } from '../../regelwerk/grwListen';
+import { gratisStaerkeDerKultur, grwAttribute, grwFertigkeitsKategorien, grwFertigkeitsattribute, grwHeimatregionen, grwMondzeichen, grwRassen, grwSprachen, grwStaerken } from '../../regelwerk/grwListen';
 
 // ---------------------------------------------------------------------------
 
@@ -119,7 +118,7 @@ export function CreationView() {
     const hasPurchasedStrengths = strengthsList.some((s) => !s.isRacial && !s.isFree);
     const doChange = () => {
       const racialStrengths = buildRacialStrengths(newRace);
-      const regionStrengthName = homeRegion ? `Kulturkunde (${homeRegion})` : '';
+      const regionStrengthName = homeRegion ? `${gratisStaerkeDerKultur()} (${homeRegion})` : '';
       const keptStrengths = strengthsList.filter((s) => s.name === regionStrengthName);
       dispatch({ type: 'SET_RACE', payload: { race: newRace, racialStrengths, keptStrengths } });
       toast.success(`Rasse zu ${newRace} geändert`);
@@ -326,9 +325,9 @@ export function CreationView() {
                     onChange={(e) => {
                       const newRegion = e.target.value;
                       if (newRegion) {
-                        const kulturkundeName = `Kulturkunde (${newRegion})`;
-                        const alreadyHas = strengthsList.some((s) => s.name === kulturkundeName);
-                        if (!alreadyHas) toast.success(`Kulturkunde (${newRegion}) hinzugefügt`);
+                        const gratisName = `${gratisStaerkeDerKultur()} (${newRegion})`;
+                        const alreadyHas = strengthsList.some((s) => s.name === gratisName);
+                        if (!alreadyHas) toast.success(`${gratisName} hinzugefügt`);
                       }
                       dispatch({ type: 'SET_HOME_REGION', payload: newRegion });
                     }}
@@ -338,7 +337,7 @@ export function CreationView() {
                     disabled={mode !== 'creation'}
                   >
                     <option value="">-- Wählen --</option>
-                    {REGIONS.map((reg) => <option key={reg} value={reg}>{reg}</option>)}
+                    {[...grwHeimatregionen(), ...(homeRegion && !grwHeimatregionen().includes(homeRegion) ? [homeRegion] : [])].map((reg) => <option key={reg} value={reg}>{reg}</option>)}
                   </select>
                 </div>
                 <div>

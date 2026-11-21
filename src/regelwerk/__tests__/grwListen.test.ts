@@ -82,3 +82,13 @@ describe('Erschaffung: kostenlose Stärke der Kultur', () => {
     expect(gratisStaerkeDerKultur(null)).toBe('Kulturkunde');
   });
 });
+
+describe('Heimatregionen: Kulturkunde der Kultur-Module', () => {
+  it('die zwölf Kulturen des GRW (S. 39–50), Rückfall gleich', async () => {
+    const { grwHeimatregionen } = await import('../grwListen');
+    const r = grwHeimatregionen(K);
+    expect(r).toHaveLength(12);
+    expect(r).toContain('Albischer Seebund');
+    expect(r).toEqual(grwHeimatregionen(null));
+  });
+});

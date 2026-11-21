@@ -1,8 +1,16 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useCalculations } from '../hooks/useCalculations';
 import { DEFAULT_STATE } from '../hooks/useCharacterState';
 import type { CharacterState } from '../types';
+import { setzeAktivenKatalog } from '../regelwerk/bruecke';
+import { basisAusDateien } from '../regelwerk/__tests__/hilfen';
+import { Katalog } from '../regelwerk/katalog';
+
+// Regeln aus dem GRW-Paket (Wirkungen, Ruhewirkungen, Minderungen); ohne Paket gibt es keine Boni nach Namen mehr
+beforeAll(() => { const b = basisAusDateien(); setzeAktivenKatalog(new Katalog(b.manifest, [b.basis]), false); });
+afterAll(() => setzeAktivenKatalog(null, false));
+
 
 describe('Derived Stats and Calculations (Splittermond GRW)', () => {
   it('calculates derived stats accurately for standard Mensch', () => {
