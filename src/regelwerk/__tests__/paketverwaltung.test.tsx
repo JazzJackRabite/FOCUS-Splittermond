@@ -12,7 +12,7 @@ vi.mock('react-hot-toast', () => ({ default: { success: vi.fn(), error: vi.fn() 
 const abruf = (async (url: string) => {
   const datei = path.join(PUBLIC, String(url).split('/').pop()!);
   const buf = fs.readFileSync(datei);
-  return { ok: true, status: 200, json: async () => JSON.parse(buf.toString('utf-8')), arrayBuffer: async () => buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) };
+  return { ok: true, status: 200, text: async () => buf.toString('utf-8'), json: async () => JSON.parse(buf.toString('utf-8')), arrayBuffer: async () => buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) };
 }) as unknown as typeof fetch;
 
 const TESTBUCH = {
