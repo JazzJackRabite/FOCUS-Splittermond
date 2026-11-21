@@ -1566,7 +1566,7 @@ export const PlaySharedVitals: React.FC<PlaySharedVitalsProps> = ({ isMinimal = 
                 {
                   category: 'heal',
                   title: totalHealed > 0 ? `+${totalHealed} LP geheilt` : 'Zustände geheilt',
-                  description: `${healMethod ?? 'Heilung'}: ${details.join(', ')}${note ? ` (${note})` : ''}`,
+                  description: `${healMethod ?? 'Geheilt'}: ${details.join(', ')}${note ? ` (${note})` : ''}`,
                   badge: { text: totalHealed > 0 ? `+${totalHealed} LP` : 'Geheilt', variant: 'success' },
                 }
               );

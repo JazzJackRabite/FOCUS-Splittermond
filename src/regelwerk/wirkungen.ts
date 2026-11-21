@@ -135,24 +135,29 @@ function bezugText(w: Wirkung): string {
   return BEZUG_TEXT[b] ?? b;
 }
 
+/** Kurztexte je Art einer Wirkung (Schlüssel: Vokabular `art` der Wirkungen im Paket, nicht Regelnamen) */
+const KURZTEXT: Record<string, (w: Wirkung, z: string) => string> = {
+  bonus: (w, z) => `${z} auf ${(w.auf ?? bezugText(w)).replace(/^(?:seine[nrs]?|ihre[nrs]?|den|die|das) /, '')}`.trim(),
+  wert_erhoeht: (w, z) => `${bezugText(w)} ${z}`.trim(),
+  schaden_gesenkt: (w) => `${w.schadensart ?? 'Schaden'} −${w.wert}`,
+  immunitaet: (w) => `immun gegen ${w.zustand_ref?.text ?? ''}`.trim(),
+  zusatzschaden: (w) => `${w.wert} zusätzlicher Schaden`,
+  sr_ignorieren: (w) => `${w.wert} SR ignorieren`,
+  zustand: (w) => `Zustand ${w.zustand_ref?.text ?? ''}`.trim(),
+  wert_gesetzt: (w) => `${w.bezug ?? ''} = ${w.wert}`,
+  heilung: (w) => `heilt ${w.wert} ${w.bezug ?? ''}`.trim(),
+  schaden: (w) => `${w.wert} Schaden`,
+  kosten_gesenkt: (w) => `Kosten −${w.wert}`,
+  kosten_erhoeht: (w) => `Kosten +${w.wert}`,
+};
+KURZTEXT.malus = KURZTEXT.bonus;
+KURZTEXT.wert_gesenkt = KURZTEXT.wert_erhoeht;
+
 /** Kurztext einer Wirkung für die Anzeige */
 export function wirkungKurz(w: Wirkung): string {
   const z = (w.art === 'malus' || w.art === 'wert_gesenkt' ? '−' : '+') + (w.wert ?? '') + (w.pro_eg ? ` (+${w.pro_eg} je EG)` : '');
-  switch (w.art) {
-    case 'bonus': case 'malus': return `${z} auf ${(w.auf ?? bezugText(w)).replace(/^(?:seine[nrs]?|ihre[nrs]?|den|die|das) /, '')}`.trim();
-    case 'wert_erhoeht': case 'wert_gesenkt': return `${bezugText(w)} ${z}`.trim();
-    case 'schaden_gesenkt': return `${w.schadensart ?? 'Schaden'} −${w.wert}`;
-    case 'immunitaet': return `immun gegen ${w.zustand_ref?.text ?? ''}`.trim();
-    case 'zusatzschaden': return `${w.wert} zusätzlicher Schaden`;
-    case 'sr_ignorieren': return `${w.wert} SR ignorieren`;
-    case 'zustand': return `Zustand ${w.zustand_ref?.text ?? ''}`.trim();
-    case 'wert_gesetzt': return `${w.bezug ?? ''} = ${w.wert}`;
-    case 'heilung': return `heilt ${w.wert} ${w.bezug ?? ''}`.trim();
-    case 'schaden': return `${w.wert} Schaden`;
-    case 'kosten_gesenkt': return `Kosten −${w.wert}`;
-    case 'kosten_erhoeht': return `Kosten +${w.wert}`;
-    default: return w.beleg;
-  }
+  const f = KURZTEXT[w.art];
+  return f ? f(w, z) : w.beleg;
 }
 
 // ---------------------------------------------------------------- Situative Boni beim Würfeln

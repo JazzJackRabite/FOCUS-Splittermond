@@ -7,6 +7,8 @@ import {
   parseWeaponDamage,
   executeAttackDamageRoll,
   wuchtangriffJeEg,
+  kombiniereManoever,
+  manoeverHinzufuegbar,
 } from '../utils/combatRules';
 import { Katalog } from '../regelwerk/katalog';
 import { basisAusDateien } from '../regelwerk/__tests__/hilfen';
@@ -39,32 +41,28 @@ describe('Splittermond Combat Rules & Attack Calculations', () => {
       expect(calculateAttackEG(30, 15).eg).toBe(5);
     });
 
-    it('handles missed attacks correctly', () => {
+    it('verfehlte Angriffe mit Einstufung nach GRW S. 17 (knapp misslungen bei −1/−2)', () => {
       const closeMiss = calculateAttackEG(14, 15);
       expect(closeMiss.isSuccess).toBe(false);
       expect(closeMiss.differenz).toBe(-1);
-      expect(closeMiss.outcomeLabel).toBe('Knapp verfehlt');
-
-      const farMiss = calculateAttackEG(10, 15);
-      expect(farMiss.isSuccess).toBe(false);
-      expect(farMiss.outcomeLabel).toBe('Verfehlt');
+      expect(closeMiss.outcomeLabel).toBe('Knapp misslungen');
+      expect(calculateAttackEG(10, 15).outcomeLabel).toBe('Misslungen');
+      expect(calculateAttackEG(15, 15).outcomeLabel).toBe('(Knapp) gelungen');
+      expect(calculateAttackEG(30, 15).outcomeLabel).toBe('Herausragend gelungen');
     });
 
-    it('handles Fumble (Patzer) and Triumph (Doppel-10)', () => {
+    it('Patzer verfehlt immer; Triumph gibt +3 EG, aber nur wenn der Angriff rechnerisch trifft (GRW S. 18)', () => {
       const fumble = calculateAttackEG(18, 15, true, false);
       expect(fumble.isSuccess).toBe(false);
       expect(fumble.isFumble).toBe(true);
       expect(fumble.eg).toBe(0);
-      expect(fumble.outcomeLabel).toBe('Patzer!');
+      expect(fumble.outcomeLabel).toMatch(/^Patzer/);
 
-      // Triumph gives minimum 1 EG and +1 extra EG
       const triumphLow = calculateAttackEG(15, 15, false, true);
-      expect(triumphLow.isSuccess).toBe(true);
-      expect(triumphLow.isCrit).toBe(true);
-      expect(triumphLow.eg).toBe(1); // 0 base + 1 triumph bonus = 1
-
-      const triumphHigh = calculateAttackEG(21, 15, false, true);
-      expect(triumphHigh.eg).toBe(3); // 2 base + 1 triumph bonus = 3
+      expect(triumphLow).toMatchObject({ isSuccess: true, isCrit: true, eg: 3 });
+      expect(calculateAttackEG(21, 15, false, true).eg).toBe(5);
+      // Triumph bei rechnerischem Fehlschlag: kein Treffer, keine Zusatz-EG
+      expect(calculateAttackEG(13, 15, false, true)).toMatchObject({ isSuccess: false, isCrit: false, eg: 0 });
     });
   });
 
@@ -200,5 +198,47 @@ describe('Splittermond Combat Rules & Attack Calculations', () => {
       }
       expect(executeAttackDamageRoll({ baseFormula: '1W6+4', egBonusDamage: 3, damageMultiplier: 0 }).grossDamage).toBe(0);
     });
+  });
+});
+
+describe('Mehrere Meisterschafts-Manöver je Angriff (GRW S. 161)', () => {
+  const r = manoeverRegeln(K);
+  const liste = getAvailableCombatManeuvers(
+    [{ name: 'Hammerschlag', skill: 'Hiebwaffen' }, { name: 'Knochenbrecher', skill: 'Hiebwaffen' }, { name: 'Abdrängen', skill: 'Hiebwaffen' }, { name: 'Umreißen', skill: 'Hiebwaffen' }, { name: 'Rundumschlag', skill: 'Hiebwaffen' }],
+    'Hiebwaffen', undefined, {}, K,
+  );
+  const m = (n: string) => liste.find((x) => x.name === n)!;
+
+  it('Kombinationsregeln aus dem Paket', () => {
+    expect(r.kombination).toEqual({ mehrere: true, gleicherWiderstand: true, schadenFuerAngriff: true, jeManoeverEinmal: true });
+    expect(manoeverRegeln(null).kombination.mehrere).toBe(false);
+  });
+
+  it('nur gegen denselben Widerstand, jedes Manöver einmal', () => {
+    expect(manoeverHinzufuegbar([m('Hammerschlag')], m('Knochenbrecher'), r)).toBeNull();
+    expect(manoeverHinzufuegbar([m('Hammerschlag')], m('Abdrängen'), r)).toMatch(/KW/);
+    expect(manoeverHinzufuegbar([m('Abdrängen')], m('Umreißen'), r)).toBeNull();
+    expect(manoeverHinzufuegbar([m('Hammerschlag')], m('Hammerschlag'), r)).toMatch(/einmal/);
+    expect(manoeverHinzufuegbar([m('Hammerschlag')], m('Knochenbrecher'), manoeverRegeln(null))).toMatch(/Nur ein/);
+  });
+
+  it('EG summiert, Zusatzschaden und Zustände gesammelt, Schadenseinschränkung für den ganzen Angriff', () => {
+    const k = kombiniereManoever([m('Hammerschlag'), m('Knochenbrecher'), m('Rundumschlag')], r);
+    expect(k.egKosten).toBe(3);
+    expect(k.angesagt).toBe(3);
+    expect(k.extraDamageFormulas).toEqual(['1W6']);
+    expect(k.zustaende.length).toBe(1);
+    expect(k.damageMultiplier).toBe(0.5);
+    expect(k.gesamt.name).toBe('Hammerschlag + Knochenbrecher + Rundumschlag');
+    expect(kombiniereManoever([], r).angesagt).toBe(0);
+    expect(kombiniereManoever([], r).egKosten).toBe(0);
+  });
+
+  it('Schaden: mehrere Zusatzwürfel, Streiftreffer −2 je angesagtem Manöver', () => {
+    const res = executeAttackDamageRoll({ baseFormula: '0W6+10', maneuverExtraFormulas: ['0W6+2', '0W6+3'], egBonusDamage: 0, maneuverConditions: ['Benommen', 'Verwundet 1'] });
+    expect(res.grossDamage).toBe(15);
+    expect(res.appliedConditions).toEqual(['Benommen', 'Verwundet 1']);
+    const st = executeAttackDamageRoll({ baseFormula: '0W6+10', egBonusDamage: 0, streiftrefferAbzug: 2 * r.streiftrefferSchaden });
+    expect(st.grossDamage).toBe(6);
   });
 });

@@ -763,6 +763,31 @@ die Grimoires), Dateiendung `.grim`. Das Grundregelwerk ist kein Grimoire; es bl
 - Tests: Oberflächentests auf den Assistenten umgestellt (Hilfen `begleiterErstellen`, `weiter`, `abschliessen`,
   `blattWaehlen` in `__tests__/hilfen.ts`); 417 Tests grün mit den Grimoires vom 12.11. auf D:, Build läuft.
 
+## Stand 31 (21.11.2026): Lage beim Angriff, mehrere Manöver, Proben und Zauber-EG aus dem Paket
+
+- **Lage beim Angriff** (`regelwerk/kampflage.ts`, Datenseite `Werkzeuge/regelpakete/kampfsituationen.py` + `.json`): die
+  erfundenen Knöpfe „Gegner liegt +2“, „Vorteil +1“, „Ziel in Deckung +2 VTD“ sind entfernt. Neu im Angriffsdialog, alle
+  Zahlen aus dem GRW-Paket: eigene Position und Position des Ziels nach der Tabelle Kampfpositionen (S. 170, mit eigener
+  Zeile für Armbrüste), Taktische Vorteile (+3 je Vorteil), Überzahl (+1 je Kämpfer, höchstens +3, nur Nahkampf), Lücke
+  suchen bzw. Zielen (+1 je 2 Ticks, höchstens +3), im Fernkampf Deckung (leicht 1, schwer 2 zusätzliche EG, sonst „trifft
+  die Deckung“) und Kampfgetümmel (−6; entfällt mit Scharfschütze, `ignoriert_situation`). Hinweis, wenn ein Manöver Zielen
+  voraussetzt und keine Ticks eingetragen sind.
+- **Mehrere Meisterschafts-Manöver je Angriff** (GRW S. 161; `manoever_regeln.kombination` mit Belegsätzen):
+  nur gegen denselben Widerstand, jedes einmal, EG-Kosten addiert, Zusatzschaden und Zustände gesammelt, Schadens-
+  einschränkung (halb/kein Schaden) für den ganzen Angriff, Streiftreffer −2 je angesagtem Manöver, weitere EG je Manöver.
+  `kombiniereManoever` und `manoeverHinzufuegbar` in `combatRules.ts`; gesperrte Karten nennen den Grund.
+- **Proben** (`regelwerk/proben.ts`): Würfelanzahl je Wurfart, Patzer- und Triumphgrenzen, EG je 3 Punkte und die
+  Einstufungen aus den Kernregeln (S. 16–18). Korrigiert: Triumph gibt +3 EG und nur, wenn die Probe rechnerisch gelingt
+  (vorher +1 und automatisch gelungen); Patzer EG −3, höchstens −1. Gilt für Proben, Angriffe und Zauber.
+- **Zauber-EG** (`regelwerk/zauberEg.ts`): EG je Option, Höchstzahl, Mindestwerte und die Grunddauer des Auslösens (3 Ticks,
+  neu als `strukturiert.ausloesezeit_ticks`, Beleg S. 194) aus dem Paket; die erfundene Liste `STANDARD_SPELL_ENHANCEMENTS`
+  („+2 FO“) ist entfernt.
+- **Potenzial von Tieren** (Bestienmeister S. 15) stand mit Zahlen im Code; jetzt `strukturiert.potenzial` im Grimoire
+  (`begleiter_regeln.json`, Tabellenzellen gelten als Beleg). Ohne Bestienmeister kein Potenzial und keine Qualitätsauswahl.
+- **Regelnamen im Code 16 → 0** (Voraussetzungsprüfung ohne Namenssonderfälle, das Paket hat alle formal; Lichtschaden vor
+  Blitzschaden erkannt). Altlasten-Tabelle: Würfelmechanik, Fokuskosten und Regelnamen gestrichen.
+- Tests: 437 grün mit allen Grimoires und Volltest, 406 ohne Bücher; Prüfsuite 0 neue Befunde, Praxistest 109/109; Build läuft.
+
 ## Google AI Studio
 
 Unverändert eine Vite-/React-App mit `metadata.json` im Wurzelordner; Import über „Import from GitHub“, Hosting über Cloud Run.

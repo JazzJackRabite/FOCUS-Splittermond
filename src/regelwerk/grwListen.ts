@@ -13,7 +13,7 @@ import { STRENGTHS_DATA, type StrengthData } from '../data/strengths';
 import { WEAKNESSES_DATA, WEAKNESS_DESCRIPTIONS, WEAKNESS_PAGES } from '../data/weaknesses';
 import { PREDEFINED_RESOURCES, type ResourceData } from '../data/resources';
 import { LANGUAGES_DATA, type LanguageData } from '../data/languages';
-import { ATTRIBUTES, BASE_STRENGTH_POINTS, MOON_SIGNS, RACES, REGIONS, SKILL_CATEGORIES, SKILL_DATA, WOUND_PENALTIES } from '../data/rules';
+import { ATTRIBUTES, BASE_STRENGTH_POINTS, GRATIS_STAERKE_DER_KULTUR, MOON_SIGNS, RACES, REGIONS, SKILL_CATEGORIES, SKILL_DATA, WOUND_PENALTIES } from '../data/rules';
 import type { RaceData } from '../types';
 import { RASSE_ID } from './bruecke';
 import { gesundheitsstufen } from './vitals';
@@ -261,7 +261,7 @@ export function grwFertigkeitsKategorien(k: Katalog | null = aktiverKatalog()): 
 /** Stärke, die die Kultur kostenlos für die Heimatregion gibt (GRW S. 23: Kulturkunde); ohne Paket „Kulturkunde“ */
 export function gratisStaerkeDerKultur(k: Katalog | null = aktiverKatalog()): string {
   const ref = (k?.get(ERSCHAFFUNG_ID)?.daten.strukturiert as { kultur_frei?: { gratis_staerke_ref?: { id: string } } } | undefined)?.kultur_frei?.gratis_staerke_ref;
-  return (ref && k?.get(ref.id)?.name) || 'Kulturkunde';
+  return (ref && k?.get(ref.id)?.name) || GRATIS_STAERKE_DER_KULTUR;
 }
 
 /**

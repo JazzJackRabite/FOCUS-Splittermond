@@ -18,7 +18,7 @@ import { erstelleKatalog, grimoireLesen } from '../laden';
 import { bedingungsCharakter } from '../bruecke';
 import {
   abrichtungen, alleTiere, beschwoerbareWesen, diensteFuer, istReittier, kreaturStufe, mehrfachGrenze, potenzial, pruefeAbrichtung,
-  tierTraeger, tiergefaehrten, wertekasten,
+  tierQualitaeten, tierTraeger, tiergefaehrten, wertekasten,
 } from '../begleiter';
 import type { Begleiter, CharacterState } from '../../types';
 
@@ -60,10 +60,9 @@ describe('Regeln ohne Buch', () => {
     expect(kreaturZuordnung([2], [3])).toBe(false);
     expect(kreaturZuordnung([], [0, 0])).toBe(true);
   });
-  it('Potenzial: Grundwert/Qualität, 2 je Kreatur, Tiervertrauter', () => {
-    expect(potenzial(K, { id: 'x', art: 'tier', name: 'x' }, []).gesamt).toBe(1);
-    expect(potenzial(K, { id: 'x', art: 'tier', name: 'x', kreatur: 3, vertrauter: true }, []).gesamt).toBe(1 + 6 + 3);
-    expect(potenzial(K, { id: 'x', art: 'tier', name: 'x', qualitaet: 4 }, []).gesamt).toBe(4);
+  it('Potenzial nur mit Grimoire (Bestienmeister S. 15)', () => {
+    // Potenzial ist eine Regel aus dem Bestienmeister: ohne Grimoire keine Werte im Code
+    expect(potenzial(K, { id: 'x', art: 'tier', name: 'x', kreatur: 3, vertrauter: true }, []).posten).toEqual([]);
   });
 });
 
@@ -197,6 +196,11 @@ describe.skipIf(!BESTIEN || !fs.existsSync(BESTIEN))('Abrichtungen mit „Bestie
       .map(n => Object.values(KB.eintraege).find(e => e.typ === 'meisterschaft' && e.name === n)!.id);
     expect(potenzial(KB, pferd, ids).gesamt).toBe(1 + 6 + 2 + 2 + 1);
     expect(potenzial(KB, { ...pferd, kreatur: undefined }, ids).gesamt).toBe(1 + 2 + 2);
+    expect(potenzial(KB, { id: 'x', art: 'tier', name: 'x' }, []).gesamt).toBe(1);
+    expect(potenzial(KB, { id: 'x', art: 'tier', name: 'x', kreatur: 3, vertrauter: true }, []).gesamt).toBe(1 + 6 + 3);
+    expect(potenzial(KB, { id: 'x', art: 'tier', name: 'x', qualitaet: 4 }, []).gesamt).toBe(4);
+    expect(tierQualitaeten(KB).map(q => q.potenzial)).toEqual([1, 2, 4, 5, 6]);
+    expect(tierQualitaeten(K)).toEqual([]);
   });
   it('Tab: Abrichtung hinzufügen, Potenzial und Status', () => {
     kat.aktuell = KB;

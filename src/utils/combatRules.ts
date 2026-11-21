@@ -2,6 +2,7 @@ import type { Katalog } from '../regelwerk/katalog';
 import type { Eintrag } from '../regelwerk/typen';
 import type { Wirkung } from '../regelwerk/wirkungen';
 import { aktiverKatalog, meisterschaftId, norm } from '../regelwerk/bruecke';
+import { erfolgsgrade } from '../regelwerk/proben';
 
 export interface AttackEGCalculation {
   totalRoll: number;
@@ -15,18 +16,9 @@ export interface AttackEGCalculation {
 }
 
 /**
- * Calculates attack success and success degrees (Erfolgsgrade, EG)
- * according to Splittermond Grundregelwerk (GRW S. 17 & S. 158-161).
- *
- * Rules:
- * - Differenz = totalRoll - targetVTD
- * - Diff >= 0 -> Treffer!
- * - Diff 0..2 = 0 EG (Knapp gelungen)
- * - Diff 3..5 = 1 EG
- * - Diff 6..8 = 2 EG
- * - Diff 9..11 = 3 EG (+1 EG per 3 points above)
- * - Fumble (Patzer): Always failure, 0 EG
- * - Triumph (Doppel-10): Guarantees success and grants at least +1 bonus EG!
+ * Erfolg und Erfolgsgrade eines Angriffs nach den Probenregeln des Pakets (regelwerk/proben.ts, GRW S. 17–18):
+ * je volle 3 Punkte über der Verteidigung 1 EG; Patzer: immer verfehlt; Triumph: +3 EG, nur wenn der Angriff
+ * rechnerisch trifft. Die Bezeichnung ist die Einstufung des GRW („Gelungen“, „Herausragend gelungen“ …).
  */
 export function calculateAttackEG(
   totalRoll: number,
@@ -34,71 +26,16 @@ export function calculateAttackEG(
   isFumble: boolean = false,
   isCrit: boolean = false
 ): AttackEGCalculation {
-  if (isFumble) {
-    return {
-      totalRoll,
-      targetVTD,
-      differenz: totalRoll - targetVTD,
-      isSuccess: false,
-      isFumble: true,
-      isCrit: false,
-      eg: 0,
-      outcomeLabel: 'Patzer!',
-    };
-  }
-
-  const differenz = totalRoll - targetVTD;
-  let isSuccess = differenz >= 0;
-
-  if (isCrit) {
-    // Triumph always succeeds in Splittermond
-    isSuccess = true;
-  }
-
-  if (!isSuccess) {
-    const isClose = differenz >= -2;
-    return {
-      totalRoll,
-      targetVTD,
-      differenz,
-      isSuccess: false,
-      isFumble: false,
-      isCrit: false,
-      eg: 0,
-      outcomeLabel: isClose ? 'Knapp verfehlt' : 'Verfehlt',
-    };
-  }
-
-  // Base EG calculation
-  let eg = Math.max(0, Math.floor(differenz / 3));
-
-  if (isCrit) {
-    // Triumph gives minimum 1 EG and +1 extra EG
-    eg = Math.max(1, eg + 1);
-  }
-
-  let outcomeLabel = 'Treffer!';
-  if (isCrit) {
-    outcomeLabel = 'Triumph! Kritischer Treffer!';
-  } else if (eg >= 4) {
-    outcomeLabel = 'Meisterhafter Treffer!';
-  } else if (eg >= 2) {
-    outcomeLabel = 'Herausragender Treffer!';
-  } else if (eg === 1) {
-    outcomeLabel = 'Solider Treffer';
-  } else {
-    outcomeLabel = 'Knapper Treffer (0 EG)';
-  }
-
+  const r = erfolgsgrade(totalRoll, targetVTD, isFumble, isCrit);
   return {
     totalRoll,
     targetVTD,
-    differenz,
-    isSuccess: true,
-    isFumble: false,
-    isCrit,
-    eg,
-    outcomeLabel,
+    differenz: r.differenz,
+    isSuccess: r.gelungen,
+    isFumble,
+    isCrit: r.triumph,
+    eg: r.gelungen ? Math.max(0, r.eg) : 0,
+    outcomeLabel: isFumble ? `Patzer – ${r.einstufung}` : r.triumph ? `Triumph – ${r.einstufung}` : r.einstufung,
   };
 }
 
@@ -200,6 +137,8 @@ export interface ManoeverRegeln {
   streiftrefferSchaden: number;
   streiftrefferBetaeubung: number;
   freie: FreiesManoever[];
+  /** Kombination mehrerer Meisterschafts-Manöver (GRW S. 161); ohne Paket nur ein Manöver je Angriff */
+  kombination: { mehrere: boolean; gleicherWiderstand: boolean; schadenFuerAngriff: boolean; jeManoeverEinmal: boolean };
   quelle: string;
 }
 
@@ -211,6 +150,12 @@ export function manoeverRegeln(k: Katalog | null = aktiverKatalog()): ManoeverRe
     streiftrefferSchaden: r?.streiftreffer?.schaden_je_manoever ?? 2,
     streiftrefferBetaeubung: r?.streiftreffer?.betaeubung_je_manoever ?? 2,
     freie: r?.freie_manoever ?? [{ name: 'Wuchtangriff', je_eg: { schaden: 1 } }],
+    kombination: {
+      mehrere: !!r?.kombination?.mehrere,
+      gleicherWiderstand: r?.kombination?.gleicher_widerstand ?? true,
+      schadenFuerAngriff: r?.kombination?.schadenseinschraenkung_gilt_fuer_angriff ?? true,
+      jeManoeverEinmal: r?.kombination?.je_manoever_einmal ?? true,
+    },
     quelle: 'GRW S. 161',
   };
 }
@@ -226,6 +171,72 @@ export function wuchtangriffJeEg(waffenMerkmale: string | undefined, k: Katalog 
     }
   }
   return grund;
+}
+
+/** Mehrere angesagte Meisterschafts-Manöver zu einem Angriff zusammengefasst (GRW S. 161) */
+export interface ManoeverKombination {
+  manoever: CombatManeuver[];
+  /** gesamte EG-Kosten (je Manöver seine Kosten) */
+  egKosten: number;
+  widerstand: 'VTD' | 'KW' | 'GW';
+  /** Schadenseinschränkung gilt für den ganzen Angriff: kleinster Faktor */
+  damageMultiplier: number;
+  extraDamageFormulas: string[];
+  fixedExtraDamage: number;
+  zustaende: string[];
+  selbstZustaende: string[];
+  voraussetzungen: ('zielen' | 'ringend')[];
+  /** Anzahl angesagter Meisterschafts-Manöver (für Streiftreffer) */
+  angesagt: number;
+  /** zusammengefasstes Manöver für Protokoll und Rückgabe */
+  gesamt: CombatManeuver;
+}
+
+/** Darf `m` zu den bereits gewählten Manövern hinzukommen? Grund, wenn nicht. */
+export function manoeverHinzufuegbar(gewaehlt: CombatManeuver[], m: CombatManeuver, regeln: ManoeverRegeln = manoeverRegeln()): string | null {
+  if (m.type !== 'mastery') return null;
+  const meister = gewaehlt.filter((g) => g.type === 'mastery');
+  if (regeln.kombination.jeManoeverEinmal && meister.some((g) => g.id === m.id)) return 'Jedes Manöver nur einmal je Angriff';
+  if (meister.length === 0) return null;
+  if (!regeln.kombination.mehrere) return 'Nur ein Manöver je Angriff';
+  const w = meister[0].targetResistance ?? 'VTD';
+  if (regeln.kombination.gleicherWiderstand && (m.targetResistance ?? 'VTD') !== w) return `Geht gegen ${m.targetResistance}, die gewählten gegen ${w}`;
+  return null;
+}
+
+export function kombiniereManoever(gewaehlt: CombatManeuver[], regeln: ManoeverRegeln = manoeverRegeln()): ManoeverKombination {
+  const meister = gewaehlt.filter((m) => m.type === 'mastery');
+  const liste = meister.length ? meister : [STANDARDANGRIFF];
+  const mult = liste.map((m) => m.damageMultiplier ?? 1);
+  const gesamtMult = regeln.kombination.schadenFuerAngriff ? Math.min(...mult) : mult[mult.length - 1];
+  const r: Omit<ManoeverKombination, 'gesamt'> = {
+    manoever: liste,
+    egKosten: meister.reduce((s, m) => s + (m.egCost ?? 0), 0),
+    widerstand: liste[0].targetResistance ?? 'VTD',
+    damageMultiplier: gesamtMult,
+    extraDamageFormulas: liste.map((m) => m.extraDamageFormula).filter((f): f is string => !!f),
+    fixedExtraDamage: liste.reduce((s, m) => s + (m.fixedExtraDamage ?? 0), 0),
+    zustaende: liste.map((m) => m.inflictsCondition).filter((z): z is string => !!z),
+    selbstZustaende: liste.map((m) => m.selfCondition).filter((z): z is string => !!z),
+    voraussetzungen: [...new Set(liste.map((m) => m.requires).filter((v): v is 'zielen' | 'ringend' => !!v))],
+    angesagt: meister.length,
+  };
+  const gesamt: CombatManeuver = liste.length === 1 ? liste[0] : {
+    ...liste[0],
+    id: liste.map((m) => m.id).join('+'),
+    name: liste.map((m) => m.name).join(' + '),
+    description: liste.map((m) => `${m.name}: ${m.description}`).join(' '),
+    shortDesc: liste.map((m) => m.shortDesc).join(' / '),
+    egCost: r.egKosten,
+    extraDamageFormula: r.extraDamageFormulas.join(' + ') || undefined,
+    fixedExtraDamage: r.fixedExtraDamage || undefined,
+    damageMultiplier: r.damageMultiplier,
+    inflictsCondition: r.zustaende.join(', ') || undefined,
+    selfCondition: r.selbstZustaende.join(', ') || undefined,
+    jeWeiteremEg: undefined,
+    belege: liste.flatMap((m) => m.belege),
+  };
+  return { ...r, gesamt };
 }
 
 export interface AngreiferWerte { INT?: number; STA?: number; GSW?: number }
@@ -443,6 +454,10 @@ export function parseWeaponDamage(formulaStr?: string | null, fallbackType: stri
 export interface DamageRollInput {
   baseFormula: string;           // e.g. "1W6+3"
   maneuverExtraFormula?: string; // e.g. "1W6" (from Hammerschlag)
+  /** mehrere Manöver: alle Zusatzwürfel */
+  maneuverExtraFormulas?: string[];
+  /** mehrere Manöver: alle Zustände */
+  maneuverConditions?: string[];
   /** fester Zusatzschaden des Manövers (z. B. Stärke beim Würgegriff) */
   maneuverFixedDamage?: number;
   /** Betäubungsschlag: profaner Schaden wird Betäubungsschaden (GRW S. 161) */
@@ -488,13 +503,15 @@ export function executeAttackDamageRoll(input: DamageRollInput): DamageRollResul
 
   // Roll maneuver extra dice (if applicable, e.g. Hammerschlag +1W6)
   const maneuverDice: number[] = [];
-  if (input.maneuverExtraFormula) {
-    const parsedM = parseWeaponDamage(input.maneuverExtraFormula);
+  let maneuverBonus = 0;
+  for (const f of [...(input.maneuverExtraFormula ? [input.maneuverExtraFormula] : []), ...(input.maneuverExtraFormulas ?? [])]) {
+    const parsedM = parseWeaponDamage(f);
     for (let i = 0; i < parsedM.count; i++) {
       maneuverDice.push(Math.floor(Math.random() * parsedM.sides) + 1);
     }
+    maneuverBonus += parsedM.bonus;
   }
-  const maneuverDiceSum = maneuverDice.reduce((a, b) => a + b, 0);
+  const maneuverDiceSum = maneuverDice.reduce((a, b) => a + b, 0) + maneuverBonus;
 
   // Sum before multiplier
   const fest = input.maneuverFixedDamage ?? 0;
@@ -515,6 +532,7 @@ export function executeAttackDamageRoll(input: DamageRollInput): DamageRollResul
   if (input.maneuverCondition) {
     appliedConditions.push(input.maneuverCondition);
   }
+  for (const z of input.maneuverConditions ?? []) appliedConditions.push(z);
   if (input.tripCondition) {
     appliedConditions.push('Liegend');
   }
@@ -523,7 +541,7 @@ export function executeAttackDamageRoll(input: DamageRollInput): DamageRollResul
   const dicePart = `[${baseDice.join(', ')}]`;
   const bonusPart = parsed.bonus !== 0 ? (parsed.bonus > 0 ? ` + ${parsed.bonus}` : ` - ${Math.abs(parsed.bonus)}`) : '';
   const egPart = input.egBonusDamage > 0 ? ` + ${input.egBonusDamage} EG` : '';
-  const manPart = (maneuverDice.length > 0 ? ` + Manöver [${maneuverDice.join(', ')}]` : '') + (fest ? ` + ${fest} Manöver` : '');
+  const manPart = (maneuverDice.length > 0 ? ` + Manöver [${maneuverDice.join(', ')}]${maneuverBonus ? ` + ${maneuverBonus}` : ''}` : '') + (fest ? ` + ${fest} Manöver` : '');
   const multPart = (multiplier === 0.5 ? ' halbiert' : multiplier === 0 ? ' kein Schaden' : multiplier !== 1 ? ` × ${multiplier}` : '') + (abzug ? ` − ${abzug} Streiftreffer` : '');
   const armorPart = rawArmor > 0
     ? ` - ${effectiveArmor} RS${armorPen > 0 ? ` (${rawArmor} - ${armorPen} durchdrungen)` : ''}`

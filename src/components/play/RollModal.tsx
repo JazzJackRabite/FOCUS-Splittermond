@@ -21,6 +21,7 @@ import { SituativeBoni, useSituativeBoni } from './SituativeBoni';
 type RollType = 'standard' | 'safe' | 'risk';
 
 import { wuerfeln, type WurfErgebnis as RollResult } from '../../utils/wuerfeln';
+import { erfolgsgrade } from '../../regelwerk/proben';
 
 /** Stabile leere Liste: ein `= []` als Vorgabe erzeugt bei jedem Rendern ein neues Array und löst über den Effekt unten eine Endlosschleife aus. */
 const KEINE_ZAUBER: ChanneledSpell[] = [];
@@ -46,46 +47,9 @@ function calcEG(
   isFumble: boolean,
   isCrit: boolean,
 ): EGResult {
-  const differenz = total - schwierigkeit;
-  // Use truncation (not floor) so that –1/–2 diff → 0 EG (knapp misslungen)
-  let eg = Math.trunc(differenz / 3);
-
-  // Triumph only grants bonus EG when the roll also succeeds (total >= schwierigkeit)
-  const hasCritModifier = isCrit && total >= schwierigkeit;
-
-  if (isFumble) {
-    eg = Math.min(eg - 3, -1);
-  } else if (hasCritModifier) {
-    eg += 3;
-  }
-
-  let qualitaet: string;
-  let qualitaetEmoji: string;
-
-  if (eg >= 5) {
-    qualitaet = 'Herausragend gelungen';
-    qualitaetEmoji = '';
-  } else if (eg >= 1) {
-    qualitaet = 'Gelungen';
-    qualitaetEmoji = '';
-  } else if (eg === 0) {
-    // Distinguish "knapp gelungen" (diff 0–2) vs "knapp misslungen" (diff –1 to –2)
-    if (differenz >= 0) {
-      qualitaet = 'Knapp gelungen';
-      qualitaetEmoji = '';
-    } else {
-      qualitaet = 'Knapp misslungen';
-      qualitaetEmoji = '';
-    }
-  } else if (eg >= -4) {
-    qualitaet = 'Misslungen';
-    qualitaetEmoji = '';
-  } else {
-    qualitaet = 'Verheerend misslungen';
-    qualitaetEmoji = '';
-  }
-
-  return { eg, differenz, qualitaet, qualitaetEmoji, hasFumbleModifier: isFumble, hasCritModifier };
+  // Erfolgsgrade und Einstufung nach den Probenregeln des Pakets (regelwerk/proben.ts, GRW S. 17–18)
+  const r = erfolgsgrade(total, schwierigkeit, isFumble, isCrit);
+  return { eg: r.eg, differenz: r.differenz, qualitaet: r.einstufung, qualitaetEmoji: '', hasFumbleModifier: isFumble, hasCritModifier: r.triumph };
 }
 
 export interface RollModalProps {

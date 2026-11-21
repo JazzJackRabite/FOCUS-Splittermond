@@ -79,14 +79,33 @@ export function alleTiere(k: Katalog): Tiergefaehrte[] {
     .sort((a, b) => a.name.localeCompare(b.name, 'de') || a.quelle.localeCompare(b.quelle, 'de'));
 }
 
-/** Qualität gekaufter Tiere → Grundpotenzial (Bestienmeister S. 15, Tabelle „Tier / Potenzial / Preis“) */
-export const TIER_QUALITAET: { name: string; potenzial: number }[] = [
-  { name: 'Wildtier / unausgebildet / einfach', potenzial: 1 },
-  { name: 'Vielversprechend', potenzial: 2 },
-  { name: 'Hervorragend', potenzial: 4 },
-  { name: 'Prachtexemplar', potenzial: 5 },
-  { name: 'Legendär', potenzial: 6 },
-];
+/** Regeln zum Potenzial von Tieren aus dem Paket (Bestienmeister S. 15: `strukturiert.potenzial`); ohne Grimoire keine */
+export interface PotenzialRegeln {
+  grundwert: number; kreaturJePunkt: number; tiervertrauter: number;
+  qualitaeten: { name: string; potenzial: number }[];
+  meisterschaften: { ref: string; bonus: number; jeWahl?: boolean; nurKreatur?: boolean }[];
+}
+const POTENZIAL_CACHE = new WeakMap<Katalog, PotenzialRegeln | null>();
+export function potenzialRegeln(k: Katalog | null): PotenzialRegeln | null {
+  if (!k) return null;
+  if (POTENZIAL_CACHE.has(k)) return POTENZIAL_CACHE.get(k)!;
+  const p = Object.values(k.eintraege).map(e => e.daten.strukturiert?.potenzial).find(Boolean);
+  const r: PotenzialRegeln | null = p ? {
+    grundwert: p.grundwert, kreaturJePunkt: p.kreatur_je_punkt, tiervertrauter: p.tiervertrauter,
+    qualitaeten: p.qualitaeten ?? [],
+    meisterschaften: (p.meisterschaften ?? []).map((m: { ref: string; bonus: number; je_wahl?: boolean; nur_kreatur?: boolean }) => ({ ref: m.ref, bonus: m.bonus, jeWahl: m.je_wahl, nurKreatur: m.nur_kreatur })),
+  } : null;
+  POTENZIAL_CACHE.set(k, r);
+  return r;
+}
+
+/** Qualität gekaufter Tiere → Grundpotenzial; gleiche Potenziale zusammengefasst („Wildtier / Unausgebildet / Einfach“) */
+export function tierQualitaeten(k: Katalog | null): { name: string; potenzial: number }[] {
+  const r = potenzialRegeln(k); if (!r) return [];
+  const m = new Map<number, string[]>();
+  for (const q of r.qualitaeten) m.set(q.potenzial, [...(m.get(q.potenzial) ?? []), q.name]);
+  return [...m].map(([potenzial, n]) => ({ name: n.join(' / '), potenzial }));
+}
 
 export interface AbrichtungsInfo {
   id: string; name: string; gruppe: string; kosten: number; beschreibung: string;
@@ -155,15 +174,21 @@ export interface PotenzialPosten { text: string; wert: number }
 
 /** Potenzial eines Tieres (Bestienmeister S. 15) mit Aufschlüsselung */
 export function potenzial(k: Katalog, b: Begleiter, meisterschaftsIds: string[]): { gesamt: number; posten: PotenzialPosten[] } {
+  const r = potenzialRegeln(k);
+  if (!r) return { gesamt: 0, posten: [] };
   const posten: PotenzialPosten[] = [];
-  const q = TIER_QUALITAET.find(x => x.potenzial === (b.qualitaet ?? 1));
-  posten.push({ text: b.qualitaet && b.qualitaet > 1 ? `Grundwert (${q?.name ?? 'Qualität'})` : 'Grundwert', wert: b.qualitaet ?? 1 });
-  if (b.kreatur) posten.push({ text: `Ressource Kreatur ${b.kreatur}`, wert: 2 * b.kreatur });
-  if (b.vertrauter) posten.push({ text: 'Tiervertrauter', wert: 3 });
-  const anzahl = (name: string) => meisterschaftsIds.filter(i => k.get(i)?.name === name).length;
-  const ts = anzahl('Tierspezialist'); if (ts) posten.push({ text: `Tierspezialist${ts > 1 ? ` ×${ts}` : ''}`, wert: ts });
-  if (anzahl('Meister der Bestien')) posten.push({ text: 'Meister der Bestien', wert: 2 });
-  if (b.kreatur && anzahl('Meisterbändiger')) posten.push({ text: 'Meisterbändiger (Kreatur)', wert: 1 });
+  const q = tierQualitaeten(k).find(x => x.potenzial === (b.qualitaet ?? r.grundwert));
+  const grund = b.qualitaet ?? r.grundwert;
+  posten.push({ text: b.qualitaet && b.qualitaet > r.grundwert ? `Grundwert (${q?.name ?? 'Qualität'})` : 'Grundwert', wert: grund });
+  if (b.kreatur) posten.push({ text: `Ressource Kreatur ${b.kreatur}`, wert: r.kreaturJePunkt * b.kreatur });
+  if (b.vertrauter) posten.push({ text: 'Vertrauter', wert: r.tiervertrauter });
+  for (const m of r.meisterschaften) {
+    const n = meisterschaftsIds.filter(i => i === m.ref).length;
+    if (!n || (m.nurKreatur && !b.kreatur)) continue;
+    const name = k.get(m.ref)?.name ?? m.ref;
+    const mal = m.jeWahl ? n : 1;
+    posten.push({ text: `${name}${mal > 1 ? ` ×${mal}` : ''}${m.nurKreatur ? ' (Kreatur)' : ''}`, wert: m.bonus * mal });
+  }
   return { gesamt: posten.reduce((s, p) => s + p.wert, 0), posten };
 }
 

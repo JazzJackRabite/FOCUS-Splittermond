@@ -1,24 +1,7 @@
 {
   "_hinweis": "Bekannte Verstöße gegen FUNDAMENT.md. Wird nur kleiner: nach einer Umstellung mit FUNDAMENT_ALTLASTEN=schreiben npx vitest run src/fundament neu schreiben. Nie von Hand erweitern.",
   "farbwerte": {},
-  "regelnamen": [
-    "src/components/play/CastSpellModal.tsx: lichtkugel",
-    "src/components/play/HealModal.tsx: heilung",
-    "src/components/play/PlaySharedVitals.tsx: heilung",
-    "src/regelwerk/begleiter.ts: tiervertrauter",
-    "src/regelwerk/grwListen.ts: kulturkunde",
-    "src/regelwerk/wirkungen.ts: heilung",
-    "src/utils/magicRules.ts: lichtblitz",
-    "src/utils/prerequisiteValidator.ts: bevorzugte gestalt",
-    "src/utils/prerequisiteValidator.ts: entwaffnen",
-    "src/utils/prerequisiteValidator.ts: fachmann",
-    "src/utils/prerequisiteValidator.ts: geselle",
-    "src/utils/prerequisiteValidator.ts: kleintierform",
-    "src/utils/prerequisiteValidator.ts: meister",
-    "src/utils/prerequisiteValidator.ts: meisterwerk",
-    "src/utils/prerequisiteValidator.ts: tierarzt",
-    "src/utils/prerequisiteValidator.ts: tierform"
-  ],
+  "regelnamen": [],
   "paketzugriffe": [
     "src/components/creation/ErschaffungRegelwerk.tsx"
   ]
