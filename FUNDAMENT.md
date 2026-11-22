@@ -7,7 +7,7 @@ Gemini in Google AI Studio – liest diese Datei zuerst und hält sich daran.
 - Die Prüfungen in `src/fundament/__tests__/` setzen diese Datei durch. Schlägt eine fehl, ist der Code zu ändern, nicht die Prüfung.
 - Änderungen an dieser Datei entscheidet der Projektinhaber.
 
-> **Stand 22.11.2026 (Stand 36).** Teil 2 (Regelquellen) ist gegen den Code geprüft; eine Prüfung hält Tabelle und Code seitdem
+> **Stand 22.11.2026 (Stand 38).** Teil 2 (Regelquellen) ist gegen den Code geprüft; eine Prüfung hält Tabelle und Code seitdem
 > zusammen (`src/fundament/__tests__`).
 
 ---
@@ -67,7 +67,7 @@ Felder stehen unter `daten` des jeweiligen Eintrags. **Was hier nicht steht, dar
 | Zauber, Meisterschaften, Stärken, Ressourcen aus Grimoires in den Auswahllisten | `schulen`, `kosten`, `zauberdauer`, `reichweite`, `wirkungsdauer`, `wirkung`, `erfolgsgrade`, `schwelle`, `stufe`, `fertigkeit`, `manoever` | `regelwerk/bruecke.ts` |
 | Ausrüstung aus Grimoires | Ausrüstungseinträge; `modus` (ersetzt, ergänzt) | `regelwerk/ausruestung.ts` |
 | Relikte | `relikt_baukasten`, `baustein` | `regelwerk/relikte.ts` |
-| Begleiter: Tiere, beschworene Wesen, Dienste | `werte_berechnet`, `tabellenzeile`, `beschwoerbares_wesen_stufe`, `immer_verfuegbar`; Abrichtungen: `mehrfach_grenze` | `regelwerk/begleiter.ts`, `regelwerk/dienste.ts` |
+| Begleiter: Tiere, beschworene Wesen, Dienste | `werte_berechnet`, `tabellenzeile`, `beschwoerbares_wesen_stufe`, `immer_verfuegbar`; Abrichtungen: `mehrfach_grenze`, `sammel_fuer_gruppe`, `macht_reittier` | `regelwerk/begleiter.ts`, `regelwerk/dienste.ts` |
 | Begleiter: Gefolge, erhobene Untote, Golems | `strukturiert` (`gefolge`, `untote`, Golem-Regeln), `wertesaetze`, `attribute`, `modulwerte`, `modifikationen_strukturiert`, `kosten_ep`, `baustein`, `felder`, `tabellen`; Golem-Bausteine: `voraussetzung_name`, `mehrfach_aus_text`; Feinschliff: `sonderausstattung`; Animierungszauber: `golem_stufe_bis` | `regelwerk/gefolge.ts`, `regelwerk/untote.ts`, `regelwerk/golem.ts`, `regelwerk/modifikationen.ts` |
 | Begleiter: Wesen-Baukasten (beschwörbare Wesen, Kreaturen) | Einträge `wesen_baukasten_basis`, `wesen_baukasten_modul`, `wesen_baukasten_rolle`; `beschwoerbares_wesen_stufe`, `ressource_kreatur`, `stufe_bonus`, `kosten_punkte`, `mehrfach`, `gruppe`, `voraussetzungen`, `moegliche_dienste`, `modifikationen_strukturiert`; Schritt 5: `strukturiert` | `regelwerk/wesenBaukasten.ts`, `regelwerk/modifikationen.ts` |
 | Begleiter: Abrichtungen mit Zahlen, Vertraute | Abrichtungen: `modifikationen_strukturiert`, `wahlen`, `werte_hinweis`; Vertrautenmagie: `vertrautenmagie` (Meisterschaften), `typus` (Zauber) | `regelwerk/abrichtungsWerte.ts`, `regelwerk/vertraute.ts` |
@@ -191,6 +191,10 @@ Datei (`knoepfe` in `src/fundament/altlasten.json`) und lässt sie nur weniger w
 
 1. **Vor der Arbeit:** diese Datei lesen, den aktuellen Stand holen (`git pull`).
 2. **Prüfen:** `npx tsc --noEmit` und `npx vitest run` müssen ohne Fehler laufen, `npm run build` muss gelingen.
+   Mit den Büchern (nur auf dem Rechner des Projektinhabers, Pfade unter `SCR4P3`) laufen zusätzlich die lokalen Tests:
+   `FOKUS_GRIMOIRES=<Regelpakete/editor/grimoires> FOKUS_BUCHFAELLE=<Pruefsuite/editor_buchfaelle.json>
+   FOKUS_REFERENZ_VOLL=<Pruefsuite/editor_referenz_voll.json> npx vitest run`. Nach jedem Bauen der Pakete vorher
+   `python editor_referenz.py` im Ordner `Pruefsuite`. Ohne diese Variablen werden die lokalen Tests übersprungen.
 3. **Altlasten werden nur weniger.** Wer eine Ansicht umstellt oder eine Regel ins Paket verlagert, schreibt die Liste neu:
    `FUNDAMENT_ALTLASTEN=schreiben npx vitest run src/fundament`. Die Liste wird nie von Hand erweitert.
 4. **Festhalten:** Jede abgeschlossene Arbeit bekommt einen Eintrag „Stand n“ in `CLAUDE_EDITION.md` (fortlaufend

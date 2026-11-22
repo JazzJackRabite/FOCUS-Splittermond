@@ -128,10 +128,12 @@ export function mehrfachGrenze(g: { anzahl?: number; beliebig?: boolean; je_held
 /** Alle Abrichtungen im Katalog (leer ohne Grimoire „Bestienmeister“) */
 export function abrichtungen(k: Katalog): AbrichtungsInfo[] {
   const alle = Object.values(k.eintraege).filter(e => e.typ === 'abrichtung');
-  const grund = alle.find(e => e.name === 'Grundausbildung' && !e.daten.tabellenzeile);
+  // Sammel-Abrichtung einer Gruppe (Datenseite: sammel_fuer_gruppe): ihre Voraussetzungen gelten für jede Abrichtung der Gruppe
+  const grund = alle.find(e => typeof e.daten.sammel_fuer_gruppe === 'string');
+  const gruppeGrund = grund?.daten.sammel_fuer_gruppe as string | undefined;
   return alle.map(e => {
     const d = e.daten;
-    const ga = !!d.tabellenzeile || d.gruppe === 'Grundausbildungen';
+    const ga = !!d.tabellenzeile || (!!gruppeGrund && d.gruppe === gruppeGrund);
     let v = d.voraussetzungen && typeof d.voraussetzungen === 'object' && 'bedingung' in d.voraussetzungen ? d.voraussetzungen : null;
     const gv = grund?.daten.voraussetzungen;
     if (ga && gv?.bedingung) v = v ? { text: `${gv.text}, ${v.text}`, bedingung: { alle: [gv.bedingung, v.bedingung] } } : gv;
@@ -142,7 +144,7 @@ export function abrichtungen(k: Katalog): AbrichtungsInfo[] {
       grundausbildung: ga, voraussetzung: v ?? null,
       quelle: k.pakete[e.quelle.paket]?.kuerzel ?? e.quelle.paket, seite: e.quelle.buch_seiten?.[0],
     };
-  }).filter(a => !(a.name === 'Grundausbildung' && !a.grundausbildung)) // die Sammel-Abrichtung selbst nicht anbieten
+  }).filter(a => a.id !== grund?.id) // die Sammel-Abrichtung selbst nicht anbieten
     .sort((a, b) => a.gruppe.localeCompare(b.gruppe, 'de') || a.name.localeCompare(b.name, 'de'));
 }
 
@@ -193,10 +195,10 @@ export function potenzialVerbraucht(liste: AbrichtungsInfo[], gewaehlt: string[]
   return gewaehlt.reduce((s, i) => s + (m.get(i)?.kosten ?? 1), 0);
 }
 
-/** Reittier: Typus Reittier oder die Grundausbildung dafür (an der ID erkannt) */
+/** Reittier: Typus Reittier oder eine Abrichtung, nach der das Tier geritten werden kann (Datenseite: macht_reittier) */
 export function istReittier(k: Katalog, b: Begleiter): boolean {
   const e = k.get(b.id);
-  return (e ? typusListe(e).includes('Reittier') : false) || (b.abrichtungen ?? []).some(i => /reittier-i$/.test(i));
+  return (e ? typusListe(e).includes('Reittier') : false) || (b.abrichtungen ?? []).some(i => !!k.get(i)?.daten.macht_reittier);
 }
 
 /** Stufe eines beschwörbaren Wesens (null, wenn nicht angegeben) */

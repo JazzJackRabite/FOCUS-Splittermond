@@ -935,6 +935,18 @@ Bakebakeku bleiben; die eingebauten Listen in `src/data`, die Stand 33 noch erg�
   nicht auf D: geliefert, weil der PC beim Abschluss nicht erreichbar war; bis dahin regenerieren alle Begleiterarten wie der
   Abenteurer.
 
+## Stand 38 (22.11.2026): Kopfzeile am Handy, letzte Namensregeln auf der Datenseite
+
+- **Kopfzeile:** Auf schmalen Handys wurde der Zurücksetzen-Knopf abgeschnitten. Der Markenblock schrumpft jetzt, unter
+  360 px entfällt die Unterzeile, unter 430 px ist „Meine Charaktere“ nur ein Symbol (mit Beschriftung für
+  Vorleseprogramme). Geprüft bei 320, 390, 412, 768 und 1280 px.
+- **Abrichtungen:** Die Sammel-Abrichtung des Bestienmeisters und die Abrichtung, nach der ein Tier als Reittier gilt,
+  erkennt der Editor nicht mehr an Name, Gruppenname oder ID-Muster, sondern an den neuen Feldern `sammel_fuer_gruppe`
+  und `macht_reittier` (Datenseite `begleiter_werte.py`, Abschnitt `abrichtung_rollen`, mit Belegsätzen).
+- **Arbeitsweise:** Der vollständige lokale Testlauf mit allen Büchern steht jetzt im FUNDAMENT (Teil 4).
+- Tests: 508 grün mit allen Grimoires, Falldatei und Volltest, 448 ohne Bücher; Prüfsuite 0 neue Befunde, Praxistest
+  109/109; Build.
+
 ## Google AI Studio
 
 Unverändert eine Vite-/React-App mit `metadata.json` im Wurzelordner; Import über „Import from GitHub“, Hosting über Cloud Run.
