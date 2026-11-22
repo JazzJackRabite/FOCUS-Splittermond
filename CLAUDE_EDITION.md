@@ -892,6 +892,23 @@ Bakebakeku bleiben; die eingebauten Listen in `src/data`, die Stand 33 noch erg�
 - Tests: 496 grün mit allen Grimoires und Volltest, 448 ohne Bücher; Build; im Browser geprüft (Start ohne Netz,
   Spielen-Ansicht auf Handy und Desktop ohne Querscrollen).
 
+## Stand 36 (22.11.2026): Keine Buchinhalte aus Erweiterungen im Quelltext
+
+- **Tests:** Fälle aus einzelnen Grimoires (IDs, Namen, Sollwerte) stehen nicht mehr im Repository, sondern in der lokalen
+  Falldatei `Pruefsuite/editor_buchfaelle.json` (Umgebungsvariable `FOKUS_BUCHFAELLE`, Hilfsfunktion `buchfaelle()` in
+  `regelwerk/__tests__/hilfen.ts`). Umgebaut: `untoteGolems`, `begleiter`, `begleiterWerte`, `wesenBaukasten`, `zustaende`,
+  `zustandswerte`, `relikte`, `ausruestung`. Wo es ging, prüfen allgemeine Tests alle Einträge eines Grimoires statt
+  einzelner Fälle (Wirkungen auf andere Wesen: jetzt 22 Einträge statt einem; Zustände: jeder ist wählbar und nennt seine
+  Seite). Beispiele ohne Buch sind erfunden (Merkmalsnamen, Zahlen).
+- **Programmcode:** Die Merkmalskette des „robuster“-Satzes kommt jetzt aus den Daten (`robuster_kette`, Datenseite
+  `textauslese.py`) statt aus Merkmalsnamen im Editor; ohne Feinschliff-Regel steigen die LP nicht mehr pauschal.
+  Hinweistexte in Golem- und Wesen-Ansicht formulieren keine Regeln aus „Die Magie“ mehr aus (Voraussetzungen,
+  Konstruktionsproben, Ritus-Arten); Zitate aus Büchern in Kommentaren entfernt.
+- **Neue Prüfung (lokal):** sucht im ganzen `src` nach Eintragsnamen aus den Grimoires, die nicht im GRW stehen; erlaubte
+  allgemeine Begriffe stehen ebenfalls in der Falldatei.
+- Tests: 508 grün mit allen Grimoires, Falldatei und Volltest, 448 ohne Bücher; Prüfsuite 0 neue Befunde, Praxistest
+  109/109; Build.
+
 ## Google AI Studio
 
 Unverändert eine Vite-/React-App mit `metadata.json` im Wurzelordner; Import über „Import from GitHub“, Hosting über Cloud Run.

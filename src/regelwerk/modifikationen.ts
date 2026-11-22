@@ -23,11 +23,13 @@ export interface Modifikationen {
   waffenmerkmale: string[];
   /** entfallende Waffenmerkmale („Waffenmerkmal Stumpf entfällt“) */
   waffenmerkmaleWeg: string[];
-  /** „etwaiges Merkmal Zerbrechlich wird zu Schwächlich oder etwaiges Merkmal Schwächlich entfällt“ (sonst LP +1, Magie S. 207) */
+  /** wie oft die Merkmalskette angewandt wird: vorhandenes Merkmal der Kette wird zum nächsten, das letzte entfällt,
+   *  fehlen alle, steigen die LP um `robuster_lp` der Feinschliff-Regel (Datenseite: `robuster`, `robuster_kette`) */
   robuster: number;
-  /** „Merkmal Furchterregend 15 oder +5“: fehlt das Merkmal, kommt es mit Stufe `neu` dazu, sonst steigt es um `plus` */
+  robusterKette: string[];
+  /** Merkmal mit Stufe: fehlt das Merkmal, kommt es mit Stufe `neu` dazu, sonst steigt es um `plus` */
   merkmaleStufe: { name: string; neu: number; plus: number }[];
-  /** dasselbe für Waffenmerkmale aller Angriffe („Waffenmerkmal Kritisch 1 oder +1“) */
+  /** dasselbe für Waffenmerkmale aller Angriffe */
   waffenmerkmaleStufe: { name: string; neu: number; plus: number }[];
   /** nicht als feste Zahl lesbare Teile */
   rest: string[];
@@ -44,7 +46,7 @@ export interface MerkmalRegel {
 }
 
 export const leer = (): Modifikationen => ({
-  attribute: {}, abgeleitet: {}, hoechstens: {}, angriff: 0, schaden: 0, wgs: 0, fertigkeiten: {}, merkmaleDazu: [], merkmaleWeg: [], waffenmerkmale: [], waffenmerkmaleWeg: [], robuster: 0, merkmaleStufe: [], waffenmerkmaleStufe: [], rest: [],
+  attribute: {}, abgeleitet: {}, hoechstens: {}, angriff: 0, schaden: 0, wgs: 0, fertigkeiten: {}, merkmaleDazu: [], merkmaleWeg: [], waffenmerkmale: [], waffenmerkmaleWeg: [], robuster: 0, robusterKette: [], merkmaleStufe: [], waffenmerkmaleStufe: [], rest: [],
 });
 
 const zahl = (s: string) => Number(s.replace(/[−–]/g, '-').replace('+', ''));
@@ -72,7 +74,7 @@ export type WahlRoh =
 /** Feld `modifikationen_strukturiert` im Paket */
 export interface ModifikationenStruktur {
   attribute?: Record<string, number>; abgeleitet?: Record<string, number>; hoechstens?: Record<string, number>; fertigkeiten?: Record<string, number>;
-  angriff?: number; schaden?: number; wgs?: number; robuster?: number;
+  angriff?: number; schaden?: number; wgs?: number; robuster?: number; robuster_kette?: string[];
   merkmale_dazu?: string[]; merkmale_weg?: string[]; waffenmerkmale?: string[]; waffenmerkmale_weg?: string[];
   merkmale_stufe?: { name: string; neu: number; plus: number }[]; waffenmerkmale_stufe?: { name: string; neu: number; plus: number }[];
   wahlen?: WahlRoh[]; feste_meisterschaften?: string[]; text?: string[];
@@ -86,7 +88,7 @@ export function ausStruktur(s: ModifikationenStruktur | null | undefined): Modif
   for (const [a, v] of Object.entries(s.abgeleitet ?? {})) plus(m.abgeleitet, a, v);
   for (const [a, v] of Object.entries(s.fertigkeiten ?? {})) plus(m.fertigkeiten, a, v);
   Object.assign(m.hoechstens, s.hoechstens ?? {});
-  m.angriff = s.angriff ?? 0; m.schaden = s.schaden ?? 0; m.wgs = s.wgs ?? 0; m.robuster = s.robuster ?? 0;
+  m.angriff = s.angriff ?? 0; m.schaden = s.schaden ?? 0; m.wgs = s.wgs ?? 0; m.robuster = s.robuster ?? 0; m.robusterKette = [...(s.robuster_kette ?? [])];
   m.merkmaleDazu = [...(s.merkmale_dazu ?? [])]; m.merkmaleWeg = [...(s.merkmale_weg ?? [])];
   m.waffenmerkmale = [...(s.waffenmerkmale ?? [])]; m.waffenmerkmaleWeg = [...(s.waffenmerkmale_weg ?? [])];
   m.merkmaleStufe = [...(s.merkmale_stufe ?? [])]; m.waffenmerkmaleStufe = [...(s.waffenmerkmale_stufe ?? [])];
@@ -103,7 +105,7 @@ export function summe(...liste: Modifikationen[]): Modifikationen {
     for (const [a, v] of Object.entries(m.fertigkeiten)) plus(s.fertigkeiten, a, v);
     for (const [a, v] of Object.entries(m.hoechstens)) s.hoechstens[a] = Math.min(s.hoechstens[a] ?? Infinity, v);
     s.angriff += m.angriff; s.schaden += m.schaden; s.wgs += m.wgs;
-    s.merkmaleDazu.push(...m.merkmaleDazu); s.merkmaleWeg.push(...m.merkmaleWeg); s.waffenmerkmale.push(...m.waffenmerkmale); s.waffenmerkmaleWeg.push(...m.waffenmerkmaleWeg); s.robuster += m.robuster; s.merkmaleStufe.push(...m.merkmaleStufe); s.waffenmerkmaleStufe.push(...m.waffenmerkmaleStufe); s.rest.push(...m.rest);
+    s.merkmaleDazu.push(...m.merkmaleDazu); s.merkmaleWeg.push(...m.merkmaleWeg); s.waffenmerkmale.push(...m.waffenmerkmale); s.waffenmerkmaleWeg.push(...m.waffenmerkmaleWeg); s.robuster += m.robuster; if (!s.robusterKette.length) s.robusterKette = [...m.robusterKette]; s.merkmaleStufe.push(...m.merkmaleStufe); s.waffenmerkmaleStufe.push(...m.waffenmerkmaleStufe); s.rest.push(...m.rest);
   }
   return s;
 }
@@ -233,10 +235,12 @@ export function anwenden(k: Katalog, w: Werteblock, m: Modifikationen, regel?: M
   if (regel) merkmale = merkmaleZusammenfuehren([...merkmale, ...m.merkmaleDazu.filter(x => !m.merkmaleWeg.some(y => grund(y) === grund(x)))], regel);
   else for (const x of m.merkmaleDazu) if (!merkmale.some(y => y === x)) merkmale = [...merkmale, x];
   for (const x of m.merkmaleStufe) merkmale = stufeAnwenden(merkmale, x);
+  const kette = m.robusterKette;
   for (let i = 0; i < m.robuster; i++) {
-    if (merkmale.includes('Zerbrechlich')) merkmale = merkmale.map(x => (x === 'Zerbrechlich' ? 'Schwächlich' : x));
-    else if (merkmale.includes('Schwächlich')) merkmale = merkmale.filter(x => x !== 'Schwächlich');
-    else if (abgeleitet.LP !== undefined) abgeleitet.LP += regel?.robuster_lp ?? 1;
+    const j = kette.findIndex(x => merkmale.includes(x));
+    if (j >= 0 && j < kette.length - 1) merkmale = merkmale.map(x => (x === kette[j] ? kette[j + 1] : x));
+    else if (j >= 0) merkmale = merkmale.filter(x => x !== kette[j]);
+    else if (abgeleitet.LP !== undefined) abgeleitet.LP += regel?.robuster_lp ?? 0;
   }
   return { ...w, attribute, abgeleitet, waffen, fertigkeiten, merkmale };
 }

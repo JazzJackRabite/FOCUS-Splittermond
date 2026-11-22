@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import fs from 'node:fs';
 import { Katalog } from '../katalog';
 import { erstelleKatalog, grimoireLesen } from '../laden';
-import { basisAusDateien, grimoireDatei } from './hilfen';
+import { basisAusDateien, buchfaelle, grimoireDatei } from './hilfen';
 import { fokusDurchZustaende, mitZustaenden, textMitZustaenden, zustandswerte } from '../zustandswerte';
 import React from 'react';
 import { render, screen } from '@testing-library/react';
@@ -53,14 +53,13 @@ describe('Zustände und abgeleitete Werte (GRW S. 168–169)', () => {
     expect(getConditionMalus(z('Geblendet', 1), { bereich: 'allgemein' })?.vorausgewaehlt).toBe(false);
   });
 
-  const buecher = ['schleier', 'jenseits', 'goetter'].map((id) => grimoireDatei(id));
-  it.skipIf(buecher.some((b) => !b || !fs.existsSync(b)))('Zustände aus Grimoires: Schwermut, Übergangsschock, Erschaudert, Verstoßen', () => {
-    const { katalog: k } = erstelleKatalog(basis, buecher.map((b) => grimoireLesen(fs.readFileSync(b, 'utf-8'), basis.manifest)));
-    const zw = zustandswerte([z('Schwermut'), z('Übergangsschock', 2), z('Erschaudert', 1)], k);
-    expect(mitZustaenden('GW', 20, zw)).toBe(15); // −2 −2 −1
-    expect(mitZustaenden('VTD', 20, zw)).toBe(18);
-    expect(fokusDurchZustaende(13, zustandswerte([z('Verstoßen', 1)], k))).toBe(3);
-    expect(fokusDurchZustaende(13, zustandswerte([z('Verstoßen', 4)], k))).toBe(13);
+  // Fälle aus den Grimoires stehen in der lokalen Falldatei (hilfen.ts: buchfaelle)
+  const F = buchfaelle<{ grimoires: string[]; kombination: { zustaende: [string, number][]; werte: [string, number, number][] }; fokus: [string, number, number, number][] }>('zustandswerte', ['schleier', 'jenseits', 'goetter']);
+  it.skipIf(!F)('Zustände aus Grimoires auf Werte und Fokus (lokal)', () => {
+    const { katalog: k } = erstelleKatalog(basis, F!.grimoires.map((g) => grimoireLesen(fs.readFileSync(grimoireDatei(g), 'utf-8'), basis.manifest)));
+    const zw = zustandswerte(F!.kombination.zustaende.map(([n, l]) => z(n, l || undefined)), k);
+    for (const [wert, grund, soll] of F!.kombination.werte) expect(mitZustaenden(wert as never, grund, zw), wert).toBe(soll);
+    for (const [n, l, grund, soll] of F!.fokus) expect(fokusDurchZustaende(grund, zustandswerte([z(n, l)], k)), `${n} ${l}`).toBe(soll);
   });
 });
 

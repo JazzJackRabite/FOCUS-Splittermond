@@ -14,7 +14,7 @@ import { BegleiterView } from '../../features/begleiter/BegleiterView';
 import { kreaturZuordnung } from '../../components/begleiter/besitzer';
 import { validateCharacterImport } from '../../utils/importValidation';
 import { Katalog } from '../katalog';
-import { abschliessen, basisAusDateien, begleiterErstellen, blattWaehlen, grimoireDatei, weiter } from './hilfen';
+import { abschliessen, basisAusDateien, begleiterErstellen, blattWaehlen, buchfaelle, grimoireDatei, weiter } from './hilfen';
 import { erstelleKatalog, grimoireLesen } from '../laden';
 import { bedingungsCharakter } from '../bruecke';
 import {
@@ -139,74 +139,80 @@ describe('Tab „Begleiter“ (nur GRW)', () => {
 });
 
 
-const MAGIE = grimoireDatei('magie');
-const BESTIEN = grimoireDatei('bestien');
+// Namen, Anzahlen und Sollwerte zu den Grimoires: lokale Falldatei (hilfen.ts: buchfaelle)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const FM = buchfaelle<any>('begleiter', ['magie']);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const FB = buchfaelle<any>('begleiter', ['bestien']);
+const lade = (g: string) => grimoireLesen(fs.readFileSync(grimoireDatei(g), 'utf-8'), b.manifest);
 
-describe.skipIf(!MAGIE || !fs.existsSync(MAGIE))('Beschworene Wesen mit „Die Magie“ (lokal)', () => {
+describe.skipIf(!FM)('Beschworene Wesen (lokal)', () => {
   it('Wesen und Dienste: Basisdienste für alle, erweiterte nur mit passender Meisterschaft', () => {
-    const { katalog: KM } = erstelleKatalog(b, [grimoireLesen(fs.readFileSync(MAGIE, 'utf-8'), b.manifest)]);
+    const { katalog: KM } = erstelleKatalog(b, [lade('magie')]);
     const w = beschwoerbareWesen(KM);
-    expect(w.length).toBe(62); // ohne die drei Korpusse des Wesen-Baukastens (Klein, Mittel, Groß)
-    const aschling = w.find(x => x.name === 'Aschling')!;
-    const ohne = diensteFuer(KM, aschling.id, {});
+    expect(w.length).toBe(FM.wesen.anzahl); // ohne die Korpusse des Wesen-Baukastens
+    const ohne = diensteFuer(KM, w.find(x => x.name === FM.wesen.beispiel)!.id, {});
     expect(ohne.length).toBeGreaterThan(0);
     expect(ohne.every(d => d.art !== 'erweitert')).toBe(true);
   });
 });
 
-describe.skipIf(!BESTIEN || !fs.existsSync(BESTIEN))('Abrichtungen mit „Bestienmeister“ (lokal)', () => {
+describe.skipIf(!FB)('Abrichtungen und Potenzial (lokal)', () => {
   let KB = K; let liste: ReturnType<typeof abrichtungen> = [];
   beforeAll(() => {
-    KB = erstelleKatalog(b, [grimoireLesen(fs.readFileSync(BESTIEN, 'utf-8'), b.manifest)]).katalog;
+    KB = erstelleKatalog(b, [lade('bestien')]).katalog;
     liste = abrichtungen(KB);
   });
   const A = (n: string) => liste.find(a => a.name === n)!;
+  const AB = FB?.abrichtungen; const P = FB?.potenzial; const W = FB?.wahl;
   const pferd: Begleiter = { id: 'grw:kreatur:pferd', art: 'tier', name: 'Pferd', kreatur: 3 };
   const wolf: Begleiter = { id: 'grw:kreatur:wolf', art: 'tier', name: 'Wolf', kreatur: 4 };
   const fuehrer = (...ms: string[]) => bedingungsCharakter(KB, {
     meisterschaften: ms.map(name => ({ id: name, name, tier: 1, cost: 0, isFree: false, isCreationBonus: false, source: 'test', skill: 'Tierführung' })), fertigkeiten: { Tierführung: 9 },
   });
 
-  it('63 Abrichtungen ohne die Sammel-Abrichtung „Grundausbildung“; Grundausbildungen kosten 1 und brauchen Dompteur', () => {
-    expect(liste.length).toBe(63);
-    expect(liste.some(a => a.name === 'Grundausbildung')).toBe(false);
-    const r1 = A('Reittier I');
-    expect(r1.grundausbildung).toBe(true);
-    expect(r1.kosten).toBe(1);
-    expect(r1.voraussetzung?.text).toMatch(/Dompteur.*Typus Reittier/);
-    expect(A('Kleiner Trick').kosten).toBe(0);
-    expect(A('Kämpfer').hoechstens).toBe(4);
+  it('Liste ohne die Sammel-Abrichtung; Grundausbildungen kosten 1 und brauchen Dompteur', () => {
+    expect(liste.length).toBe(AB.anzahl);
+    expect(liste.some(a => a.name === AB.sammel)).toBe(false);
+    const g = A(AB.grund.name);
+    expect(g.grundausbildung).toBe(true);
+    expect(g.kosten).toBe(AB.grund.kosten);
+    expect(g.voraussetzung?.text).toMatch(new RegExp(AB.grund.voraussetzung));
+    expect(A(AB.kostenlos).kosten).toBe(0);
+    expect(A(AB.gestaffelt.name).hoechstens).toBe(AB.gestaffelt.hoechstens);
   });
-  it('Reittier I: Dompteur beim Führer und Typus Reittier beim Tier', () => {
-    expect(pruefeAbrichtung(KB, A('Reittier I'), fuehrer(), tierTraeger(KB, pferd))).toBe(false);
-    expect(pruefeAbrichtung(KB, A('Reittier I'), fuehrer('Dompteur'), tierTraeger(KB, pferd))).toBe(true);
-    expect(pruefeAbrichtung(KB, A('Reittier I'), fuehrer('Dompteur'), tierTraeger(KB, wolf))).toBe(false);
+  it('Grundausbildung: Dompteur beim Führer und Typus Reittier beim Tier', () => {
+    const g = A(AB.grund.name);
+    expect(pruefeAbrichtung(KB, g, fuehrer(), tierTraeger(KB, pferd))).toBe(false);
+    expect(pruefeAbrichtung(KB, g, fuehrer('Dompteur'), tierTraeger(KB, pferd))).toBe(true);
+    expect(pruefeAbrichtung(KB, g, fuehrer('Dompteur'), tierTraeger(KB, wolf))).toBe(false);
   });
-  it('Schlachtross braucht Reittier I beim Tier', () => {
-    const mit = { ...pferd, abrichtungen: [A('Reittier I').id] };
-    expect(pruefeAbrichtung(KB, A('Schlachtross'), fuehrer('Dompteur'), tierTraeger(KB, pferd))).toBe(false);
-    expect(pruefeAbrichtung(KB, A('Schlachtross'), fuehrer('Dompteur'), tierTraeger(KB, mit))).toBe(true);
-    expect(istReittier(KB, { ...wolf, abrichtungen: [A('Reittier I').id] })).toBe(true);
+  it('aufbauende Abrichtung braucht die Grundausbildung beim Tier', () => {
+    const mit = { ...pferd, abrichtungen: [A(AB.grund.name).id] };
+    expect(pruefeAbrichtung(KB, A(AB.aufbauend), fuehrer('Dompteur'), tierTraeger(KB, pferd))).toBe(false);
+    expect(pruefeAbrichtung(KB, A(AB.aufbauend), fuehrer('Dompteur'), tierTraeger(KB, mit))).toBe(true);
+    expect(istReittier(KB, { ...wolf, abrichtungen: [A(AB.grund.name).id] })).toBe(true);
   });
-  it('Kämpfer gestaffelt: zweite Wahl braucht Kampfabrichter II', () => {
-    const tier = tierTraeger(KB, { ...wolf, abrichtungen: [A('Kampfgefährte').id] });
-    expect(pruefeAbrichtung(KB, A('Kämpfer'), fuehrer('Kampfabrichter I'), tier, 0)).toBe(true);
-    expect(pruefeAbrichtung(KB, A('Kämpfer'), fuehrer('Kampfabrichter I'), tier, 1)).toBe(false);
-    expect(pruefeAbrichtung(KB, A('Kämpfer'), fuehrer('Kampfabrichter I', 'Kampfabrichter II'), tier, 1)).toBe(true);
+  it('gestaffelte Abrichtung: zweite Wahl braucht die höhere Meisterschaft', () => {
+    const st = AB.gestaffelt;
+    const tier = tierTraeger(KB, { ...wolf, abrichtungen: [A(st.vorher).id] });
+    expect(pruefeAbrichtung(KB, A(st.name), fuehrer(st.stufe1), tier, 0)).toBe(true);
+    expect(pruefeAbrichtung(KB, A(st.name), fuehrer(st.stufe1), tier, 1)).toBe(false);
+    expect(pruefeAbrichtung(KB, A(st.name), fuehrer(st.stufe1, st.stufe2), tier, 1)).toBe(true);
   });
-  it('Potenzial mit Tierspezialist, Meister der Bestien und Meisterbändiger', () => {
-    const ids = ['Tierspezialist', 'Tierspezialist', 'Meister der Bestien', 'Meisterbändiger']
-      .map(n => Object.values(KB.eintraege).find(e => e.typ === 'meisterschaft' && e.name === n)!.id);
-    expect(potenzial(KB, pferd, ids).gesamt).toBe(1 + 6 + 2 + 2 + 1);
-    expect(potenzial(KB, { ...pferd, kreatur: undefined }, ids).gesamt).toBe(1 + 2 + 2);
-    expect(potenzial(KB, { id: 'x', art: 'tier', name: 'x' }, []).gesamt).toBe(1);
-    expect(potenzial(KB, { id: 'x', art: 'tier', name: 'x', kreatur: 3, vertrauter: true }, []).gesamt).toBe(1 + 6 + 3);
-    expect(potenzial(KB, { id: 'x', art: 'tier', name: 'x', qualitaet: 4 }, []).gesamt).toBe(4);
-    expect(tierQualitaeten(KB).map(q => q.potenzial)).toEqual([1, 2, 4, 5, 6]);
+  it('Potenzial mit Meisterschaften, Kreatur, Vertrauter und Qualität', () => {
+    const ids = (P.meisterschaften as string[]).map(n => Object.values(KB.eintraege).find(e => e.typ === 'meisterschaft' && e.name === n)!.id);
+    expect(potenzial(KB, pferd, ids).gesamt).toBe(P.mitKreatur3);
+    expect(potenzial(KB, { ...pferd, kreatur: undefined }, ids).gesamt).toBe(P.ohneKreatur);
+    expect(potenzial(KB, { id: 'x', art: 'tier', name: 'x' }, []).gesamt).toBe(P.grund);
+    expect(potenzial(KB, { id: 'x', art: 'tier', name: 'x', kreatur: 3, vertrauter: true }, []).gesamt).toBe(P.vertrauterKreatur3);
+    expect(potenzial(KB, { id: 'x', art: 'tier', name: 'x', qualitaet: 4 }, []).gesamt).toBe(P.qualitaet4);
+    expect(tierQualitaeten(KB).map(q => q.potenzial)).toEqual(P.qualitaeten);
     expect(tierQualitaeten(K)).toEqual([]);
   });
   it('Tab: Abrichtung hinzufügen, Potenzial und Status', () => {
     kat.aktuell = KB;
+    const name = AB.grund.name as string; const max = P.kreatur3;
     render(<Rahmen start={{
       resourcesList: [{ name: 'Kreatur', level: 3, source: 'test' }],
       begleiter: [pferd],
@@ -216,24 +222,24 @@ describe.skipIf(!BESTIEN || !fs.existsSync(BESTIEN))('Abrichtungen mit „Bestie
     weiter(); // Grundangaben → Abrichtungen
     const d = screen.getByTestId('begleiter-assistent');
     const sel = screen.getByLabelText('Abrichtung wählen') as HTMLSelectElement;
-    const r1 = [...sel.options].find(o => o.text.includes('Reittier I ('))!;
+    const r1 = [...sel.options].find(o => o.text.startsWith(`${name} (`))!;
     expect(r1.text).not.toMatch(/Voraussetzung fehlt|Spielleitung/); // erfüllt: kein Zusatz (keine Symbole, FUNDAMENT)
     fireEvent.change(sel, { target: { value: r1.value } });
     fireEvent.click(screen.getByRole('button', { name: /Abrichtung hinzufügen/ }));
-    expect(within(d).getByText('Potenzial 1/7')).toBeTruthy();
+    expect(within(d).getByText(`Potenzial 1/${max}`)).toBeTruthy();
     expect([...sel.options].find(o => o.value === r1.value)!.disabled).toBe(true);
     expect(within(d).getByText('erfüllt')).toBeTruthy();
-    fireEvent.click(screen.getByLabelText('Abrichtung Reittier I entfernen'));
-    expect(within(d).getByText('Potenzial 0/7')).toBeTruthy();
+    fireEvent.click(screen.getByLabelText(`Abrichtung ${name} entfernen`));
+    expect(within(d).getByText(`Potenzial 0/${max}`)).toBeTruthy();
     fireEvent.change(sel, { target: { value: r1.value } });
     fireEvent.click(screen.getByRole('button', { name: /Abrichtung hinzufügen/ }));
     abschliessen();
     const blatt = screen.getByTestId('begleiter-blatt');
-    expect(within(blatt).getByText('Potenzial 1/7')).toBeTruthy();
-    expect(within(blatt).getByRole('button', { name: 'Reittier I' })).toBeTruthy();
+    expect(within(blatt).getByText(`Potenzial 1/${max}`)).toBeTruthy();
+    expect(within(blatt).getByRole('button', { name })).toBeTruthy();
     kat.aktuell = K;
   });
-  it('Tab: Vertrauter erstellen, Abrichtung mit Wahl (Gefestigt) wirkt auf das Blatt', () => {
+  it('Tab: Vertrauter erstellen, Abrichtung mit Wahl wirkt auf das Blatt', () => {
     kat.aktuell = KB;
     const { unmount } = render(<Rahmen start={{}} />);
     fireEvent.click(screen.getByRole('button', { name: /^Begleiter erstellen$/ }));
@@ -248,18 +254,17 @@ describe.skipIf(!BESTIEN || !fs.existsSync(BESTIEN))('Abrichtungen mit „Bestie
     expect((within(d).getByLabelText(/^Vertrauter/) as HTMLInputElement).checked).toBe(true);
     weiter(); // → Abrichtungen
     const ab = within(d).getByLabelText('Abrichtung wählen') as HTMLSelectElement;
-    fireEvent.change(ab, { target: { value: [...ab.options].find(o => o.text.startsWith('Gefestigt ('))!.value } });
+    fireEvent.change(ab, { target: { value: [...ab.options].find(o => o.text.startsWith(`${W.abrichtung} (`))!.value } });
     setzeHausregeln(true); // Voraussetzungen des Führers hier nicht erfüllt
     fireEvent.click(within(d).getByRole('button', { name: /Abrichtung hinzufügen/ }));
     setzeHausregeln(false);
-    fireEvent.change(within(d).getByLabelText('Gefestigt: Merkmal'), { target: { value: '2' } }); // Feigling entfällt
+    fireEvent.change(within(d).getByLabelText(W.feld), { target: { value: W.wert } });
     abschliessen();
     const blatt = screen.getByTestId('begleiter-blatt');
     expect(within(blatt).getAllByText('Vertrauter').length).toBeGreaterThan(0);
     expect(within(blatt).getByText('Vertrautenmagie')).toBeTruthy();
     expect(within(blatt).getByText(/Noch nichts gelernt/)).toBeTruthy();
-    const merkmale = within(blatt).getByText('Merkmale').parentElement!.textContent!;
-    expect(merkmale).not.toMatch(/Feigling/);
+    expect(within(blatt).getByText('Merkmale').parentElement!.textContent!).not.toContain(W.merkmalWeg);
     expect(within(blatt).getByText(/Boni der Abrichtungen sind in Werten/)).toBeTruthy();
     kat.aktuell = K;
   });

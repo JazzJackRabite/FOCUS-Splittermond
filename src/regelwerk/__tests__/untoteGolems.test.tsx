@@ -1,5 +1,6 @@
 /**
- * Begleiter Teil 3: Modifikationen-Texte, erhobene Untote und Golems (Die Magie S. 182–184, 197–207; lokal mit FOKUS_GRIMOIRES).
+ * Begleiter Teil 3: Modifikationen, erhobene Untote und Golems. Die Beispiele ohne Grimoires sind erfunden; die Fälle aus
+ * „Die Magie“ (IDs, Namen, Sollwerte) stehen in der lokalen Falldatei (FOKUS_BUCHFAELLE, hilfen.ts: buchfaelle).
  */
 import { setzeHausregeln } from '../../fundament/hausregeln';
 import React from 'react';
@@ -12,7 +13,7 @@ import { CharacterContext } from '../../context/CharacterContext';
 import { BegleiterView } from '../../features/begleiter/BegleiterView';
 import { validateCharacterImport } from '../../utils/importValidation';
 import { Katalog } from '../katalog';
-import { abschliessen, basisAusDateien, begleiterErstellen, grimoireDatei, weiter } from './hilfen';
+import { abschliessen, basisAusDateien, begleiterErstellen, buchfaelle, grimoireDatei, weiter } from './hilfen';
 import { erstelleKatalog, grimoireLesen } from '../laden';
 import { anwenden, ausStruktur, iniPlus, schadenPlus, werteblock } from '../modifikationen';
 import { attributKosten, erhebungen, fertigkeitKosten, freieSchwelle, grenzHeldengrad, untotWerte, ANGRIFF } from '../untote';
@@ -26,26 +27,31 @@ vi.mock('../RegelwerkContext', () => ({ useRegelwerk: () => ({ katalog: kat.aktu
 describe('Modifikationen-Texte', () => {
   // Das Auslesen der Texte macht die Datenseite (Werkzeuge/regelpakete/textauslese.py, mit Selbsttest beim Bau)
   it('übernimmt das Feld modifikationen_strukturiert', () => {
-    const m = ausStruktur({ attribute: { KON: 1, 'STÄ': 1 }, abgeleitet: { LP: 1, VTD: 2, SR: 2, INI: -1, GK: 1 }, hoechstens: { GK: 7 }, angriff: 1, schaden: 2, wgs: 2,
-      fertigkeiten: { 'grw:fertigkeit:athletik': 2 }, merkmale_dazu: ['Dämmersicht'], merkmale_weg: ['Pazifist'], waffenmerkmale: ['Wuchtig'],
-      wahlen: [{ art: 'attribut', optionen: ['AUS'], bonus: 1, text: 'ein beliebiges Attribut +1' }], text: ['Sonderregel'] });
-    expect(m.attribute).toEqual({ KON: 1, 'STÄ': 1 });
-    expect(m.hoechstens).toEqual({ GK: 7 });
-    expect([m.angriff, m.schaden, m.wgs]).toEqual([1, 2, 2]);
-    expect(m.merkmaleDazu).toEqual(['Dämmersicht']);
-    expect(m.rest).toEqual(['ein beliebiges Attribut +1', 'Sonderregel']);
+    const m = ausStruktur({ attribute: { BEW: 2, 'STÄ': 1 }, abgeleitet: { LP: 3, VTD: 1, SR: 1, INI: -2, GK: 1 }, hoechstens: { GK: 6 }, angriff: 3, schaden: 1, wgs: 1,
+      fertigkeiten: { 'grw:fertigkeit:athletik': 1 }, merkmale_dazu: ['Laut'], merkmale_weg: ['Friedlich'], waffenmerkmale: ['Spitz'],
+      wahlen: [{ art: 'attribut', optionen: ['AUS'], bonus: 1, text: 'eine Wahl' }], text: ['Sonderregel'] });
+    expect(m.attribute).toEqual({ BEW: 2, 'STÄ': 1 });
+    expect(m.hoechstens).toEqual({ GK: 6 });
+    expect([m.angriff, m.schaden, m.wgs]).toEqual([3, 1, 1]);
+    expect(m.merkmaleDazu).toEqual(['Laut']);
+    expect(m.rest).toEqual(['eine Wahl', 'Sonderregel']);
     expect(ausStruktur(undefined).rest).toEqual([]);
   });
-  it('wendet an: Waffen, Initiative, Zerbrechlich → Schwächlich, Obergrenze', () => {
+  it('wendet an: Waffen, Initiative, Merkmalskette aus den Daten, Obergrenze', () => {
     const w = werteblock(K, {
-      attribute: { KON: '2' }, abgeleitete_werte: { GK: '7', LP: '5', SR: '0' }, merkmale: 'Pazifist, Zerbrechlich',
+      attribute: { KON: '2' }, abgeleitete_werte: { GK: '7', LP: '5', SR: '0' }, merkmale: 'Friedlich, Spröde',
       waffen: [{ name: 'Körper', wert: '4', schaden: '1W10', wgs: '8', ini: '9−1W6', merkmale: '–' }],
     });
-    const m = ausStruktur({ abgeleitet: { GK: 1, INI: -2 }, hoechstens: { GK: 7 }, angriff: 2, schaden: 1, merkmale_weg: ['Pazifist'], robuster: 1 });
+    const m = ausStruktur({ abgeleitet: { GK: 1, INI: -2 }, hoechstens: { GK: 7 }, angriff: 2, schaden: 1, merkmale_weg: ['Friedlich'], robuster: 1, robuster_kette: ['Spröde', 'Schwach'] });
     const r = anwenden(K, w, m);
     expect(r.abgeleitet.GK).toBe(7);
     expect(r.waffen[0]).toMatchObject({ wert: 6, schaden: '1W10+1', ini: '7−1W6' });
-    expect(r.merkmale).toEqual(['Schwächlich']);
+    expect(r.merkmale).toEqual(['Schwach']);
+    // zweimal: das letzte Glied der Kette entfällt; danach LP nach der Feinschliff-Regel (ohne Regel: keine)
+    expect(anwenden(K, w, { ...m, robuster: 2 }).merkmale).toEqual([]);
+    const regel = { ersetzen: [], stufen_addieren: false, andere_doppelte_entfallen: false, beide_entfallen: [], robuster_lp: 2 };
+    expect(anwenden(K, w, { ...m, robuster: 3 }, regel).abgeleitet.LP).toBe(5 + 2);
+    expect(anwenden(K, w, { ...m, robuster: 3 }).abgeleitet.LP).toBe(5);
     expect(schadenPlus('2W6+3', -4)).toBe('2W6−1');
     expect(iniPlus('8−1W6', -1)).toBe('7−1W6');
   });
@@ -72,148 +78,138 @@ describe('Untote: Regeln', () => {
   });
 });
 
-const MAGIE = grimoireDatei('magie');
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const F = buchfaelle<any>('untoteGolems', ['magie']);
 
-describe.skipIf(!MAGIE || !fs.existsSync(MAGIE))('Untote und Golems mit „Die Magie“ (lokal)', () => {
+describe.skipIf(!F)('Untote und Golems mit Grimoire (lokal)', () => {
   let KM = K;
-  beforeAll(() => { KM = erstelleKatalog(b, [grimoireLesen(fs.readFileSync(MAGIE, 'utf-8'), b.manifest)]).katalog; });
+  beforeAll(() => { KM = erstelleKatalog(b, F.grimoires.map((g: string) => grimoireLesen(fs.readFileSync(grimoireDatei(g), 'utf-8'), b.manifest))).katalog; });
+  const bid = (n: string) => Object.values(KM.eintraege).find(e => e.typ === 'golem_baustein' && e.name === n)!.id;
   it('Grenze der neuen Punkte nach Zaubergrad (aus dem Paket)', () => {
-    expect([1, 2, 3, 4, 5].map(n => grenzHeldengrad(KM, n))).toEqual([1, 1, 2, 3, 4]);
+    expect([1, 2, 3, 4, 5].map(n => grenzHeldengrad(KM, n))).toEqual(F.grenze);
   });
 
-  it('Erhebungszauber, Gruftkatze: Verstand 0, Steigerung wirkt auf abgeleitete Werte, Abnormität', () => {
-    expect(erhebungen(KM).map(x => x.zauber.name)).toEqual(['Totentier', 'Untote erheben', 'Grabesbestie', 'Der letzte Ruf']);
-    const katze: Begleiter = { id: 'magie:kreatur:gruftkatze', art: 'untoter', name: 'Gruftkatze', erhebung: 'magie:zauber:totentier', verstaerkungen: 2,
-      steigerung: { attribute: { KON: 1 }, fertigkeiten: { 'grw:fertigkeit:wahrnehmung': 2 } }, abnormitaet: 'magie:abnormitaet:modernder-panzer' };
-    const u = untotWerte(KM, katze, { nekromant: false, meisterDerAbnormitaeten: true });
-    // Gruftkatze: KON 1, LP 3, KW 15, VTD 18, SR 0, Wahrnehmung 7
-    expect(u.werte!.attribute).toMatchObject({ KON: 2, VER: 0 });
-    expect(u.werte!.abgeleitet).toMatchObject({ LP: 4, KW: 16, VTD: 20, SR: 2 }); // +KON; Modernder Panzer VTD +2, SR +2
-    expect(u.werte!.fertigkeiten.find(f => f.name === 'Wahrnehmung')?.wert).toBe(7 + 2);
-    expect(u.epGesamt).toBe(20);
-    expect(u.epVerbraucht).toBe(10 + 6 + 5);
-    expect(u.hinweise).toEqual(expect.arrayContaining([expect.stringMatching(/Nekromant/), expect.stringMatching(/21 EP verteilt/)]));
+  it('Erhebungszauber; Untoter: Steigerung wirkt auf abgeleitete Werte, Abnormität, EP', () => {
+    expect(erhebungen(KM).map(x => x.zauber.name)).toEqual(F.erhebungen);
+    const U = F.untot;
+    const u = untotWerte(KM, { id: U.id, art: 'untoter', name: U.name, erhebung: U.erhebung, verstaerkungen: U.verstaerkungen, steigerung: U.steigerung, abnormitaet: U.abnormitaet },
+      { nekromant: false, meisterDerAbnormitaeten: true });
+    expect(u.werte!.attribute).toMatchObject(U.attribute);
+    expect(u.werte!.abgeleitet).toMatchObject(U.abgeleitet);
+    expect(u.werte!.fertigkeiten.find(f => f.name === U.fertigkeit[0])?.wert).toBe(U.fertigkeit[1]);
+    expect(u.epGesamt).toBe(U.epGesamt);
+    expect(u.epVerbraucht).toBe(U.epVerbraucht);
+    expect(u.hinweise).toEqual(expect.arrayContaining((U.hinweise as string[]).map(h => expect.stringContaining(h))));
   });
 
   it('Untote: freie Meisterschaften je erreichter Schwelle, nur mit freiem Platz', () => {
-    const katze: Begleiter = { id: 'magie:kreatur:gruftkatze', art: 'untoter', name: 'Gruftkatze', erhebung: 'magie:zauber:totentier', verstaerkungen: 1,
-      steigerung: { fertigkeiten: { 'grw:fertigkeit:wahrnehmung': 6 } } };
-    const u = untotWerte(KM, katze, { nekromant: true, meisterDerAbnormitaeten: false });
-    expect(u.freieMeisterschaften).toEqual([{ fertigkeitId: 'grw:fertigkeit:wahrnehmung', fertigkeit: 'Wahrnehmung', schwelle: 1 }]);
-    const s1 = Object.values(KM.eintraege).filter(e => e.typ === 'meisterschaft' && e.daten.fertigkeit === 'grw:fertigkeit:wahrnehmung');
+    const U = F.untot; const fid = 'grw:fertigkeit:wahrnehmung';
+    const untot: Begleiter = { id: U.id, art: 'untoter', name: U.name, erhebung: U.erhebung, verstaerkungen: 1, steigerung: { fertigkeiten: { [fid]: 6 } } };
+    const u = untotWerte(KM, untot, { nekromant: true, meisterDerAbnormitaeten: false });
+    expect(u.freieMeisterschaften).toEqual([{ fertigkeitId: fid, fertigkeit: 'Wahrnehmung', schwelle: 1 }]);
+    const s1 = Object.values(KM.eintraege).filter(e => e.typ === 'meisterschaft' && e.daten.fertigkeit === fid);
     const eins = s1.find(e => Number(e.daten.schwelle) === 1)!; const zwei = s1.find(e => Number(e.daten.schwelle) === 2)!;
-    const mit = untotWerte(KM, { ...katze, meisterschaften: [eins.id] }, { nekromant: true, meisterDerAbnormitaeten: false });
+    const mit = untotWerte(KM, { ...untot, meisterschaften: [eins.id] }, { nekromant: true, meisterDerAbnormitaeten: false });
     expect(mit.meisterschaften[0]).toMatchObject({ ok: true, schwelle: 1 });
     expect(mit.werte!.meisterschaften).toContain(eins.name);
     // Schwelle 2 hat keinen Platz (erst ab 9 Punkten), ein zweiter Platz fehlt auch
-    const zuviel = untotWerte(KM, { ...katze, meisterschaften: [eins.id, zwei.id] }, { nekromant: true, meisterDerAbnormitaeten: false });
+    const zuviel = untotWerte(KM, { ...untot, meisterschaften: [eins.id, zwei.id] }, { nekromant: true, meisterDerAbnormitaeten: false });
     expect(zuviel.meisterschaften[1].ok).toBe(false);
     expect(zuviel.verstoesse.some(v => v.schluessel === 'meisterschaften')).toBe(true);
   });
 
-  it('Golem: Feinschliff-Wahlen Meisterschaft, Fertigkeit und Punkte mit Grenzen aus dem Text', () => {
-    const id = (n: string) => Object.values(KM.eintraege).find(e => e.typ === 'golem_baustein' && e.name === n)!.id;
+  it('Golem: Feinschliff-Wahlen Meisterschaft, Fertigkeit und Punkte mit Grenzen aus den Daten', () => {
+    const G = F.golemWahlen;
     const alle = Object.values(KM.eintraege).filter(e => e.typ === 'golem_baustein' && ['Zusätzliche Fähigkeit', 'Rolle'].includes(e.daten.baustein)).map(e => e.id);
-    const g = golemWerte(KM, { id: 'magie:golem_baustein:gross', art: 'golem', name: 'Groß', material: 'magie:material:holz', bausteine: alle, golemRessource: true });
-    const arten = new Set(g.wahlen.map(w => w.art));
-    expect([...arten].sort()).toEqual(['attribut', 'fertigkeit', 'meisterschaft', 'punkte']);
+    const basis: Begleiter = { id: G.korpus, art: 'golem', name: G.name, material: G.material, bausteine: alle, golemRessource: true };
+    const g = golemWerte(KM, basis);
+    expect([...new Set(g.wahlen.map(w => w.art))].sort()).toEqual(['attribut', 'fertigkeit', 'meisterschaft', 'punkte']);
     const punkte = g.wahlen.find(w => w.art === 'punkte')!;
-    expect(punkte).toMatchObject({ anzahl: 8, max: 2 });
-    // „[Schwelle siehe Schritt 5]“ → Schwelle nach Stufe (Tabelle Schritt 5), „[Schwelle 1]“ → 1
+    expect(punkte).toMatchObject(G.punkte);
     const ms = g.wahlen.filter(w => w.art === 'meisterschaft').map(w => (w as { schwelle: number }).schwelle);
     expect(ms.every(x => Number.isFinite(x) && x >= 1)).toBe(true);
     expect(ms).toContain(1); expect(ms).toContain(g.meisterschaftSchwelle);
     const f = g.werte!.fertigkeiten.find(x => x.id)!;
-    const zuviel = golemWerte(KM, { id: 'magie:golem_baustein:gross', art: 'golem', name: 'Groß', material: 'magie:material:holz', bausteine: alle, golemRessource: true,
-      feinschliff: { [punkte.schluessel]: { [f.id!]: 3 } } });
-    expect(zuviel.verstoesse.some(v => v.schluessel.startsWith('max:'))).toBe(true);
-    const gut = golemWerte(KM, { id: 'magie:golem_baustein:gross', art: 'golem', name: 'Groß', material: 'magie:material:holz', bausteine: alle, golemRessource: true,
-      feinschliff: { [punkte.schluessel]: { [f.id!]: 2 } } });
-    expect(gut.werte!.fertigkeiten.find(x => x.id === f.id)!.wert).toBe(g.werte!.fertigkeiten.find(x => x.id === f.id)!.wert + 2);
-    expect(id('Kämpfer')).toBeTruthy();
+    expect(golemWerte(KM, { ...basis, feinschliff: { [punkte.schluessel]: { [f.id!]: G.punkte.max + 1 } } }).verstoesse.some(v => v.schluessel.startsWith('max:'))).toBe(true);
+    const gut = golemWerte(KM, { ...basis, feinschliff: { [punkte.schluessel]: { [f.id!]: G.punkte.max } } });
+    expect(gut.werte!.fertigkeiten.find(x => x.id === f.id)!.wert).toBe(g.werte!.fertigkeiten.find(x => x.id === f.id)!.wert + G.punkte.max);
+    expect(bid(G.baustein)).toBeTruthy();
   });
 
   it('Golem: Stufe, Werte aus Korpus + Material + Modulen, Applikationen, Preis, Animierung', () => {
-    expect(korpusse(KM).map(e => e.name)).toEqual(['Klein', 'Mittel', 'Groß']);
-    const id = (n: string) => Object.values(KM.eintraege).find(e => e.typ === 'golem_baustein' && e.name === n)!.id;
-    const golem: Begleiter = {
-      id: 'magie:golem_baustein:mittel', art: 'golem', name: 'Mittel', material: 'magie:material:metall',
-      bausteine: [id('Gerüstet'), id('Aggressiv'), id('Kämpfer'), id('Kennwort'), id('Speicher'), id('Sprachausgabe'), id('Kämpfe')],
-      sonderausstattung: ['SR +2', 'Applikation Gefügig (x2)'],
-    };
+    const G = F.golem;
+    expect(korpusse(KM).map(e => e.name)).toEqual(G.korpusse);
+    const golem: Begleiter = { id: G.korpus, art: 'golem', name: G.name, material: G.material, bausteine: (G.bausteine as string[]).map(bid), sonderausstattung: G.sonderausstattung };
     const g = golemWerte(KM, golem);
-    expect(g.stufe).toBe(2 + 1 + 1 + 1); // Mittel 2, Gerüstet, Aggressiv, Kämpfer
-    expect(g.sonderausstattungPlaetze).toBe(2);
-    // Mittel: KON 2, STÄ 3, LP 7, VTD 17, SR 1, Körper 6 / 1W10+1; Metall STÄ+1, VTD+1, SR+1, Langsam GSW −3; Gerüstet KON+1 STÄ+1 LP+1 VTD+2 SR+2;
-    // Aggressiv Angriff +2; Kämpfer VTD+1, Angriff +2, Schaden +1; Sonderausstattung SR +2
-    expect(g.werte!.attribute).toMatchObject({ KON: 3, 'STÄ': 5 });
-    expect(g.werte!.abgeleitet).toMatchObject({ LP: 8, VTD: 21, SR: 6, GSW: 3 });
-    expect(g.werte!.waffen[0]).toMatchObject({ wert: 10, schaden: '1W10+2' });
-    expect(g.werte!.merkmale).toContain('Golem 5');
-    expect(g.werte!.merkmale).not.toContain('Pazifist');
-    expect(g.applikationenExtra).toBe(1);
-    expect(g.hinweise).toEqual(expect.arrayContaining([expect.stringMatching(/fehlen 1 Schwachpunkt/)]));
-    expect(g.konstruktion).toEqual({ schwierigkeit: 20 + 10 + 1, fortschritt: 10 + 3 });
-    expect(g.preis).toBe(250 + 0 + 10);
-    expect(g.animierung?.name).toBe('Animierung III');
-    expect(g.meisterschaftSchwelle).toBe(2);
-    // Wahlen des Feinschliffs aus den Texten: Kämpfer „BEW oder INT oder KON oder STÄ +1“
-    const attr = g.wahlen.find(w => w.art === 'attribut' && w.quelle === 'Kämpfer')!;
-    expect(attr).toMatchObject({ optionen: ['BEW', 'INT', 'KON', 'STÄ'], bonus: 1 });
-    // gewählt: KON +1 → LP +1 (GK + KON), KW +1 (12 + KON + WIL); Zähigkeit (KON/WIL) +1
+    expect(g.stufe).toBe(G.stufe);
+    expect(g.sonderausstattungPlaetze).toBe(G.plaetze);
+    expect(g.werte!.attribute).toMatchObject(G.attribute);
+    expect(g.werte!.abgeleitet).toMatchObject(G.abgeleitet);
+    expect(g.werte!.waffen[0]).toMatchObject(G.waffe);
+    expect(g.werte!.merkmale).toContain(G.merkmal);
+    expect(g.werte!.merkmale).not.toContain(G.merkmalNicht);
+    expect(g.applikationenExtra).toBe(G.applikationenExtra);
+    expect(g.hinweise).toEqual(expect.arrayContaining([expect.stringContaining(G.hinweis)]));
+    expect(g.konstruktion).toEqual(G.konstruktion);
+    expect(g.preis).toBe(G.preis);
+    expect(g.animierung?.name).toBe(G.animierung);
+    expect(g.meisterschaftSchwelle).toBe(G.schwelle);
+    // Attributwahl des Feinschliffs aus den Daten
+    const attr = g.wahlen.find(w => w.art === 'attribut' && w.quelle === G.wahl.quelle)!;
+    expect(attr).toMatchObject({ optionen: G.wahl.optionen, bonus: G.wahl.bonus });
+    // gewählt: KON +1 → LP +1 (GK + KON), KW +1 (12 + KON + WIL)
     const mitKon = golemWerte(KM, { ...golem, feinschliff: { [attr.schluessel]: 'KON' } });
-    expect(mitKon.werte!.attribute.KON).toBe(4);
+    expect(mitKon.werte!.attribute.KON).toBe(g.werte!.attribute.KON + 1);
     expect(mitKon.werte!.abgeleitet.LP).toBe(g.werte!.abgeleitet.LP + 1);
     expect(mitKon.werte!.abgeleitet.KW).toBe(g.werte!.abgeleitet.KW + 1);
     expect(golemWerte(KM, { ...golem, feinschliff: { [attr.schluessel]: 'MYS' } }).werte!.attribute.MYS).toBe(g.werte!.attribute.MYS); // nicht wählbar
-    // Kämpfer ohne Aggressiv
-    const ohne = golemWerte(KM, { ...golem, bausteine: [id('Kämpfer')] });
-    expect(ohne.hinweise).toEqual(expect.arrayContaining(['Kämpfer setzt Aggressiv voraus']));
+    expect(golemWerte(KM, { ...golem, bausteine: [bid(G.allein)] }).hinweise).toEqual(expect.arrayContaining([G.alleinHinweis]));
     // Ressource Golem: eine Applikation je Stufe
     expect(golemWerte(KM, { ...golem, golemRessource: true }).applikationenExtra).toBe(0);
   });
 
   it('Assistent: Golem bauen und Untoten erheben', () => {
+    const A = F.assistent;
     kat.aktuell = KM;
-    render(<Rahmen start={{ masteries: { Todesmagie: [{ id: 'm', name: 'Meister der Abnormitäten', tier: 1, cost: 0, isFree: false, isCreationBonus: false, source: 't', skill: 'Todesmagie' }] } }} />);
+    render(<Rahmen start={{ masteries: { [A.fertigkeit]: [{ id: 'm', name: A.meisterschaft, tier: 1, cost: 0, isFree: false, isCreationBonus: false, source: 't', skill: A.fertigkeit }] } }} />);
     let d = begleiterErstellen('Golem');
-    fireEvent.change(within(d).getByLabelText('Korpus (Schritt 1)'), { target: { value: 'magie:golem_baustein:klein' } });
+    fireEvent.change(within(d).getByLabelText('Korpus (Schritt 1)'), { target: { value: A.korpus } });
     weiter();
     const stand = () => within(d).getByTestId('golem-stand').textContent ?? '';
-    expect(stand()).toContain('Golem 1');
-    fireEvent.change(within(d).getByLabelText(/Golemmaterial/), { target: { value: 'magie:material:holz' } });
+    expect(stand()).toContain(A.stand1);
+    fireEvent.change(within(d).getByLabelText(/Golemmaterial/), { target: { value: A.material } });
     weiter();
     const fa = within(d).getByLabelText('Zusätzliche Fähigkeit wählen') as HTMLSelectElement;
-    fireEvent.change(fa, { target: { value: [...fa.options].find(o => o.text.startsWith('Hände'))!.value } });
+    fireEvent.change(fa, { target: { value: [...fa.options].find(o => o.text.startsWith(A.faehigkeit))!.value } });
     fireEvent.click(within(d).getByRole('button', { name: /^Zusätzliche Fähigkeit hinzufügen$/ }));
-    expect(stand()).toContain('Golem 2');
+    expect(stand()).toContain(A.stand2);
     fireEvent.click(screen.getByRole('button', { name: /Zurück/ }));
-    expect(within(d).getByText(/Animierung II/)).toBeTruthy();
+    expect(within(d).getByText((t) => t.includes(A.animierung))).toBeTruthy();
     abschliessen();
     let blatt = screen.getByTestId('begleiter-blatt');
-    expect(within(blatt).getByRole('heading', { name: 'Golem (Klein)' })).toBeTruthy();
-    expect(within(blatt).getByText('Golem 2')).toBeTruthy();
-    expect(within(blatt).getByText('Hände')).toBeTruthy();
+    expect(within(blatt).getByRole('heading', { name: A.titel })).toBeTruthy();
+    expect(within(blatt).getByText(A.stand2)).toBeTruthy();
+    expect(within(blatt).getByText(A.faehigkeit)).toBeTruthy();
 
     d = begleiterErstellen('Erhobener Untoter');
-    fireEvent.change(within(d).getByLabelText('Erhebungszauber'), { target: { value: 'magie:zauber:totentier' } });
-    fireEvent.change(within(d).getByLabelText('Wertesatz'), { target: { value: 'Gruftkatze' } });
+    fireEvent.change(within(d).getByLabelText('Erhebungszauber'), { target: { value: A.erhebung } });
+    fireEvent.change(within(d).getByLabelText('Wertesatz'), { target: { value: A.wertesatz } });
     weiter();
     fireEvent.change(within(d).getByLabelText('Anzahl Verstärkungen'), { target: { value: '1' } });
     weiter();
     fireEvent.click(within(d).getByLabelText('KON steigern'));
-    expect(within(d).getByText('EP 10/10')).toBeTruthy();
+    expect(within(d).getByText(A.epVorher)).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: /Zurück/ }));
-    // 15 EP bei 10 verfügbaren: ohne Hausregeln gesperrt, mit Hausregeln nur eine Warnung
-    fireEvent.change(within(d).getByLabelText('Abnormität'), { target: { value: 'magie:abnormitaet:mordlust' } });
-    expect(within(d).getByText('EP 10/10')).toBeTruthy();
+    // mehr EP als verfügbar: ohne Hausregeln gesperrt, mit Hausregeln nur eine Warnung
+    fireEvent.change(within(d).getByLabelText('Abnormität'), { target: { value: A.abnormitaet } });
+    expect(within(d).getByText(A.epVorher)).toBeTruthy();
     setzeHausregeln(true);
-    fireEvent.change(within(d).getByLabelText('Abnormität'), { target: { value: 'magie:abnormitaet:mordlust' } });
-    expect(within(d).getByText('EP 15/10')).toBeTruthy();
+    fireEvent.change(within(d).getByLabelText('Abnormität'), { target: { value: A.abnormitaet } });
+    expect(within(d).getByText(A.epNachher)).toBeTruthy();
     abschliessen();
     blatt = screen.getByTestId('begleiter-blatt');
-    expect(within(blatt).getByRole('heading', { name: 'Gruftkatze' })).toBeTruthy();
-    expect(within(blatt).getByText('EP 15/10')).toBeTruthy();
+    expect(within(blatt).getByRole('heading', { name: A.wertesatz })).toBeTruthy();
+    expect(within(blatt).getByText(A.epNachher)).toBeTruthy();
     expect(screen.getAllByRole('tab')).toHaveLength(2);
     setzeHausregeln(false);
   });

@@ -1,11 +1,11 @@
 /**
  * Spielwerte für Begleiter aus den Paketen (Datenseite begleiter_werte.py, 21.11.2026):
  * Abrichtungen mit Zahlen und Wahlen, Zusammenführen doppelter Merkmale, Verbesserte Angriffe, Vertrautenmagie.
- * Teile mit Grimoires laufen nur, wenn FOKUS_GRIMOIRES auf die Grimoires zeigt.
+ * Teile mit Grimoires laufen nur lokal (FOKUS_GRIMOIRES und FOKUS_BUCHFAELLE).
  */
 import fs from 'fs';
 import { beforeAll, describe, expect, it } from 'vitest';
-import { basisAusDateien, grimoireDatei } from './hilfen';
+import { basisAusDateien, buchfaelle, grimoireDatei } from './hilfen';
 import { erstelleKatalog, grimoireLesen } from '../laden';
 import { Katalog } from '../katalog';
 import { merkmaleZusammenfuehren, ausStruktur, anwenden, type MerkmalRegel } from '../modifikationen';
@@ -17,84 +17,86 @@ import type { Begleiter } from '../../types';
 const b = basisAusDateien();
 const GRW = new Katalog(b.manifest, [b.basis]);
 
+// Die Beispiele ohne Grimoires sind erfunden (Merkmalsnamen und Zahlen), damit hier kein Regeltext aus den Büchern steht.
 describe('Merkmale zusammenführen (ohne Grimoires)', () => {
   const regel: MerkmalRegel = {
-    ersetzen: [{ merkmal: 'Dämmersicht', ab: 2, wird: 'Dunkelsicht' }], stufen_addieren: true, andere_doppelte_entfallen: true,
-    beide_entfallen: [['Feigling', 'Furchtimmunität']], beide_entfallen_ausser_mehrfach: ['Furchtimmunität'], robuster_lp: 2,
+    ersetzen: [{ merkmal: 'Sicht', ab: 2, wird: 'Weitsicht' }], stufen_addieren: true, andere_doppelte_entfallen: true,
+    beide_entfallen: [['Scheu', 'Mutig']], beide_entfallen_ausser_mehrfach: ['Mutig'], robuster_lp: 3,
   };
   it('Ersetzen, Stufen addieren, Aufheben, Doppelte entfallen', () => {
-    expect(merkmaleZusammenfuehren(['Dämmersicht', 'Dämmersicht', 'Flugwesen'], regel)).toEqual(['Flugwesen', 'Dunkelsicht']);
-    expect(merkmaleZusammenfuehren(['Rüstungsbrecher 1', 'Rüstungsbrecher 2'], regel)).toEqual(['Rüstungsbrecher 3']);
-    expect(merkmaleZusammenfuehren(['Feigling', 'Furchtimmunität', 'Flugwesen'], regel)).toEqual(['Flugwesen']);
-    expect(merkmaleZusammenfuehren(['Feigling', 'Furchtimmunität', 'Furchtimmunität'], regel)).toEqual(['Furchtimmunität']);
+    expect(merkmaleZusammenfuehren(['Sicht', 'Sicht', 'Flugwesen'], regel)).toEqual(['Flugwesen', 'Weitsicht']);
+    expect(merkmaleZusammenfuehren(['Zäh 1', 'Zäh 2'], regel)).toEqual(['Zäh 3']);
+    expect(merkmaleZusammenfuehren(['Scheu', 'Mutig', 'Flugwesen'], regel)).toEqual(['Flugwesen']);
+    expect(merkmaleZusammenfuehren(['Scheu', 'Mutig', 'Mutig'], regel)).toEqual(['Mutig']);
     expect(merkmaleZusammenfuehren(['Flugwesen', 'Flugwesen'], { ...regel, stufen_addieren: false })).toEqual(['Flugwesen']);
   });
-  it('„Merkmal X N oder +M“ und „Waffenmerkmal X N oder +M“', () => {
-    // Datenseite (textauslese.py) liest „Angriff +2, Merkmal Furchterregend 15 oder +5, Waffenmerkmal Kritisch 1 oder +1“
-    const m = ausStruktur({ angriff: 2, merkmale_stufe: [{ name: 'Furchterregend', neu: 15, plus: 5 }], waffenmerkmale_stufe: [{ name: 'Kritisch', neu: 1, plus: 1 }] });
-    expect(m.merkmaleStufe).toEqual([{ name: 'Furchterregend', neu: 15, plus: 5 }]);
-    expect(m.waffenmerkmaleStufe).toEqual([{ name: 'Kritisch', neu: 1, plus: 1 }]);
-    const w = { attribute: {}, abgeleitet: { LP: 10 }, fertigkeiten: [], merkmale: ['Furchterregend 15'], waffen: [{ name: 'Biss', wert: 10, schaden: '1W6', wgs: '6', ini: '5', merkmale: 'Kritisch 1, Scharf 2' }] };
+  it('Merkmal und Waffenmerkmal mit Stufe: neu mit Stufe N, vorhanden um M erhöht', () => {
+    const m = ausStruktur({ angriff: 3, merkmale_stufe: [{ name: 'Laut', neu: 10, plus: 4 }], waffenmerkmale_stufe: [{ name: 'Spitz', neu: 2, plus: 1 }] });
+    expect(m.merkmaleStufe).toEqual([{ name: 'Laut', neu: 10, plus: 4 }]);
+    expect(m.waffenmerkmaleStufe).toEqual([{ name: 'Spitz', neu: 2, plus: 1 }]);
+    const w = { attribute: {}, abgeleitet: { LP: 10 }, fertigkeiten: [], merkmale: ['Laut 10'], waffen: [{ name: 'Biss', wert: 10, schaden: '1W6', wgs: '6', ini: '5', merkmale: 'Spitz 2, Scharf 2' }] };
     const neu = anwenden(GRW, w, m);
-    expect(neu.merkmale).toEqual(['Furchterregend 20']);
-    expect(neu.waffen[0]).toMatchObject({ wert: 12, merkmale: 'Kritisch 2, Scharf 2' });
-    expect(anwenden(GRW, { ...w, merkmale: [] }, m).merkmale).toEqual(['Furchterregend 15']);
+    expect(neu.merkmale).toEqual(['Laut 14']);
+    expect(neu.waffen[0]).toMatchObject({ wert: 13, merkmale: 'Spitz 3, Scharf 2' });
+    expect(anwenden(GRW, { ...w, merkmale: [] }, m).merkmale).toEqual(['Laut 10']);
   });
 });
 
-const BESTIEN = grimoireDatei('bestien');
-const MAGIE = grimoireDatei('magie');
-const mitGrimoires = !!BESTIEN && fs.existsSync(BESTIEN) && !!MAGIE && fs.existsSync(MAGIE);
+// IDs und Sollwerte zu den Grimoires: lokale Falldatei (hilfen.ts: buchfaelle)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const F = buchfaelle<any>('begleiterWerte', ['bestien', 'magie']);
 
-describe.skipIf(!mitGrimoires)('mit „Bestienmeister“ und „Die Magie“ (lokal)', () => {
+describe.skipIf(!F)('Begleiterwerte mit Grimoires (lokal)', () => {
   let K: Katalog;
   beforeAll(() => {
-    K = erstelleKatalog(b, [grimoireLesen(fs.readFileSync(BESTIEN, 'utf-8'), b.manifest), grimoireLesen(fs.readFileSync(MAGIE, 'utf-8'), b.manifest)]).katalog;
+    K = erstelleKatalog(b, F.grimoires.map((g: string) => grimoireLesen(fs.readFileSync(grimoireDatei(g), 'utf-8'), b.manifest))).katalog;
   });
-  const wolf = (x: Partial<Begleiter> = {}): Begleiter => ({ id: 'grw:kreatur:wolf', art: 'tier', name: 'Wolf', ...x });
+  const tier = (x: Partial<Begleiter> = {}): Begleiter => ({ id: F.tier.id, art: 'tier', name: F.tier.name, ...x });
 
-  it('Abrichtungen mit Zahlen: Angreifer, Kämpfer, Knurren, Renner', () => {
-    const g = tierGrundwerte(K, K.get('grw:kreatur:wolf'))!;
+  it('Abrichtungen mit Zahlen; Meisterschaftswahl bis zur Schwelle des Abrichters; GSW und Merkmalsstufe', () => {
+    const g = tierGrundwerte(K, K.get(F.tier.id))!;
     const angriff = g.waffen[0].wert; const vtd = g.abgeleitet.VTD;
-    const t = tierWerte(K, wolf({ abrichtungen: ['bestien:abrichtung:angreifer', 'bestien:abrichtung:kaempfer', 'bestien:abrichtung:furchterregendes-knurren'] }), g, []);
+    const z = F.zahlen;
+    const t = tierWerte(K, tier({ abrichtungen: z.abrichtungen }), g, []);
     expect(t.geaendert).toBe(true);
-    expect(t.werte!.waffen[0].wert).toBe(angriff + 5);
-    expect(t.werte!.waffen[0].merkmale).toMatch(/Kritisch 1/);
-    expect(t.werte!.abgeleitet.VTD).toBe(vtd + 2);
-    expect(t.werte!.merkmale).toContain('Furchterregend 15');
-    // Kämpfer: Meisterschaft in Handgemenge bis zur Schwelle der Kampfabrichter-Meisterschaft des Abrichters
-    const ms = t.wahlen.find(w => w.w.art === 'meisterschaft')!;
-    expect(ms.schwelle).toBe(0);
-    expect(tierWerte(K, wolf({ abrichtungen: ['bestien:abrichtung:kaempfer'] }), g, ['bestien:meisterschaft:tierfuehrung:kampfabrichter-ii']).wahlen[0].schwelle).toBe(2);
+    expect(t.werte!.waffen[0].wert).toBe(angriff + z.angriffPlus);
+    expect(t.werte!.waffen[0].merkmale).toContain(z.waffenmerkmal);
+    expect(t.werte!.abgeleitet.VTD).toBe(vtd + z.vtdPlus);
+    expect(t.werte!.merkmale).toContain(z.merkmal);
+    expect(t.wahlen.find(w => w.w.art === 'meisterschaft')!.schwelle).toBe(0);
+    const mw = F.meisterschaftswahl;
+    expect(tierWerte(K, tier({ abrichtungen: [mw.abrichtung] }), g, [mw.meisterschaft]).wahlen[0].schwelle).toBe(mw.schwelle);
 
-    const p = tierGrundwerte(K, K.get('grw:kreatur:pferd'))!;
-    const r = tierWerte(K, { id: 'grw:kreatur:pferd', art: 'tier', name: 'Pferd', abrichtungen: ['bestien:abrichtung:renner'] }, p, []);
-    expect(r.werte!.abgeleitet.GSW).toBe(p.abgeleitet.GSW + 3);
-    expect(r.werte!.merkmale).toContain('Erschöpfungsresistenz 2'); // Pferd hat Erschöpfungsresistenz 1
+    const q = F.gsw;
+    const p = tierGrundwerte(K, K.get(q.tier))!;
+    const r = tierWerte(K, { id: q.tier, art: 'tier', name: q.name, abrichtungen: [q.abrichtung] }, p, []);
+    expect(r.werte!.abgeleitet.GSW).toBe(p.abgeleitet.GSW + q.gswPlus);
+    expect(r.werte!.merkmale).toContain(q.merkmal);
   });
 
-  it('Wahlen: Gefestigt lässt Feigling entfallen, Verbesserte Fähigkeiten verlangen unterschiedliche Fertigkeiten', () => {
-    const g = tierGrundwerte(K, K.get('grw:kreatur:wolf'))!;
-    expect(g.merkmale).toContain('Feigling');
-    const t = tierWerte(K, wolf({ abrichtungen: ['bestien:abrichtung:gefestigt'], abrichtungWahlen: { '0:0': '2' } }), g, []);
-    expect(t.werte!.merkmale).not.toContain('Feigling');
-    const ath = g.fertigkeiten.find(f => f.id === 'grw:fertigkeit:athletik')!.wert;
-    const v = tierWerte(K, wolf({ abrichtungen: ['bestien:abrichtung:verbesserte-faehigkeiten'], abrichtungWahlen: { '0:0': 'grw:fertigkeit:athletik', '0:1': 'grw:fertigkeit:athletik' } }), g, []);
-    expect(v.werte!.fertigkeiten.find(f => f.id === 'grw:fertigkeit:athletik')!.wert).toBe(ath + 6);
+  it('Wahlen: Merkmal entfällt; doppelte Wahl derselben Fertigkeit ist ein Hinweis; Abrichtungen ohne Zahlen ändern nichts', () => {
+    const g = tierGrundwerte(K, K.get(F.tier.id))!;
+    const mw = F.merkmalWeg;
+    expect(g.merkmale).toContain(mw.merkmal);
+    expect(tierWerte(K, tier({ abrichtungen: [mw.abrichtung], abrichtungWahlen: mw.wahlen }), g, []).werte!.merkmale).not.toContain(mw.merkmal);
+    const dw = F.doppelteWahl;
+    const vorher = g.fertigkeiten.find(f => f.id === dw.fertigkeit)!.wert;
+    const v = tierWerte(K, tier({ abrichtungen: [dw.abrichtung], abrichtungWahlen: { '0:0': dw.fertigkeit, '0:1': dw.fertigkeit } }), g, []);
+    expect(v.werte!.fertigkeiten.find(f => f.id === dw.fertigkeit)!.wert).toBe(vorher + dw.plus);
     expect(v.hinweise.some(h => /unterschiedlich/.test(h))).toBe(true);
-    // Abrichtungen ohne Zahlen ändern nichts
-    expect(tierWerte(K, wolf({ abrichtungen: ['bestien:abrichtung:apportieren'] }), g, []).geaendert).toBe(false);
+    expect(tierWerte(K, tier({ abrichtungen: [F.ohneZahlen] }), g, []).geaendert).toBe(false);
   });
 
-  it('Verbesserte Angriffe: Punkte aus Kämpfer + Korpus Mittel, Käufe über die Punkte sind ein Hinweis', () => {
-    const mittel = Object.values(K.eintraege).find(e => e.typ === 'wesen_baukasten_basis' && e.name === 'Mittel')!;
-    const w0 = wesenBaukastenWerte(K, { id: mittel.id, art: 'wesen', name: 'W', bausteine: ['magie:wesen_baukasten_rolle:kaempfer'] });
-    expect(w0.verbesserteAngriffe).toMatchObject({ punkte: 2, verbraucht: 0 });
+  it('Verbesserte Angriffe: Punkte aus Rolle und Korpus, Käufe über die Punkte sind ein Hinweis', () => {
+    const va = F.verbesserteAngriffe;
+    const basis = Object.values(K.eintraege).find(e => e.typ === 'wesen_baukasten_basis' && e.name === va.basis)!;
+    const w0 = wesenBaukastenWerte(K, { id: basis.id, art: 'wesen', name: 'W', bausteine: [va.rolle] });
+    expect(w0.verbesserteAngriffe).toMatchObject({ punkte: va.punkte, verbraucht: 0 });
     const n = w0.werte!.waffen.length;
-    const w1 = wesenBaukastenWerte(K, { id: mittel.id, art: 'wesen', name: 'W', bausteine: ['magie:wesen_baukasten_rolle:kaempfer'], verbesserteAngriffe: ['stumpf', 'set:3'] });
-    expect(w1.verbesserteAngriffe).toMatchObject({ punkte: 2, verbraucht: 4 });
+    const w1 = wesenBaukastenWerte(K, { id: basis.id, art: 'wesen', name: 'W', bausteine: [va.rolle], verbesserteAngriffe: va.kaeufe });
+    expect(w1.verbesserteAngriffe).toMatchObject({ punkte: va.punkte, verbraucht: va.verbraucht });
     expect(w1.werte!.waffen).toHaveLength(n + 1);
-    expect(w1.werte!.waffen.some(x => /Stumpf/.test(x.merkmale))).toBe(false);
+    expect(w1.werte!.waffen.some(x => x.merkmale.includes(va.merkmalNicht))).toBe(false);
     expect(w1.hinweise.some(h => h.schluessel === 'va:punkte')).toBe(true);
   });
 

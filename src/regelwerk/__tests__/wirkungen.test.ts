@@ -9,7 +9,7 @@ import { Katalog } from '../katalog';
 import { grimoireLesen, erstelleKatalog } from '../laden';
 import { setzeAktivenKatalog, wirkungenFuerCharakter } from '../bruecke';
 import { fertigkeitsBoni, wirkungenDesCharakters, wirkungKurz } from '../wirkungen';
-import { basisAusDateien, grimoireDatei } from './hilfen';
+import { basisAusDateien, GRIMOIRE_ORDNER, istGrimoireDatei } from './hilfen';
 import { calculateCharacter } from '../../utils/characterCalculations';
 import type { CharacterState, Mastery } from '../../types';
 
@@ -70,18 +70,28 @@ describe('Wirkungen im Editor', () => {
   });
 });
 
-const MAGIE = grimoireDatei('magie');
-describe.skipIf(!MAGIE || !fs.existsSync(MAGIE))('Wirkungen mit „Die Magie“ (lokal)', () => {
-  const { katalog: KM } = erstelleKatalog(basis, MAGIE ? [grimoireLesen(fs.readFileSync(MAGIE, 'utf-8'), basis.manifest)] : []);
-  beforeAll(() => setzeAktivenKatalog(KM, false));
+/**
+ * Mit allen Grimoires (lokal): Wirkungen, die einem anderen Wesen gelten (traeger „andere“, etwa beschworenen Wesen),
+ * zählen nie zum Charakter. Feste Boni auf Fertigkeiten prüft nachrechnen.test.ts.
+ */
+const GRIMS = GRIMOIRE_ORDNER && fs.existsSync(GRIMOIRE_ORDNER) ? fs.readdirSync(GRIMOIRE_ORDNER).filter(istGrimoireDatei).sort() : [];
+describe.skipIf(!GRIMS.length)('Wirkungen auf andere Wesen (alle Grimoires, lokal)', () => {
   afterAll(() => setzeAktivenKatalog(null, false));
-  it('Wasserbeschwörer: Boni und Initiative gehören dem Wesen, nicht dem Zauberer', () => {
-    const w = wirkungenFuerCharakter({ strengthsList: [], masteries: { Wassermagie: [M('Wasserbeschwörer')] } })!;
-    expect(w.liste).toEqual([]);
-  });
-  it('Leuchtendes Vorbild: Anführen +2, Darbietung und Diplomatie je +1', () => {
-    const w = wirkungenFuerCharakter({ strengthsList: [], masteries: { Lichtmagie: [M('Leuchtendes Vorbild')] } })!;
-    expect(Object.fromEntries(Object.entries(w.fertigkeitsBoni).map(([k, v]) => [k, v.summe]))).toEqual({ 'Anführen': 2, Darbietung: 1, Diplomatie: 1 });
+  it.each(GRIMS)('%s', (datei) => {
+    const g = grimoireLesen(fs.readFileSync(path.join(GRIMOIRE_ORDNER, datei), 'utf-8'), basis.manifest);
+    const { katalog: KG } = erstelleKatalog(basis, [g]);
+    setzeAktivenKatalog(KG, false);
+    const falsch: string[] = [];
+    for (const e of g.paket.eintraege) {
+      if (e.typ !== 'meisterschaft') continue;
+      const ws = (e.daten?.wirkungen_strukturiert ?? []) as { traeger?: string }[];
+      if (!ws.length || ws.some(w => w.traeger !== 'andere')) continue;
+      const f = KG.get(String(e.daten.fertigkeit ?? ''));
+      if (f?.typ !== 'fertigkeit' || KG.get(e.id)?.name !== e.name) continue;
+      const w = wirkungenFuerCharakter({ strengthsList: [], masteries: { [f.name]: [M(e.name)] } });
+      if (w && w.liste.length) falsch.push(e.id);
+    }
+    expect(falsch).toEqual([]);
   });
 });
 

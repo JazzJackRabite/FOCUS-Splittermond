@@ -11,7 +11,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { FARBEN_ERLAUBT, WURZEL, dialogeOhneKopf, eigeneKnoepfe, farbtabelle, farbwerte, kontrast, kontrastBefunde, paketzugriffe, regelnamenImCode, regelquellen, regelquellenBefunde, suchmuster } from './pruefen';
+import { FARBEN_ERLAUBT, WURZEL, buchnamenImCode, dialogeOhneKopf, eigeneKnoepfe, farbtabelle, farbwerte, kontrast, kontrastBefunde, paketzugriffe, regelnamenImCode, regelquellen, regelquellenBefunde, suchmuster } from './pruefen';
+import { GRIMOIRE_ORDNER, buchfaelle, istGrimoireDatei } from '../../regelwerk/__tests__/hilfen';
 import { Abschnittstitel, Auswahl, Dialog, Eingabe, Karte, Knopf, Marke, Rauten, Rollbereich, Wahlknopf } from '..';
 
 const ALTLASTEN = path.join(WURZEL, 'src/fundament/altlasten.json');
@@ -45,6 +46,13 @@ describe('Fundament: Altlasten dürfen nur weniger werden', () => {
   it('jeder Dialog hat die Titelzeile aus den Bausteinen (Dialogkopf oder Dialog)', () => {
     // Ausnahme: das Quellen-Popover am Handy ist kein Dialog mit Titel
     expect(dialogeOhneKopf().filter((d) => d !== 'src/components/ui/SourceBadge.tsx')).toEqual([]);
+  });
+
+  const erlaubt = buchfaelle<string[]>('erlaubteBegriffe');
+  const grims = GRIMOIRE_ORDNER && fs.existsSync(GRIMOIRE_ORDNER) ? fs.readdirSync(GRIMOIRE_ORDNER).filter(istGrimoireDatei) : [];
+  it.skipIf(!erlaubt || !grims.length)('keine Eintragsnamen aus den Grimoires im Quelltext (Grundsatz 3, lokal)', () => {
+    const namen = grims.flatMap(f => (JSON.parse(fs.readFileSync(path.join(GRIMOIRE_ORDNER, f), 'utf8')).eintraege as { name?: string }[]).map(e => e.name ?? ''));
+    expect(buchnamenImCode(namen, erlaubt!)).toEqual([]);
   });
 
   it('keine Suchmuster, die Regeltext lesen (Grundsatz 3)', () => {

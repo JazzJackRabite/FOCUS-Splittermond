@@ -143,7 +143,7 @@ export interface WesenBaukastenWerte {
   wahlen: GolemWahl[];
   /** höchste Schwelle und höchster Zaubergrad im Feinschliff (beschwörbare Wesen) */
   schritt5: { schwelle: number | null; grad: number | null; dienste: string | null } | null;
-  /** Punkte Verbesserter Angriff (Rolle Kämpfer, Korpus-Bonus) und die Käufe */
+  /** Punkte Verbesserter Angriff (Rolle, Korpus-Bonus) und die Käufe */
   verbesserteAngriffe: { punkte: number; verbraucht: number; kaeufe: VaKauf[] } | null;
   hinweise: { text: string; schluessel: string; mass: number }[];
 }

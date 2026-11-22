@@ -70,7 +70,7 @@ function schwachpunktModifikation(e: Eintrag): Modifikationen {
   return m;
 }
 
-/** Sonderausstattung (Tabelle Schritt 5): Zeilen mit zwei Möglichkeiten („SR +2“ oder „Applikation Gefügig (x2)“), Datenseite: `sonderausstattung` */
+/** Sonderausstattung (Tabelle Schritt 5): Zeilen mit zwei Möglichkeiten, Datenseite: `sonderausstattung` */
 export function sonderausstattungen(k: Katalog): { optionen: string[]; material: string }[] {
   return sonderausstattungDaten(k).map(z => ({ optionen: z.optionen.map(o => o.text), material: z.material }));
 }
@@ -227,7 +227,7 @@ export function golemWerte(k: Katalog, b: Begleiter): GolemWerte {
     verstoss(`Für ${applikationenExtra} zusätzliche Applikation${applikationenExtra > 1 ? 'en' : ''} fehlen ${schwachpunkteNoetig - gewaehlt.Schwachpunkt.length} Schwachpunkt(e)`, 'schwachpunkte', schwachpunkteNoetig - gewaehlt.Schwachpunkt.length);
   const instruktionenErlaubt = (GR?.instruktionen_weitere ?? 0) + gewaehlt.Applikation.filter(e => e.id === GR?.instruktion_applikation).length;
   const instr = gewaehlt.Instruktion.filter(e => !(GR?.instruktionen_immer ?? []).includes(e.id));
-  if (instr.length > instruktionenErlaubt) verstoss(`Mehr Instruktionen (${instr.length}) als implementierbar (${instruktionenErlaubt}); weitere über die Applikation Zusätzliche Instruktion`, 'instruktionen', instr.length - instruktionenErlaubt);
+  if (instr.length > instruktionenErlaubt) verstoss(`Mehr Instruktionen (${instr.length}) als implementierbar (${instruktionenErlaubt}); weitere über die Applikation ${GR?.instruktion_applikation ? (k.get(GR.instruktion_applikation)?.name ?? '') : ''}`, 'instruktionen', instr.length - instruktionenErlaubt);
   const verfuegungenAktiv = b.golemRessource ? Math.max(GR?.ressource.verfuegungen_mindestens ?? 0, (GR?.ressource.verfuegungen_je_stufe ?? 0) * stufe) : null;
   if (verfuegungenAktiv !== null && gewaehlt['Verfügung'].length > verfuegungenAktiv) verstoss(`Höchstens ${verfuegungenAktiv} aktive Verfügungen (Ressource Golem)`, 'verfuegungen', gewaehlt['Verfügung'].length - verfuegungenAktiv);
   const sonderausstattungPlaetze = GR?.sonderausstattung_je_stufen ? Math.floor(stufe / GR.sonderausstattung_je_stufen) : 0;

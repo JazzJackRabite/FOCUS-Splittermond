@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import fs from 'node:fs';
 import { Katalog } from '../katalog';
 import { erstelleKatalog, grimoireLesen } from '../laden';
-import { basisAusDateien, grimoireDatei } from './hilfen';
+import { basisAusDateien, buchfaelle, grimoireDatei } from './hilfen';
 import { alleZustaende, zustandHatStufe, zustandQuelle, zustandsliste } from '../zustaende';
 import { getConditionDescription, getConditionMalus, probenbereich, zustandTooltip } from '../../utils/conditionModifiers';
 import { setzeAktivenKatalog } from '../bruecke';
@@ -17,7 +17,7 @@ describe('Zustände aus den Paketen', () => {
     const erwartet = [...GRW, 'Liegend'].sort((a, b) => a.localeCompare(b, 'de'));
     expect(alleZustaende(K)).toEqual(erwartet);
     expect(alleZustaende(null)).toEqual([]);
-    for (const n of ['Schwermut', 'Verstoßen', 'Verorkt', 'Erschaudert']) expect(alleZustaende(K)).not.toContain(n);
+    for (const z of zustandsliste(K).filter((x) => x.id)) expect(z.id, z.name).toMatch(/^grw:/);
   });
 
   it('Stufen laut Paket', () => {
@@ -44,20 +44,29 @@ describe('Zustände aus den Paketen', () => {
     setzeAktivenKatalog(null, false);
   });
 
-  const buecher = ['schleier', 'jenseits', 'goetter'].map((id) => grimoireDatei(id));
-  it.skipIf(buecher.some((b) => !b || !fs.existsSync(b)))('Zustände aus Grimoires: wählbar, mit Quelle, Abzüge aus dem Paket', () => {
-    const { katalog: k } = erstelleKatalog(basis, buecher.map((b) => grimoireLesen(fs.readFileSync(b, 'utf-8'), basis.manifest)));
-    for (const n of ['Erschaudert', 'Geistreisend', 'Übergangsschock', 'Schwermut', 'Verstoßen']) expect(alleZustaende(k), n).toContain(n);
-    expect(zustandQuelle('Schwermut', k)).toMatch(/S\. 51$/);
-    expect(zustandQuelle('Verstoßen', k)).toMatch(/S\. 147$/);
-    expect(zustandHatStufe('Verstoßen', k)).toBe(true);
+  // Fälle aus den Grimoires (Namen, Seiten, Sollwerte) stehen in der lokalen Falldatei (hilfen.ts: buchfaelle)
+  const F = buchfaelle<{ grimoires: string[]; vorhanden: string[]; quelle: [string, string][]; mitStufe: string[]; malus: [string, number, string, number | null][] }>('zustaende', ['schleier', 'jenseits', 'goetter']);
+  it.skipIf(!F)('Zustände aus Grimoires: wählbar, mit Quelle, Abzüge aus dem Paket (lokal)', () => {
+    const { katalog: k } = erstelleKatalog(basis, F!.grimoires.map((g) => grimoireLesen(fs.readFileSync(grimoireDatei(g), 'utf-8'), basis.manifest)));
+    for (const n of F!.vorhanden) expect(alleZustaende(k), n).toContain(n);
+    for (const [n, muster] of F!.quelle) expect(zustandQuelle(n, k)).toMatch(new RegExp(muster));
+    for (const n of F!.mitStufe) expect(zustandHatStufe(n, k), n).toBe(true);
     setzeAktivenKatalog(k, false);
-    const m = (key: string, level: number, fertigkeit: string) => getConditionMalus({ id: 'x', key, level }, { bereich: probenbereich(fertigkeit), fertigkeit })?.malus ?? null;
-    expect(m('Schwermut', 1, 'Entschlossenheit')).toBe(-2); // AUS + WIL
-    expect(m('Schwermut', 1, 'Akrobatik')).toBeNull();
-    expect(m('Erschaudert', 3, 'Arkane Kunde')).toBe(-3); // MYS + VER
-    expect(m('Übergangsschock', 2, 'Akrobatik')).toBe(-2);
-    expect(m('Übergangsschock', 2, 'Arkane Kunde')).toBeNull();
+    for (const [key, level, fertigkeit, soll] of F!.malus) {
+      expect(getConditionMalus({ id: 'x', key, level }, { bereich: probenbereich(fertigkeit), fertigkeit })?.malus ?? null, `${key} ${level} ${fertigkeit}`).toBe(soll);
+    }
     setzeAktivenKatalog(null, false);
+  });
+
+  const alle = ['schleier', 'jenseits', 'goetter'].map((id) => grimoireDatei(id));
+  it.skipIf(alle.some((b) => !b || !fs.existsSync(b)))('jeder Zustand aus einem Grimoire ist wählbar und nennt seine Seite (lokal)', () => {
+    const gs = alle.map((b) => grimoireLesen(fs.readFileSync(b, 'utf-8'), basis.manifest));
+    const { katalog: k } = erstelleKatalog(basis, gs);
+    const namen = alleZustaende(k);
+    for (const g of gs) for (const e of g.paket.eintraege.filter((x) => x.typ === 'zustand' && k.get(x.id)?.name === x.name)) {
+      expect(namen, e.id).toContain(e.name);
+      const seite = e.quelle?.buch_seiten?.[0];
+      if (seite) expect(zustandQuelle(e.name, k), e.id).toMatch(new RegExp(`S\\. ${seite}`));
+    }
   });
 });

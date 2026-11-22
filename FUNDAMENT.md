@@ -7,7 +7,7 @@ Gemini in Google AI Studio – liest diese Datei zuerst und hält sich daran.
 - Die Prüfungen in `src/fundament/__tests__/` setzen diese Datei durch. Schlägt eine fehl, ist der Code zu ändern, nicht die Prüfung.
 - Änderungen an dieser Datei entscheidet der Projektinhaber.
 
-> **Stand 22.11.2026 (Stand 35).** Teil 2 (Regelquellen) ist gegen den Code geprüft; eine Prüfung hält Tabelle und Code seitdem
+> **Stand 22.11.2026 (Stand 36).** Teil 2 (Regelquellen) ist gegen den Code geprüft; eine Prüfung hält Tabelle und Code seitdem
 > zusammen (`src/fundament/__tests__`).
 
 ---
@@ -22,7 +22,10 @@ Gemini in Google AI Studio – liest diese Datei zuerst und hält sich daran.
    keine Zahlen aus dem Gedächtnis. Fehlt ein Wert, kommt er zuerst ins Paket (Datenseite, Ordner `Werkzeuge`), dann liest
    ihn der Editor.
 3. **Kein Regeltext aus Erweiterungen im Code.** Werkzeuge, Tests und Editor enthalten zu Erweiterungen nur IDs, Zahlen,
-   Fingerabdrücke und kurze Kennwörter.
+   Fingerabdrücke und kurze Kennwörter. Hinweistexte der Oberfläche formulieren keine Regeln aus Erweiterungen aus, sondern
+   setzen Werte aus den Paketen ein. Tests mit Fällen aus einzelnen Büchern (Namen, Sollwerte) lesen diese aus der lokalen
+   Falldatei `FOKUS_BUCHFAELLE` (`Pruefsuite/editor_buchfaelle.json`, nie im Repository); Beispiele ohne Buch sind erfunden.
+   Eine lokale Prüfung sucht im Quelltext nach Eintragsnamen aus den Grimoires.
 4. **Jede Regel hat eine Fundstelle.** Seitenangaben werden gegen das Paket geprüft, nicht geschätzt. Eine Auslegung ohne
    Regelstelle wird als Auslegung gekennzeichnet.
 5. **Die App bleibt in Google AI Studio lauffähig:** Vite und React, `metadata.json` im Wurzelordner, Daten unter

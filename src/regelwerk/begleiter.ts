@@ -193,7 +193,7 @@ export function potenzialVerbraucht(liste: AbrichtungsInfo[], gewaehlt: string[]
   return gewaehlt.reduce((s, i) => s + (m.get(i)?.kosten ?? 1), 0);
 }
 
-/** Reittier: Typus Reittier oder Grundausbildung Reittier I */
+/** Reittier: Typus Reittier oder die Grundausbildung dafür (an der ID erkannt) */
 export function istReittier(k: Katalog, b: Begleiter): boolean {
   const e = k.get(b.id);
   return (e ? typusListe(e).includes('Reittier') : false) || (b.abrichtungen ?? []).some(i => /reittier-i$/.test(i));
