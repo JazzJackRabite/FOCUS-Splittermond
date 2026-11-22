@@ -931,9 +931,10 @@ Bakebakeku bleiben; die eingebauten Listen in `src/data`, die Stand 33 noch erg�
   Abstand von `space-y` auf); Spaltenköpfe der Waffentabelle mit Abstand. Kein waagrechtes Scrollen außer der Reiterleiste.
 - Tests: 459 grün ohne Bücher; mit Grimoires ohne Falldatei alles grün (Falldatei-Tests übersprungen); Build; im Browser
   geprüft (Rast mit Begleitern und Rückgängig, Handy und Desktop, PDF als Bild).
-- **Offen:** Die Datenseite (`begleiter_werte.py`/`.json`, LIESMICH) ist gebaut und geprüft (Prüfsuite 0 Befunde), aber noch
-  nicht auf D: geliefert, weil der PC beim Abschluss nicht erreichbar war; bis dahin regenerieren alle Begleiterarten wie der
-  Abenteurer.
+- **Datenseite** (nachgeliefert 22.11.2026 vormittags, auf den neuen Stand von `begleiter_werte.*` mit `abrichtung_rollen`
+  aufgesetzt): `begleiter_werte.py`/`.json` Abschnitt `ruhephase_begleiter`, LIESMICH; neu gebaut ist nur das Magie-Paket
+  (zwei Regeltexte mit `strukturiert.ruhephase_begleiter`) samt Grimoire und Manifest. Prüfsuite 0 Befunde; der allgemeine
+  Test in `begleiterRast.test.ts` läuft damit (vorher übersprungen).
 
 ## Stand 38 (22.11.2026): Kopfzeile am Handy, letzte Namensregeln auf der Datenseite
 
