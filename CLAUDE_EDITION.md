@@ -948,6 +948,19 @@ Bakebakeku bleiben; die eingebauten Listen in `src/data`, die Stand 33 noch erg�
 - Tests: 508 grün mit allen Grimoires, Falldatei und Volltest, 448 ohne Bücher; Prüfsuite 0 neue Befunde, Praxistest
   109/109; Build.
 
+## Stand 39 (22.11.2026): Start ohne Netz wirklich ohne Netz
+
+- **Fehler aus Stand 35:** Der Rückfall auf das gespeicherte Grundregelwerk griff nur, wenn die Seite selbst noch vom
+  Server kam. War das Netz ganz weg, lud der Browser die App gar nicht (Rückmeldung des Projektinhabers). Der Test hatte
+  nur die Regelpakete abgeschaltet.
+- **Service Worker** `public/sw.js` (ohne Abhängigkeit, angemeldet in `main.tsx`, nur im gebauten Editor): speichert Seite,
+  Skripte, Stile und Schriften, immer zuerst aus dem Netz, ohne Netz aus dem Zwischenspeicher. Beim ersten Besuch schickt
+  die Seite die schon geladenen Dateien nach. Regelpakete laufen nicht über ihn; das Grundregelwerk kommt ohne Netz wie
+  bisher aus IndexedDB, mit Hinweis. `ignoreVary`, weil manche Server „Vary: Origin“ senden.
+- Geprüft im Browser mit ganz abgeschaltetem Netz (Playwright `setOffline`), im Wurzelverzeichnis und unter `/fokus/`:
+  Editor startet, Hinweis erscheint. Ein Browser, der die App noch nie mit Netz geöffnet hat, kann sie ohne Netz
+  erwartungsgemäß nicht laden.
+
 ## Google AI Studio
 
 Unverändert eine Vite-/React-App mit `metadata.json` im Wurzelordner; Import über „Import from GitHub“, Hosting über Cloud Run.
