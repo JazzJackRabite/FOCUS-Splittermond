@@ -74,7 +74,7 @@ Felder stehen unter `daten` des jeweiligen Eintrags. **Was hier nicht steht, dar
 | Baukästen: doppelte Merkmale, Verbesserte Angriffe | Feinschliff-Regeln: `strukturiert` (`merkmale_zusammenfuehren`, `verbesserte_angriffe`); Rolle: `verbesserter_angriff`; Waffen: `schaden`, `wgs`, `modus`, `merkmale_text` | `regelwerk/modifikationen.ts`, `regelwerk/wesenBaukasten.ts`, `regelwerk/golem.ts` |
 | Lebenspunkte und Stufen der Begleiter | Kernregeln: `strukturiert`; Merkmale: `gesundheitsstufen_namen`, `betaeubungsimmun` | `regelwerk/vitals.ts` |
 | Schadens- und Heildialog | Splittergaben: `strukturiert.gaben`; Heilung: `strukturiert.pausen`, `ruheregeln`; Zustände: `hat_stufe`, `zustandswirkung`; Heilkunde: `auswirkungen` | `regelwerk/schadenUndHeilung.ts` |
-| Rast der Begleiter (Ausnahmen von der LP-Regeneration, z. B. Golems, erhobene Untote) | Regeltexte: `strukturiert.ruhephase_begleiter`; sonst `ruheregeln` der Kernregel „Heilung“ | `regelwerk/begleiterRast.ts` |
+| Rast der Begleiter (Begleiterarten ohne LP-Regeneration in der Ruhephase) | Regeltexte: `strukturiert.ruhephase_begleiter`; sonst `ruheregeln` der Kernregel „Heilung“ | `regelwerk/begleiterRast.ts` |
 
 Ansichten (`components/`) greifen nicht selbst in die Paketdaten, sondern fragen die Module aus `regelwerk/`. Wo eine
 Ansicht das heute noch tut, steht sie in `src/fundament/altlasten.json` (`paketzugriffe`).
@@ -163,7 +163,7 @@ Fehlt einer, wird er dort ergänzt – nicht in der Ansicht nachgebaut.
 
 | Baustein | Zweck | Varianten |
 |---|---|---|
-| `Knopf` | jede Schaltfläche | `primaer` (Gold, eine je Ansicht), `sekundaer` (goldener Rahmen), `neutral`, `gefahr`, `erholung`; `nurSymbol` |
+| `Knopf` | jede Schaltfläche | `primaer` (Gold, eine je Ansicht), `sekundaer` (goldener Rahmen), `neutral`, `gefahr`, `erholung`; `nurSymbol`; `eng` (schmaler Innenabstand für mehrere Knöpfe in einer Handyzeile) |
 | `Wahlknopf` | auswählbare Karte oder Filter (eine Wahl aus mehreren, Umschalter), `aria-pressed` | Ton im gewählten Zustand: `gold`, `erholung`, `gefahr`; `mittig` |
 | `Leistenknopf` | Knopf in einer farbigen Leiste (Plus/Minus, mittige Beschriftung); füllt die Höhe der mindestens 44 px hohen Leiste | Farben über `className` aus fundament.css |
 | `Feldknopf` | Kästchen einer Punkteleiste (LP, Fokus, temporäre LP), per Klick zurücknehmbar; bewusst klein, damit die Leiste in eine Zeile passt | `beschriftung` (Pflicht, wird title und aria-label), leere Kästchen `disabled` |

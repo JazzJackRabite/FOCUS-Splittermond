@@ -4,8 +4,8 @@
  *   Ruhephase heilt allen Betäubungs- und kanalisierten Schaden, Lebenspunkte in Höhe der doppelten Konstitution
  *   (mindestens 1), allen erschöpften und kanalisierten Fokus und verzehrten Fokus in Höhe der doppelten Willenskraft;
  *   die Verschnaufpause heilt Betäubungsschaden und erschöpften Fokus.
- * - Ausnahmen aus `strukturiert.ruhephase_begleiter` an den Regeltexten (Datenseite: begleiter_werte.py), z. B. Golems
- *   (Merkmal Konstrukt) und erhobene Untote regenerieren keine Lebenspunkte.
+ * - Ausnahmen aus `strukturiert.ruhephase_begleiter` an den Regeltexten (Datenseite: begleiter_werte.py): Begleiterarten,
+ *   die laut Paket in der Ruhephase keine Lebenspunkte regenerieren; Fundstelle aus dem Eintrag.
  * Zustände der Begleiter bleiben unverändert; sie werden im Blatt des Begleiters beendet.
  */
 import type { Katalog } from './katalog';

@@ -909,6 +909,32 @@ Bakebakeku bleiben; die eingebauten Listen in `src/data`, die Stand 33 noch erg�
 - Tests: 508 grün mit allen Grimoires, Falldatei und Volltest, 448 ohne Bücher; Prüfsuite 0 neue Befunde, Praxistest
   109/109; Build.
 
+## Stand 37 (22.11.2026): Begleiter – gemeinsame Rast, PDF-Export, Handy-Ansicht
+
+- **Gemeinsame Rast** (`regelwerk/begleiterRast.ts`, `components/begleiter/rast.tsx`): In „Regeneration & Pausen“ steht
+  „Begleiter rasten mit (N)“ (voreingestellt an), sobald es Begleiter gibt. Ruhephase und Verschnaufpause des Abenteurers
+  gelten dann auch für alle Begleiter, mit Konstitution und Willenskraft aus ihrem berechneten Wertekasten und den
+  `ruheregeln` der Kernregel „Heilung“. Begleiterarten, die laut Paket in der Ruhephase keine Lebenspunkte regenerieren,
+  stehen als `strukturiert.ruhephase_begleiter` an den Regeltexten (Datenseite `begleiter_werte.py`, Abschnitt
+  `ruhephase_begleiter`, mit Belegen); der Hinweis nennt die Fundstelle. Zustände der Begleiter bleiben. Ein
+  Protokolleintrag nennt je Begleiter, was geheilt wurde. Im Blatt jedes Begleiters gibt es neben der Verschnaufpause jetzt
+  auch die Ruhephase.
+- **Rückgängig im Spiel** sichert jetzt auch den Spielzustand der Begleiter (neue Aktion `BEGLEITER_ZUSTAENDE_SETZEN`, je
+  Stelle in der Liste). Vorher nahm „Rückgängig“ Schaden, Heilung und Fokus der Begleiter nicht zurück.
+- **PDF-Export** (`components/export/begleiterPdf.ts`): nach den Zaubern eine Seite „Begleiter“, je Begleiter Kopf mit Art
+  und Kurzangaben, abgeleitete Werte und Attribute, Angriffe, Fertigkeiten, Typus, Merkmale, Meisterschaften, die Angaben
+  der Art (Abrichtungen, Vertrautenmagie, Dienste, Stärken …), Zauber, Notiz und Kästchen für Lebenspunkte je
+  Gesundheitsstufe und Fokus zum Abhaken. `besitzerBerechnen` (ohne React) liefert dafür die Angaben des Abenteurers.
+- **Handy (390 px)** geprüft: Begleiter-Leiste, Blatt, Assistent (Tier, Gefolgsmann mit sieben Schritten), Bearbeiten,
+  Rast. Geändert: Schrittleiste in einer Zeile zum Schieben, Namen nur beim aktuellen Schritt; Fokus-Menge und die drei
+  Fokus-Knöpfe in einer Zeile (neu `Knopf eng`); Wahlkarten linksbündig; Abstand unter Erklärungen (die `m-0` hob den
+  Abstand von `space-y` auf); Spaltenköpfe der Waffentabelle mit Abstand. Kein waagrechtes Scrollen außer der Reiterleiste.
+- Tests: 459 grün ohne Bücher; mit Grimoires ohne Falldatei alles grün (Falldatei-Tests übersprungen); Build; im Browser
+  geprüft (Rast mit Begleitern und Rückgängig, Handy und Desktop, PDF als Bild).
+- **Offen:** Die Datenseite (`begleiter_werte.py`/`.json`, LIESMICH) ist gebaut und geprüft (Prüfsuite 0 Befunde), aber noch
+  nicht auf D: geliefert, weil der PC beim Abschluss nicht erreichbar war; bis dahin regenerieren alle Begleiterarten wie der
+  Abenteurer.
+
 ## Google AI Studio
 
 Unverändert eine Vite-/React-App mit `metadata.json` im Wurzelordner; Import über „Import from GitHub“, Hosting über Cloud Run.
