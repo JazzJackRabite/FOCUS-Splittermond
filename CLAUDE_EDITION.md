@@ -961,6 +961,19 @@ Bakebakeku bleiben; die eingebauten Listen in `src/data`, die Stand 33 noch erg�
   Editor startet, Hinweis erscheint. Ein Browser, der die App noch nie mit Netz geöffnet hat, kann sie ohne Netz
   erwartungsgemäß nicht laden.
 
+## Stand 40 (22.11.2026): Aufräumen – Favicon, Umgebungsvariablen, unbenutzte Dateien
+
+- **Favicon:** Das Logo lag als PNG mit 1000 × 1000 Pixeln (610 KB) unter dem Namen `favicon.ico`, doppelt im Wurzelordner
+  und in `public/`. Jetzt nur noch `public/favicon.ico` als echte ICO-Datei (16–64 px, 18 KB) und
+  `public/apple-touch-icon.png` (180 px) für den Startbildschirm am Handy; beide in `index.html` verlinkt, damit sie auch
+  unter einem Unterpfad gefunden werden (`--base=/fokus/` geprüft).
+- **`.env.example`:** nennt die Variablen, die die Tests heute lesen: `FOKUS_GRIMOIRES`, `FOKUS_BUCHFAELLE`,
+  `FOKUS_REFERENZ_VOLL` (statt des alten `FOKUS_BUECHER`).
+- **Entfernt:** `public/sql-wasm.wasm` (658 KB, seit dem Wegfall von `sql.js` in Stand 8 unbenutzt) und
+  `public/dice-icon.svg` (nirgends eingebunden).
+- Ideensammlung: Nachschlage-Inhalte der Grimoires als Idee #20 (Priorität niedrig) eingetragen.
+- Tests: 459 grün ohne Bücher; Build.
+
 ## Google AI Studio
 
 Unverändert eine Vite-/React-App mit `metadata.json` im Wurzelordner; Import über „Import from GitHub“, Hosting über Cloud Run.
