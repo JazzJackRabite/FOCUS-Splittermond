@@ -203,11 +203,11 @@ const App: React.FC = () => {
           <div className="bg-flaeche text-schrift px-4 sm:px-6 pt-4 pb-3 relative z-10 no-print w-full">
             <div className="flex items-center justify-between gap-3 lg:gap-4">
               {/* 1. Branding */}
-              <div className="shrink-0">
+              <div className="min-w-0">
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-widest text-gold leading-none">
                   FOCUS
                 </h1>
-                <p className="text-[11px] sm:text-xs text-leise tracking-wide leading-tight mt-1">
+                <p className="text-[11px] sm:text-xs text-leise tracking-wide leading-tight mt-1 hidden min-[360px]:block">
                   Freier Online Charaktereditor:<br />
                   Universum Splittermond v.1.2
                 </p>
@@ -215,10 +215,10 @@ const App: React.FC = () => {
 
               {/* 2. Action Controls */}
               <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-                <Knopf art="sekundaer" onClick={() => setShowProfileModal(true)} title="Helden-Profile & Vorlagen" className="text-xs sm:text-sm font-bold">
-                  <Users size={17} />
+                <Knopf art="sekundaer" onClick={() => setShowProfileModal(true)} title="Helden-Profile & Vorlagen" aria-label="Meine Charaktere" className="text-xs sm:text-sm font-bold max-[429px]:w-11 max-[429px]:px-0">
+                  <Users size={17} aria-hidden />
                   <span className="hidden sm:inline">Meine Charaktere</span>
-                  <span className="inline sm:hidden">Helden</span>
+                  <span className="hidden min-[430px]:inline sm:hidden">Helden</span>
                 </Knopf>
 
                 <Knopf art="sekundaer" nurSymbol onClick={() => setShowThemeModal(true)} title="Menü & Einstellungen" aria-label="Menü & Einstellungen">
