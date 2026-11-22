@@ -72,24 +72,33 @@ const ArtWahl: React.FC<{ k: Katalog; art: BegleiterArt | null; vertrauter: bool
 };
 
 /** Schrittleiste: Nummer bzw. Häkchen und Titel; erreichbare Schritte anklickbar */
-const Schrittleiste: React.FC<{ titel: string[]; aktuell: number; erreichbar: number; gehe: (i: number) => void }> = ({ titel, aktuell, erreichbar, gehe }) => (
-  <ol className="flex flex-wrap gap-1.5 m-0 p-0 list-none" aria-label="Schritte">
+const Schrittleiste: React.FC<{ titel: string[]; aktuell: number; erreichbar: number; gehe: (i: number) => void }> = ({ titel, aktuell, erreichbar, gehe }) => {
+  // auf dem Handy eine Zeile, die sich seitlich schieben lässt; beim Schrittwechsel wird nur waagrecht zum aktuellen Schritt geschoben
+  const leiste = React.useRef<HTMLOListElement>(null);
+  React.useEffect(() => {
+    const ol = leiste.current; const li = ol?.children[aktuell] as HTMLElement | undefined;
+    if (ol && li && ol.scrollWidth > ol.clientWidth) ol.scrollLeft = Math.max(0, li.offsetLeft - ol.offsetLeft - 8);
+  }, [aktuell]);
+  return (
+  <ol ref={leiste} className="flex flex-nowrap sm:flex-wrap gap-1.5 m-0 p-0 pb-1 list-none overflow-x-auto" aria-label="Schritte">
     {titel.map((t, i) => {
       const fertig = i < aktuell;
       return (
-        <li key={i}>
+        <li key={i} className="shrink-0">
           <Wahlknopf gewaehlt={i === aktuell} mittig disabled={i > erreichbar} onClick={() => gehe(i)} aria-current={i === aktuell ? 'step' : undefined}
             className={`px-2.5 text-xs ${i === aktuell ? 'font-bold' : fertig ? '' : 'text-leise'}`}>
             <span className={`w-5 h-5 rounded-full border flex items-center justify-center text-[11px] shrink-0 ${i === aktuell || fertig ? 'border-gold text-gold' : 'border-rahmen'}`} aria-hidden>
               {fertig ? <Check size={12} /> : i + 1}
             </span>
-            {t}
+            {/* auf dem Handy nur der aktuelle Schritt mit Namen, die übrigen als Nummer */}
+            <span className={i === aktuell ? '' : 'sr-only sm:not-sr-only'}>{t}</span>
           </Wahlknopf>
         </li>
       );
     })}
   </ol>
-);
+  );
+};
 
 export const BegleiterAssistent: React.FC<{
   k: Katalog; besitzer: Besitzer;

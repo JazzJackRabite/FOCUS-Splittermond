@@ -4,7 +4,7 @@ import DiceIcon from '../ui/DiceIcon';
 import { useCharacter } from '../../context/CharacterContext';
 import { usePlaySession } from '../../context/PlaySessionContext';
 import { PlaySharedVitals } from './PlaySharedVitals';
-import { RestSection } from './RestSection';
+import { RastMitBegleitern } from '../begleiter/rast';
 import { WirkungenKarte } from './WirkungenKarte';
 import { SourceBadge } from '../ui/SourceBadge';
 
@@ -267,7 +267,7 @@ export const PlayTab: React.FC = () => {
         {/* ── Rechte Spalte: Regeneration & Pausen & Attribute ── */}
         <div className="lg:col-span-1 space-y-6">
           {/* ── Regeneration & Pausen ── */}
-          <RestSection
+          <RastMitBegleitern
             kon={currentAttributes.KON ?? 1}
             wil={currentAttributes.WIL ?? 1}
             strengthsList={strengthsList}

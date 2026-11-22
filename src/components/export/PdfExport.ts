@@ -9,6 +9,8 @@ import type {
   Spell,
 } from '../../types';
 import { grwAttribute, grwFertigkeitsKategorien, grwFertigkeitsattribute, grwRassen } from '../../regelwerk/grwListen';
+import { aktiverKatalog } from '../../regelwerk/bruecke';
+import { begleiterSeiten } from './begleiterPdf';
 
 interface GroupedItem<T> {
   skill: string;
@@ -413,6 +415,10 @@ export async function generatePDF(opts: GeneratePdfOptions): Promise<void> {
         2;
     });
   }
+
+  // Begleiter: je Begleiter ein Wertekasten mit Kästchen für LP und Fokus (braucht die geladenen Pakete)
+  const katalog = aktiverKatalog();
+  if (katalog) begleiterSeiten(doc, autoTable, katalog, state, calculateCharacter(state), { blau: colBlue, gold: colGold, text: colText, hell: colLight });
 
   doc.save(`${name}_charakter.pdf`);
 }

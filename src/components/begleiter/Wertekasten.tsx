@@ -69,13 +69,13 @@ export const Werte: React.FC<{ w: Wertekasten; aktionen?: Aktionen; zustaende?: 
     {(w.waffen ?? []).length > 0 && (
       <div className="overflow-x-auto">
         <table className="w-full text-left border-separate border-spacing-y-1">
-          <thead><tr className="text-xs text-leise"><th>Waffe</th><th>Wert</th><th>Schaden</th><th>WGS</th><th>INI</th><th>Merkmale</th></tr></thead>
+          <thead><tr className="text-xs text-leise">{['Waffe', 'Wert', 'Schaden', 'WGS', 'INI', 'Merkmale'].map(t => <th key={t} className="pr-2 font-bold whitespace-nowrap">{t}</th>)}</tr></thead>
           <tbody>{w.waffen!.map((x, i) => (
             <tr key={i}>
-              <td className="pr-2">{x.name}</td>
+              <td className="pr-2 whitespace-nowrap">{x.name}</td>
               <td className="pr-2">{aktionen ? <WuerfelKnopf symbol="schwert" onClick={() => aktionen.angriff(x)} label={`Angriff ${x.name} würfeln`}>{x.wert}</WuerfelKnopf> : x.wert}</td>
               <td className="pr-2">{aktionen ? <WuerfelKnopf onClick={() => aktionen.schaden(x)} label={`Schaden ${x.name} würfeln`}>{x.schaden}</WuerfelKnopf> : x.schaden}</td>
-              <td className="pr-2">{x.wgs}</td><td className="pr-2"><ZWert name="INI" text={x.ini} zw={zw} testid="zustand-wert-INI" /></td><td>{x.merkmale}</td>
+              <td className="pr-2">{x.wgs}</td><td className="pr-2 whitespace-nowrap"><ZWert name="INI" text={x.ini} zw={zw} testid="zustand-wert-INI" /></td><td>{x.merkmale}</td>
             </tr>
           ))}</tbody>
         </table>

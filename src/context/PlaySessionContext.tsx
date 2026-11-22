@@ -3,6 +3,7 @@ import { alleZustaende } from '../regelwerk/zustaende';
 import React, { createContext, useContext, useState, useMemo, ReactNode } from 'react';
 import { toast } from 'react-hot-toast';
 import type {
+  Begleiter,
   CharacterAction,
   PlayState,
   Spell,
@@ -67,7 +68,7 @@ export interface PlaySessionContextType {
   // Protocol & history
   protocolHistory: LogEntry[];
   setProtocolHistory: React.Dispatch<React.SetStateAction<LogEntry[]>>;
-  playHistory: { playState: PlayState; protocolHistory: LogEntry[] }[];
+  playHistory: { playState: PlayState; protocolHistory: LogEntry[]; begleiter?: Begleiter['zustand'][] }[];
   pushPlayHistory: (currentPlayState?: PlayState, currentProtocol?: LogEntry[]) => void;
   handleUndoPlay: () => void;
   dispatchWithHistory: (action: CharacterAction) => void;
@@ -164,7 +165,7 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
 
   // State
   const [protocolHistory, setProtocolHistory] = useState<LogEntry[]>([]);
-  const [playHistory, setPlayHistory] = useState<{ playState: PlayState; protocolHistory: LogEntry[] }[]>([]);
+  const [playHistory, setPlayHistory] = useState<{ playState: PlayState; protocolHistory: LogEntry[]; begleiter?: Begleiter['zustand'][] }[]>([]);
   const [rollConfig, setRollConfig] = useState<RollModalConfig | null>(null);
   const [castSpellTarget, setCastSpellTarget] = useState<Spell | null>(null);
   const [attackTarget, setAttackTarget] = useState<AttackTargetConfig | null>(null);
@@ -184,7 +185,9 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
   const [tempHPInput, setTempHPInput] = useState(1);
 
   const pushPlayHistory = (currentPlayState: PlayState = playState, currentProtocol: LogEntry[] = protocolHistory) => {
-    setPlayHistory((prev) => [{ playState: currentPlayState, protocolHistory: currentProtocol }, ...prev].slice(0, 50));
+    // Spielzustand der Begleiter mitsichern, damit Rückgängig auch Schaden, Heilung und Rast der Begleiter zurücknimmt
+    const begleiter = (state.begleiter ?? []).map((b) => b.zustand);
+    setPlayHistory((prev) => [{ playState: currentPlayState, protocolHistory: currentProtocol, begleiter }, ...prev].slice(0, 50));
   };
 
   const handleUndoPlay = () => {
@@ -192,6 +195,9 @@ export const PlaySessionProvider: React.FC<{ children: ReactNode }> = ({ childre
     const [lastSnapshot, ...remaining] = playHistory;
     setPlayHistory(remaining);
     dispatch({ type: 'PLAY_SET_STATE', payload: lastSnapshot.playState });
+    if (lastSnapshot.begleiter && lastSnapshot.begleiter.length === (state.begleiter ?? []).length) {
+      dispatch({ type: 'BEGLEITER_ZUSTAENDE_SETZEN', payload: lastSnapshot.begleiter.map((zustand, index) => ({ index, zustand })) });
+    }
     setProtocolHistory(lastSnapshot.protocolHistory);
     toast.success('Letztes Spiel-Ereignis rückgängig gemacht');
   };

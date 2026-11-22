@@ -27,10 +27,12 @@ export interface KnopfProps extends React.ButtonHTMLAttributes<HTMLButtonElement
   art?: KnopfArt;
   /** quadratischer Knopf nur mit Symbol – braucht aria-label */
   nurSymbol?: boolean;
+  /** schmaler Innenabstand, wenn mehrere Knöpfe auf dem Handy in eine Zeile passen sollen */
+  eng?: boolean;
 }
 
 /** Schaltfläche. Mindestens 44 px hoch, damit sie auch am Handy sicher zu treffen ist. */
-export const Knopf = React.forwardRef<HTMLButtonElement, KnopfProps>(({ art = 'neutral', nurSymbol, className, type = 'button', ...rest }, ref) => (
+export const Knopf = React.forwardRef<HTMLButtonElement, KnopfProps>(({ art = 'neutral', nurSymbol, eng, className, type = 'button', ...rest }, ref) => (
   <button
     ref={ref}
     type={type}
@@ -38,7 +40,7 @@ export const Knopf = React.forwardRef<HTMLButtonElement, KnopfProps>(({ art = 'n
       'inline-flex items-center justify-center gap-2 min-h-11 rounded-knopf border font-text text-[13px] cursor-pointer transition-colors',
       'disabled:cursor-not-allowed disabled:bg-flaeche disabled:border-rahmen disabled:text-leise disabled:font-normal',
       'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-hell',
-      nurSymbol ? 'w-11 px-0' : 'px-[18px]',
+      nurSymbol ? 'w-11 px-0' : eng ? 'px-2' : 'px-[18px]',
       KNOPF[art],
       className,
     )}

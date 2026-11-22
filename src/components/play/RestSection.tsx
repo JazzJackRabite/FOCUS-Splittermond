@@ -20,8 +20,10 @@ interface RestSectionProps {
   weaknessesList: ItemEntry[];
   masteries: Record<string, Mastery[]>;
   moonSign: string;
-  onVerschnaufpause: (options?: Partial<VerschnaufpauseOptions>) => void;
-  onRuhephase: (lpAmount: number, foAmount: number) => void;
+  onVerschnaufpause: (options?: Partial<VerschnaufpauseOptions>, mitBegleitern?: boolean) => void;
+  onRuhephase: (lpAmount: number, foAmount: number, mitBegleitern?: boolean) => void;
+  /** Anzahl der Begleiter; bei mehr als 0 erscheint „Begleiter rasten mit“ */
+  begleiterAnzahl?: number;
 }
 
 export const RestSection: React.FC<RestSectionProps> = ({
@@ -32,7 +34,10 @@ export const RestSection: React.FC<RestSectionProps> = ({
   moonSign,
   onVerschnaufpause,
   onRuhephase,
+  begleiterAnzahl = 0,
 }) => {
+  const [mitBegleitern, setMitBegleitern] = useState(true);
+  const mit = begleiterAnzahl > 0 && mitBegleitern;
   // Pausenregeln und Ruhewirkungen aus dem Paket (regelwerk/spielwirkungen.ts): keine Namen von Stärken oder Meisterschaften im Code
   const regeln = ruheregeln();
   const wirkungen = ruhewirkungen({ strengthsList, masteries });
@@ -117,14 +122,14 @@ export const RestSection: React.FC<RestSectionProps> = ({
       exhaustedFocusAmount: vpHealAllFocus ? undefined : vpFocusAmount,
       exhaustReduction: vpExhaustReduction,
       removeConditions: vpRemoveConditions,
-    });
+    }, mit);
     if (activeModal === 'verschnaufpause') {
       setActiveModal(null);
     }
   };
 
   const handleExecuteRuhephase = () => {
-    onRuhephase(customLP, customFO);
+    onRuhephase(customLP, customFO, mit);
     if (activeModal === 'ruhephase') {
       setActiveModal(null);
     }
@@ -144,6 +149,18 @@ export const RestSection: React.FC<RestSectionProps> = ({
           </h3>
         </div>
       </div>
+
+      {begleiterAnzahl > 0 && (
+        <label className="flex items-center gap-2 min-h-11 text-sm text-schrift cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={mitBegleitern}
+            onChange={(e) => setMitBegleitern(e.target.checked)}
+            className="w-4 h-4 rounded-knopf border-rahmen text-unverletzt focus:ring-unverletzt"
+          />
+          <span>Begleiter rasten mit ({begleiterAnzahl})</span>
+        </label>
+      )}
 
       {/* Two Action Cards (gestapelt für rechte Spalte) */}
       <div className="grid grid-cols-1 gap-3">

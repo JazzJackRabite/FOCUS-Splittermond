@@ -10,7 +10,7 @@ import { nekromantenMeisterschaften } from '../../regelwerk/untote';
 import { heldengrade } from '../../regelwerk/steigerungsregeln';
 import { gefolgeWerte } from '../../regelwerk/gefolge';
 import type { Katalog } from '../../regelwerk/katalog';
-import type { Begleiter } from '../../types';
+import type { Begleiter, CharacterState } from '../../types';
 
 export interface Besitzer {
   /** Tierführer: Bedingungs-Charakter für Voraussetzungen, Meisterschafts-IDs, Heldengrad */
@@ -27,7 +27,17 @@ export interface Besitzer {
 
 export function useBesitzer(k: Katalog): Besitzer {
   const { state, calc } = useCharacter();
-  return useMemo(() => {
+  return useMemo(() => besitzerBerechnen(k, state, calc),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [k, state.masteries, state.skillsBase, state.resourcesList, state.spellsList, state.strengthsList, state.race, calc]);
+}
+
+type BesitzerStand = Pick<CharacterState, 'masteries' | 'skillsBase' | 'resourcesList' | 'spellsList' | 'strengthsList' | 'race'>;
+type BesitzerRechnung = { getSkillValue?: (s: string) => number; heldengrad?: { nr?: number; maxSkill?: number } } | null | undefined;
+
+/** Angaben des Tierführers ohne React (z. B. für den PDF-Export) */
+export function besitzerBerechnen(k: Katalog, state: BesitzerStand, calc: BesitzerRechnung): Besitzer {
+  {
     const ms = Object.entries(state.masteries ?? {}).flatMap(([skill, l]) => l.map(m => ({ ...m, skill: m.skill || skill })));
     const fertigkeiten: Record<string, number> = {};
     for (const s of Object.keys(state.skillsBase ?? {})) fertigkeiten[s] = calc?.getSkillValue ? calc.getSkillValue(s) : (state.skillsBase[s] ?? 0);
@@ -52,7 +62,7 @@ export function useBesitzer(k: Katalog): Besitzer {
       golemPunkte: ressource('golem'),
       konstrukteur: msIds.some(i => i.endsWith(':konstrukteur')),
     };
-  }, [k, state.masteries, state.skillsBase, state.resourcesList, state.spellsList, state.strengthsList, state.race, calc]);
+  }
 }
 
 /** Passen die Kreatur-Punkte der Tiere zu den Ressourcen? (jede Ressource Kreatur trägt ein Tier) */

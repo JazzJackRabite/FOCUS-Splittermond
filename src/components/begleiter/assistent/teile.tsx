@@ -6,7 +6,7 @@ import { Werte, Hinweise } from '../Wertekasten';
 import { artInfo, begleiterAnsicht } from '../ansicht';
 import type { Schritt, SchrittProps } from './typen';
 
-export const Erklaerung: React.FC<{ children: React.ReactNode }> = ({ children }) => <p className="text-sm text-leise m-0">{children}</p>;
+export const Erklaerung: React.FC<{ children: React.ReactNode }> = ({ children }) => <p className="text-sm text-leise">{children}</p>;
 
 export const Titel3: React.FC<{ children: React.ReactNode }> = ({ children }) => <Abschnittstitel als="h3" className="text-[15px]">{children}</Abschnittstitel>;
 
@@ -14,12 +14,14 @@ export const Titel3: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 export const Wahlkarte: React.FC<{
   gewaehlt: boolean; onClick: () => void; titel: string; text?: React.ReactNode; symbol?: React.ReactNode; disabled?: boolean; hinweis?: string;
 }> = ({ gewaehlt, onClick, titel, text, symbol, disabled, hinweis }) => (
-  <Wahlknopf gewaehlt={gewaehlt} mittig onClick={onClick} disabled={disabled} className="w-full">
+  <Wahlknopf gewaehlt={gewaehlt} onClick={onClick} disabled={disabled} className="w-full">
+    <span className="flex items-start gap-3 w-full">
     {symbol && <span className="text-gold shrink-0 mt-0.5" aria-hidden>{symbol}</span>}
     <span className="min-w-0 flex-1 space-y-1">
       <span className="flex items-center gap-2 font-bold text-schrift text-[15px]">{titel}{gewaehlt && <Check size={16} className="text-gold" aria-hidden />}</span>
       {text && <span className="block text-sm text-leise">{text}</span>}
       {hinweis && <span className="block text-xs text-leise italic">{hinweis}</span>}
+    </span>
     </span>
   </Wahlknopf>
 );

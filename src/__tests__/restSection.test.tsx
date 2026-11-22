@@ -57,7 +57,7 @@ describe('RestSection Component (Streamlined Regeneration & Pausen)', () => {
       exhaustedFocusAmount: undefined,
       exhaustReduction: 1,
       removeConditions: true,
-    });
+    }, false);
   });
 
   it('triggers onRuhephase directly with calculated defaults on button click', () => {
@@ -69,7 +69,7 @@ describe('RestSection Component (Streamlined Regeneration & Pausen)', () => {
     fireEvent.click(ruheBtn);
 
     expect(onRuhephase).toHaveBeenCalledTimes(1);
-    expect(onRuhephase).toHaveBeenCalledWith(6, 4);
+    expect(onRuhephase).toHaveBeenCalledWith(6, 4, false); // ohne Begleiter kein „Begleiter rasten mit“
   });
 
   it('opens options modal when "Optionen anpassen" is clicked and allows custom adjustment', () => {

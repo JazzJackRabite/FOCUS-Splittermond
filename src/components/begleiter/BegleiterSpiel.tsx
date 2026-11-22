@@ -7,7 +7,10 @@ import { fokusDurchZustaende, zustandsErklaerung, zustandswerte } from '../../re
 import { alleZustaende, zustandHatStufe, zustandQuelle } from '../../regelwerk/zustaende';
 import React, { useContext, useMemo, useState } from 'react';
 import { toast } from 'react-hot-toast';
-import { Heart, Sparkles, RotateCcw, Coffee, HeartCrack, HeartPulse, Plus } from 'lucide-react';
+import { Heart, Sparkles, RotateCcw, Coffee, HeartCrack, HeartPulse, Plus, Moon } from 'lucide-react';
+import { ruheAusnahme, ruhephaseBegleiter, verschnaufpauseBegleiter } from '../../regelwerk/begleiterRast';
+import { ruheregeln } from '../../regelwerk/spielwirkungen';
+import { verschnaufpause } from '../../regelwerk/schadenUndHeilung';
 import { MarkeMitEntfernen } from './Wertekasten';
 import { CharacterContext, useCharacter } from '../../context/CharacterContext';
 import { usePlaySessionOptional } from '../../context/PlaySessionContext';
@@ -59,6 +62,8 @@ export function wirfFormel(formel: string): { wuerfel: number[]; mod: number; su
 
 export interface BegleiterSpielDaten {
   name: string; lp: number; fo: number; merkmale: string[]; sr?: string | number;
+  /** Art und Attribute für die Rast (Konstitution, Willenskraft) */
+  art?: Begleiter['art']; attribute?: Record<string, string>;
 }
 
 /** Würfeln und Vitalwerte eines Begleiters. Liefert die Aktionen und die Modale (im Eintrag rendern). */
@@ -225,6 +230,9 @@ export const BegleiterVitals: React.FC<{ spiel: ReturnType<typeof useBegleiterSp
   const immun = betaeubungsimmun(k, angaben.merkmale);
   const f = z.fokus ?? {};
   const frei = Math.max(0, fokusFrei(angaben.fo, z) - fokusDurchZustaende(angaben.fo, zustandswerte(z.zustaende ?? [])));
+  const regeln = ruheregeln(k);
+  const pause = verschnaufpause(k);
+  const ausnahme = ruheAusnahme(k, angaben.art ?? 'tier');
   const aendern = (neu: BegleiterZustand, titel: string, art: 'damage' | 'heal' | 'focus', badge: string) => {
     setze(neu); log(art, titel, undefined, { text: badge, variant: art === 'damage' ? 'danger' : art === 'heal' ? 'success' : 'info' });
   };
@@ -274,16 +282,17 @@ export const BegleiterVitals: React.FC<{ spiel: ReturnType<typeof useBegleiterSp
             {(f.kanalisiert ?? 0) > 0 && <Marke ton="kanalisiert" klein>kanalisiert {f.kanalisiert}</Marke>}
             {(f.verzehrt ?? 0) > 0 && <Marke ton="schaden" klein>verzehrt {f.verzehrt}</Marke>}
           </div>
-          <div className="flex flex-wrap gap-2 items-end">
-            <Eingabe beschriftung="Menge Fokus" beschriftungVerborgen type="number" min={1} className="w-20" value={foMenge} onChange={e => setFoMenge(Number(e.target.value) || 1)} />
+          {/* Menge und die drei Arten in einer Zeile, auch auf dem Handy */}
+          <div className="grid grid-cols-[4.5rem_repeat(3,minmax(0,1fr))] gap-2 items-end">
+            <div className="min-w-0"><Eingabe beschriftung="Menge Fokus" beschriftungVerborgen type="number" min={1} value={foMenge} onChange={e => setFoMenge(Number(e.target.value) || 1)} /></div>
             {([['erschoepft', 'erschöpfen', 'erschöpft'], ['kanalisiert', 'kanalisieren', 'kanalisiert'], ['verzehrt', 'verzehren', 'verzehrt']] as const).map(([feld, text, partizip]) => (
-              <Knopf key={feld} disabled={frei <= 0}
+              <Knopf key={feld} eng disabled={frei <= 0} className="min-w-0"
                 onClick={() => { const m = Math.min(frei, Math.max(1, foMenge)); aendern({ ...z, fokus: { ...f, [feld]: (f[feld] ?? 0) + m } }, `${m} Fokus ${partizip}`, 'focus', `−${m} FO`); }}>
                 {text}
               </Knopf>
             ))}
             {(f.kanalisiert ?? 0) > 0 && (
-              <Knopf onClick={() => aendern({ ...z, fokus: { ...f, kanalisiert: 0, erschoepft: (f.erschoepft ?? 0) + (f.kanalisiert ?? 0) } }, 'Kanalisierung beendet', 'focus', 'K → erschöpft')}>
+              <Knopf className="col-span-4" onClick={() => aendern({ ...z, fokus: { ...f, kanalisiert: 0, erschoepft: (f.erschoepft ?? 0) + (f.kanalisiert ?? 0) } }, 'Kanalisierung beendet', 'focus', 'K → erschöpft')}>
                 Kanalisierung beenden
               </Knopf>
             )}
@@ -292,8 +301,10 @@ export const BegleiterVitals: React.FC<{ spiel: ReturnType<typeof useBegleiterSp
       )}
       <BegleiterZustaende spiel={spiel} />
       <div className="flex flex-wrap gap-2">
-        <Knopf art="erholung" title="Betäubungsschaden und erschöpfter Fokus erholen sich"
-          onClick={() => aendern({ ...z, betaeubung: 0, fokus: { ...f, erschoepft: 0 } }, 'Verschnaufpause', 'heal', 'Pause')}><Coffee size={14} aria-hidden />Verschnaufpause</Knopf>
+        <Knopf art="erholung" title={`${pause.minuten} Minuten: Betäubungsschaden und erschöpfter Fokus erholen sich`}
+          onClick={() => { const e = verschnaufpauseBegleiter(z); aendern(e.zustand, `Verschnaufpause${e.teile.length ? `: ${e.teile.join(', ')}` : ''}`, 'heal', 'Pause'); }}><Coffee size={14} aria-hidden />Verschnaufpause</Knopf>
+        <Knopf art="erholung" title={`${regeln.ruheStunden} Stunden: Lebenspunkte aus der doppelten Konstitution, verzehrter Fokus aus der doppelten Willenskraft${ausnahme && !ausnahme.lp ? ` (keine Lebenspunkte: ${ausnahme.quelle})` : ''}`}
+          onClick={() => { const e = ruhephaseBegleiter(k, angaben.art ?? 'tier', z, angaben.attribute); aendern(e.zustand, `Ruhephase${e.teile.length ? `: ${e.teile.join(', ')}` : ''}${e.hinweis ? ` – ${e.hinweis}` : ''}`, 'heal', 'Ruhe'); }}><Moon size={14} aria-hidden />Ruhephase</Knopf>
         <Knopf onClick={() => aendern({}, 'Werte zurückgesetzt (voll)', 'heal', 'voll')}><RotateCcw size={14} aria-hidden />Alles zurücksetzen</Knopf>
       </div>
     </div>
@@ -303,7 +314,7 @@ export const BegleiterVitals: React.FC<{ spiel: ReturnType<typeof useBegleiterSp
 /** Spieldaten aus einem Wertekasten (LP und FO je Stufe, Merkmale) */
 export function spielDaten(b: Begleiter, w: Wertekasten | null | undefined): BegleiterSpielDaten {
   const merkmale = String(w?.felder?.merkmale ?? '').split(/,(?![^(]*\))/).map(x => x.trim()).filter(Boolean);
-  return { name: b.rufname || b.name, lp: zahl(w?.abgeleitete_werte?.LP), fo: zahl(w?.abgeleitete_werte?.FO), sr: w?.abgeleitete_werte?.SR, merkmale };
+  return { name: b.rufname || b.name, lp: zahl(w?.abgeleitete_werte?.LP), fo: zahl(w?.abgeleitete_werte?.FO), sr: w?.abgeleitete_werte?.SR, merkmale, art: b.art, attribute: w?.attribute };
 }
 
 /** Kurzanzeige im Kopf eines Begleiters: LP und Fokus */

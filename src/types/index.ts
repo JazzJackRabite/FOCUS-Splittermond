@@ -417,6 +417,8 @@ export type CharacterAction =
   | { type: 'BEGLEITER_HINZU'; payload: Begleiter }
   | { type: 'BEGLEITER_ENTFERNEN'; payload: { index: number } }
   | { type: 'BEGLEITER_AENDERN'; payload: { index: number; aenderung: Partial<Omit<Begleiter, 'id' | 'art'>> } }
+  /** Spielzustand mehrerer Begleiter auf einmal (Rast mit dem Abenteurer, Rückgängig im Spiel), je Stelle in der Liste */
+  | { type: 'BEGLEITER_ZUSTAENDE_SETZEN'; payload: { index: number; zustand: Begleiter['zustand'] }[] }
   | { type: 'RELIKT_SPEICHERN'; payload: { relikt: Relikt; inventar: InventoryItem } }
   | { type: 'RELIKT_LOESCHEN'; payload: { id: string } }
   | { type: 'REGEL_NAMEN_ABGLEICHEN'; payload: Partial<Pick<CharacterState, 'strengthsList' | 'weaknessesList' | 'resourcesList' | 'masteries' | 'spellsList'>> };

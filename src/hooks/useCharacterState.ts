@@ -1265,6 +1265,9 @@ export function baseCharacterReducer(
     case 'BEGLEITER_AENDERN':
       return { ...state, begleiter: (state.begleiter ?? []).map((b, i) => (i === action.payload.index ? { ...b, ...action.payload.aenderung } : b)) };
 
+    case 'BEGLEITER_ZUSTAENDE_SETZEN':
+      return { ...state, begleiter: (state.begleiter ?? []).map((b, i) => { const n = action.payload.find((x) => x.index === i); return n ? { ...b, zustand: n.zustand } : b; }) };
+
     // ---- Relikte: Relikt speichern und Inventareintrag anlegen bzw. aktualisieren ----
     case 'RELIKT_SPEICHERN': {
       const { relikt, inventar } = action.payload;
