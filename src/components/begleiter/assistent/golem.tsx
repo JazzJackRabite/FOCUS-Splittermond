@@ -78,8 +78,7 @@ const Korpus: React.FC<SchrittProps> = ({ k, b, aendern, besitzer }) => {
   return (
     <div className="space-y-4">
       <Erklaerung>
-        Baukasten nach Die Magie S. 205–207: Korpus, Material, Zusätzliche Fähigkeiten, Rollen, Feinschliff. Gekauft oder selbst gebaut
-        (Kleiner Ritus mit Animierungszauber) oder dauerhaft über die Ressource Golem.
+        Baukasten aus dem Grimoire „Die Magie“ (S. 205–207): Korpus, Material, Zusätzliche Fähigkeiten, Rollen, Feinschliff.
         {besitzer.golemPunkte.length > 0 && <> Ressource Golem: {besitzer.golemPunkte.join(', ')}.</>}
       </Erklaerung>
       <Auswahl beschriftung="Korpus (Schritt 1)" value={b.id} onChange={e => { const x = k.get(e.target.value); aendern({ id: x?.id ?? '', name: x?.name ?? '', bausteine: undefined, sonderausstattung: undefined, feinschliff: undefined }); }}>
@@ -104,14 +103,14 @@ const Grundangaben: React.FC<SchrittProps> = (p) => {
           {materialien(k).map(m => <option key={m.id} value={m.id}>{m.name} ({materialInfo(m)})</option>)}
         </Auswahl>
       </div>
-      <label className="flex items-center gap-2 min-h-11" title="Ressource Golem: dauerhaft animiert">
+      <label className="flex items-center gap-2 min-h-11" title="Ressource Golem">
         <input type="checkbox" className="w-5 h-5 accent-gold" checked={!!b.golemRessource} onChange={ev => aendern({ golemRessource: ev.target.checked || undefined })} />
-        über Ressource Golem (Großer Ritus)
+        über Ressource Golem
       </label>
       <Erklaerung>
-        {g.animierung ? <>Kleiner Ritus: <strong className="text-schrift">{g.animierung.name}</strong>{kennt ? ' (bekannt)' : ''}. </> : 'Kein Animierungszauber für diese Stufe. '}
-        Konstruktion: Handwerk/Edelhandwerk gegen {g.konstruktion.schwierigkeit}, {g.konstruktion.fortschritt} Fortschrittspunkte
-        {besitzer.konstrukteur ? '' : ' (Meisterschaft Konstrukteur nötig)'}; Unterweisung (Arkane Kunde) ebenso.
+        {g.animierung ? <>Animierungszauber: <strong className="text-schrift">{g.animierung.name}</strong>{kennt ? ' (bekannt)' : ''}. </> : 'Kein Animierungszauber für diese Stufe. '}
+        Konstruktion: Schwierigkeit {g.konstruktion.schwierigkeit}, {g.konstruktion.fortschritt} Fortschrittspunkte
+        {besitzer.konstrukteur ? '' : ' (die nötige Meisterschaft fehlt)'}.
         {g.materialSchwachpunkt && <> Schwachpunkt des Materials: {g.materialSchwachpunkt}.</>}
       </Erklaerung>
     </div>
@@ -122,7 +121,7 @@ const FaehigkeitenRollen: React.FC<SchrittProps> = (p) => (
   <div className="space-y-5">
     <Stand {...p} />
     <BausteinGruppe k={p.k} art="Zusätzliche Fähigkeit" b={p.b} aendern={p.aendern} info="Schritt 3: Jede Fähigkeit erhöht die Stufe des Golems." />
-    <BausteinGruppe k={p.k} art="Rolle" b={p.b} aendern={p.aendern} info="Schritt 4: Mehrfach wählbar und kombinierbar; Kämpfer setzt Aggressiv voraus." />
+    <BausteinGruppe k={p.k} art="Rolle" b={p.b} aendern={p.aendern} info="Schritt 4: Voraussetzungen der Rollen prüft der Editor." />
   </div>
 );
 
@@ -142,9 +141,9 @@ const Unterweisung: React.FC<SchrittProps> = (p) => {
   const g = golemWerte(p.k, p.b);
   return (
     <div className="space-y-5">
-      <BausteinGruppe k={p.k} art="Instruktion" b={p.b} aendern={p.aendern} info={<>Implementierbar: {g.instruktionenErlaubt} (eine, weitere über „Zusätzliche Instruktion“).</>} />
+      <BausteinGruppe k={p.k} art="Instruktion" b={p.b} aendern={p.aendern} info={<>Implementierbar: {g.instruktionenErlaubt}.</>} />
       <BausteinGruppe k={p.k} art="Verfügung" b={p.b} aendern={p.aendern}
-        info={g.verfuegungenAktiv !== null ? <>Aktiv höchstens {g.verfuegungenAktiv} (Stufe des Merkmals Golem, mind. 1).</> : 'Beim Kleinen Ritus über die Verstärkung des Animierungszaubers.'} />
+        info={g.verfuegungenAktiv !== null ? <>Aktiv höchstens {g.verfuegungenAktiv}.</> : 'Ohne Ressource Golem: Regel im Grimoire.'} />
     </div>
   );
 };

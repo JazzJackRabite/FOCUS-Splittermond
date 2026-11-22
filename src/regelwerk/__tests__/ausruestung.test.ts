@@ -9,6 +9,7 @@ import { Katalog } from '../katalog';
 import { grimoireLesen, erstelleKatalog } from '../laden';
 import { AUSRUESTUNGS_TYPEN, alleAusruestung, findeAusruestung, grwAusruestung, grimoireAusruestung } from '../ausruestung';
 import { basisAusDateien, GRIMOIRE_ORDNER, istGrimoireDatei } from './hilfen';
+import { buchfaelle } from './hilfen';
 import type { LadePaket, RegelPaket } from '../typen';
 
 const basis = basisAusDateien();
@@ -34,7 +35,7 @@ function testbuch(): LadePaket {
       { id: 'testbuch:kraut:testkraut', typ: 'kraut', aktion: 'neu', name: 'Testkraut', quelle: q(13),
         daten: { preis: { text: '1 L' }, besonderheiten: 'Duftet nach Test.' } },
       { id: 'testbuch:waffe:waffenlos:nahkampf', typ: 'waffe', aktion: 'ersetzt', name: 'Waffenlos', ziel: waffenlos.id, quelle: q(20),
-        aenderungen: { merkmale_text: { alt: waffenlos.daten.merkmale_text, neu: 'Entwaffnend (1), Freihändig, Stumpf, Umklammern' } }, daten: {} },
+        aenderungen: { merkmale_text: { alt: waffenlos.daten.merkmale_text, neu: 'Stumpf, Testmerkmal' } }, daten: {} },
       { id: 'testbuch:waffe:dolch:nahkampf', typ: 'waffe', aktion: 'ergaenzt', name: 'Dolch', ziel: 'grw:waffe:dolch:nahkampf', quelle: q(21),
         daten: { beschreibung: 'Der Dolch ist die häufigste Waffe.' } },
     ],
@@ -73,9 +74,9 @@ describe('Ausrüstung aus Grimoires', () => {
   it('Ersetzung ändert den GRW-Eintrag, Ergänzung hängt die Beschreibung an', () => {
     const w = finde('Waffenlos');
     expect(w.length).toBe(1);
-    expect(w[0]).toEqual(expect.objectContaining({ source: 'GRW', attributes: 'Entwaffnend (1), Freihändig, Stumpf, Umklammern' }));
-    expect(w[0].desc).toContain('Geändert durch TB S. 20: Merkmale Entwaffnend (1), Freihändig, Stumpf, Umklammern.');
-    expect(w[0].desc).toContain('| Merkmale: Entwaffnend (1), Freihändig');
+    expect(w[0]).toEqual(expect.objectContaining({ source: 'GRW', attributes: 'Stumpf, Testmerkmal' }));
+    expect(w[0].desc).toContain('Geändert durch TB S. 20: Merkmale Stumpf, Testmerkmal.');
+    expect(w[0].desc).toContain('| Merkmale: Stumpf, Testmerkmal');
     const dolch = finde('Dolch').find(i => i.type === 'weapon')!;
     expect(dolch.desc).toContain('TB S. 21: Der Dolch ist die häufigste Waffe.');
   });
@@ -94,12 +95,14 @@ describe.skipIf(!ORDNER || !fs.existsSync(ORDNER))('Ausrüstung aller Bücher (l
     const liste = alleAusruestung(K);
     const ids = liste.map(i => i.id).filter((i): i is string => !!i && !i.startsWith('grw:')).sort();
     expect(ids).toEqual(soll);
-    expect(soll.length).toBeGreaterThan(700);
     for (const i of liste) { expect(i.name).toBeTruthy(); expect(typeof i.desc).toBe('string'); }
-    // Mondstahlklingen: Waffenlos mit Freihändig, Liandia geändert
-    expect((liste.find(i => i.name === 'Waffenlos') as { attributes: string }).attributes).toContain('Freihändig');
-    expect(liste.find(i => i.name === 'Waffenlos')!.desc).toMatch(/Geändert durch Mondstahlklingen/);
-    // Beschreibungen aus Mondstahlklingen zu GRW-Ausrüstung
-    expect(liste.filter(i => i.source === 'GRW' && /Mondstahlklingen S\. \d+: /.test(i.desc ?? '')).length).toBeGreaterThan(30);
+    // Sollwerte zu einzelnen Büchern: lokale Falldatei (hilfen.ts: buchfaelle)
+    const F = buchfaelle<{ mindestEintraege: number; geaendert: { gegenstand: string; merkmal: string; text: string }; beschreibungen: { muster: string; mindestens: number } }>('ausruestung');
+    if (!F) return;
+    expect(soll.length).toBeGreaterThan(F.mindestEintraege);
+    const g = liste.find(i => i.name === F.geaendert.gegenstand) as { attributes: string; desc?: string };
+    expect(g.attributes).toContain(F.geaendert.merkmal);
+    expect(g.desc).toContain(F.geaendert.text);
+    expect(liste.filter(i => i.source === 'GRW' && new RegExp(F.beschreibungen.muster).test(i.desc ?? '')).length).toBeGreaterThan(F.beschreibungen.mindestens);
   });
 });

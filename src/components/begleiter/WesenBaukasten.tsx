@@ -12,7 +12,7 @@ import { Hinweise, MarkeMitEntfernen } from './Wertekasten';
 
 const Titel3: React.FC<{ children: React.ReactNode }> = ({ children }) => <Abschnittstitel als="h3" className="text-[15px]">{children}</Abschnittstitel>;
 
-/** Verbesserte Angriffe (Die Magie S. 196–197): Punkte der Rolle Kämpfer für Wertesets, „Stumpf entfällt“ oder eine Waffe */
+/** Verbesserte Angriffe (Die Magie S. 196–197): Punkte und Angebote aus `strukturiert.verbesserte_angriffe` */
 const VerbesserteAngriffe: React.FC<{ k: Katalog; b: Begleiter; va: NonNullable<WesenBaukastenWerte['verbesserteAngriffe']>; aendern: (a: Partial<Begleiter>) => void }> = ({ k, b, va, aendern }) => {
   const [wahl, setWahl] = useState('');
   const R = vaRegel(k);
@@ -30,7 +30,7 @@ const VerbesserteAngriffe: React.FC<{ k: Katalog; b: Begleiter; va: NonNullable<
       <Titel3>Verbesserte Angriffe</Titel3>
       <div className="flex items-center gap-2 flex-wrap">
         <Marke ton={frei < 0 ? 'schaden' : 'neutral'}>Punkte {va.verbraucht}/{va.punkte}</Marke>
-        <span className="text-sm text-leise">aus der Rolle Kämpfer, bei Korpus Mittel oder Groß mehr; neue Angriffe zählen zusätzlich, Änderungen der Module gelten für alle.</span>
+        <span className="text-sm text-leise">aus Rolle und Korpus; neue Angriffe zählen zusätzlich, Änderungen der Module gelten für alle.</span>
       </div>
       {va.kaeufe.length > 0 && (
         <div className="flex flex-wrap gap-2">

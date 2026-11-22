@@ -266,7 +266,7 @@ export interface Begleiter {
   bausteine?: string[];
   /** gewählte Sonderausstattung je Platz (Text der Möglichkeit, z. B. „SR +2“) */
   sonderausstattung?: string[];
-  /** über die Ressource Golem dauerhaft animiert (Großer Ritus) */
+  /** über die Ressource Golem animiert */
   golemRessource?: boolean;
   /** Wahlen beim Feinschliff je Wahl-Schlüssel: Attribut, Meisterschaft, Fertigkeit oder verteilte Punkte */
   feinschliff?: Record<string, string | Record<string, number>>;

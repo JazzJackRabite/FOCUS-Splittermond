@@ -11,7 +11,7 @@ import { baseCharacterReducer, DEFAULT_STATE } from '../../hooks/useCharacterSta
 import { CharacterContext } from '../../context/CharacterContext';
 import { ReliktKarte } from '../../components/relikte/ReliktKarte';
 import { Katalog } from '../katalog';
-import { basisAusDateien, GRIMOIRE_ORDNER, grimoireDatei } from './hilfen';
+import { basisAusDateien, buchfaelle, grimoireDatei } from './hilfen';
 import { grimoireLesen, erstelleKatalog } from '../laden';
 import { alleAusruestung } from '../ausruestung';
 import { artVon, kostenVon, passtZu, pruefeRelikt, reliktAlsInventar, reliktBaukasten, reliktBausteine, ressourcePunkte } from '../relikte';
@@ -140,24 +140,23 @@ describe('Relikte im Zustand und in der Werkstatt', () => {
   });
 });
 
-const ORDNER = GRIMOIRE_ORDNER || undefined;
-describe.skipIf(!ORDNER || !fs.existsSync(ORDNER))('Relikt-Bausteine der Erweiterungen (lokal)', () => {
-  it('Mondstahlklingen und Götter erweitern den Baukasten', () => {
-    const lade = (n: string) => grimoireLesen(fs.readFileSync(grimoireDatei(n), 'utf-8'), b.manifest);
-    const { katalog: KB } = erstelleKatalog(b, [lade('mondstahl'), lade('goetter')]);
+// Zahlen und IDs zu den Erweiterungen: lokale Falldatei (hilfen.ts: buchfaelle)
+interface ReliktFaelle { grimoires: string[]; typen: string[]; anzahl: Record<string, number>; materialMindestens: number; grwMaterial: { id: string; kosten: number; mindestPunkte: number }; ergaenzt: { id: string; muster: string } }
+const F = buchfaelle<ReliktFaelle>('relikte', ['mondstahl', 'goetter']);
+describe.skipIf(!F)('Relikt-Bausteine der Erweiterungen (lokal)', () => {
+  it('Grimoires erweitern den Baukasten', () => {
+    const { katalog: KB } = erstelleKatalog(b, F!.grimoires.map(n => grimoireLesen(fs.readFileSync(grimoireDatei(n), 'utf-8'), b.manifest)));
     const bk = reliktBaukasten(KB)!;
-    expect(bk.typen).toEqual(['verbesserung', 'artefaktwirkung', 'legendaere_kraft', 'goettliche_kraft', 'material']);
+    expect(bk.typen).toEqual(F!.typen);
     expect(bk.material).toEqual({ kosten: 1, mindestAus: 'qualitaet' });
     const bs = reliktBausteine(KB, bk);
     const zahl = (t: string) => bs.filter(x => x.typ === t).length;
-    // GRW 8 + Mondstahlklingen 29 eigene (10 wiederholen GRW-Verbesserungen), 17 legendäre, 6 göttliche Kräfte, Materialien mit Qualität
-    expect(zahl('verbesserung')).toBe(8 + 29);
-    expect(zahl('legendaere_kraft')).toBe(17);
-    expect(zahl('goettliche_kraft')).toBe(6);
-    expect(zahl('material')).toBeGreaterThan(25);
+    for (const [t, n] of Object.entries(F!.anzahl)) expect(zahl(t), t).toBe(n);
+    expect(zahl('material')).toBeGreaterThan(F!.materialMindestens);
     // GRW-Material, dessen Materialqualität erst eine Ergänzung nennt
-    expect(bs.find(x => x.id === 'grw:material:mondstahl')).toEqual(expect.objectContaining({ typ: 'material', kosten: 1, mindestPunkte: 6 }));
-    expect(bs.find(x => x.id === 'grw:verbesserung:waffenschaden-1')!.beschreibung).toMatch(/Mondstahlklingen S\. \d+:/);
+    const { id, ...rest } = F!.grwMaterial;
+    expect(bs.find(x => x.id === id)).toEqual(expect.objectContaining({ typ: 'material', ...rest }));
+    expect(bs.find(x => x.id === F!.ergaenzt.id)!.beschreibung).toMatch(new RegExp(F!.ergaenzt.muster));
     expect(bs.every(x => x.kosten !== null || x.kostenNachGrad)).toBe(true);
     // Material: Kosten 1, Mindestpunkte = Materialqualität; nur ein Material je Relikt
     const mat = bs.filter(x => x.typ === 'material').sort((a, c) => (c.mindestPunkte ?? 0) - (a.mindestPunkte ?? 0));

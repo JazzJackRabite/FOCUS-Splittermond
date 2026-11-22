@@ -238,3 +238,28 @@ export function kontrastBefunde(mindest: number): string[] {
   }
   return [...new Set(befunde)].sort();
 }
+
+/**
+ * Eintragsnamen aus den Grimoires im Quelltext (alle Dateien unter src, auch Tests), die nicht auch im GRW-Paket stehen
+ * („Datei: name“, klein geschrieben). Nur lokal sinnvoll, weil die Grimoires nicht im Repository liegen (Grundsatz 3).
+ * `erlaubt`: allgemeine Begriffe, die zufällig auch Eintragsnamen sind (aus der lokalen Falldatei).
+ */
+export function buchnamenImCode(grimoireNamen: string[], erlaubt: string[]): string[] {
+  const paket = JSON.parse(fs.readFileSync(path.join(WURZEL, 'public/regelpakete/grw.srp.json'), 'utf8'));
+  const grw = new Set<string>(paket.eintraege.map((e: { name: string }) => e.name.toLowerCase()));
+  const frei = new Set(erlaubt.map(x => x.toLowerCase()));
+  const namen = [...new Set(grimoireNamen.map(n => n.toLowerCase()))].filter(n => n.length >= 6 && !grw.has(n) && !frei.has(n)).sort((a, b) => b.length - a.length);
+  if (!namen.length) return [];
+  const flucht = (x: string) => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const rx = new RegExp(`(?<![a-zäöüß])(${namen.map(flucht).join('|')})(?![a-zäöüß])`, 'g');
+  const alle = (ordner: string, out: string[] = []): string[] => {
+    for (const e of fs.readdirSync(ordner, { withFileTypes: true })) {
+      const p = path.join(ordner, e.name);
+      if (e.isDirectory()) alle(p, out); else if (/\.tsx?$/.test(e.name)) out.push(p);
+    }
+    return out;
+  };
+  const out = new Set<string>();
+  for (const p of alle(SRC)) for (const m of fs.readFileSync(p, 'utf8').toLowerCase().matchAll(rx)) out.add(`${rel(p)}: ${m[1]}`);
+  return [...out].sort();
+}

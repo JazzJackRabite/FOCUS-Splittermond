@@ -28,6 +28,21 @@ export function charAusJson(c: any): BedingungsCharakter {
  */
 export const GRIMOIRE_ORDNER = process.env.FOKUS_GRIMOIRES ?? '';
 
+/**
+ * Buchspezifische Testfälle (IDs, Namen und Sollwerte aus den Grimoires) aus der lokalen Datei FOKUS_BUCHFAELLE.
+ * Sie liegt neben der Volltest-Referenz auf dem Rechner des Projektinhabers und kommt nie ins Repository
+ * (FUNDAMENT, Grundsatz 3). Ohne Datei oder ohne die genannten Grimoires: null, die Tests werden übersprungen.
+ */
+export const BUCHFAELLE = process.env.FOKUS_BUCHFAELLE ?? '';
+let buchfaelleCache: Record<string, unknown> | null | undefined;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function buchfaelle<T = any>(teil: string, grimoires: string[] = []): T | null {
+  if (buchfaelleCache === undefined) buchfaelleCache = BUCHFAELLE && fs.existsSync(BUCHFAELLE) ? JSON.parse(fs.readFileSync(BUCHFAELLE, 'utf-8')) : null;
+  const f = buchfaelleCache?.[teil];
+  if (!f || grimoires.some(g => !fs.existsSync(grimoireDatei(g) || '/nicht-vorhanden'))) return null;
+  return f as T;
+}
+
 /** Ist das eine Grimoire-Datei (`.grim`)? */
 export const istGrimoireDatei = (f: string) => f.endsWith('.grim');
 

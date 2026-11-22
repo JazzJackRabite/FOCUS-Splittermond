@@ -1,6 +1,6 @@
 /**
  * Zustände aus den Regelpaketen (FUNDAMENT.md, Regelquellen): Die Zustände des Grundregelwerks kommen aus dem
- * Grundregelwerk-Paket, alle anderen (z. B. Schwermut, Verstoßen, Erschaudert) aus den hochgeladenen Grimoires.
+ * Grundregelwerk-Paket, alle anderen aus den hochgeladenen Grimoires.
  * Stufe, Abzüge und Quelle stehen im Eintrag vom Typ `zustand` (`hat_stufe`/`parameter`, `zustandswirkung`, `quelle`).
  * „Liegend“ ist kein Zustand, sondern eine Kampfposition (GRW S. 170); der Editor führt sie in derselben Auswahl,
  * weil sie am Spieltisch genauso an- und abgelegt wird.

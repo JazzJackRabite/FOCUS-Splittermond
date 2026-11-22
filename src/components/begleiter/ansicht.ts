@@ -177,7 +177,7 @@ export function begleiterAnsicht(k: Katalog, b: Begleiter, besitzer: Besitzer): 
       ...((b.sonderausstattung ?? []).filter(Boolean).length ? [{ titel: 'Sonderausstattung', eintraege: (b.sonderausstattung ?? []).filter(Boolean).map(s => ({ name: s })) }] : []),
     ],
     text: [
-      g.animierung ? `Kleiner Ritus: ${g.animierung.name}${besitzer.zauber.includes(g.animierung.name) ? ' (bekannt)' : ''}.` : 'Kein Animierungszauber für diese Stufe.',
+      g.animierung ? `Animierungszauber: ${g.animierung.name}${besitzer.zauber.includes(g.animierung.name) ? ' (bekannt)' : ''}.` : 'Kein Animierungszauber für diese Stufe.',
       ...(g.materialSchwachpunkt ? [`Schwachpunkt des Materials: ${g.materialSchwachpunkt}.`] : []),
       ...g.feinschliff.map(t => `Für die Spielleitung: ${t}`),
     ],
